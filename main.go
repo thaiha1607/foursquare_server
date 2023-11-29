@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo-contrib/pprof"
 	"github.com/labstack/echo/v4"
-	"github.com/thaiha1607/foursquare_server/env"
+	"github.com/thaiha1607/foursquare_server/common/env"
 )
 
 func main() {
