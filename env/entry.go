@@ -9,6 +9,6 @@ import (
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error("Error loading .env file")
+		slog.Warn("Could not load .env file")
 	}
 }
