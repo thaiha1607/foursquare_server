@@ -3,14 +3,18 @@ module github.com/thaiha1607/foursquare_server
 go 1.21
 
 require (
+	entgo.io/ent v0.12.5
+	github.com/google/uuid v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.3
+	github.com/shopspring/decimal v1.3.1
 )
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/prometheus/client_golang v1.17.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
