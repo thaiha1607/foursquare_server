@@ -18,6 +18,6 @@ jobs:
       - name: Fetch dependencies
         run: go mod download && go mod verify
       - name: Run go fmt
-        run: go fmt -l .
+        run: gofmt -l .
       - name: Run go vet
         run: go vet
