@@ -19,7 +19,7 @@ type FinancialTransaction struct {
 // Annotations of the FinancialTransaction.
 func (FinancialTransaction) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "financial_transaction"},
+		entsql.Annotation{Table: "financial_transactions"},
 	}
 }
 
@@ -30,14 +30,16 @@ func (FinancialTransaction) Fields() []ent.Field {
 			Default(uuid.New),
 		field.UUID("customer_id", uuid.UUID{}),
 		field.UUID("invoice_id", uuid.UUID{}),
-		field.String("transaction_type"),
+		field.String("transaction_type").
+			NotEmpty(),
 		field.Float("amount").GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
 		field.String("comment"),
-		field.String("payment_method"),
+		field.String("payment_method").
+			NotEmpty(),
 	}
 }
 
@@ -50,14 +52,6 @@ func (FinancialTransaction) Edges() []ent.Edge {
 			Required(),
 		edge.To("invoice", Invoice.Type).
 			Field("invoice_id").
-			Unique().
-			Required(),
-		edge.To("type", TransactionType.Type).
-			Field("transaction_type").
-			Unique().
-			Required(),
-		edge.To("payment", PaymentMethod.Type).
-			Field("payment_method").
 			Unique().
 			Required(),
 	}

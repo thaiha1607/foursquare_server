@@ -17,39 +17,35 @@ type DeliveryAssignment struct {
 // Annotations of the DeliveryAssignment.
 func (DeliveryAssignment) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "delivery_assignment"},
+		entsql.Annotation{Table: "delivery_assignments"},
+		field.ID("user_id", "invoice_id"),
 	}
 }
 
 // Fields of the DeliveryAssignment.
 func (DeliveryAssignment) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+		field.UUID("user_id", uuid.UUID{}),
 		field.UUID("invoice_id", uuid.UUID{}),
-		field.UUID("staff_id", uuid.UUID{}),
 		field.UUID("assigned_by", uuid.UUID{}),
-		field.String("status"),
+		field.String("status").
+			NotEmpty(),
 	}
 }
 
 // Edges of the DeliveryAssignment.
 func (DeliveryAssignment) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("staff", User.Type).
+			Field("user_id").
+			Unique().
+			Required(),
 		edge.To("invoice", Invoice.Type).
 			Field("invoice_id").
 			Unique().
 			Required(),
-		edge.To("staff", Employee.Type).
-			Field("staff_id").
-			Unique().
-			Required(),
-		edge.To("manager", Employee.Type).
+		edge.To("manager", User.Type).
 			Field("assigned_by").
-			Unique().
-			Required(),
-		edge.To("delivery_assignment_status", DeliveryAssignmentStatus.Type).
-			Field("status").
 			Unique().
 			Required(),
 	}

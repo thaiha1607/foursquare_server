@@ -11,24 +11,24 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// OrderLineItem holds the schema definition for the OrderLineItem entity.
-type OrderLineItem struct {
+// CategoryQuantity holds the schema definition for the CategoryQuantity entity.
+type CategoryQuantity struct {
 	ent.Schema
 }
 
-// Annotations of the OrderLineItem.
-func (OrderLineItem) Annotations() []schema.Annotation {
+// Annotations of the CategoryQuantity.
+func (CategoryQuantity) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "order_line_items"},
+		entsql.Annotation{Table: "product_quantities"},
+		field.ID("workplace_id", "category_id"),
 	}
 }
 
-// Fields of the OrderLineItem.
-func (OrderLineItem) Fields() []ent.Field {
+// Fields of the CategoryQuantity.
+func (CategoryQuantity) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
-		field.UUID("order_id", uuid.UUID{}),
+		field.String("workplace_id").
+			NotEmpty(),
 		field.UUID("category_id", uuid.UUID{}),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
@@ -39,11 +39,11 @@ func (OrderLineItem) Fields() []ent.Field {
 	}
 }
 
-// Edges of the OrderLineItem.
-func (OrderLineItem) Edges() []ent.Edge {
+// Edges of the CategoryQuantity.
+func (CategoryQuantity) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("order", Order.Type).
-			Field("order_id").
+		edge.To("warehouse", Workplace.Type).
+			Field("workplace_id").
 			Unique().
 			Required(),
 		edge.To("category", Category.Type).
@@ -53,8 +53,8 @@ func (OrderLineItem) Edges() []ent.Edge {
 	}
 }
 
-// Mixin of the OrderLineItem.
-func (OrderLineItem) Mixin() []ent.Mixin {
+// Mixin of the CategoryQuantity.
+func (CategoryQuantity) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		TimeMixin{},
 	}

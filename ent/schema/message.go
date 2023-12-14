@@ -32,13 +32,13 @@ func (Message) Edges() []ent.Edge {
 			Field("conversation_id").
 			Unique().
 			Required(),
-		edge.To("sender", Employee.Type).
+		edge.To("sender", User.Type).
 			Field("sender_id").
 			Unique().
 			Required(),
-		edge.To("message_type", MessageType.Type).
-			Field("type").
-			Unique(),
+		edge.From("seen_recipients", User.Type).
+			Ref("messages").
+			Through("message_read_states", MessageReadState.Type),
 	}
 }
 

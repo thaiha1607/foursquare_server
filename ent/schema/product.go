@@ -30,7 +30,7 @@ func (Product) Fields() []ent.Field {
 		field.String("unit").
 			Optional(),
 		field.String("type").
-			Optional(),
+			NotEmpty(),
 	}
 }
 
@@ -39,9 +39,6 @@ func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("provider", Provider.Type).
 			Field("provider_id").
-			Unique(),
-		edge.To("product_type", ProductType.Type).
-			Field("type").
 			Unique(),
 	}
 }

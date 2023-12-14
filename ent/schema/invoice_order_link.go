@@ -17,27 +17,28 @@ type InvoiceOrderLink struct {
 // Annotations of the InvoiceOrderLink.
 func (InvoiceOrderLink) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "invoice_order_link"},
+		entsql.Annotation{Table: "invoice_order_links"},
+		field.ID("order_id", "invoice_id"),
 	}
 }
 
 // Fields of the InvoiceOrderLink.
 func (InvoiceOrderLink) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("invoice_id", uuid.UUID{}),
 		field.UUID("order_id", uuid.UUID{}),
+		field.UUID("invoice_id", uuid.UUID{}),
 	}
 }
 
 // Edges of the InvoiceOrderLink.
 func (InvoiceOrderLink) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("invoice", Invoice.Type).
-			Field("invoice_id").
-			Unique().
-			Required(),
 		edge.To("order", Order.Type).
 			Field("order_id").
+			Unique().
+			Required(),
+		edge.To("invoice", Invoice.Type).
+			Field("invoice_id").
 			Unique().
 			Required(),
 	}

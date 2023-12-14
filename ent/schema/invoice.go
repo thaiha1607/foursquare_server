@@ -37,23 +37,23 @@ func (Invoice) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.Float("totals").
-			GoType(decimal.Decimal{}).
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric(12,2)",
-				dialect.MySQL:    "decimal(12,2)",
-			}),
-		field.String("type"),
+		field.String("type").
+			NotEmpty(),
 	}
 }
 
 // Edges of the Invoice.
 func (Invoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("invoice_type", InvoiceType.Type).
-			Field("type").
-			Unique().
-			Required(),
+		edge.From("orders", Order.Type).
+			Ref("invoices").
+			Through("invoice_order_links", InvoiceOrderLink.Type),
+		edge.From("delivery_employees", User.Type).
+			Ref("delivery_stage_invoices").
+			Through("delivery_assignments", DeliveryAssignment.Type),
+		edge.From("warehouse_employees", User.Type).
+			Ref("warehouse_stage_invoices").
+			Through("warehouse_assignments", WarehouseAssignment.Type),
 	}
 }
 

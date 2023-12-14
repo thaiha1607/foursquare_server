@@ -22,31 +22,3 @@ func (TimeMixin) Fields() []ent.Field {
 			UpdateDefault(time.Now),
 	}
 }
-
-type NumericCodeMixin struct {
-	mixin.Schema
-}
-
-func (NumericCodeMixin) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("id").
-			Unique().
-			Immutable(),
-		field.String("description").
-			Immutable(),
-	}
-}
-
-type TextCodeMixin struct {
-	mixin.Schema
-}
-
-func (TextCodeMixin) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("id").
-			Unique().
-			Immutable(),
-		field.String("description").
-			Immutable(),
-	}
-}

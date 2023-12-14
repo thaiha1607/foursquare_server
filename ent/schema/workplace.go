@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-// Warehouse holds the schema definition for the Warehouse entity.
-type Warehouse struct {
+// Workplace holds the schema definition for the Workplace entity.
+type Workplace struct {
 	ent.Schema
 }
 
-// Fields of the Warehouse.
-func (Warehouse) Fields() []ent.Field {
+// Fields of the Workplace.
+func (Workplace) Fields() []ent.Field {
 	return []ent.Field{
 		// Length of ID is 10 characters.
 		// ID has the following format:
@@ -29,22 +29,26 @@ func (Warehouse) Fields() []ent.Field {
 			NotEmpty(),
 		field.String("address").
 			NotEmpty(),
+		field.Bool("is_warehouse").
+			Default(false),
 		field.UUID("manager_id", uuid.UUID{}).
 			Optional(),
 	}
 }
 
-// Edges of the Warehouse.
-func (Warehouse) Edges() []ent.Edge {
+// Edges of the Workplace.
+func (Workplace) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("manager", Employee.Type).
+		edge.To("manager", User.Type).
 			Field("manager_id").
 			Unique(),
+		edge.To("categories", Category.Type).
+			Through("category_quantities", CategoryQuantity.Type),
 	}
 }
 
-// Mixin of the Warehouse.
-func (Warehouse) Mixin() []ent.Mixin {
+// Mixin of the Workplace.
+func (Workplace) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		TimeMixin{},
 	}

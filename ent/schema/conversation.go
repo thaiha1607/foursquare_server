@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -22,7 +23,11 @@ func (Conversation) Fields() []ent.Field {
 
 // Edges of the Conversation.
 func (Conversation) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("users", User.Type).
+			Ref("conversations").
+			Through("participants", Participant.Type),
+	}
 }
 
 // Mixin of the Conversation.

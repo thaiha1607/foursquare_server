@@ -17,17 +17,16 @@ type MessageReadState struct {
 // Annotations of the MessageReadState.
 func (MessageReadState) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "message_read_state"},
+		entsql.Annotation{Table: "message_read_states"},
+		field.ID("user_id", "message_id"),
 	}
 }
 
 // Fields of the MessageReadState.
 func (MessageReadState) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
-		field.UUID("message_id", uuid.UUID{}),
 		field.UUID("user_id", uuid.UUID{}),
+		field.UUID("message_id", uuid.UUID{}),
 		field.Time("read_at").
 			Optional(),
 	}
@@ -36,12 +35,12 @@ func (MessageReadState) Fields() []ent.Field {
 // Edges of the MessageReadState.
 func (MessageReadState) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("message", Message.Type).
-			Field("message_id").
-			Unique().
-			Required(),
 		edge.To("user", User.Type).
 			Field("user_id").
+			Unique().
+			Required(),
+		edge.To("message", Message.Type).
+			Field("message_id").
 			Unique().
 			Required(),
 	}

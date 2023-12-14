@@ -17,10 +17,9 @@ func (Order) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}),
 		field.String("status").
-			Optional(),
-		field.UUID("customer_id", uuid.UUID{}),
-		field.String("address").
 			NotEmpty(),
+		field.UUID("customer_id", uuid.UUID{}),
+		field.UUID("address_id", uuid.UUID{}),
 		field.String("phone").
 			NotEmpty(),
 		field.UUID("parent_order_id", uuid.UUID{}).
@@ -32,7 +31,7 @@ func (Order) Fields() []ent.Field {
 		field.String("internal_note").
 			Optional(),
 		field.String("type").
-			Optional(),
+			NotEmpty(),
 		field.UUID("created_by", uuid.UUID{}).
 			Optional(),
 	}
@@ -41,14 +40,12 @@ func (Order) Fields() []ent.Field {
 // Edges of the Order.
 func (Order) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("order_type", OrderType.Type).
-			Field("type").
-			Unique(),
-		edge.To("order_status", OrderStatus.Type).
-			Field("status").
-			Unique(),
 		edge.To("customer", User.Type).
 			Field("customer_id").
+			Unique().
+			Required(),
+		edge.To("address", CustomerAddress.Type).
+			Field("address_id").
 			Unique().
 			Required(),
 		edge.To("parent_order", Order.Type).
@@ -57,6 +54,8 @@ func (Order) Edges() []ent.Edge {
 		edge.To("creator", User.Type).
 			Field("created_by").
 			Unique(),
+		edge.To("invoices", Invoice.Type).
+			Through("invoice_order_links", InvoiceOrderLink.Type),
 	}
 }
 

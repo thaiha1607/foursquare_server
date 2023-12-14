@@ -39,10 +39,13 @@ func (Category) Fields() []ent.Field {
 // Edges of the Category.
 func (Category) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("product", Product.Type).
+		edge.To("products", Product.Type).
 			Field("product_id").
 			Unique().
 			Required(),
+		edge.From("warehouses", Workplace.Type).
+			Ref("categories").
+			Through("category_quantities", CategoryQuantity.Type),
 	}
 }
 

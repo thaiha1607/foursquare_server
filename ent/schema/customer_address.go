@@ -17,7 +17,7 @@ type CustomerAddress struct {
 // Annotations of the CustomerAddress.
 func (CustomerAddress) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "customer_address"},
+		entsql.Annotation{Table: "customer_addresses"},
 	}
 }
 
@@ -42,7 +42,7 @@ func (CustomerAddress) Fields() []ent.Field {
 // Edges of the CustomerAddress.
 func (CustomerAddress) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("customer", User.Type).
+		edge.To("customers", User.Type).
 			Field("customer_id").
 			Unique().
 			Required(),

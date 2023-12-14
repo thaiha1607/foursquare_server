@@ -19,7 +19,7 @@ type InvoiceLineItem struct {
 // Annotations of the InvoiceLineItem.
 func (InvoiceLineItem) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "invoice_line_item"},
+		entsql.Annotation{Table: "invoice_line_items"},
 	}
 }
 
