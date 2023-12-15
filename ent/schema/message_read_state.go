@@ -38,11 +38,11 @@ func (MessageReadState) Fields() []ent.Field {
 // Edges of the MessageReadState.
 func (MessageReadState) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type).
+		edge.To("users", User.Type).
 			Field("user_id").
 			Unique().
 			Required(),
-		edge.To("message", Message.Type).
+		edge.To("messages", Message.Type).
 			Field("message_id").
 			Unique().
 			Required(),

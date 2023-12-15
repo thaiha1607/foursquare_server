@@ -39,7 +39,7 @@ func (Category) Fields() []ent.Field {
 // Edges of the Category.
 func (Category) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("products", Product.Type).
+		edge.To("product", Product.Type).
 			Field("product_id").
 			Unique().
 			Required(),

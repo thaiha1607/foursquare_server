@@ -33,11 +33,11 @@ func (InvoiceOrderLink) Fields() []ent.Field {
 // Edges of the InvoiceOrderLink.
 func (InvoiceOrderLink) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("order", Order.Type).
+		edge.To("orders", Order.Type).
 			Field("order_id").
 			Unique().
 			Required(),
-		edge.To("invoice", Invoice.Type).
+		edge.To("invoices", Invoice.Type).
 			Field("invoice_id").
 			Unique().
 			Required(),

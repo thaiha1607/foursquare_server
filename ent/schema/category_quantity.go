@@ -19,7 +19,7 @@ type CategoryQuantity struct {
 // Annotations of the CategoryQuantity.
 func (CategoryQuantity) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "product_quantities"},
+		entsql.Annotation{Table: "category_quantities"},
 		field.ID("workplace_id", "category_id"),
 	}
 }
@@ -42,11 +42,11 @@ func (CategoryQuantity) Fields() []ent.Field {
 // Edges of the CategoryQuantity.
 func (CategoryQuantity) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("warehouse", Workplace.Type).
+		edge.To("warehouses", Workplace.Type).
 			Field("workplace_id").
 			Unique().
 			Required(),
-		edge.To("category", Category.Type).
+		edge.To("categories", Category.Type).
 			Field("category_id").
 			Unique().
 			Required(),

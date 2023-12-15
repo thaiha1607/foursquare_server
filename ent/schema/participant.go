@@ -31,11 +31,11 @@ func (Participant) Fields() []ent.Field {
 // Edges of the Participant.
 func (Participant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type).
+		edge.To("users", User.Type).
 			Field("user_id").
 			Unique().
 			Required(),
-		edge.To("conversation", Conversation.Type).
+		edge.To("conversations", Conversation.Type).
 			Field("conversation_id").
 			Unique().
 			Required(),

@@ -42,7 +42,7 @@ func (CustomerAddress) Fields() []ent.Field {
 // Edges of the CustomerAddress.
 func (CustomerAddress) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("customers", User.Type).
+		edge.To("customer", User.Type).
 			Field("customer_id").
 			Unique().
 			Required(),

@@ -40,7 +40,7 @@ func (WarehouseAssignment) Edges() []ent.Edge {
 			Field("user_id").
 			Unique().
 			Required(),
-		edge.To("invoice", Invoice.Type).
+		edge.To("invoices", Invoice.Type).
 			Field("invoice_id").
 			Unique().
 			Required(),
