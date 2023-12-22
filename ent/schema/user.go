@@ -27,8 +27,6 @@ func (User) Fields() []ent.Field {
 					return err
 				},
 			),
-		field.Bool("email_visible").
-			Default(true),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.Time("last_reset").
