@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -51,28 +50,18 @@ func (User) Fields() []ent.Field {
 		field.String("role").
 			NotEmpty().
 			Default("customer"),
-		field.String("workplace_id").
-			MaxLen(10).
-			MinLen(10).
+		field.String("address").
+			Optional(),
+		field.String("postal_code").
+			Optional(),
+		field.String("other_address_info").
 			Optional(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("workplace", Workplace.Type).
-			Unique().
-			Field("workplace_id"),
-		edge.To("delivery_stage_invoices", Invoice.Type).
-			Through("delivery_assignments", DeliveryAssignment.Type),
-		edge.To("conversations", Conversation.Type).
-			Through("participants", Participant.Type),
-		edge.To("messages", Message.Type).
-			Through("message_read_states", MessageReadState.Type),
-		edge.To("warehouse_stage_invoices", Invoice.Type).
-			Through("warehouse_assignments", WarehouseAssignment.Type),
-	}
+	return []ent.Edge{}
 }
 
 // Mixin of the User.

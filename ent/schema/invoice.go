@@ -48,12 +48,6 @@ func (Invoice) Edges() []ent.Edge {
 		edge.From("orders", Order.Type).
 			Ref("invoices").
 			Through("invoice_order_links", InvoiceOrderLink.Type),
-		edge.From("delivery_employees", User.Type).
-			Ref("delivery_stage_invoices").
-			Through("delivery_assignments", DeliveryAssignment.Type),
-		edge.From("warehouse_employees", User.Type).
-			Ref("warehouse_stage_invoices").
-			Through("warehouse_assignments", WarehouseAssignment.Type),
 	}
 }
 

@@ -31,6 +31,12 @@ func (Category) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
+		field.Float("qty").
+			GoType(decimal.Decimal{}).
+			SchemaType(map[string]string{
+				dialect.Postgres: "numeric(12,2)",
+				dialect.MySQL:    "decimal(12,2)",
+			}),
 		field.JSON("image_url", &url.URL{}).
 			Optional(),
 	}
@@ -43,9 +49,6 @@ func (Category) Edges() []ent.Edge {
 			Field("product_id").
 			Unique().
 			Required(),
-		edge.From("warehouses", Workplace.Type).
-			Ref("categories").
-			Through("category_quantities", CategoryQuantity.Type),
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"net/url"
 
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -25,22 +24,19 @@ func (Product) Fields() []ent.Field {
 			Default(uuid.New),
 		field.JSON("image_urls", []url.URL{}).
 			Optional(),
-		field.UUID("provider_id", uuid.UUID{}).
-			Optional(),
 		field.String("unit").
 			Optional(),
 		field.String("type").
 			NotEmpty(),
+		field.Strings("tags"),
+		field.String("provider").
+			Optional(),
 	}
 }
 
 // Edges of the Product.
 func (Product) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("provider", Provider.Type).
-			Field("provider_id").
-			Unique(),
-	}
+	return nil
 }
 
 // Mixin of the Product.

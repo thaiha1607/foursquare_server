@@ -18,15 +18,22 @@ func (Conversation) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.String("title").Optional(),
+		field.UUID("user_one_id", uuid.UUID{}),
+		field.UUID("user_two_id", uuid.UUID{}),
 	}
 }
 
 // Edges of the Conversation.
 func (Conversation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("users", User.Type).
-			Ref("conversations").
-			Through("participants", Participant.Type),
+		edge.To("user_one", User.Type).
+			Field("user_one_id").
+			Unique().
+			Required(),
+		edge.To("user_two", User.Type).
+			Field("user_two_id").
+			Unique().
+			Required(),
 	}
 }
 

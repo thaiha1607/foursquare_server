@@ -21,7 +21,10 @@ func (Message) Fields() []ent.Field {
 		field.UUID("sender_id", uuid.UUID{}),
 		field.String("type").
 			Optional(),
-		field.String("content").Optional(),
+		field.String("content").
+			Optional(),
+		field.Bool("is_read").
+			Default(false),
 	}
 }
 
@@ -36,9 +39,6 @@ func (Message) Edges() []ent.Edge {
 			Field("sender_id").
 			Unique().
 			Required(),
-		edge.From("seen_recipients", User.Type).
-			Ref("messages").
-			Through("message_read_states", MessageReadState.Type),
 	}
 }
 
