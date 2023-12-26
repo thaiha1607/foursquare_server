@@ -18,7 +18,7 @@ func GetEnv(key string) (envVar string, err error) {
 func GetEnvOrDefault(key string, defaultValue string) (envVar string) {
 	envVar = os.Getenv(key)
 	if envVar == "" {
-		log.Printf("Environment variable %s not set, using default value", key)
+		log.Printf("environment variable %s not set, using default value", key)
 		return defaultValue
 	}
 	return envVar

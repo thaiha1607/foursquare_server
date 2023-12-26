@@ -77,7 +77,7 @@ func main() {
 	handlers.RegisterRoutes(e)
 	go func() {
 		if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			e.Logger.Fatal("Shutting down the server")
+			e.Logger.Fatal("shutting down the server")
 		}
 	}()
 	// Graceful shutdown
