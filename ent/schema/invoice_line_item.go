@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
@@ -36,19 +37,7 @@ func (InvoiceLineItem) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.Float("total_exclusive").
-			GoType(decimal.Decimal{}).
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric(12,2)",
-				dialect.MySQL:    "decimal(12,2)",
-			}),
-		field.Float("total_inclusive").
-			GoType(decimal.Decimal{}).
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric(12,2)",
-				dialect.MySQL:    "decimal(12,2)",
-			}),
-		field.Float("vat_amount").
+		field.Float("total").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
@@ -68,6 +57,14 @@ func (InvoiceLineItem) Edges() []ent.Edge {
 			Field("order_line_item_id").
 			Unique().
 			Required(),
+	}
+}
+
+// Indexes of the InvoiceLineItem.
+func (InvoiceLineItem) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("invoice_id", "order_line_item_id").
+			Unique(),
 	}
 }
 

@@ -28,30 +28,33 @@ func (FinancialTransaction) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("customer_id", uuid.UUID{}),
 		field.UUID("invoice_id", uuid.UUID{}),
-		field.String("transaction_type").
-			NotEmpty(),
 		field.Float("amount").GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.String("comment"),
-		field.String("payment_method").
-			NotEmpty(),
+		field.String("comment").
+			Optional().
+			Nillable(),
+		field.Int("type"),
+		field.Int("payment_method"),
 	}
 }
 
 // Edges of the FinancialTransaction.
 func (FinancialTransaction) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("customer", User.Type).
-			Field("customer_id").
-			Unique().
-			Required(),
 		edge.To("invoice", Invoice.Type).
 			Field("invoice_id").
+			Unique().
+			Required(),
+		edge.To("transaction_type", TransactionType.Type).
+			Field("type").
+			Unique().
+			Required(),
+		edge.To("payment", PaymentMethod.Type).
+			Field("payment_method").
 			Unique().
 			Required(),
 	}

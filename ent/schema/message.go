@@ -19,10 +19,9 @@ func (Message) Fields() []ent.Field {
 			Default(uuid.New),
 		field.UUID("conversation_id", uuid.UUID{}),
 		field.UUID("sender_id", uuid.UUID{}),
-		field.String("type").
-			Optional(),
+		field.Int("type"),
 		field.String("content").
-			Optional(),
+			NotEmpty(),
 		field.Bool("is_read").
 			Default(false),
 	}
@@ -37,6 +36,10 @@ func (Message) Edges() []ent.Edge {
 			Required(),
 		edge.To("sender", User.Type).
 			Field("sender_id").
+			Unique().
+			Required(),
+		edge.To("message_type", MessageType.Type).
+			Field("type").
 			Unique().
 			Required(),
 	}

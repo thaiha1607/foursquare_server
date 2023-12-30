@@ -16,29 +16,30 @@ type Order struct {
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}),
-		field.String("status").
-			NotEmpty(),
 		field.UUID("customer_id", uuid.UUID{}),
-		field.String("phone").
-			NotEmpty(),
+		field.String("note").
+			Optional().
+			Nillable(),
+		field.UUID("created_by", uuid.UUID{}),
 		field.UUID("parent_order_id", uuid.UUID{}).
 			Optional(),
 		field.Int("priority").
-			Default(0),
-		field.String("note").
-			Optional(),
+			Default(0).
+			Range(0, 10),
+		field.Int("type"),
+		field.Int("status_code"),
+		field.UUID("manaagment_staff_id", uuid.UUID{}),
+		field.UUID("warehouse_staff_id", uuid.UUID{}).
+			Optional().
+			Nillable(),
+		field.UUID("delivery_staff_id", uuid.UUID{}).
+			Optional().
+			Nillable(),
 		field.String("internal_note").
-			Optional(),
-		field.String("type").
-			NotEmpty(),
-		field.UUID("created_by", uuid.UUID{}).
-			Optional(),
-		field.UUID("delivery_employee_id", uuid.UUID{}).
-			Optional(),
-		field.UUID("warehouse_employee_id", uuid.UUID{}).
-			Optional(),
-		field.UUID("assigned_by", uuid.UUID{}).
-			Optional(),
+			Optional().
+			Nillable(),
+		field.Bool("is_internal").
+			Default(false),
 	}
 }
 
@@ -49,23 +50,31 @@ func (Order) Edges() []ent.Edge {
 			Field("customer_id").
 			Unique().
 			Required(),
+		edge.To("creator", User.Type).
+			Field("created_by").
+			Unique().
+			Required(),
 		edge.To("parent_order", Order.Type).
 			Field("parent_order_id").
 			Unique(),
-		edge.To("creator", User.Type).
-			Field("created_by").
+		edge.To("order_status", OrderStatusCode.Type).
+			Field("status_code").
+			Unique().
+			Required(),
+		edge.To("order_type", OrderType.Type).
+			Field("type").
+			Unique().
+			Required(),
+		edge.To("management_staff", User.Type).
+			Field("manaagment_staff_id").
+			Unique().
+			Required(),
+		edge.To("warehouse_staff", User.Type).
+			Field("warehouse_staff_id").
 			Unique(),
-		edge.To("invoices", Invoice.Type).
-			Through("invoice_order_links", InvoiceOrderLink.Type),
-		edge.To("delivery_employee", User.Type).
-			Unique().
-			Field("delivery_employee_id"),
-		edge.To("warehouse_employee", User.Type).
-			Unique().
-			Field("warehouse_employee_id"),
-		edge.To("manager", User.Type).
-			Unique().
-			Field("assigned_by"),
+		edge.To("delivery_staff", User.Type).
+			Field("delivery_staff_id").
+			Unique(),
 	}
 }
 

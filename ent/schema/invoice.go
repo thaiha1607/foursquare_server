@@ -19,35 +19,33 @@ func (Invoice) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.Float("total_exclusive").
+		field.UUID("order_id", uuid.UUID{}),
+		field.Float("total").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.Float("total_inclusive").
-			GoType(decimal.Decimal{}).
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric(12,2)",
-				dialect.MySQL:    "decimal(12,2)",
-			}),
-		field.Float("vat_amount").
-			GoType(decimal.Decimal{}).
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric(12,2)",
-				dialect.MySQL:    "decimal(12,2)",
-			}),
-		field.String("type").
-			NotEmpty(),
+		field.Int("type"),
+		field.Int("status_code"),
 	}
 }
 
 // Edges of the Invoice.
 func (Invoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("orders", Order.Type).
-			Ref("invoices").
-			Through("invoice_order_links", InvoiceOrderLink.Type),
+		edge.To("order", Order.Type).
+			Field("order_id").
+			Unique().
+			Required(),
+		edge.To("invoice_type", InvoiceType.Type).
+			Field("type").
+			Unique().
+			Required(),
+		edge.To("invoice_status", InvoiceStatusCode.Type).
+			Field("status_code").
+			Unique().
+			Required(),
 	}
 }
 

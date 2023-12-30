@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 )
 
@@ -12,12 +13,22 @@ type Conversation struct {
 	ent.Schema
 }
 
+// Indexes of the Conversation.
+func (Conversation) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("user_one_id", "user_two_id").
+			Unique(),
+	}
+}
+
 // Fields of the Conversation.
 func (Conversation) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.String("title").Optional(),
+		field.String("title").
+			Optional().
+			Nillable(),
 		field.UUID("user_one_id", uuid.UUID{}),
 		field.UUID("user_two_id", uuid.UUID{}),
 	}

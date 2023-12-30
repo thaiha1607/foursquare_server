@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
@@ -29,7 +30,7 @@ func (OrderLineItem) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.UUID("order_id", uuid.UUID{}),
-		field.UUID("category_id", uuid.UUID{}),
+		field.UUID("product_id", uuid.UUID{}),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
@@ -46,10 +47,18 @@ func (OrderLineItem) Edges() []ent.Edge {
 			Field("order_id").
 			Unique().
 			Required(),
-		edge.To("category", Category.Type).
-			Field("category_id").
+		edge.To("product", Product.Type).
+			Field("product_id").
 			Unique().
 			Required(),
+	}
+}
+
+// Indexes of the OrderLineItem.
+func (OrderLineItem) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("order_id", "product_id").
+			Unique(),
 	}
 }
 
