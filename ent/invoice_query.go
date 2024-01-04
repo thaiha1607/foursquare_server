@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
@@ -21,13 +20,12 @@ import (
 // InvoiceQuery is the builder for querying Invoice entities.
 type InvoiceQuery struct {
 	config
-	ctx               *QueryContext
-	order             []invoice.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Invoice
-	withOrder         *OrderQuery
-	withInvoiceType   *InvoiceTypeQuery
-	withInvoiceStatus *InvoiceStatusCodeQuery
+	ctx             *QueryContext
+	order           []invoice.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Invoice
+	withOrder       *OrderQuery
+	withInvoiceType *InvoiceTypeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,28 +99,6 @@ func (iq *InvoiceQuery) QueryInvoiceType() *InvoiceTypeQuery {
 			sqlgraph.From(invoice.Table, invoice.FieldID, selector),
 			sqlgraph.To(invoicetype.Table, invoicetype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoice.InvoiceTypeTable, invoice.InvoiceTypeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryInvoiceStatus chains the current query on the "invoice_status" edge.
-func (iq *InvoiceQuery) QueryInvoiceStatus() *InvoiceStatusCodeQuery {
-	query := (&InvoiceStatusCodeClient{config: iq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := iq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := iq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(invoice.Table, invoice.FieldID, selector),
-			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, invoice.InvoiceStatusTable, invoice.InvoiceStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
 		return fromU, nil
@@ -317,14 +293,13 @@ func (iq *InvoiceQuery) Clone() *InvoiceQuery {
 		return nil
 	}
 	return &InvoiceQuery{
-		config:            iq.config,
-		ctx:               iq.ctx.Clone(),
-		order:             append([]invoice.OrderOption{}, iq.order...),
-		inters:            append([]Interceptor{}, iq.inters...),
-		predicates:        append([]predicate.Invoice{}, iq.predicates...),
-		withOrder:         iq.withOrder.Clone(),
-		withInvoiceType:   iq.withInvoiceType.Clone(),
-		withInvoiceStatus: iq.withInvoiceStatus.Clone(),
+		config:          iq.config,
+		ctx:             iq.ctx.Clone(),
+		order:           append([]invoice.OrderOption{}, iq.order...),
+		inters:          append([]Interceptor{}, iq.inters...),
+		predicates:      append([]predicate.Invoice{}, iq.predicates...),
+		withOrder:       iq.withOrder.Clone(),
+		withInvoiceType: iq.withInvoiceType.Clone(),
 		// clone intermediate query.
 		sql:  iq.sql.Clone(),
 		path: iq.path,
@@ -350,17 +325,6 @@ func (iq *InvoiceQuery) WithInvoiceType(opts ...func(*InvoiceTypeQuery)) *Invoic
 		opt(query)
 	}
 	iq.withInvoiceType = query
-	return iq
-}
-
-// WithInvoiceStatus tells the query-builder to eager-load the nodes that are connected to
-// the "invoice_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (iq *InvoiceQuery) WithInvoiceStatus(opts ...func(*InvoiceStatusCodeQuery)) *InvoiceQuery {
-	query := (&InvoiceStatusCodeClient{config: iq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	iq.withInvoiceStatus = query
 	return iq
 }
 
@@ -442,10 +406,9 @@ func (iq *InvoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Invo
 	var (
 		nodes       = []*Invoice{}
 		_spec       = iq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [2]bool{
 			iq.withOrder != nil,
 			iq.withInvoiceType != nil,
-			iq.withInvoiceStatus != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -475,12 +438,6 @@ func (iq *InvoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Invo
 	if query := iq.withInvoiceType; query != nil {
 		if err := iq.loadInvoiceType(ctx, query, nodes, nil,
 			func(n *Invoice, e *InvoiceType) { n.Edges.InvoiceType = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := iq.withInvoiceStatus; query != nil {
-		if err := iq.loadInvoiceStatus(ctx, query, nodes, nil,
-			func(n *Invoice, e *InvoiceStatusCode) { n.Edges.InvoiceStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -545,35 +502,6 @@ func (iq *InvoiceQuery) loadInvoiceType(ctx context.Context, query *InvoiceTypeQ
 	}
 	return nil
 }
-func (iq *InvoiceQuery) loadInvoiceStatus(ctx context.Context, query *InvoiceStatusCodeQuery, nodes []*Invoice, init func(*Invoice), assign func(*Invoice, *InvoiceStatusCode)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Invoice)
-	for i := range nodes {
-		fk := nodes[i].StatusCode
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(invoicestatuscode.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "status_code" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 
 func (iq *InvoiceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := iq.querySpec()
@@ -605,9 +533,6 @@ func (iq *InvoiceQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if iq.withInvoiceType != nil {
 			_spec.Node.AddColumnOnce(invoice.FieldType)
-		}
-		if iq.withInvoiceStatus != nil {
-			_spec.Node.AddColumnOnce(invoice.FieldStatusCode)
 		}
 	}
 	if ps := iq.predicates; len(ps) > 0 {

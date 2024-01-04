@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 )
@@ -65,15 +64,51 @@ func (ic *InvoiceCreate) SetTotal(d decimal.Decimal) *InvoiceCreate {
 	return ic
 }
 
+// SetComment sets the "comment" field.
+func (ic *InvoiceCreate) SetComment(s string) *InvoiceCreate {
+	ic.mutation.SetComment(s)
+	return ic
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (ic *InvoiceCreate) SetNillableComment(s *string) *InvoiceCreate {
+	if s != nil {
+		ic.SetComment(*s)
+	}
+	return ic
+}
+
+// SetNote sets the "note" field.
+func (ic *InvoiceCreate) SetNote(s string) *InvoiceCreate {
+	ic.mutation.SetNote(s)
+	return ic
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (ic *InvoiceCreate) SetNillableNote(s *string) *InvoiceCreate {
+	if s != nil {
+		ic.SetNote(*s)
+	}
+	return ic
+}
+
 // SetType sets the "type" field.
 func (ic *InvoiceCreate) SetType(i int) *InvoiceCreate {
 	ic.mutation.SetType(i)
 	return ic
 }
 
-// SetStatusCode sets the "status_code" field.
-func (ic *InvoiceCreate) SetStatusCode(i int) *InvoiceCreate {
-	ic.mutation.SetStatusCode(i)
+// SetStatus sets the "status" field.
+func (ic *InvoiceCreate) SetStatus(i invoice.Status) *InvoiceCreate {
+	ic.mutation.SetStatus(i)
+	return ic
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ic *InvoiceCreate) SetNillableStatus(i *invoice.Status) *InvoiceCreate {
+	if i != nil {
+		ic.SetStatus(*i)
+	}
 	return ic
 }
 
@@ -105,17 +140,6 @@ func (ic *InvoiceCreate) SetInvoiceTypeID(id int) *InvoiceCreate {
 // SetInvoiceType sets the "invoice_type" edge to the InvoiceType entity.
 func (ic *InvoiceCreate) SetInvoiceType(i *InvoiceType) *InvoiceCreate {
 	return ic.SetInvoiceTypeID(i.ID)
-}
-
-// SetInvoiceStatusID sets the "invoice_status" edge to the InvoiceStatusCode entity by ID.
-func (ic *InvoiceCreate) SetInvoiceStatusID(id int) *InvoiceCreate {
-	ic.mutation.SetInvoiceStatusID(id)
-	return ic
-}
-
-// SetInvoiceStatus sets the "invoice_status" edge to the InvoiceStatusCode entity.
-func (ic *InvoiceCreate) SetInvoiceStatus(i *InvoiceStatusCode) *InvoiceCreate {
-	return ic.SetInvoiceStatusID(i.ID)
 }
 
 // Mutation returns the InvoiceMutation object of the builder.
@@ -161,6 +185,10 @@ func (ic *InvoiceCreate) defaults() {
 		v := invoice.DefaultUpdatedAt()
 		ic.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ic.mutation.Status(); !ok {
+		v := invoice.DefaultStatus
+		ic.mutation.SetStatus(v)
+	}
 	if _, ok := ic.mutation.ID(); !ok {
 		v := invoice.DefaultID()
 		ic.mutation.SetID(v)
@@ -184,17 +212,19 @@ func (ic *InvoiceCreate) check() error {
 	if _, ok := ic.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Invoice.type"`)}
 	}
-	if _, ok := ic.mutation.StatusCode(); !ok {
-		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Invoice.status_code"`)}
+	if _, ok := ic.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Invoice.status"`)}
+	}
+	if v, ok := ic.mutation.Status(); ok {
+		if err := invoice.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
+		}
 	}
 	if _, ok := ic.mutation.OrderID(); !ok {
 		return &ValidationError{Name: "order", err: errors.New(`ent: missing required edge "Invoice.order"`)}
 	}
 	if _, ok := ic.mutation.InvoiceTypeID(); !ok {
 		return &ValidationError{Name: "invoice_type", err: errors.New(`ent: missing required edge "Invoice.invoice_type"`)}
-	}
-	if _, ok := ic.mutation.InvoiceStatusID(); !ok {
-		return &ValidationError{Name: "invoice_status", err: errors.New(`ent: missing required edge "Invoice.invoice_status"`)}
 	}
 	return nil
 }
@@ -243,6 +273,18 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 		_spec.SetField(invoice.FieldTotal, field.TypeFloat64, value)
 		_node.Total = value
 	}
+	if value, ok := ic.mutation.Comment(); ok {
+		_spec.SetField(invoice.FieldComment, field.TypeString, value)
+		_node.Comment = &value
+	}
+	if value, ok := ic.mutation.Note(); ok {
+		_spec.SetField(invoice.FieldNote, field.TypeString, value)
+		_node.Note = &value
+	}
+	if value, ok := ic.mutation.Status(); ok {
+		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
 	if nodes := ic.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -275,23 +317,6 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.Type = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ic.mutation.InvoiceStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceStatusTable,
-			Columns: []string{invoice.InvoiceStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.StatusCode = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

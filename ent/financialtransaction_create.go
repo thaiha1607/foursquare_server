@@ -14,7 +14,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
 
@@ -86,8 +85,16 @@ func (ftc *FinancialTransactionCreate) SetType(i int) *FinancialTransactionCreat
 }
 
 // SetPaymentMethod sets the "payment_method" field.
-func (ftc *FinancialTransactionCreate) SetPaymentMethod(i int) *FinancialTransactionCreate {
-	ftc.mutation.SetPaymentMethod(i)
+func (ftc *FinancialTransactionCreate) SetPaymentMethod(fm financialtransaction.PaymentMethod) *FinancialTransactionCreate {
+	ftc.mutation.SetPaymentMethod(fm)
+	return ftc
+}
+
+// SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
+func (ftc *FinancialTransactionCreate) SetNillablePaymentMethod(fm *financialtransaction.PaymentMethod) *FinancialTransactionCreate {
+	if fm != nil {
+		ftc.SetPaymentMethod(*fm)
+	}
 	return ftc
 }
 
@@ -119,17 +126,6 @@ func (ftc *FinancialTransactionCreate) SetTransactionTypeID(id int) *FinancialTr
 // SetTransactionType sets the "transaction_type" edge to the TransactionType entity.
 func (ftc *FinancialTransactionCreate) SetTransactionType(t *TransactionType) *FinancialTransactionCreate {
 	return ftc.SetTransactionTypeID(t.ID)
-}
-
-// SetPaymentID sets the "payment" edge to the PaymentMethod entity by ID.
-func (ftc *FinancialTransactionCreate) SetPaymentID(id int) *FinancialTransactionCreate {
-	ftc.mutation.SetPaymentID(id)
-	return ftc
-}
-
-// SetPayment sets the "payment" edge to the PaymentMethod entity.
-func (ftc *FinancialTransactionCreate) SetPayment(p *PaymentMethod) *FinancialTransactionCreate {
-	return ftc.SetPaymentID(p.ID)
 }
 
 // Mutation returns the FinancialTransactionMutation object of the builder.
@@ -175,6 +171,10 @@ func (ftc *FinancialTransactionCreate) defaults() {
 		v := financialtransaction.DefaultUpdatedAt()
 		ftc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ftc.mutation.PaymentMethod(); !ok {
+		v := financialtransaction.DefaultPaymentMethod
+		ftc.mutation.SetPaymentMethod(v)
+	}
 	if _, ok := ftc.mutation.ID(); !ok {
 		v := financialtransaction.DefaultID()
 		ftc.mutation.SetID(v)
@@ -201,14 +201,16 @@ func (ftc *FinancialTransactionCreate) check() error {
 	if _, ok := ftc.mutation.PaymentMethod(); !ok {
 		return &ValidationError{Name: "payment_method", err: errors.New(`ent: missing required field "FinancialTransaction.payment_method"`)}
 	}
+	if v, ok := ftc.mutation.PaymentMethod(); ok {
+		if err := financialtransaction.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "FinancialTransaction.payment_method": %w`, err)}
+		}
+	}
 	if _, ok := ftc.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice", err: errors.New(`ent: missing required edge "FinancialTransaction.invoice"`)}
 	}
 	if _, ok := ftc.mutation.TransactionTypeID(); !ok {
 		return &ValidationError{Name: "transaction_type", err: errors.New(`ent: missing required edge "FinancialTransaction.transaction_type"`)}
-	}
-	if _, ok := ftc.mutation.PaymentID(); !ok {
-		return &ValidationError{Name: "payment", err: errors.New(`ent: missing required edge "FinancialTransaction.payment"`)}
 	}
 	return nil
 }
@@ -261,6 +263,10 @@ func (ftc *FinancialTransactionCreate) createSpec() (*FinancialTransaction, *sql
 		_spec.SetField(financialtransaction.FieldComment, field.TypeString, value)
 		_node.Comment = &value
 	}
+	if value, ok := ftc.mutation.PaymentMethod(); ok {
+		_spec.SetField(financialtransaction.FieldPaymentMethod, field.TypeEnum, value)
+		_node.PaymentMethod = value
+	}
 	if nodes := ftc.mutation.InvoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -293,23 +299,6 @@ func (ftc *FinancialTransactionCreate) createSpec() (*FinancialTransaction, *sql
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.Type = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ftc.mutation.PaymentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.PaymentTable,
-			Columns: []string{financialtransaction.PaymentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(paymentmethod.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.PaymentMethod = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

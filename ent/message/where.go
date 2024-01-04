@@ -76,11 +76,6 @@ func SenderID(v uuid.UUID) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldSenderID, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v int) predicate.Message {
-	return predicate.Message(sql.FieldEQ(FieldType, v))
-}
-
 // Content applies equality check predicate on the "content" field. It's identical to ContentEQ.
 func Content(v string) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldContent, v))
@@ -212,22 +207,22 @@ func SenderIDNotIn(vs ...uuid.UUID) predicate.Message {
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v int) predicate.Message {
+func TypeEQ(v Type) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v int) predicate.Message {
+func TypeNEQ(v Type) predicate.Message {
 	return predicate.Message(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...int) predicate.Message {
+func TypeIn(vs ...Type) predicate.Message {
 	return predicate.Message(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...int) predicate.Message {
+func TypeNotIn(vs ...Type) predicate.Message {
 	return predicate.Message(sql.FieldNotIn(FieldType, vs...))
 }
 
@@ -344,29 +339,6 @@ func HasSender() predicate.Message {
 func HasSenderWith(preds ...predicate.User) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
 		step := newSenderStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasMessageType applies the HasEdge predicate on the "message_type" edge.
-func HasMessageType() predicate.Message {
-	return predicate.Message(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, MessageTypeTable, MessageTypeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasMessageTypeWith applies the HasEdge predicate on the "message_type" edge with a given conditions (other predicates).
-func HasMessageTypeWith(preds ...predicate.MessageType) predicate.Message {
-	return predicate.Message(func(s *sql.Selector) {
-		step := newMessageTypeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

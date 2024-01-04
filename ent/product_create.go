@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/product"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -112,8 +111,16 @@ func (pc *ProductCreate) SetNillableUnitOfMeasurement(s *string) *ProductCreate 
 }
 
 // SetType sets the "type" field.
-func (pc *ProductCreate) SetType(i int) *ProductCreate {
-	pc.mutation.SetType(i)
+func (pc *ProductCreate) SetType(s string) *ProductCreate {
+	pc.mutation.SetType(s)
+	return pc
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (pc *ProductCreate) SetNillableType(s *string) *ProductCreate {
+	if s != nil {
+		pc.SetType(*s)
+	}
 	return pc
 }
 
@@ -143,17 +150,6 @@ func (pc *ProductCreate) SetNillableID(u *uuid.UUID) *ProductCreate {
 		pc.SetID(*u)
 	}
 	return pc
-}
-
-// SetProductTypeID sets the "product_type" edge to the ProductType entity by ID.
-func (pc *ProductCreate) SetProductTypeID(id int) *ProductCreate {
-	pc.mutation.SetProductTypeID(id)
-	return pc
-}
-
-// SetProductType sets the "product_type" edge to the ProductType entity.
-func (pc *ProductCreate) SetProductType(p *ProductType) *ProductCreate {
-	return pc.SetProductTypeID(p.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -250,12 +246,6 @@ func (pc *ProductCreate) check() error {
 	if _, ok := pc.mutation.Qty(); !ok {
 		return &ValidationError{Name: "qty", err: errors.New(`ent: missing required field "Product.qty"`)}
 	}
-	if _, ok := pc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Product.type"`)}
-	}
-	if _, ok := pc.mutation.ProductTypeID(); !ok {
-		return &ValidationError{Name: "product_type", err: errors.New(`ent: missing required edge "Product.product_type"`)}
-	}
 	return nil
 }
 
@@ -327,26 +317,13 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
 		_node.UnitOfMeasurement = value
 	}
+	if value, ok := pc.mutation.GetType(); ok {
+		_spec.SetField(product.FieldType, field.TypeString, value)
+		_node.Type = &value
+	}
 	if value, ok := pc.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
 		_node.Provider = value
-	}
-	if nodes := pc.mutation.ProductTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   product.ProductTypeTable,
-			Columns: []string{product.ProductTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(producttype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Type = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

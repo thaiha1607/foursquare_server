@@ -13,7 +13,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
 
@@ -35,7 +34,7 @@ type FinancialTransaction struct {
 	// Type holds the value of the "type" field.
 	Type int `json:"type,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
-	PaymentMethod int `json:"payment_method,omitempty"`
+	PaymentMethod financialtransaction.PaymentMethod `json:"payment_method,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FinancialTransactionQuery when eager-loading is set.
 	Edges        FinancialTransactionEdges `json:"edges"`
@@ -48,11 +47,9 @@ type FinancialTransactionEdges struct {
 	Invoice *Invoice `json:"invoice,omitempty"`
 	// TransactionType holds the value of the transaction_type edge.
 	TransactionType *TransactionType `json:"transaction_type,omitempty"`
-	// Payment holds the value of the payment edge.
-	Payment *PaymentMethod `json:"payment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [2]bool
 }
 
 // InvoiceOrErr returns the Invoice value or an error if the edge
@@ -81,19 +78,6 @@ func (e FinancialTransactionEdges) TransactionTypeOrErr() (*TransactionType, err
 	return nil, &NotLoadedError{edge: "transaction_type"}
 }
 
-// PaymentOrErr returns the Payment value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e FinancialTransactionEdges) PaymentOrErr() (*PaymentMethod, error) {
-	if e.loadedTypes[2] {
-		if e.Payment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: paymentmethod.Label}
-		}
-		return e.Payment, nil
-	}
-	return nil, &NotLoadedError{edge: "payment"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*FinancialTransaction) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -101,9 +85,9 @@ func (*FinancialTransaction) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case financialtransaction.FieldAmount:
 			values[i] = new(decimal.Decimal)
-		case financialtransaction.FieldType, financialtransaction.FieldPaymentMethod:
+		case financialtransaction.FieldType:
 			values[i] = new(sql.NullInt64)
-		case financialtransaction.FieldComment:
+		case financialtransaction.FieldComment, financialtransaction.FieldPaymentMethod:
 			values[i] = new(sql.NullString)
 		case financialtransaction.FieldCreatedAt, financialtransaction.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -168,10 +152,10 @@ func (ft *FinancialTransaction) assignValues(columns []string, values []any) err
 				ft.Type = int(value.Int64)
 			}
 		case financialtransaction.FieldPaymentMethod:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field payment_method", values[i])
 			} else if value.Valid {
-				ft.PaymentMethod = int(value.Int64)
+				ft.PaymentMethod = financialtransaction.PaymentMethod(value.String)
 			}
 		default:
 			ft.selectValues.Set(columns[i], values[i])
@@ -194,11 +178,6 @@ func (ft *FinancialTransaction) QueryInvoice() *InvoiceQuery {
 // QueryTransactionType queries the "transaction_type" edge of the FinancialTransaction entity.
 func (ft *FinancialTransaction) QueryTransactionType() *TransactionTypeQuery {
 	return NewFinancialTransactionClient(ft.config).QueryTransactionType(ft)
-}
-
-// QueryPayment queries the "payment" edge of the FinancialTransaction entity.
-func (ft *FinancialTransaction) QueryPayment() *PaymentMethodQuery {
-	return NewFinancialTransactionClient(ft.config).QueryPayment(ft)
 }
 
 // Update returns a builder for updating this FinancialTransaction.

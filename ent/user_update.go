@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/user"
-	"github.com/thaiha1607/foursquare_server/ent/userrole"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -173,15 +172,15 @@ func (uu *UserUpdate) SetNillablePhone(s *string) *UserUpdate {
 }
 
 // SetRole sets the "role" field.
-func (uu *UserUpdate) SetRole(i int) *UserUpdate {
-	uu.mutation.SetRole(i)
+func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
+	uu.mutation.SetRole(u)
 	return uu
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableRole(i *int) *UserUpdate {
-	if i != nil {
-		uu.SetRole(*i)
+func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
+	if u != nil {
+		uu.SetRole(*u)
 	}
 	return uu
 }
@@ -246,26 +245,9 @@ func (uu *UserUpdate) ClearOtherAddressInfo() *UserUpdate {
 	return uu
 }
 
-// SetUserRoleID sets the "user_role" edge to the UserRole entity by ID.
-func (uu *UserUpdate) SetUserRoleID(id int) *UserUpdate {
-	uu.mutation.SetUserRoleID(id)
-	return uu
-}
-
-// SetUserRole sets the "user_role" edge to the UserRole entity.
-func (uu *UserUpdate) SetUserRole(u *UserRole) *UserUpdate {
-	return uu.SetUserRoleID(u.ID)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
-}
-
-// ClearUserRole clears the "user_role" edge to the UserRole entity.
-func (uu *UserUpdate) ClearUserRole() *UserUpdate {
-	uu.mutation.ClearUserRole()
-	return uu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -331,8 +313,10 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
 		}
 	}
-	if _, ok := uu.mutation.UserRoleID(); uu.mutation.UserRoleCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "User.user_role"`)
+	if v, ok := uu.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -388,6 +372,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 	}
+	if value, ok := uu.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+	}
 	if value, ok := uu.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 	}
@@ -405,35 +392,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.OtherAddressInfoCleared() {
 		_spec.ClearField(user.FieldOtherAddressInfo, field.TypeString)
-	}
-	if uu.mutation.UserRoleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   user.UserRoleTable,
-			Columns: []string{user.UserRoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userrole.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.UserRoleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   user.UserRoleTable,
-			Columns: []string{user.UserRoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userrole.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -598,15 +556,15 @@ func (uuo *UserUpdateOne) SetNillablePhone(s *string) *UserUpdateOne {
 }
 
 // SetRole sets the "role" field.
-func (uuo *UserUpdateOne) SetRole(i int) *UserUpdateOne {
-	uuo.mutation.SetRole(i)
+func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
+	uuo.mutation.SetRole(u)
 	return uuo
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableRole(i *int) *UserUpdateOne {
-	if i != nil {
-		uuo.SetRole(*i)
+func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
+	if u != nil {
+		uuo.SetRole(*u)
 	}
 	return uuo
 }
@@ -671,26 +629,9 @@ func (uuo *UserUpdateOne) ClearOtherAddressInfo() *UserUpdateOne {
 	return uuo
 }
 
-// SetUserRoleID sets the "user_role" edge to the UserRole entity by ID.
-func (uuo *UserUpdateOne) SetUserRoleID(id int) *UserUpdateOne {
-	uuo.mutation.SetUserRoleID(id)
-	return uuo
-}
-
-// SetUserRole sets the "user_role" edge to the UserRole entity.
-func (uuo *UserUpdateOne) SetUserRole(u *UserRole) *UserUpdateOne {
-	return uuo.SetUserRoleID(u.ID)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
-}
-
-// ClearUserRole clears the "user_role" edge to the UserRole entity.
-func (uuo *UserUpdateOne) ClearUserRole() *UserUpdateOne {
-	uuo.mutation.ClearUserRole()
-	return uuo
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -769,8 +710,10 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
 		}
 	}
-	if _, ok := uuo.mutation.UserRoleID(); uuo.mutation.UserRoleCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "User.user_role"`)
+	if v, ok := uuo.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -843,6 +786,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 	}
+	if value, ok := uuo.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+	}
 	if value, ok := uuo.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 	}
@@ -860,35 +806,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.OtherAddressInfoCleared() {
 		_spec.ClearField(user.FieldOtherAddressInfo, field.TypeString)
-	}
-	if uuo.mutation.UserRoleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   user.UserRoleTable,
-			Columns: []string{user.UserRoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userrole.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.UserRoleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   user.UserRoleTable,
-			Columns: []string{user.UserRoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userrole.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -65,8 +64,16 @@ func (mc *MessageCreate) SetSenderID(u uuid.UUID) *MessageCreate {
 }
 
 // SetType sets the "type" field.
-func (mc *MessageCreate) SetType(i int) *MessageCreate {
-	mc.mutation.SetType(i)
+func (mc *MessageCreate) SetType(m message.Type) *MessageCreate {
+	mc.mutation.SetType(m)
+	return mc
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (mc *MessageCreate) SetNillableType(m *message.Type) *MessageCreate {
+	if m != nil {
+		mc.SetType(*m)
+	}
 	return mc
 }
 
@@ -114,17 +121,6 @@ func (mc *MessageCreate) SetSender(u *User) *MessageCreate {
 	return mc.SetSenderID(u.ID)
 }
 
-// SetMessageTypeID sets the "message_type" edge to the MessageType entity by ID.
-func (mc *MessageCreate) SetMessageTypeID(id int) *MessageCreate {
-	mc.mutation.SetMessageTypeID(id)
-	return mc
-}
-
-// SetMessageType sets the "message_type" edge to the MessageType entity.
-func (mc *MessageCreate) SetMessageType(m *MessageType) *MessageCreate {
-	return mc.SetMessageTypeID(m.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (mc *MessageCreate) Mutation() *MessageMutation {
 	return mc.mutation
@@ -168,6 +164,10 @@ func (mc *MessageCreate) defaults() {
 		v := message.DefaultUpdatedAt()
 		mc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := mc.mutation.GetType(); !ok {
+		v := message.DefaultType
+		mc.mutation.SetType(v)
+	}
 	if _, ok := mc.mutation.IsRead(); !ok {
 		v := message.DefaultIsRead
 		mc.mutation.SetIsRead(v)
@@ -195,6 +195,11 @@ func (mc *MessageCreate) check() error {
 	if _, ok := mc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Message.type"`)}
 	}
+	if v, ok := mc.mutation.GetType(); ok {
+		if err := message.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Message.type": %w`, err)}
+		}
+	}
 	if _, ok := mc.mutation.Content(); !ok {
 		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "Message.content"`)}
 	}
@@ -211,9 +216,6 @@ func (mc *MessageCreate) check() error {
 	}
 	if _, ok := mc.mutation.SenderID(); !ok {
 		return &ValidationError{Name: "sender", err: errors.New(`ent: missing required edge "Message.sender"`)}
-	}
-	if _, ok := mc.mutation.MessageTypeID(); !ok {
-		return &ValidationError{Name: "message_type", err: errors.New(`ent: missing required edge "Message.message_type"`)}
 	}
 	return nil
 }
@@ -258,6 +260,10 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := mc.mutation.GetType(); ok {
+		_spec.SetField(message.FieldType, field.TypeEnum, value)
+		_node.Type = value
+	}
 	if value, ok := mc.mutation.Content(); ok {
 		_spec.SetField(message.FieldContent, field.TypeString, value)
 		_node.Content = value
@@ -298,23 +304,6 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.SenderID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := mc.mutation.MessageTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.MessageTypeTable,
-			Columns: []string{message.MessageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(messagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Type = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

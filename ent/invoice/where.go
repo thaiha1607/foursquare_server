@@ -77,14 +77,19 @@ func Total(v decimal.Decimal) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldTotal, v))
 }
 
+// Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
+func Comment(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldComment, v))
+}
+
+// Note applies equality check predicate on the "note" field. It's identical to NoteEQ.
+func Note(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldNote, v))
+}
+
 // Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
 func Type(v int) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldType, v))
-}
-
-// StatusCode applies equality check predicate on the "status_code" field. It's identical to StatusCodeEQ.
-func StatusCode(v int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldEQ(FieldStatusCode, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -227,6 +232,156 @@ func TotalLTE(v decimal.Decimal) predicate.Invoice {
 	return predicate.Invoice(sql.FieldLTE(FieldTotal, v))
 }
 
+// CommentEQ applies the EQ predicate on the "comment" field.
+func CommentEQ(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldComment, v))
+}
+
+// CommentNEQ applies the NEQ predicate on the "comment" field.
+func CommentNEQ(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNEQ(FieldComment, v))
+}
+
+// CommentIn applies the In predicate on the "comment" field.
+func CommentIn(vs ...string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldIn(FieldComment, vs...))
+}
+
+// CommentNotIn applies the NotIn predicate on the "comment" field.
+func CommentNotIn(vs ...string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotIn(FieldComment, vs...))
+}
+
+// CommentGT applies the GT predicate on the "comment" field.
+func CommentGT(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGT(FieldComment, v))
+}
+
+// CommentGTE applies the GTE predicate on the "comment" field.
+func CommentGTE(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGTE(FieldComment, v))
+}
+
+// CommentLT applies the LT predicate on the "comment" field.
+func CommentLT(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLT(FieldComment, v))
+}
+
+// CommentLTE applies the LTE predicate on the "comment" field.
+func CommentLTE(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLTE(FieldComment, v))
+}
+
+// CommentContains applies the Contains predicate on the "comment" field.
+func CommentContains(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldContains(FieldComment, v))
+}
+
+// CommentHasPrefix applies the HasPrefix predicate on the "comment" field.
+func CommentHasPrefix(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldHasPrefix(FieldComment, v))
+}
+
+// CommentHasSuffix applies the HasSuffix predicate on the "comment" field.
+func CommentHasSuffix(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldHasSuffix(FieldComment, v))
+}
+
+// CommentIsNil applies the IsNil predicate on the "comment" field.
+func CommentIsNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldIsNull(FieldComment))
+}
+
+// CommentNotNil applies the NotNil predicate on the "comment" field.
+func CommentNotNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotNull(FieldComment))
+}
+
+// CommentEqualFold applies the EqualFold predicate on the "comment" field.
+func CommentEqualFold(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEqualFold(FieldComment, v))
+}
+
+// CommentContainsFold applies the ContainsFold predicate on the "comment" field.
+func CommentContainsFold(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldContainsFold(FieldComment, v))
+}
+
+// NoteEQ applies the EQ predicate on the "note" field.
+func NoteEQ(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldNote, v))
+}
+
+// NoteNEQ applies the NEQ predicate on the "note" field.
+func NoteNEQ(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNEQ(FieldNote, v))
+}
+
+// NoteIn applies the In predicate on the "note" field.
+func NoteIn(vs ...string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldIn(FieldNote, vs...))
+}
+
+// NoteNotIn applies the NotIn predicate on the "note" field.
+func NoteNotIn(vs ...string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotIn(FieldNote, vs...))
+}
+
+// NoteGT applies the GT predicate on the "note" field.
+func NoteGT(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGT(FieldNote, v))
+}
+
+// NoteGTE applies the GTE predicate on the "note" field.
+func NoteGTE(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGTE(FieldNote, v))
+}
+
+// NoteLT applies the LT predicate on the "note" field.
+func NoteLT(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLT(FieldNote, v))
+}
+
+// NoteLTE applies the LTE predicate on the "note" field.
+func NoteLTE(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLTE(FieldNote, v))
+}
+
+// NoteContains applies the Contains predicate on the "note" field.
+func NoteContains(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldContains(FieldNote, v))
+}
+
+// NoteHasPrefix applies the HasPrefix predicate on the "note" field.
+func NoteHasPrefix(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldHasPrefix(FieldNote, v))
+}
+
+// NoteHasSuffix applies the HasSuffix predicate on the "note" field.
+func NoteHasSuffix(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldHasSuffix(FieldNote, v))
+}
+
+// NoteIsNil applies the IsNil predicate on the "note" field.
+func NoteIsNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldIsNull(FieldNote))
+}
+
+// NoteNotNil applies the NotNil predicate on the "note" field.
+func NoteNotNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotNull(FieldNote))
+}
+
+// NoteEqualFold applies the EqualFold predicate on the "note" field.
+func NoteEqualFold(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEqualFold(FieldNote, v))
+}
+
+// NoteContainsFold applies the ContainsFold predicate on the "note" field.
+func NoteContainsFold(v string) predicate.Invoice {
+	return predicate.Invoice(sql.FieldContainsFold(FieldNote, v))
+}
+
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v int) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldType, v))
@@ -247,24 +402,24 @@ func TypeNotIn(vs ...int) predicate.Invoice {
 	return predicate.Invoice(sql.FieldNotIn(FieldType, vs...))
 }
 
-// StatusCodeEQ applies the EQ predicate on the "status_code" field.
-func StatusCodeEQ(v int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldEQ(FieldStatusCode, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldStatus, v))
 }
 
-// StatusCodeNEQ applies the NEQ predicate on the "status_code" field.
-func StatusCodeNEQ(v int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldNEQ(FieldStatusCode, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNEQ(FieldStatus, v))
 }
 
-// StatusCodeIn applies the In predicate on the "status_code" field.
-func StatusCodeIn(vs ...int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldIn(FieldStatusCode, vs...))
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Invoice {
+	return predicate.Invoice(sql.FieldIn(FieldStatus, vs...))
 }
 
-// StatusCodeNotIn applies the NotIn predicate on the "status_code" field.
-func StatusCodeNotIn(vs ...int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldNotIn(FieldStatusCode, vs...))
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // HasOrder applies the HasEdge predicate on the "order" edge.
@@ -305,29 +460,6 @@ func HasInvoiceType() predicate.Invoice {
 func HasInvoiceTypeWith(preds ...predicate.InvoiceType) predicate.Invoice {
 	return predicate.Invoice(func(s *sql.Selector) {
 		step := newInvoiceTypeStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasInvoiceStatus applies the HasEdge predicate on the "invoice_status" edge.
-func HasInvoiceStatus() predicate.Invoice {
-	return predicate.Invoice(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, InvoiceStatusTable, InvoiceStatusColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasInvoiceStatusWith applies the HasEdge predicate on the "invoice_status" edge with a given conditions (other predicates).
-func HasInvoiceStatusWith(preds ...predicate.InvoiceStatusCode) predicate.Invoice {
-	return predicate.Invoice(func(s *sql.Selector) {
-		step := newInvoiceStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

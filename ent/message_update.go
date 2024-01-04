@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
@@ -67,15 +66,15 @@ func (mu *MessageUpdate) SetNillableSenderID(u *uuid.UUID) *MessageUpdate {
 }
 
 // SetType sets the "type" field.
-func (mu *MessageUpdate) SetType(i int) *MessageUpdate {
-	mu.mutation.SetType(i)
+func (mu *MessageUpdate) SetType(m message.Type) *MessageUpdate {
+	mu.mutation.SetType(m)
 	return mu
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableType(i *int) *MessageUpdate {
-	if i != nil {
-		mu.SetType(*i)
+func (mu *MessageUpdate) SetNillableType(m *message.Type) *MessageUpdate {
+	if m != nil {
+		mu.SetType(*m)
 	}
 	return mu
 }
@@ -118,17 +117,6 @@ func (mu *MessageUpdate) SetSender(u *User) *MessageUpdate {
 	return mu.SetSenderID(u.ID)
 }
 
-// SetMessageTypeID sets the "message_type" edge to the MessageType entity by ID.
-func (mu *MessageUpdate) SetMessageTypeID(id int) *MessageUpdate {
-	mu.mutation.SetMessageTypeID(id)
-	return mu
-}
-
-// SetMessageType sets the "message_type" edge to the MessageType entity.
-func (mu *MessageUpdate) SetMessageType(m *MessageType) *MessageUpdate {
-	return mu.SetMessageTypeID(m.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (mu *MessageUpdate) Mutation() *MessageMutation {
 	return mu.mutation
@@ -143,12 +131,6 @@ func (mu *MessageUpdate) ClearConversation() *MessageUpdate {
 // ClearSender clears the "sender" edge to the User entity.
 func (mu *MessageUpdate) ClearSender() *MessageUpdate {
 	mu.mutation.ClearSender()
-	return mu
-}
-
-// ClearMessageType clears the "message_type" edge to the MessageType entity.
-func (mu *MessageUpdate) ClearMessageType() *MessageUpdate {
-	mu.mutation.ClearMessageType()
 	return mu
 }
 
@@ -190,6 +172,11 @@ func (mu *MessageUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mu *MessageUpdate) check() error {
+	if v, ok := mu.mutation.GetType(); ok {
+		if err := message.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Message.type": %w`, err)}
+		}
+	}
 	if v, ok := mu.mutation.Content(); ok {
 		if err := message.ContentValidator(v); err != nil {
 			return &ValidationError{Name: "content", err: fmt.Errorf(`ent: validator failed for field "Message.content": %w`, err)}
@@ -200,9 +187,6 @@ func (mu *MessageUpdate) check() error {
 	}
 	if _, ok := mu.mutation.SenderID(); mu.mutation.SenderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Message.sender"`)
-	}
-	if _, ok := mu.mutation.MessageTypeID(); mu.mutation.MessageTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Message.message_type"`)
 	}
 	return nil
 }
@@ -221,6 +205,9 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := mu.mutation.GetType(); ok {
+		_spec.SetField(message.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := mu.mutation.Content(); ok {
 		_spec.SetField(message.FieldContent, field.TypeString, value)
@@ -286,35 +273,6 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.MessageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.MessageTypeTable,
-			Columns: []string{message.MessageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(messagetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.MessageTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.MessageTypeTable,
-			Columns: []string{message.MessageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(messagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{message.Label}
@@ -370,15 +328,15 @@ func (muo *MessageUpdateOne) SetNillableSenderID(u *uuid.UUID) *MessageUpdateOne
 }
 
 // SetType sets the "type" field.
-func (muo *MessageUpdateOne) SetType(i int) *MessageUpdateOne {
-	muo.mutation.SetType(i)
+func (muo *MessageUpdateOne) SetType(m message.Type) *MessageUpdateOne {
+	muo.mutation.SetType(m)
 	return muo
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableType(i *int) *MessageUpdateOne {
-	if i != nil {
-		muo.SetType(*i)
+func (muo *MessageUpdateOne) SetNillableType(m *message.Type) *MessageUpdateOne {
+	if m != nil {
+		muo.SetType(*m)
 	}
 	return muo
 }
@@ -421,17 +379,6 @@ func (muo *MessageUpdateOne) SetSender(u *User) *MessageUpdateOne {
 	return muo.SetSenderID(u.ID)
 }
 
-// SetMessageTypeID sets the "message_type" edge to the MessageType entity by ID.
-func (muo *MessageUpdateOne) SetMessageTypeID(id int) *MessageUpdateOne {
-	muo.mutation.SetMessageTypeID(id)
-	return muo
-}
-
-// SetMessageType sets the "message_type" edge to the MessageType entity.
-func (muo *MessageUpdateOne) SetMessageType(m *MessageType) *MessageUpdateOne {
-	return muo.SetMessageTypeID(m.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (muo *MessageUpdateOne) Mutation() *MessageMutation {
 	return muo.mutation
@@ -446,12 +393,6 @@ func (muo *MessageUpdateOne) ClearConversation() *MessageUpdateOne {
 // ClearSender clears the "sender" edge to the User entity.
 func (muo *MessageUpdateOne) ClearSender() *MessageUpdateOne {
 	muo.mutation.ClearSender()
-	return muo
-}
-
-// ClearMessageType clears the "message_type" edge to the MessageType entity.
-func (muo *MessageUpdateOne) ClearMessageType() *MessageUpdateOne {
-	muo.mutation.ClearMessageType()
 	return muo
 }
 
@@ -506,6 +447,11 @@ func (muo *MessageUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (muo *MessageUpdateOne) check() error {
+	if v, ok := muo.mutation.GetType(); ok {
+		if err := message.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Message.type": %w`, err)}
+		}
+	}
 	if v, ok := muo.mutation.Content(); ok {
 		if err := message.ContentValidator(v); err != nil {
 			return &ValidationError{Name: "content", err: fmt.Errorf(`ent: validator failed for field "Message.content": %w`, err)}
@@ -516,9 +462,6 @@ func (muo *MessageUpdateOne) check() error {
 	}
 	if _, ok := muo.mutation.SenderID(); muo.mutation.SenderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Message.sender"`)
-	}
-	if _, ok := muo.mutation.MessageTypeID(); muo.mutation.MessageTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Message.message_type"`)
 	}
 	return nil
 }
@@ -554,6 +497,9 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 	}
 	if value, ok := muo.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := muo.mutation.GetType(); ok {
+		_spec.SetField(message.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := muo.mutation.Content(); ok {
 		_spec.SetField(message.FieldContent, field.TypeString, value)
@@ -612,35 +558,6 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if muo.mutation.MessageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.MessageTypeTable,
-			Columns: []string{message.MessageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(messagetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.MessageTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.MessageTypeTable,
-			Columns: []string{message.MessageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(messagetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -10,23 +10,18 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
-	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/ordertype"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 	"github.com/thaiha1607/foursquare_server/ent/schema"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
-	"github.com/thaiha1607/foursquare_server/ent/userrole"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -109,25 +104,6 @@ func init() {
 	invoicelineitemDescID := invoicelineitemFields[0].Descriptor()
 	// invoicelineitem.DefaultID holds the default value on creation for the id field.
 	invoicelineitem.DefaultID = invoicelineitemDescID.Default.(func() uuid.UUID)
-	invoicestatuscodeMixin := schema.InvoiceStatusCode{}.Mixin()
-	invoicestatuscodeMixinFields0 := invoicestatuscodeMixin[0].Fields()
-	_ = invoicestatuscodeMixinFields0
-	invoicestatuscodeFields := schema.InvoiceStatusCode{}.Fields()
-	_ = invoicestatuscodeFields
-	// invoicestatuscodeDescCreatedAt is the schema descriptor for created_at field.
-	invoicestatuscodeDescCreatedAt := invoicestatuscodeMixinFields0[0].Descriptor()
-	// invoicestatuscode.DefaultCreatedAt holds the default value on creation for the created_at field.
-	invoicestatuscode.DefaultCreatedAt = invoicestatuscodeDescCreatedAt.Default.(func() time.Time)
-	// invoicestatuscodeDescUpdatedAt is the schema descriptor for updated_at field.
-	invoicestatuscodeDescUpdatedAt := invoicestatuscodeMixinFields0[1].Descriptor()
-	// invoicestatuscode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	invoicestatuscode.DefaultUpdatedAt = invoicestatuscodeDescUpdatedAt.Default.(func() time.Time)
-	// invoicestatuscode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	invoicestatuscode.UpdateDefaultUpdatedAt = invoicestatuscodeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// invoicestatuscodeDescInvoiceStatus is the schema descriptor for invoice_status field.
-	invoicestatuscodeDescInvoiceStatus := invoicestatuscodeFields[0].Descriptor()
-	// invoicestatuscode.InvoiceStatusValidator is a validator for the "invoice_status" field. It is called by the builders before save.
-	invoicestatuscode.InvoiceStatusValidator = invoicestatuscodeDescInvoiceStatus.Validators[0].(func(string) error)
 	invoicetypeMixin := schema.InvoiceType{}.Mixin()
 	invoicetypeMixinFields0 := invoicetypeMixin[0].Fields()
 	_ = invoicetypeMixinFields0
@@ -174,25 +150,6 @@ func init() {
 	messageDescID := messageFields[0].Descriptor()
 	// message.DefaultID holds the default value on creation for the id field.
 	message.DefaultID = messageDescID.Default.(func() uuid.UUID)
-	messagetypeMixin := schema.MessageType{}.Mixin()
-	messagetypeMixinFields0 := messagetypeMixin[0].Fields()
-	_ = messagetypeMixinFields0
-	messagetypeFields := schema.MessageType{}.Fields()
-	_ = messagetypeFields
-	// messagetypeDescCreatedAt is the schema descriptor for created_at field.
-	messagetypeDescCreatedAt := messagetypeMixinFields0[0].Descriptor()
-	// messagetype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	messagetype.DefaultCreatedAt = messagetypeDescCreatedAt.Default.(func() time.Time)
-	// messagetypeDescUpdatedAt is the schema descriptor for updated_at field.
-	messagetypeDescUpdatedAt := messagetypeMixinFields0[1].Descriptor()
-	// messagetype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	messagetype.DefaultUpdatedAt = messagetypeDescUpdatedAt.Default.(func() time.Time)
-	// messagetype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	messagetype.UpdateDefaultUpdatedAt = messagetypeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// messagetypeDescMessageType is the schema descriptor for message_type field.
-	messagetypeDescMessageType := messagetypeFields[0].Descriptor()
-	// messagetype.MessageTypeValidator is a validator for the "message_type" field. It is called by the builders before save.
-	messagetype.MessageTypeValidator = messagetypeDescMessageType.Validators[0].(func(string) error)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinFields0 := orderMixin[0].Fields()
 	_ = orderMixinFields0
@@ -275,25 +232,6 @@ func init() {
 	ordertypeDescOrderType := ordertypeFields[0].Descriptor()
 	// ordertype.OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
 	ordertype.OrderTypeValidator = ordertypeDescOrderType.Validators[0].(func(string) error)
-	paymentmethodMixin := schema.PaymentMethod{}.Mixin()
-	paymentmethodMixinFields0 := paymentmethodMixin[0].Fields()
-	_ = paymentmethodMixinFields0
-	paymentmethodFields := schema.PaymentMethod{}.Fields()
-	_ = paymentmethodFields
-	// paymentmethodDescCreatedAt is the schema descriptor for created_at field.
-	paymentmethodDescCreatedAt := paymentmethodMixinFields0[0].Descriptor()
-	// paymentmethod.DefaultCreatedAt holds the default value on creation for the created_at field.
-	paymentmethod.DefaultCreatedAt = paymentmethodDescCreatedAt.Default.(func() time.Time)
-	// paymentmethodDescUpdatedAt is the schema descriptor for updated_at field.
-	paymentmethodDescUpdatedAt := paymentmethodMixinFields0[1].Descriptor()
-	// paymentmethod.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	paymentmethod.DefaultUpdatedAt = paymentmethodDescUpdatedAt.Default.(func() time.Time)
-	// paymentmethod.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	paymentmethod.UpdateDefaultUpdatedAt = paymentmethodDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// paymentmethodDescPaymentMethod is the schema descriptor for payment_method field.
-	paymentmethodDescPaymentMethod := paymentmethodFields[0].Descriptor()
-	// paymentmethod.PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
-	paymentmethod.PaymentMethodValidator = paymentmethodDescPaymentMethod.Validators[0].(func(string) error)
 	productMixin := schema.Product{}.Mixin()
 	productMixinFields0 := productMixin[0].Fields()
 	_ = productMixinFields0
@@ -336,25 +274,6 @@ func init() {
 	producttag.DefaultUpdatedAt = producttagDescUpdatedAt.Default.(func() time.Time)
 	// producttag.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	producttag.UpdateDefaultUpdatedAt = producttagDescUpdatedAt.UpdateDefault.(func() time.Time)
-	producttypeMixin := schema.ProductType{}.Mixin()
-	producttypeMixinFields0 := producttypeMixin[0].Fields()
-	_ = producttypeMixinFields0
-	producttypeFields := schema.ProductType{}.Fields()
-	_ = producttypeFields
-	// producttypeDescCreatedAt is the schema descriptor for created_at field.
-	producttypeDescCreatedAt := producttypeMixinFields0[0].Descriptor()
-	// producttype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	producttype.DefaultCreatedAt = producttypeDescCreatedAt.Default.(func() time.Time)
-	// producttypeDescUpdatedAt is the schema descriptor for updated_at field.
-	producttypeDescUpdatedAt := producttypeMixinFields0[1].Descriptor()
-	// producttype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	producttype.DefaultUpdatedAt = producttypeDescUpdatedAt.Default.(func() time.Time)
-	// producttype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	producttype.UpdateDefaultUpdatedAt = producttypeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// producttypeDescProductType is the schema descriptor for product_type field.
-	producttypeDescProductType := producttypeFields[0].Descriptor()
-	// producttype.ProductTypeValidator is a validator for the "product_type" field. It is called by the builders before save.
-	producttype.ProductTypeValidator = producttypeDescProductType.Validators[0].(func(string) error)
 	tagMixin := schema.Tag{}.Mixin()
 	tagMixinFields0 := tagMixin[0].Fields()
 	_ = tagMixinFields0
@@ -450,23 +369,4 @@ func init() {
 	userDescID := userFields[2].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() uuid.UUID)
-	userroleMixin := schema.UserRole{}.Mixin()
-	userroleMixinFields0 := userroleMixin[0].Fields()
-	_ = userroleMixinFields0
-	userroleFields := schema.UserRole{}.Fields()
-	_ = userroleFields
-	// userroleDescCreatedAt is the schema descriptor for created_at field.
-	userroleDescCreatedAt := userroleMixinFields0[0].Descriptor()
-	// userrole.DefaultCreatedAt holds the default value on creation for the created_at field.
-	userrole.DefaultCreatedAt = userroleDescCreatedAt.Default.(func() time.Time)
-	// userroleDescUpdatedAt is the schema descriptor for updated_at field.
-	userroleDescUpdatedAt := userroleMixinFields0[1].Descriptor()
-	// userrole.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	userrole.DefaultUpdatedAt = userroleDescUpdatedAt.Default.(func() time.Time)
-	// userrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	userrole.UpdateDefaultUpdatedAt = userroleDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// userroleDescUserRole is the schema descriptor for user_role field.
-	userroleDescUserRole := userroleFields[0].Descriptor()
-	// userrole.UserRoleValidator is a validator for the "user_role" field. It is called by the builders before save.
-	userrole.UserRoleValidator = userroleDescUserRole.Validators[0].(func(string) error)
 }

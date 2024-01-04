@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/user"
-	"github.com/thaiha1607/foursquare_server/ent/userrole"
 )
 
 // User is the model entity for the User schema.
@@ -44,39 +43,14 @@ type User struct {
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
 	// Role holds the value of the "role" field.
-	Role int `json:"role,omitempty"`
+	Role user.Role `json:"role,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// PostalCode holds the value of the "postal_code" field.
 	PostalCode string `json:"postal_code,omitempty"`
 	// OtherAddressInfo holds the value of the "other_address_info" field.
 	OtherAddressInfo string `json:"other_address_info,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges        UserEdges `json:"edges"`
-	selectValues sql.SelectValues
-}
-
-// UserEdges holds the relations/edges for other nodes in the graph.
-type UserEdges struct {
-	// UserRole holds the value of the user_role edge.
-	UserRole *UserRole `json:"user_role,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// UserRoleOrErr returns the UserRole value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) UserRoleOrErr() (*UserRole, error) {
-	if e.loadedTypes[0] {
-		if e.UserRole == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: userrole.Label}
-		}
-		return e.UserRole, nil
-	}
-	return nil, &NotLoadedError{edge: "user_role"}
+	selectValues     sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -88,9 +62,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case user.FieldVerified:
 			values[i] = new(sql.NullBool)
-		case user.FieldRole:
-			values[i] = new(sql.NullInt64)
-		case user.FieldEmail, user.FieldName, user.FieldPasswordHash, user.FieldUsername, user.FieldPhone, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
+		case user.FieldEmail, user.FieldName, user.FieldPasswordHash, user.FieldUsername, user.FieldPhone, user.FieldRole, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldLastReset, user.FieldLastVerification:
 			values[i] = new(sql.NullTime)
@@ -186,10 +158,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.Phone = value.String
 			}
 		case user.FieldRole:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				u.Role = int(value.Int64)
+				u.Role = user.Role(value.String)
 			}
 		case user.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -220,11 +192,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
-}
-
-// QueryUserRole queries the "user_role" edge of the User entity.
-func (u *User) QueryUserRole() *UserRoleQuery {
-	return NewUserClient(u.config).QueryUserRole(u)
 }
 
 // Update returns a builder for updating this User.

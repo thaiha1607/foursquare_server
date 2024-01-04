@@ -16,22 +16,17 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
-	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/ordertype"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
-	"github.com/thaiha1607/foursquare_server/ent/userrole"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -96,22 +91,17 @@ func checkColumn(table, column string) error {
 			financialtransaction.Table: financialtransaction.ValidColumn,
 			invoice.Table:              invoice.ValidColumn,
 			invoicelineitem.Table:      invoicelineitem.ValidColumn,
-			invoicestatuscode.Table:    invoicestatuscode.ValidColumn,
 			invoicetype.Table:          invoicetype.ValidColumn,
 			message.Table:              message.ValidColumn,
-			messagetype.Table:          messagetype.ValidColumn,
 			order.Table:                order.ValidColumn,
 			orderlineitem.Table:        orderlineitem.ValidColumn,
 			orderstatuscode.Table:      orderstatuscode.ValidColumn,
 			ordertype.Table:            ordertype.ValidColumn,
-			paymentmethod.Table:        paymentmethod.ValidColumn,
 			product.Table:              product.ValidColumn,
 			producttag.Table:           producttag.ValidColumn,
-			producttype.Table:          producttype.ValidColumn,
 			tag.Table:                  tag.ValidColumn,
 			transactiontype.Table:      transactiontype.ValidColumn,
 			user.Table:                 user.ValidColumn,
-			userrole.Table:             userrole.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

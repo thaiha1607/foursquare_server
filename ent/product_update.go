@@ -17,7 +17,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -176,16 +175,22 @@ func (pu *ProductUpdate) ClearUnitOfMeasurement() *ProductUpdate {
 }
 
 // SetType sets the "type" field.
-func (pu *ProductUpdate) SetType(i int) *ProductUpdate {
-	pu.mutation.SetType(i)
+func (pu *ProductUpdate) SetType(s string) *ProductUpdate {
+	pu.mutation.SetType(s)
 	return pu
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (pu *ProductUpdate) SetNillableType(i *int) *ProductUpdate {
-	if i != nil {
-		pu.SetType(*i)
+func (pu *ProductUpdate) SetNillableType(s *string) *ProductUpdate {
+	if s != nil {
+		pu.SetType(*s)
 	}
+	return pu
+}
+
+// ClearType clears the value of the "type" field.
+func (pu *ProductUpdate) ClearType() *ProductUpdate {
+	pu.mutation.ClearType()
 	return pu
 }
 
@@ -209,17 +214,6 @@ func (pu *ProductUpdate) ClearProvider() *ProductUpdate {
 	return pu
 }
 
-// SetProductTypeID sets the "product_type" edge to the ProductType entity by ID.
-func (pu *ProductUpdate) SetProductTypeID(id int) *ProductUpdate {
-	pu.mutation.SetProductTypeID(id)
-	return pu
-}
-
-// SetProductType sets the "product_type" edge to the ProductType entity.
-func (pu *ProductUpdate) SetProductType(p *ProductType) *ProductUpdate {
-	return pu.SetProductTypeID(p.ID)
-}
-
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (pu *ProductUpdate) AddTagIDs(ids ...uuid.UUID) *ProductUpdate {
 	pu.mutation.AddTagIDs(ids...)
@@ -238,12 +232,6 @@ func (pu *ProductUpdate) AddTags(t ...*Tag) *ProductUpdate {
 // Mutation returns the ProductMutation object of the builder.
 func (pu *ProductUpdate) Mutation() *ProductMutation {
 	return pu.mutation
-}
-
-// ClearProductType clears the "product_type" edge to the ProductType entity.
-func (pu *ProductUpdate) ClearProductType() *ProductUpdate {
-	pu.mutation.ClearProductType()
-	return pu
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -315,9 +303,6 @@ func (pu *ProductUpdate) check() error {
 			return &ValidationError{Name: "year", err: fmt.Errorf(`ent: validator failed for field "Product.year": %w`, err)}
 		}
 	}
-	if _, ok := pu.mutation.ProductTypeID(); pu.mutation.ProductTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Product.product_type"`)
-	}
 	return nil
 }
 
@@ -380,40 +365,17 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.UnitOfMeasurementCleared() {
 		_spec.ClearField(product.FieldUnitOfMeasurement, field.TypeString)
 	}
+	if value, ok := pu.mutation.GetType(); ok {
+		_spec.SetField(product.FieldType, field.TypeString, value)
+	}
+	if pu.mutation.TypeCleared() {
+		_spec.ClearField(product.FieldType, field.TypeString)
+	}
 	if value, ok := pu.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
 	}
 	if pu.mutation.ProviderCleared() {
 		_spec.ClearField(product.FieldProvider, field.TypeString)
-	}
-	if pu.mutation.ProductTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   product.ProductTypeTable,
-			Columns: []string{product.ProductTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(producttype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.ProductTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   product.ProductTypeTable,
-			Columns: []string{product.ProductTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(producttype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if pu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -634,16 +596,22 @@ func (puo *ProductUpdateOne) ClearUnitOfMeasurement() *ProductUpdateOne {
 }
 
 // SetType sets the "type" field.
-func (puo *ProductUpdateOne) SetType(i int) *ProductUpdateOne {
-	puo.mutation.SetType(i)
+func (puo *ProductUpdateOne) SetType(s string) *ProductUpdateOne {
+	puo.mutation.SetType(s)
 	return puo
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (puo *ProductUpdateOne) SetNillableType(i *int) *ProductUpdateOne {
-	if i != nil {
-		puo.SetType(*i)
+func (puo *ProductUpdateOne) SetNillableType(s *string) *ProductUpdateOne {
+	if s != nil {
+		puo.SetType(*s)
 	}
+	return puo
+}
+
+// ClearType clears the value of the "type" field.
+func (puo *ProductUpdateOne) ClearType() *ProductUpdateOne {
+	puo.mutation.ClearType()
 	return puo
 }
 
@@ -667,17 +635,6 @@ func (puo *ProductUpdateOne) ClearProvider() *ProductUpdateOne {
 	return puo
 }
 
-// SetProductTypeID sets the "product_type" edge to the ProductType entity by ID.
-func (puo *ProductUpdateOne) SetProductTypeID(id int) *ProductUpdateOne {
-	puo.mutation.SetProductTypeID(id)
-	return puo
-}
-
-// SetProductType sets the "product_type" edge to the ProductType entity.
-func (puo *ProductUpdateOne) SetProductType(p *ProductType) *ProductUpdateOne {
-	return puo.SetProductTypeID(p.ID)
-}
-
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (puo *ProductUpdateOne) AddTagIDs(ids ...uuid.UUID) *ProductUpdateOne {
 	puo.mutation.AddTagIDs(ids...)
@@ -696,12 +653,6 @@ func (puo *ProductUpdateOne) AddTags(t ...*Tag) *ProductUpdateOne {
 // Mutation returns the ProductMutation object of the builder.
 func (puo *ProductUpdateOne) Mutation() *ProductMutation {
 	return puo.mutation
-}
-
-// ClearProductType clears the "product_type" edge to the ProductType entity.
-func (puo *ProductUpdateOne) ClearProductType() *ProductUpdateOne {
-	puo.mutation.ClearProductType()
-	return puo
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -786,9 +737,6 @@ func (puo *ProductUpdateOne) check() error {
 			return &ValidationError{Name: "year", err: fmt.Errorf(`ent: validator failed for field "Product.year": %w`, err)}
 		}
 	}
-	if _, ok := puo.mutation.ProductTypeID(); puo.mutation.ProductTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Product.product_type"`)
-	}
 	return nil
 }
 
@@ -868,40 +816,17 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	if puo.mutation.UnitOfMeasurementCleared() {
 		_spec.ClearField(product.FieldUnitOfMeasurement, field.TypeString)
 	}
+	if value, ok := puo.mutation.GetType(); ok {
+		_spec.SetField(product.FieldType, field.TypeString, value)
+	}
+	if puo.mutation.TypeCleared() {
+		_spec.ClearField(product.FieldType, field.TypeString)
+	}
 	if value, ok := puo.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
 	}
 	if puo.mutation.ProviderCleared() {
 		_spec.ClearField(product.FieldProvider, field.TypeString)
-	}
-	if puo.mutation.ProductTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   product.ProductTypeTable,
-			Columns: []string{product.ProductTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(producttype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.ProductTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   product.ProductTypeTable,
-			Columns: []string{product.ProductTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(producttype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if puo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{

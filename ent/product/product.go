@@ -37,21 +37,12 @@ const (
 	FieldType = "type"
 	// FieldProvider holds the string denoting the provider field in the database.
 	FieldProvider = "provider"
-	// EdgeProductType holds the string denoting the product_type edge name in mutations.
-	EdgeProductType = "product_type"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// EdgeProductTags holds the string denoting the product_tags edge name in mutations.
 	EdgeProductTags = "product_tags"
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// ProductTypeTable is the table that holds the product_type relation/edge.
-	ProductTypeTable = "products"
-	// ProductTypeInverseTable is the table name for the ProductType entity.
-	// It exists in this package in order to avoid circular dependency with the "producttype" package.
-	ProductTypeInverseTable = "product_types"
-	// ProductTypeColumn is the table column denoting the product_type relation/edge.
-	ProductTypeColumn = "type"
 	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
 	TagsTable = "product_tags"
 	// TagsInverseTable is the table name for the Tag entity.
@@ -171,13 +162,6 @@ func ByProvider(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProvider, opts...).ToFunc()
 }
 
-// ByProductTypeField orders the results by product_type field.
-func ByProductTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProductTypeStep(), sql.OrderByField(field, opts...))
-	}
-}
-
 // ByTagsCount orders the results by tags count.
 func ByTagsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -204,13 +188,6 @@ func ByProductTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newProductTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
-}
-func newProductTypeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProductTypeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, ProductTypeTable, ProductTypeColumn),
-	)
 }
 func newTagsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

@@ -3,6 +3,7 @@
 package message
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,8 +34,6 @@ const (
 	EdgeConversation = "conversation"
 	// EdgeSender holds the string denoting the sender edge name in mutations.
 	EdgeSender = "sender"
-	// EdgeMessageType holds the string denoting the message_type edge name in mutations.
-	EdgeMessageType = "message_type"
 	// Table holds the table name of the message in the database.
 	Table = "messages"
 	// ConversationTable is the table that holds the conversation relation/edge.
@@ -51,13 +50,6 @@ const (
 	SenderInverseTable = "users"
 	// SenderColumn is the table column denoting the sender relation/edge.
 	SenderColumn = "sender_id"
-	// MessageTypeTable is the table that holds the message_type relation/edge.
-	MessageTypeTable = "messages"
-	// MessageTypeInverseTable is the table name for the MessageType entity.
-	// It exists in this package in order to avoid circular dependency with the "messagetype" package.
-	MessageTypeInverseTable = "message_types"
-	// MessageTypeColumn is the table column denoting the message_type relation/edge.
-	MessageTypeColumn = "type"
 )
 
 // Columns holds all SQL columns for message fields.
@@ -96,6 +88,36 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Type defines the type for the "type" enum field.
+type Type string
+
+// TypeText is the default value of the Type enum.
+const DefaultType = TypeText
+
+// Type values.
+const (
+	TypeText  Type = "TEXT"
+	TypeImage Type = "IMAGE"
+	TypeVideo Type = "VIDEO"
+	TypeAudio Type = "AUDIO"
+	TypeFile  Type = "FILE"
+	TypeOther Type = "OTHER"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeText, TypeImage, TypeVideo, TypeAudio, TypeFile, TypeOther:
+		return nil
+	default:
+		return fmt.Errorf("message: invalid enum value for type field: %q", _type)
+	}
+}
 
 // OrderOption defines the ordering options for the Message queries.
 type OrderOption func(*sql.Selector)
@@ -153,13 +175,6 @@ func BySenderField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSenderStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByMessageTypeField orders the results by message_type field.
-func ByMessageTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMessageTypeStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newConversationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -172,12 +187,5 @@ func newSenderStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SenderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, SenderTable, SenderColumn),
-	)
-}
-func newMessageTypeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MessageTypeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, MessageTypeTable, MessageTypeColumn),
 	)
 }

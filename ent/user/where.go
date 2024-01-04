@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
@@ -104,11 +103,6 @@ func Verified(v bool) predicate.User {
 // Phone applies equality check predicate on the "phone" field. It's identical to PhoneEQ.
 func Phone(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPhone, v))
-}
-
-// Role applies equality check predicate on the "role" field. It's identical to RoleEQ.
-func Role(v int) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldRole, v))
 }
 
 // Address applies equality check predicate on the "address" field. It's identical to AddressEQ.
@@ -652,22 +646,22 @@ func PhoneContainsFold(v string) predicate.User {
 }
 
 // RoleEQ applies the EQ predicate on the "role" field.
-func RoleEQ(v int) predicate.User {
+func RoleEQ(v Role) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldRole, v))
 }
 
 // RoleNEQ applies the NEQ predicate on the "role" field.
-func RoleNEQ(v int) predicate.User {
+func RoleNEQ(v Role) predicate.User {
 	return predicate.User(sql.FieldNEQ(FieldRole, v))
 }
 
 // RoleIn applies the In predicate on the "role" field.
-func RoleIn(vs ...int) predicate.User {
+func RoleIn(vs ...Role) predicate.User {
 	return predicate.User(sql.FieldIn(FieldRole, vs...))
 }
 
 // RoleNotIn applies the NotIn predicate on the "role" field.
-func RoleNotIn(vs ...int) predicate.User {
+func RoleNotIn(vs ...Role) predicate.User {
 	return predicate.User(sql.FieldNotIn(FieldRole, vs...))
 }
 
@@ -894,29 +888,6 @@ func OtherAddressInfoEqualFold(v string) predicate.User {
 // OtherAddressInfoContainsFold applies the ContainsFold predicate on the "other_address_info" field.
 func OtherAddressInfoContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldOtherAddressInfo, v))
-}
-
-// HasUserRole applies the HasEdge predicate on the "user_role" edge.
-func HasUserRole() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, UserRoleTable, UserRoleColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserRoleWith applies the HasEdge predicate on the "user_role" edge with a given conditions (other predicates).
-func HasUserRoleWith(preds ...predicate.UserRole) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newUserRoleStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

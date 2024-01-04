@@ -20,14 +20,10 @@ type Tx struct {
 	Invoice *InvoiceClient
 	// InvoiceLineItem is the client for interacting with the InvoiceLineItem builders.
 	InvoiceLineItem *InvoiceLineItemClient
-	// InvoiceStatusCode is the client for interacting with the InvoiceStatusCode builders.
-	InvoiceStatusCode *InvoiceStatusCodeClient
 	// InvoiceType is the client for interacting with the InvoiceType builders.
 	InvoiceType *InvoiceTypeClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
-	// MessageType is the client for interacting with the MessageType builders.
-	MessageType *MessageTypeClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
 	// OrderLineItem is the client for interacting with the OrderLineItem builders.
@@ -36,22 +32,16 @@ type Tx struct {
 	OrderStatusCode *OrderStatusCodeClient
 	// OrderType is the client for interacting with the OrderType builders.
 	OrderType *OrderTypeClient
-	// PaymentMethod is the client for interacting with the PaymentMethod builders.
-	PaymentMethod *PaymentMethodClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// ProductTag is the client for interacting with the ProductTag builders.
 	ProductTag *ProductTagClient
-	// ProductType is the client for interacting with the ProductType builders.
-	ProductType *ProductTypeClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// TransactionType is the client for interacting with the TransactionType builders.
 	TransactionType *TransactionTypeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// UserRole is the client for interacting with the UserRole builders.
-	UserRole *UserRoleClient
 
 	// lazily loaded.
 	client     *Client
@@ -187,22 +177,17 @@ func (tx *Tx) init() {
 	tx.FinancialTransaction = NewFinancialTransactionClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
 	tx.InvoiceLineItem = NewInvoiceLineItemClient(tx.config)
-	tx.InvoiceStatusCode = NewInvoiceStatusCodeClient(tx.config)
 	tx.InvoiceType = NewInvoiceTypeClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
-	tx.MessageType = NewMessageTypeClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
 	tx.OrderType = NewOrderTypeClient(tx.config)
-	tx.PaymentMethod = NewPaymentMethodClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
-	tx.ProductType = NewProductTypeClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.TransactionType = NewTransactionTypeClient(tx.config)
 	tx.User = NewUserClient(tx.config)
-	tx.UserRole = NewUserRoleClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

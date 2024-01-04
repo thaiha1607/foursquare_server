@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/user"
-	"github.com/thaiha1607/foursquare_server/ent/userrole"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -130,8 +129,16 @@ func (uc *UserCreate) SetPhone(s string) *UserCreate {
 }
 
 // SetRole sets the "role" field.
-func (uc *UserCreate) SetRole(i int) *UserCreate {
-	uc.mutation.SetRole(i)
+func (uc *UserCreate) SetRole(u user.Role) *UserCreate {
+	uc.mutation.SetRole(u)
+	return uc
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uc *UserCreate) SetNillableRole(u *user.Role) *UserCreate {
+	if u != nil {
+		uc.SetRole(*u)
+	}
 	return uc
 }
 
@@ -191,17 +198,6 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 	return uc
 }
 
-// SetUserRoleID sets the "user_role" edge to the UserRole entity by ID.
-func (uc *UserCreate) SetUserRoleID(id int) *UserCreate {
-	uc.mutation.SetUserRoleID(id)
-	return uc
-}
-
-// SetUserRole sets the "user_role" edge to the UserRole entity.
-func (uc *UserCreate) SetUserRole(u *UserRole) *UserCreate {
-	return uc.SetUserRoleID(u.ID)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uc *UserCreate) Mutation() *UserMutation {
 	return uc.mutation
@@ -248,6 +244,10 @@ func (uc *UserCreate) defaults() {
 	if _, ok := uc.mutation.Verified(); !ok {
 		v := user.DefaultVerified
 		uc.mutation.SetVerified(v)
+	}
+	if _, ok := uc.mutation.Role(); !ok {
+		v := user.DefaultRole
+		uc.mutation.SetRole(v)
 	}
 	if _, ok := uc.mutation.ID(); !ok {
 		v := user.DefaultID()
@@ -309,8 +309,10 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
-	if _, ok := uc.mutation.UserRoleID(); !ok {
-		return &ValidationError{Name: "user_role", err: errors.New(`ent: missing required edge "User.user_role"`)}
+	if v, ok := uc.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -391,6 +393,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 		_node.Phone = value
 	}
+	if value, ok := uc.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+		_node.Role = value
+	}
 	if value, ok := uc.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 		_node.Address = value
@@ -402,23 +408,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.OtherAddressInfo(); ok {
 		_spec.SetField(user.FieldOtherAddressInfo, field.TypeString, value)
 		_node.OtherAddressInfo = value
-	}
-	if nodes := uc.mutation.UserRoleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   user.UserRoleTable,
-			Columns: []string{user.UserRoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userrole.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Role = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

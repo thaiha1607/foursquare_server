@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -46,7 +45,14 @@ func (User) Fields() []ent.Field {
 		field.String("phone").
 			NotEmpty().
 			Unique(),
-		field.Int("role"),
+		field.Enum("role").
+			NamedValues(
+				"Admin", "ADMIN",
+				"Customer", "CUSTOMER",
+				"Warehouse", "WAREHOUSE",
+				"Delivery", "DELIVERY",
+				"Management", "MANAGEMENT",
+			).Default("CUSTOMER"),
 		field.String("address").
 			Optional(),
 		field.String("postal_code").
@@ -58,12 +64,7 @@ func (User) Fields() []ent.Field {
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("user_role", UserRole.Type).
-			Field("role").
-			Unique().
-			Required(),
-	}
+	return nil
 }
 
 // Mixin of the User.

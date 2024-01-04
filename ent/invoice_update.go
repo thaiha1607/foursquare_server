@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
@@ -74,6 +73,46 @@ func (iu *InvoiceUpdate) AddTotal(d decimal.Decimal) *InvoiceUpdate {
 	return iu
 }
 
+// SetComment sets the "comment" field.
+func (iu *InvoiceUpdate) SetComment(s string) *InvoiceUpdate {
+	iu.mutation.SetComment(s)
+	return iu
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (iu *InvoiceUpdate) SetNillableComment(s *string) *InvoiceUpdate {
+	if s != nil {
+		iu.SetComment(*s)
+	}
+	return iu
+}
+
+// ClearComment clears the value of the "comment" field.
+func (iu *InvoiceUpdate) ClearComment() *InvoiceUpdate {
+	iu.mutation.ClearComment()
+	return iu
+}
+
+// SetNote sets the "note" field.
+func (iu *InvoiceUpdate) SetNote(s string) *InvoiceUpdate {
+	iu.mutation.SetNote(s)
+	return iu
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (iu *InvoiceUpdate) SetNillableNote(s *string) *InvoiceUpdate {
+	if s != nil {
+		iu.SetNote(*s)
+	}
+	return iu
+}
+
+// ClearNote clears the value of the "note" field.
+func (iu *InvoiceUpdate) ClearNote() *InvoiceUpdate {
+	iu.mutation.ClearNote()
+	return iu
+}
+
 // SetType sets the "type" field.
 func (iu *InvoiceUpdate) SetType(i int) *InvoiceUpdate {
 	iu.mutation.SetType(i)
@@ -88,16 +127,16 @@ func (iu *InvoiceUpdate) SetNillableType(i *int) *InvoiceUpdate {
 	return iu
 }
 
-// SetStatusCode sets the "status_code" field.
-func (iu *InvoiceUpdate) SetStatusCode(i int) *InvoiceUpdate {
-	iu.mutation.SetStatusCode(i)
+// SetStatus sets the "status" field.
+func (iu *InvoiceUpdate) SetStatus(i invoice.Status) *InvoiceUpdate {
+	iu.mutation.SetStatus(i)
 	return iu
 }
 
-// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableStatusCode(i *int) *InvoiceUpdate {
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (iu *InvoiceUpdate) SetNillableStatus(i *invoice.Status) *InvoiceUpdate {
 	if i != nil {
-		iu.SetStatusCode(*i)
+		iu.SetStatus(*i)
 	}
 	return iu
 }
@@ -118,17 +157,6 @@ func (iu *InvoiceUpdate) SetInvoiceType(i *InvoiceType) *InvoiceUpdate {
 	return iu.SetInvoiceTypeID(i.ID)
 }
 
-// SetInvoiceStatusID sets the "invoice_status" edge to the InvoiceStatusCode entity by ID.
-func (iu *InvoiceUpdate) SetInvoiceStatusID(id int) *InvoiceUpdate {
-	iu.mutation.SetInvoiceStatusID(id)
-	return iu
-}
-
-// SetInvoiceStatus sets the "invoice_status" edge to the InvoiceStatusCode entity.
-func (iu *InvoiceUpdate) SetInvoiceStatus(i *InvoiceStatusCode) *InvoiceUpdate {
-	return iu.SetInvoiceStatusID(i.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iu *InvoiceUpdate) Mutation() *InvoiceMutation {
 	return iu.mutation
@@ -143,12 +171,6 @@ func (iu *InvoiceUpdate) ClearOrder() *InvoiceUpdate {
 // ClearInvoiceType clears the "invoice_type" edge to the InvoiceType entity.
 func (iu *InvoiceUpdate) ClearInvoiceType() *InvoiceUpdate {
 	iu.mutation.ClearInvoiceType()
-	return iu
-}
-
-// ClearInvoiceStatus clears the "invoice_status" edge to the InvoiceStatusCode entity.
-func (iu *InvoiceUpdate) ClearInvoiceStatus() *InvoiceUpdate {
-	iu.mutation.ClearInvoiceStatus()
 	return iu
 }
 
@@ -190,14 +212,16 @@ func (iu *InvoiceUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iu *InvoiceUpdate) check() error {
+	if v, ok := iu.mutation.Status(); ok {
+		if err := invoice.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
+		}
+	}
 	if _, ok := iu.mutation.OrderID(); iu.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
 	}
 	if _, ok := iu.mutation.InvoiceTypeID(); iu.mutation.InvoiceTypeCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_type"`)
-	}
-	if _, ok := iu.mutation.InvoiceStatusID(); iu.mutation.InvoiceStatusCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_status"`)
 	}
 	return nil
 }
@@ -222,6 +246,21 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.AddedTotal(); ok {
 		_spec.AddField(invoice.FieldTotal, field.TypeFloat64, value)
+	}
+	if value, ok := iu.mutation.Comment(); ok {
+		_spec.SetField(invoice.FieldComment, field.TypeString, value)
+	}
+	if iu.mutation.CommentCleared() {
+		_spec.ClearField(invoice.FieldComment, field.TypeString)
+	}
+	if value, ok := iu.mutation.Note(); ok {
+		_spec.SetField(invoice.FieldNote, field.TypeString, value)
+	}
+	if iu.mutation.NoteCleared() {
+		_spec.ClearField(invoice.FieldNote, field.TypeString)
+	}
+	if value, ok := iu.mutation.Status(); ok {
+		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 	}
 	if iu.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -274,35 +313,6 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iu.mutation.InvoiceStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceStatusTable,
-			Columns: []string{invoice.InvoiceStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iu.mutation.InvoiceStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceStatusTable,
-			Columns: []string{invoice.InvoiceStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -371,6 +381,46 @@ func (iuo *InvoiceUpdateOne) AddTotal(d decimal.Decimal) *InvoiceUpdateOne {
 	return iuo
 }
 
+// SetComment sets the "comment" field.
+func (iuo *InvoiceUpdateOne) SetComment(s string) *InvoiceUpdateOne {
+	iuo.mutation.SetComment(s)
+	return iuo
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (iuo *InvoiceUpdateOne) SetNillableComment(s *string) *InvoiceUpdateOne {
+	if s != nil {
+		iuo.SetComment(*s)
+	}
+	return iuo
+}
+
+// ClearComment clears the value of the "comment" field.
+func (iuo *InvoiceUpdateOne) ClearComment() *InvoiceUpdateOne {
+	iuo.mutation.ClearComment()
+	return iuo
+}
+
+// SetNote sets the "note" field.
+func (iuo *InvoiceUpdateOne) SetNote(s string) *InvoiceUpdateOne {
+	iuo.mutation.SetNote(s)
+	return iuo
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (iuo *InvoiceUpdateOne) SetNillableNote(s *string) *InvoiceUpdateOne {
+	if s != nil {
+		iuo.SetNote(*s)
+	}
+	return iuo
+}
+
+// ClearNote clears the value of the "note" field.
+func (iuo *InvoiceUpdateOne) ClearNote() *InvoiceUpdateOne {
+	iuo.mutation.ClearNote()
+	return iuo
+}
+
 // SetType sets the "type" field.
 func (iuo *InvoiceUpdateOne) SetType(i int) *InvoiceUpdateOne {
 	iuo.mutation.SetType(i)
@@ -385,16 +435,16 @@ func (iuo *InvoiceUpdateOne) SetNillableType(i *int) *InvoiceUpdateOne {
 	return iuo
 }
 
-// SetStatusCode sets the "status_code" field.
-func (iuo *InvoiceUpdateOne) SetStatusCode(i int) *InvoiceUpdateOne {
-	iuo.mutation.SetStatusCode(i)
+// SetStatus sets the "status" field.
+func (iuo *InvoiceUpdateOne) SetStatus(i invoice.Status) *InvoiceUpdateOne {
+	iuo.mutation.SetStatus(i)
 	return iuo
 }
 
-// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableStatusCode(i *int) *InvoiceUpdateOne {
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (iuo *InvoiceUpdateOne) SetNillableStatus(i *invoice.Status) *InvoiceUpdateOne {
 	if i != nil {
-		iuo.SetStatusCode(*i)
+		iuo.SetStatus(*i)
 	}
 	return iuo
 }
@@ -415,17 +465,6 @@ func (iuo *InvoiceUpdateOne) SetInvoiceType(i *InvoiceType) *InvoiceUpdateOne {
 	return iuo.SetInvoiceTypeID(i.ID)
 }
 
-// SetInvoiceStatusID sets the "invoice_status" edge to the InvoiceStatusCode entity by ID.
-func (iuo *InvoiceUpdateOne) SetInvoiceStatusID(id int) *InvoiceUpdateOne {
-	iuo.mutation.SetInvoiceStatusID(id)
-	return iuo
-}
-
-// SetInvoiceStatus sets the "invoice_status" edge to the InvoiceStatusCode entity.
-func (iuo *InvoiceUpdateOne) SetInvoiceStatus(i *InvoiceStatusCode) *InvoiceUpdateOne {
-	return iuo.SetInvoiceStatusID(i.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iuo *InvoiceUpdateOne) Mutation() *InvoiceMutation {
 	return iuo.mutation
@@ -440,12 +479,6 @@ func (iuo *InvoiceUpdateOne) ClearOrder() *InvoiceUpdateOne {
 // ClearInvoiceType clears the "invoice_type" edge to the InvoiceType entity.
 func (iuo *InvoiceUpdateOne) ClearInvoiceType() *InvoiceUpdateOne {
 	iuo.mutation.ClearInvoiceType()
-	return iuo
-}
-
-// ClearInvoiceStatus clears the "invoice_status" edge to the InvoiceStatusCode entity.
-func (iuo *InvoiceUpdateOne) ClearInvoiceStatus() *InvoiceUpdateOne {
-	iuo.mutation.ClearInvoiceStatus()
 	return iuo
 }
 
@@ -500,14 +533,16 @@ func (iuo *InvoiceUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iuo *InvoiceUpdateOne) check() error {
+	if v, ok := iuo.mutation.Status(); ok {
+		if err := invoice.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
+		}
+	}
 	if _, ok := iuo.mutation.OrderID(); iuo.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
 	}
 	if _, ok := iuo.mutation.InvoiceTypeID(); iuo.mutation.InvoiceTypeCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_type"`)
-	}
-	if _, ok := iuo.mutation.InvoiceStatusID(); iuo.mutation.InvoiceStatusCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_status"`)
 	}
 	return nil
 }
@@ -549,6 +584,21 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	}
 	if value, ok := iuo.mutation.AddedTotal(); ok {
 		_spec.AddField(invoice.FieldTotal, field.TypeFloat64, value)
+	}
+	if value, ok := iuo.mutation.Comment(); ok {
+		_spec.SetField(invoice.FieldComment, field.TypeString, value)
+	}
+	if iuo.mutation.CommentCleared() {
+		_spec.ClearField(invoice.FieldComment, field.TypeString)
+	}
+	if value, ok := iuo.mutation.Note(); ok {
+		_spec.SetField(invoice.FieldNote, field.TypeString, value)
+	}
+	if iuo.mutation.NoteCleared() {
+		_spec.ClearField(invoice.FieldNote, field.TypeString)
+	}
+	if value, ok := iuo.mutation.Status(); ok {
+		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 	}
 	if iuo.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -601,35 +651,6 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iuo.mutation.InvoiceStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceStatusTable,
-			Columns: []string{invoice.InvoiceStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iuo.mutation.InvoiceStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceStatusTable,
-			Columns: []string{invoice.InvoiceStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

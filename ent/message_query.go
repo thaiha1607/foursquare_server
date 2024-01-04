@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
@@ -27,7 +26,6 @@ type MessageQuery struct {
 	predicates       []predicate.Message
 	withConversation *ConversationQuery
 	withSender       *UserQuery
-	withMessageType  *MessageTypeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,28 +99,6 @@ func (mq *MessageQuery) QuerySender() *UserQuery {
 			sqlgraph.From(message.Table, message.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, message.SenderTable, message.SenderColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryMessageType chains the current query on the "message_type" edge.
-func (mq *MessageQuery) QueryMessageType() *MessageTypeQuery {
-	query := (&MessageTypeClient{config: mq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := mq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(message.Table, message.FieldID, selector),
-			sqlgraph.To(messagetype.Table, messagetype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, message.MessageTypeTable, message.MessageTypeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -324,7 +300,6 @@ func (mq *MessageQuery) Clone() *MessageQuery {
 		predicates:       append([]predicate.Message{}, mq.predicates...),
 		withConversation: mq.withConversation.Clone(),
 		withSender:       mq.withSender.Clone(),
-		withMessageType:  mq.withMessageType.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -350,17 +325,6 @@ func (mq *MessageQuery) WithSender(opts ...func(*UserQuery)) *MessageQuery {
 		opt(query)
 	}
 	mq.withSender = query
-	return mq
-}
-
-// WithMessageType tells the query-builder to eager-load the nodes that are connected to
-// the "message_type" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MessageQuery) WithMessageType(opts ...func(*MessageTypeQuery)) *MessageQuery {
-	query := (&MessageTypeClient{config: mq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	mq.withMessageType = query
 	return mq
 }
 
@@ -442,10 +406,9 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	var (
 		nodes       = []*Message{}
 		_spec       = mq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [2]bool{
 			mq.withConversation != nil,
 			mq.withSender != nil,
-			mq.withMessageType != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -475,12 +438,6 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	if query := mq.withSender; query != nil {
 		if err := mq.loadSender(ctx, query, nodes, nil,
 			func(n *Message, e *User) { n.Edges.Sender = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := mq.withMessageType; query != nil {
-		if err := mq.loadMessageType(ctx, query, nodes, nil,
-			func(n *Message, e *MessageType) { n.Edges.MessageType = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -545,35 +502,6 @@ func (mq *MessageQuery) loadSender(ctx context.Context, query *UserQuery, nodes 
 	}
 	return nil
 }
-func (mq *MessageQuery) loadMessageType(ctx context.Context, query *MessageTypeQuery, nodes []*Message, init func(*Message), assign func(*Message, *MessageType)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Message)
-	for i := range nodes {
-		fk := nodes[i].Type
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(messagetype.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "type" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 
 func (mq *MessageQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := mq.querySpec()
@@ -605,9 +533,6 @@ func (mq *MessageQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if mq.withSender != nil {
 			_spec.Node.AddColumnOnce(message.FieldSenderID)
-		}
-		if mq.withMessageType != nil {
-			_spec.Node.AddColumnOnce(message.FieldType)
 		}
 	}
 	if ps := mq.predicates; len(ps) > 0 {

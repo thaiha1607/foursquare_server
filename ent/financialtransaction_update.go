@@ -15,7 +15,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
@@ -109,15 +108,15 @@ func (ftu *FinancialTransactionUpdate) SetNillableType(i *int) *FinancialTransac
 }
 
 // SetPaymentMethod sets the "payment_method" field.
-func (ftu *FinancialTransactionUpdate) SetPaymentMethod(i int) *FinancialTransactionUpdate {
-	ftu.mutation.SetPaymentMethod(i)
+func (ftu *FinancialTransactionUpdate) SetPaymentMethod(fm financialtransaction.PaymentMethod) *FinancialTransactionUpdate {
+	ftu.mutation.SetPaymentMethod(fm)
 	return ftu
 }
 
 // SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
-func (ftu *FinancialTransactionUpdate) SetNillablePaymentMethod(i *int) *FinancialTransactionUpdate {
-	if i != nil {
-		ftu.SetPaymentMethod(*i)
+func (ftu *FinancialTransactionUpdate) SetNillablePaymentMethod(fm *financialtransaction.PaymentMethod) *FinancialTransactionUpdate {
+	if fm != nil {
+		ftu.SetPaymentMethod(*fm)
 	}
 	return ftu
 }
@@ -138,17 +137,6 @@ func (ftu *FinancialTransactionUpdate) SetTransactionType(t *TransactionType) *F
 	return ftu.SetTransactionTypeID(t.ID)
 }
 
-// SetPaymentID sets the "payment" edge to the PaymentMethod entity by ID.
-func (ftu *FinancialTransactionUpdate) SetPaymentID(id int) *FinancialTransactionUpdate {
-	ftu.mutation.SetPaymentID(id)
-	return ftu
-}
-
-// SetPayment sets the "payment" edge to the PaymentMethod entity.
-func (ftu *FinancialTransactionUpdate) SetPayment(p *PaymentMethod) *FinancialTransactionUpdate {
-	return ftu.SetPaymentID(p.ID)
-}
-
 // Mutation returns the FinancialTransactionMutation object of the builder.
 func (ftu *FinancialTransactionUpdate) Mutation() *FinancialTransactionMutation {
 	return ftu.mutation
@@ -163,12 +151,6 @@ func (ftu *FinancialTransactionUpdate) ClearInvoice() *FinancialTransactionUpdat
 // ClearTransactionType clears the "transaction_type" edge to the TransactionType entity.
 func (ftu *FinancialTransactionUpdate) ClearTransactionType() *FinancialTransactionUpdate {
 	ftu.mutation.ClearTransactionType()
-	return ftu
-}
-
-// ClearPayment clears the "payment" edge to the PaymentMethod entity.
-func (ftu *FinancialTransactionUpdate) ClearPayment() *FinancialTransactionUpdate {
-	ftu.mutation.ClearPayment()
 	return ftu
 }
 
@@ -210,14 +192,16 @@ func (ftu *FinancialTransactionUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ftu *FinancialTransactionUpdate) check() error {
+	if v, ok := ftu.mutation.PaymentMethod(); ok {
+		if err := financialtransaction.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "FinancialTransaction.payment_method": %w`, err)}
+		}
+	}
 	if _, ok := ftu.mutation.InvoiceID(); ftu.mutation.InvoiceCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.invoice"`)
 	}
 	if _, ok := ftu.mutation.TransactionTypeID(); ftu.mutation.TransactionTypeCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.transaction_type"`)
-	}
-	if _, ok := ftu.mutation.PaymentID(); ftu.mutation.PaymentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.payment"`)
 	}
 	return nil
 }
@@ -248,6 +232,9 @@ func (ftu *FinancialTransactionUpdate) sqlSave(ctx context.Context) (n int, err 
 	}
 	if ftu.mutation.CommentCleared() {
 		_spec.ClearField(financialtransaction.FieldComment, field.TypeString)
+	}
+	if value, ok := ftu.mutation.PaymentMethod(); ok {
+		_spec.SetField(financialtransaction.FieldPaymentMethod, field.TypeEnum, value)
 	}
 	if ftu.mutation.InvoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -300,35 +287,6 @@ func (ftu *FinancialTransactionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(transactiontype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ftu.mutation.PaymentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.PaymentTable,
-			Columns: []string{financialtransaction.PaymentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(paymentmethod.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ftu.mutation.PaymentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.PaymentTable,
-			Columns: []string{financialtransaction.PaymentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(paymentmethod.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -432,15 +390,15 @@ func (ftuo *FinancialTransactionUpdateOne) SetNillableType(i *int) *FinancialTra
 }
 
 // SetPaymentMethod sets the "payment_method" field.
-func (ftuo *FinancialTransactionUpdateOne) SetPaymentMethod(i int) *FinancialTransactionUpdateOne {
-	ftuo.mutation.SetPaymentMethod(i)
+func (ftuo *FinancialTransactionUpdateOne) SetPaymentMethod(fm financialtransaction.PaymentMethod) *FinancialTransactionUpdateOne {
+	ftuo.mutation.SetPaymentMethod(fm)
 	return ftuo
 }
 
 // SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
-func (ftuo *FinancialTransactionUpdateOne) SetNillablePaymentMethod(i *int) *FinancialTransactionUpdateOne {
-	if i != nil {
-		ftuo.SetPaymentMethod(*i)
+func (ftuo *FinancialTransactionUpdateOne) SetNillablePaymentMethod(fm *financialtransaction.PaymentMethod) *FinancialTransactionUpdateOne {
+	if fm != nil {
+		ftuo.SetPaymentMethod(*fm)
 	}
 	return ftuo
 }
@@ -461,17 +419,6 @@ func (ftuo *FinancialTransactionUpdateOne) SetTransactionType(t *TransactionType
 	return ftuo.SetTransactionTypeID(t.ID)
 }
 
-// SetPaymentID sets the "payment" edge to the PaymentMethod entity by ID.
-func (ftuo *FinancialTransactionUpdateOne) SetPaymentID(id int) *FinancialTransactionUpdateOne {
-	ftuo.mutation.SetPaymentID(id)
-	return ftuo
-}
-
-// SetPayment sets the "payment" edge to the PaymentMethod entity.
-func (ftuo *FinancialTransactionUpdateOne) SetPayment(p *PaymentMethod) *FinancialTransactionUpdateOne {
-	return ftuo.SetPaymentID(p.ID)
-}
-
 // Mutation returns the FinancialTransactionMutation object of the builder.
 func (ftuo *FinancialTransactionUpdateOne) Mutation() *FinancialTransactionMutation {
 	return ftuo.mutation
@@ -486,12 +433,6 @@ func (ftuo *FinancialTransactionUpdateOne) ClearInvoice() *FinancialTransactionU
 // ClearTransactionType clears the "transaction_type" edge to the TransactionType entity.
 func (ftuo *FinancialTransactionUpdateOne) ClearTransactionType() *FinancialTransactionUpdateOne {
 	ftuo.mutation.ClearTransactionType()
-	return ftuo
-}
-
-// ClearPayment clears the "payment" edge to the PaymentMethod entity.
-func (ftuo *FinancialTransactionUpdateOne) ClearPayment() *FinancialTransactionUpdateOne {
-	ftuo.mutation.ClearPayment()
 	return ftuo
 }
 
@@ -546,14 +487,16 @@ func (ftuo *FinancialTransactionUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ftuo *FinancialTransactionUpdateOne) check() error {
+	if v, ok := ftuo.mutation.PaymentMethod(); ok {
+		if err := financialtransaction.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "FinancialTransaction.payment_method": %w`, err)}
+		}
+	}
 	if _, ok := ftuo.mutation.InvoiceID(); ftuo.mutation.InvoiceCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.invoice"`)
 	}
 	if _, ok := ftuo.mutation.TransactionTypeID(); ftuo.mutation.TransactionTypeCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.transaction_type"`)
-	}
-	if _, ok := ftuo.mutation.PaymentID(); ftuo.mutation.PaymentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "FinancialTransaction.payment"`)
 	}
 	return nil
 }
@@ -601,6 +544,9 @@ func (ftuo *FinancialTransactionUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if ftuo.mutation.CommentCleared() {
 		_spec.ClearField(financialtransaction.FieldComment, field.TypeString)
+	}
+	if value, ok := ftuo.mutation.PaymentMethod(); ok {
+		_spec.SetField(financialtransaction.FieldPaymentMethod, field.TypeEnum, value)
 	}
 	if ftuo.mutation.InvoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -653,35 +599,6 @@ func (ftuo *FinancialTransactionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(transactiontype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ftuo.mutation.PaymentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.PaymentTable,
-			Columns: []string{financialtransaction.PaymentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(paymentmethod.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ftuo.mutation.PaymentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.PaymentTable,
-			Columns: []string{financialtransaction.PaymentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(paymentmethod.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

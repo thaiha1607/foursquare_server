@@ -26,8 +26,26 @@ func (Invoice) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
+		field.String("comment").
+			Optional().
+			Nillable(),
+		field.String("note").
+			Optional().
+			Nillable(),
 		field.Int("type"),
-		field.Int("status_code"),
+		field.Enum("status").
+			NamedValues(
+				"Draft", "DRAFT",
+				"Active", "ACTIVE",
+				"Sent", "SENT",
+				"Disputed", "DISPUTED",
+				"Overdue", "OVERDUE",
+				"Partial", "PARTIAL",
+				"Paid", "PAID",
+				"Void", "VOID",
+				"Debt", "DEBT",
+				"Other", "OTHER",
+			).Default("DRAFT"),
 	}
 }
 
@@ -40,10 +58,6 @@ func (Invoice) Edges() []ent.Edge {
 			Required(),
 		edge.To("invoice_type", InvoiceType.Type).
 			Field("type").
-			Unique().
-			Required(),
-		edge.To("invoice_status", InvoiceStatusCode.Type).
-			Field("status_code").
 			Unique().
 			Required(),
 	}

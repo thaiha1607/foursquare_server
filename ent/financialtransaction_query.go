@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/paymentmethod"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
@@ -27,7 +26,6 @@ type FinancialTransactionQuery struct {
 	predicates          []predicate.FinancialTransaction
 	withInvoice         *InvoiceQuery
 	withTransactionType *TransactionTypeQuery
-	withPayment         *PaymentMethodQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,28 +99,6 @@ func (ftq *FinancialTransactionQuery) QueryTransactionType() *TransactionTypeQue
 			sqlgraph.From(financialtransaction.Table, financialtransaction.FieldID, selector),
 			sqlgraph.To(transactiontype.Table, transactiontype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, financialtransaction.TransactionTypeTable, financialtransaction.TransactionTypeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(ftq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryPayment chains the current query on the "payment" edge.
-func (ftq *FinancialTransactionQuery) QueryPayment() *PaymentMethodQuery {
-	query := (&PaymentMethodClient{config: ftq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := ftq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := ftq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(financialtransaction.Table, financialtransaction.FieldID, selector),
-			sqlgraph.To(paymentmethod.Table, paymentmethod.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, financialtransaction.PaymentTable, financialtransaction.PaymentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ftq.driver.Dialect(), step)
 		return fromU, nil
@@ -324,7 +300,6 @@ func (ftq *FinancialTransactionQuery) Clone() *FinancialTransactionQuery {
 		predicates:          append([]predicate.FinancialTransaction{}, ftq.predicates...),
 		withInvoice:         ftq.withInvoice.Clone(),
 		withTransactionType: ftq.withTransactionType.Clone(),
-		withPayment:         ftq.withPayment.Clone(),
 		// clone intermediate query.
 		sql:  ftq.sql.Clone(),
 		path: ftq.path,
@@ -350,17 +325,6 @@ func (ftq *FinancialTransactionQuery) WithTransactionType(opts ...func(*Transact
 		opt(query)
 	}
 	ftq.withTransactionType = query
-	return ftq
-}
-
-// WithPayment tells the query-builder to eager-load the nodes that are connected to
-// the "payment" edge. The optional arguments are used to configure the query builder of the edge.
-func (ftq *FinancialTransactionQuery) WithPayment(opts ...func(*PaymentMethodQuery)) *FinancialTransactionQuery {
-	query := (&PaymentMethodClient{config: ftq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	ftq.withPayment = query
 	return ftq
 }
 
@@ -442,10 +406,9 @@ func (ftq *FinancialTransactionQuery) sqlAll(ctx context.Context, hooks ...query
 	var (
 		nodes       = []*FinancialTransaction{}
 		_spec       = ftq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [2]bool{
 			ftq.withInvoice != nil,
 			ftq.withTransactionType != nil,
-			ftq.withPayment != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -475,12 +438,6 @@ func (ftq *FinancialTransactionQuery) sqlAll(ctx context.Context, hooks ...query
 	if query := ftq.withTransactionType; query != nil {
 		if err := ftq.loadTransactionType(ctx, query, nodes, nil,
 			func(n *FinancialTransaction, e *TransactionType) { n.Edges.TransactionType = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := ftq.withPayment; query != nil {
-		if err := ftq.loadPayment(ctx, query, nodes, nil,
-			func(n *FinancialTransaction, e *PaymentMethod) { n.Edges.Payment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -545,35 +502,6 @@ func (ftq *FinancialTransactionQuery) loadTransactionType(ctx context.Context, q
 	}
 	return nil
 }
-func (ftq *FinancialTransactionQuery) loadPayment(ctx context.Context, query *PaymentMethodQuery, nodes []*FinancialTransaction, init func(*FinancialTransaction), assign func(*FinancialTransaction, *PaymentMethod)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*FinancialTransaction)
-	for i := range nodes {
-		fk := nodes[i].PaymentMethod
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(paymentmethod.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "payment_method" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 
 func (ftq *FinancialTransactionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ftq.querySpec()
@@ -605,9 +533,6 @@ func (ftq *FinancialTransactionQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if ftq.withTransactionType != nil {
 			_spec.Node.AddColumnOnce(financialtransaction.FieldType)
-		}
-		if ftq.withPayment != nil {
-			_spec.Node.AddColumnOnce(financialtransaction.FieldPaymentMethod)
 		}
 	}
 	if ps := ftq.predicates; len(ps) > 0 {

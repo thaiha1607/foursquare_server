@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/product"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 )
 
 // Product is the model entity for the Product schema.
@@ -41,7 +40,7 @@ type Product struct {
 	// UnitOfMeasurement holds the value of the "unit_of_measurement" field.
 	UnitOfMeasurement string `json:"unit_of_measurement,omitempty"`
 	// Type holds the value of the "type" field.
-	Type int `json:"type,omitempty"`
+	Type *string `json:"type,omitempty"`
 	// Provider holds the value of the "provider" field.
 	Provider string `json:"provider,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -52,34 +51,19 @@ type Product struct {
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// ProductType holds the value of the product_type edge.
-	ProductType *ProductType `json:"product_type,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
 	// ProductTags holds the value of the product_tags edge.
 	ProductTags []*ProductTag `json:"product_tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
-}
-
-// ProductTypeOrErr returns the ProductType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProductEdges) ProductTypeOrErr() (*ProductType, error) {
-	if e.loadedTypes[0] {
-		if e.ProductType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: producttype.Label}
-		}
-		return e.ProductType, nil
-	}
-	return nil, &NotLoadedError{edge: "product_type"}
+	loadedTypes [2]bool
 }
 
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -88,7 +72,7 @@ func (e ProductEdges) TagsOrErr() ([]*Tag, error) {
 // ProductTagsOrErr returns the ProductTags value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) ProductTagsOrErr() ([]*ProductTag, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.ProductTags, nil
 	}
 	return nil, &NotLoadedError{edge: "product_tags"}
@@ -103,9 +87,9 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case product.FieldPrice, product.FieldQty:
 			values[i] = new(decimal.Decimal)
-		case product.FieldYear, product.FieldType:
+		case product.FieldYear:
 			values[i] = new(sql.NullInt64)
-		case product.FieldName, product.FieldDescription, product.FieldUnitOfMeasurement, product.FieldProvider:
+		case product.FieldName, product.FieldDescription, product.FieldUnitOfMeasurement, product.FieldType, product.FieldProvider:
 			values[i] = new(sql.NullString)
 		case product.FieldCreatedAt, product.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -189,10 +173,11 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 				pr.UnitOfMeasurement = value.String
 			}
 		case product.FieldType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				pr.Type = int(value.Int64)
+				pr.Type = new(string)
+				*pr.Type = value.String
 			}
 		case product.FieldProvider:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -211,11 +196,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pr *Product) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
-}
-
-// QueryProductType queries the "product_type" edge of the Product entity.
-func (pr *Product) QueryProductType() *ProductTypeQuery {
-	return NewProductClient(pr.config).QueryProductType(pr)
 }
 
 // QueryTags queries the "tags" edge of the Product entity.
@@ -278,8 +258,10 @@ func (pr *Product) String() string {
 	builder.WriteString("unit_of_measurement=")
 	builder.WriteString(pr.UnitOfMeasurement)
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", pr.Type))
+	if v := pr.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("provider=")
 	builder.WriteString(pr.Provider)

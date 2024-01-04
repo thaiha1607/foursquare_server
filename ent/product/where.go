@@ -98,7 +98,7 @@ func UnitOfMeasurement(v string) predicate.Product {
 }
 
 // Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v int) predicate.Product {
+func Type(v string) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldType, v))
 }
 
@@ -533,23 +533,78 @@ func UnitOfMeasurementContainsFold(v string) predicate.Product {
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v int) predicate.Product {
+func TypeEQ(v string) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v int) predicate.Product {
+func TypeNEQ(v string) predicate.Product {
 	return predicate.Product(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...int) predicate.Product {
+func TypeIn(vs ...string) predicate.Product {
 	return predicate.Product(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...int) predicate.Product {
+func TypeNotIn(vs ...string) predicate.Product {
 	return predicate.Product(sql.FieldNotIn(FieldType, vs...))
+}
+
+// TypeGT applies the GT predicate on the "type" field.
+func TypeGT(v string) predicate.Product {
+	return predicate.Product(sql.FieldGT(FieldType, v))
+}
+
+// TypeGTE applies the GTE predicate on the "type" field.
+func TypeGTE(v string) predicate.Product {
+	return predicate.Product(sql.FieldGTE(FieldType, v))
+}
+
+// TypeLT applies the LT predicate on the "type" field.
+func TypeLT(v string) predicate.Product {
+	return predicate.Product(sql.FieldLT(FieldType, v))
+}
+
+// TypeLTE applies the LTE predicate on the "type" field.
+func TypeLTE(v string) predicate.Product {
+	return predicate.Product(sql.FieldLTE(FieldType, v))
+}
+
+// TypeContains applies the Contains predicate on the "type" field.
+func TypeContains(v string) predicate.Product {
+	return predicate.Product(sql.FieldContains(FieldType, v))
+}
+
+// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
+func TypeHasPrefix(v string) predicate.Product {
+	return predicate.Product(sql.FieldHasPrefix(FieldType, v))
+}
+
+// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
+func TypeHasSuffix(v string) predicate.Product {
+	return predicate.Product(sql.FieldHasSuffix(FieldType, v))
+}
+
+// TypeIsNil applies the IsNil predicate on the "type" field.
+func TypeIsNil() predicate.Product {
+	return predicate.Product(sql.FieldIsNull(FieldType))
+}
+
+// TypeNotNil applies the NotNil predicate on the "type" field.
+func TypeNotNil() predicate.Product {
+	return predicate.Product(sql.FieldNotNull(FieldType))
+}
+
+// TypeEqualFold applies the EqualFold predicate on the "type" field.
+func TypeEqualFold(v string) predicate.Product {
+	return predicate.Product(sql.FieldEqualFold(FieldType, v))
+}
+
+// TypeContainsFold applies the ContainsFold predicate on the "type" field.
+func TypeContainsFold(v string) predicate.Product {
+	return predicate.Product(sql.FieldContainsFold(FieldType, v))
 }
 
 // ProviderEQ applies the EQ predicate on the "provider" field.
@@ -625,29 +680,6 @@ func ProviderEqualFold(v string) predicate.Product {
 // ProviderContainsFold applies the ContainsFold predicate on the "provider" field.
 func ProviderContainsFold(v string) predicate.Product {
 	return predicate.Product(sql.FieldContainsFold(FieldProvider, v))
-}
-
-// HasProductType applies the HasEdge predicate on the "product_type" edge.
-func HasProductType() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ProductTypeTable, ProductTypeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProductTypeWith applies the HasEdge predicate on the "product_type" edge with a given conditions (other predicates).
-func HasProductTypeWith(preds ...predicate.ProductType) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newProductTypeStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // HasTags applies the HasEdge predicate on the "tags" edge.

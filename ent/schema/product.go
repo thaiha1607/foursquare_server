@@ -43,7 +43,9 @@ func (Product) Fields() []ent.Field {
 			Optional(),
 		field.String("unit_of_measurement").
 			Optional(),
-		field.Int("type"),
+		field.String("type").
+			Optional().
+			Nillable(),
 		field.String("provider").
 			Optional(),
 	}
@@ -52,10 +54,6 @@ func (Product) Fields() []ent.Field {
 // Edges of the Product.
 func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("product_type", ProductType.Type).
-			Field("type").
-			Unique().
-			Required(),
 		edge.To("tags", Tag.Type).
 			Through("product_tags", ProductTag.Type),
 	}

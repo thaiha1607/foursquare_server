@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/messagetype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -30,7 +29,7 @@ type Message struct {
 	// SenderID holds the value of the "sender_id" field.
 	SenderID uuid.UUID `json:"sender_id,omitempty"`
 	// Type holds the value of the "type" field.
-	Type int `json:"type,omitempty"`
+	Type message.Type `json:"type,omitempty"`
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// IsRead holds the value of the "is_read" field.
@@ -47,11 +46,9 @@ type MessageEdges struct {
 	Conversation *Conversation `json:"conversation,omitempty"`
 	// Sender holds the value of the sender edge.
 	Sender *User `json:"sender,omitempty"`
-	// MessageType holds the value of the message_type edge.
-	MessageType *MessageType `json:"message_type,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [2]bool
 }
 
 // ConversationOrErr returns the Conversation value or an error if the edge
@@ -80,19 +77,6 @@ func (e MessageEdges) SenderOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "sender"}
 }
 
-// MessageTypeOrErr returns the MessageType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e MessageEdges) MessageTypeOrErr() (*MessageType, error) {
-	if e.loadedTypes[2] {
-		if e.MessageType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: messagetype.Label}
-		}
-		return e.MessageType, nil
-	}
-	return nil, &NotLoadedError{edge: "message_type"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Message) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -100,9 +84,7 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case message.FieldIsRead:
 			values[i] = new(sql.NullBool)
-		case message.FieldType:
-			values[i] = new(sql.NullInt64)
-		case message.FieldContent:
+		case message.FieldType, message.FieldContent:
 			values[i] = new(sql.NullString)
 		case message.FieldCreatedAt, message.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -154,10 +136,10 @@ func (m *Message) assignValues(columns []string, values []any) error {
 				m.SenderID = *value
 			}
 		case message.FieldType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				m.Type = int(value.Int64)
+				m.Type = message.Type(value.String)
 			}
 		case message.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -192,11 +174,6 @@ func (m *Message) QueryConversation() *ConversationQuery {
 // QuerySender queries the "sender" edge of the Message entity.
 func (m *Message) QuerySender() *UserQuery {
 	return NewMessageClient(m.config).QuerySender(m)
-}
-
-// QueryMessageType queries the "message_type" edge of the Message entity.
-func (m *Message) QueryMessageType() *MessageTypeQuery {
-	return NewMessageClient(m.config).QueryMessageType(m)
 }
 
 // Update returns a builder for updating this Message.

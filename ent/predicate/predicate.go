@@ -18,17 +18,11 @@ type Invoice func(*sql.Selector)
 // InvoiceLineItem is the predicate function for invoicelineitem builders.
 type InvoiceLineItem func(*sql.Selector)
 
-// InvoiceStatusCode is the predicate function for invoicestatuscode builders.
-type InvoiceStatusCode func(*sql.Selector)
-
 // InvoiceType is the predicate function for invoicetype builders.
 type InvoiceType func(*sql.Selector)
 
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
-
-// MessageType is the predicate function for messagetype builders.
-type MessageType func(*sql.Selector)
 
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
@@ -42,17 +36,11 @@ type OrderStatusCode func(*sql.Selector)
 // OrderType is the predicate function for ordertype builders.
 type OrderType func(*sql.Selector)
 
-// PaymentMethod is the predicate function for paymentmethod builders.
-type PaymentMethod func(*sql.Selector)
-
 // Product is the predicate function for product builders.
 type Product func(*sql.Selector)
 
 // ProductTag is the predicate function for producttag builders.
 type ProductTag func(*sql.Selector)
-
-// ProductType is the predicate function for producttype builders.
-type ProductType func(*sql.Selector)
 
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
@@ -62,6 +50,3 @@ type TransactionType func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
-
-// UserRole is the predicate function for userrole builders.
-type UserRole func(*sql.Selector)

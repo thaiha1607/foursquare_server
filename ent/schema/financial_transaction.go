@@ -38,7 +38,17 @@ func (FinancialTransaction) Fields() []ent.Field {
 			Optional().
 			Nillable(),
 		field.Int("type"),
-		field.Int("payment_method"),
+		field.Enum("payment_method").
+			NamedValues(
+				"Cash", "CASH",
+				"EFT", "ELECTRONIC_FUNDS_TRANSFER",
+				"GiftCard", "GIFT_CARD",
+				"CreditCard", "CREDIT_CARD",
+				"DebitCard", "DEBIT_CARD",
+				"PrepaidCard", "PREPAID_CARD",
+				"Check", "CHECK",
+				"Other", "OTHER",
+			).Default("CASH"),
 	}
 }
 
@@ -51,10 +61,6 @@ func (FinancialTransaction) Edges() []ent.Edge {
 			Required(),
 		edge.To("transaction_type", TransactionType.Type).
 			Field("type").
-			Unique().
-			Required(),
-		edge.To("payment", PaymentMethod.Type).
-			Field("payment_method").
 			Unique().
 			Required(),
 	}

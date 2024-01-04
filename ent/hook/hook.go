@@ -57,18 +57,6 @@ func (f InvoiceLineItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceLineItemMutation", m)
 }
 
-// The InvoiceStatusCodeFunc type is an adapter to allow the use of ordinary
-// function as InvoiceStatusCode mutator.
-type InvoiceStatusCodeFunc func(context.Context, *ent.InvoiceStatusCodeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f InvoiceStatusCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.InvoiceStatusCodeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceStatusCodeMutation", m)
-}
-
 // The InvoiceTypeFunc type is an adapter to allow the use of ordinary
 // function as InvoiceType mutator.
 type InvoiceTypeFunc func(context.Context, *ent.InvoiceTypeMutation) (ent.Value, error)
@@ -91,18 +79,6 @@ func (f MessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MessageMutation", m)
-}
-
-// The MessageTypeFunc type is an adapter to allow the use of ordinary
-// function as MessageType mutator.
-type MessageTypeFunc func(context.Context, *ent.MessageTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f MessageTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.MessageTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MessageTypeMutation", m)
 }
 
 // The OrderFunc type is an adapter to allow the use of ordinary
@@ -153,18 +129,6 @@ func (f OrderTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderTypeMutation", m)
 }
 
-// The PaymentMethodFunc type is an adapter to allow the use of ordinary
-// function as PaymentMethod mutator.
-type PaymentMethodFunc func(context.Context, *ent.PaymentMethodMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f PaymentMethodFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.PaymentMethodMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PaymentMethodMutation", m)
-}
-
 // The ProductFunc type is an adapter to allow the use of ordinary
 // function as Product mutator.
 type ProductFunc func(context.Context, *ent.ProductMutation) (ent.Value, error)
@@ -187,18 +151,6 @@ func (f ProductTagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductTagMutation", m)
-}
-
-// The ProductTypeFunc type is an adapter to allow the use of ordinary
-// function as ProductType mutator.
-type ProductTypeFunc func(context.Context, *ent.ProductTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ProductTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ProductTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductTypeMutation", m)
 }
 
 // The TagFunc type is an adapter to allow the use of ordinary
@@ -235,18 +187,6 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
-}
-
-// The UserRoleFunc type is an adapter to allow the use of ordinary
-// function as UserRole mutator.
-type UserRoleFunc func(context.Context, *ent.UserRoleMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserRoleMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserRoleMutation", m)
 }
 
 // Condition is a hook condition function.

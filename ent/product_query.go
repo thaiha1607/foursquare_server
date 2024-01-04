@@ -15,7 +15,6 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
-	"github.com/thaiha1607/foursquare_server/ent/producttype"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -26,7 +25,6 @@ type ProductQuery struct {
 	order           []product.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Product
-	withProductType *ProductTypeQuery
 	withTags        *TagQuery
 	withProductTags *ProductTagQuery
 	// intermediate query (i.e. traversal path).
@@ -63,28 +61,6 @@ func (pq *ProductQuery) Unique(unique bool) *ProductQuery {
 func (pq *ProductQuery) Order(o ...product.OrderOption) *ProductQuery {
 	pq.order = append(pq.order, o...)
 	return pq
-}
-
-// QueryProductType chains the current query on the "product_type" edge.
-func (pq *ProductQuery) QueryProductType() *ProductTypeQuery {
-	query := (&ProductTypeClient{config: pq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(product.Table, product.FieldID, selector),
-			sqlgraph.To(producttype.Table, producttype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, product.ProductTypeTable, product.ProductTypeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryTags chains the current query on the "tags" edge.
@@ -323,24 +299,12 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		order:           append([]product.OrderOption{}, pq.order...),
 		inters:          append([]Interceptor{}, pq.inters...),
 		predicates:      append([]predicate.Product{}, pq.predicates...),
-		withProductType: pq.withProductType.Clone(),
 		withTags:        pq.withTags.Clone(),
 		withProductTags: pq.withProductTags.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
-}
-
-// WithProductType tells the query-builder to eager-load the nodes that are connected to
-// the "product_type" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithProductType(opts ...func(*ProductTypeQuery)) *ProductQuery {
-	query := (&ProductTypeClient{config: pq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withProductType = query
-	return pq
 }
 
 // WithTags tells the query-builder to eager-load the nodes that are connected to
@@ -443,8 +407,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	var (
 		nodes       = []*Product{}
 		_spec       = pq.querySpec()
-		loadedTypes = [3]bool{
-			pq.withProductType != nil,
+		loadedTypes = [2]bool{
 			pq.withTags != nil,
 			pq.withProductTags != nil,
 		}
@@ -467,12 +430,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pq.withProductType; query != nil {
-		if err := pq.loadProductType(ctx, query, nodes, nil,
-			func(n *Product, e *ProductType) { n.Edges.ProductType = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := pq.withTags; query != nil {
 		if err := pq.loadTags(ctx, query, nodes,
 			func(n *Product) { n.Edges.Tags = []*Tag{} },
@@ -490,35 +447,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	return nodes, nil
 }
 
-func (pq *ProductQuery) loadProductType(ctx context.Context, query *ProductTypeQuery, nodes []*Product, init func(*Product), assign func(*Product, *ProductType)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Product)
-	for i := range nodes {
-		fk := nodes[i].Type
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(producttype.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "type" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 func (pq *ProductQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Product, init func(*Product), assign func(*Product, *Tag)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Product)
@@ -635,9 +563,6 @@ func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != product.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if pq.withProductType != nil {
-			_spec.Node.AddColumnOnce(product.FieldType)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

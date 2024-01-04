@@ -3,6 +3,7 @@
 package financialtransaction
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,8 +34,6 @@ const (
 	EdgeInvoice = "invoice"
 	// EdgeTransactionType holds the string denoting the transaction_type edge name in mutations.
 	EdgeTransactionType = "transaction_type"
-	// EdgePayment holds the string denoting the payment edge name in mutations.
-	EdgePayment = "payment"
 	// Table holds the table name of the financialtransaction in the database.
 	Table = "financial_transactions"
 	// InvoiceTable is the table that holds the invoice relation/edge.
@@ -51,13 +50,6 @@ const (
 	TransactionTypeInverseTable = "transaction_types"
 	// TransactionTypeColumn is the table column denoting the transaction_type relation/edge.
 	TransactionTypeColumn = "type"
-	// PaymentTable is the table that holds the payment relation/edge.
-	PaymentTable = "financial_transactions"
-	// PaymentInverseTable is the table name for the PaymentMethod entity.
-	// It exists in this package in order to avoid circular dependency with the "paymentmethod" package.
-	PaymentInverseTable = "payment_methods"
-	// PaymentColumn is the table column denoting the payment relation/edge.
-	PaymentColumn = "payment_method"
 )
 
 // Columns holds all SQL columns for financialtransaction fields.
@@ -92,6 +84,38 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// PaymentMethod defines the type for the "payment_method" enum field.
+type PaymentMethod string
+
+// PaymentMethodCash is the default value of the PaymentMethod enum.
+const DefaultPaymentMethod = PaymentMethodCash
+
+// PaymentMethod values.
+const (
+	PaymentMethodCash        PaymentMethod = "CASH"
+	PaymentMethodEFT         PaymentMethod = "ELECTRONIC_FUNDS_TRANSFER"
+	PaymentMethodGiftCard    PaymentMethod = "GIFT_CARD"
+	PaymentMethodCreditCard  PaymentMethod = "CREDIT_CARD"
+	PaymentMethodDebitCard   PaymentMethod = "DEBIT_CARD"
+	PaymentMethodPrepaidCard PaymentMethod = "PREPAID_CARD"
+	PaymentMethodCheck       PaymentMethod = "CHECK"
+	PaymentMethodOther       PaymentMethod = "OTHER"
+)
+
+func (pm PaymentMethod) String() string {
+	return string(pm)
+}
+
+// PaymentMethodValidator is a validator for the "payment_method" field enum values. It is called by the builders before save.
+func PaymentMethodValidator(pm PaymentMethod) error {
+	switch pm {
+	case PaymentMethodCash, PaymentMethodEFT, PaymentMethodGiftCard, PaymentMethodCreditCard, PaymentMethodDebitCard, PaymentMethodPrepaidCard, PaymentMethodCheck, PaymentMethodOther:
+		return nil
+	default:
+		return fmt.Errorf("financialtransaction: invalid enum value for payment_method field: %q", pm)
+	}
+}
 
 // OrderOption defines the ordering options for the FinancialTransaction queries.
 type OrderOption func(*sql.Selector)
@@ -149,13 +173,6 @@ func ByTransactionTypeField(field string, opts ...sql.OrderTermOption) OrderOpti
 		sqlgraph.OrderByNeighborTerms(s, newTransactionTypeStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByPaymentField orders the results by payment field.
-func ByPaymentField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newPaymentStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newInvoiceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -168,12 +185,5 @@ func newTransactionTypeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TransactionTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, TransactionTypeTable, TransactionTypeColumn),
-	)
-}
-func newPaymentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(PaymentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, PaymentTable, PaymentColumn),
 	)
 }

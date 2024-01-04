@@ -3,10 +3,10 @@
 package user
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -45,17 +45,8 @@ const (
 	FieldPostalCode = "postal_code"
 	// FieldOtherAddressInfo holds the string denoting the other_address_info field in the database.
 	FieldOtherAddressInfo = "other_address_info"
-	// EdgeUserRole holds the string denoting the user_role edge name in mutations.
-	EdgeUserRole = "user_role"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// UserRoleTable is the table that holds the user_role relation/edge.
-	UserRoleTable = "users"
-	// UserRoleInverseTable is the table name for the UserRole entity.
-	// It exists in this package in order to avoid circular dependency with the "userrole" package.
-	UserRoleInverseTable = "user_roles"
-	// UserRoleColumn is the table column denoting the user_role relation/edge.
-	UserRoleColumn = "role"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -110,6 +101,35 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Role defines the type for the "role" enum field.
+type Role string
+
+// RoleCustomer is the default value of the Role enum.
+const DefaultRole = RoleCustomer
+
+// Role values.
+const (
+	RoleAdmin      Role = "ADMIN"
+	RoleCustomer   Role = "CUSTOMER"
+	RoleWarehouse  Role = "WAREHOUSE"
+	RoleDelivery   Role = "DELIVERY"
+	RoleManagement Role = "MANAGEMENT"
+)
+
+func (r Role) String() string {
+	return string(r)
+}
+
+// RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
+func RoleValidator(r Role) error {
+	switch r {
+	case RoleAdmin, RoleCustomer, RoleWarehouse, RoleDelivery, RoleManagement:
+		return nil
+	default:
+		return fmt.Errorf("user: invalid enum value for role field: %q", r)
+	}
+}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -187,18 +207,4 @@ func ByPostalCode(opts ...sql.OrderTermOption) OrderOption {
 // ByOtherAddressInfo orders the results by the other_address_info field.
 func ByOtherAddressInfo(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOtherAddressInfo, opts...).ToFunc()
-}
-
-// ByUserRoleField orders the results by user_role field.
-func ByUserRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserRoleStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newUserRoleStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserRoleInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, UserRoleTable, UserRoleColumn),
-	)
 }

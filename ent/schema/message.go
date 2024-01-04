@@ -19,7 +19,15 @@ func (Message) Fields() []ent.Field {
 			Default(uuid.New),
 		field.UUID("conversation_id", uuid.UUID{}),
 		field.UUID("sender_id", uuid.UUID{}),
-		field.Int("type"),
+		field.Enum("type").
+			NamedValues(
+				"Text", "TEXT",
+				"Image", "IMAGE",
+				"Video", "VIDEO",
+				"Audio", "AUDIO",
+				"File", "FILE",
+				"Other", "OTHER",
+			).Default("TEXT"),
 		field.String("content").
 			NotEmpty(),
 		field.Bool("is_read").
@@ -36,10 +44,6 @@ func (Message) Edges() []ent.Edge {
 			Required(),
 		edge.To("sender", User.Type).
 			Field("sender_id").
-			Unique().
-			Required(),
-		edge.To("message_type", MessageType.Type).
-			Field("type").
 			Unique().
 			Required(),
 	}
