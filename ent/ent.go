@@ -16,7 +16,6 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
@@ -91,7 +90,6 @@ func checkColumn(table, column string) error {
 			financialtransaction.Table: financialtransaction.ValidColumn,
 			invoice.Table:              invoice.ValidColumn,
 			invoicelineitem.Table:      invoicelineitem.ValidColumn,
-			invoicetype.Table:          invoicetype.ValidColumn,
 			message.Table:              message.ValidColumn,
 			order.Table:                order.ValidColumn,
 			orderlineitem.Table:        orderlineitem.ValidColumn,

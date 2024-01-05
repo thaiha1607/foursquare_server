@@ -37,7 +37,8 @@ func (FinancialTransaction) Fields() []ent.Field {
 		field.String("comment").
 			Optional().
 			Nillable(),
-		field.Int("type"),
+		field.Int("type").
+			Default(1),
 		field.Enum("payment_method").
 			NamedValues(
 				"Cash", "CASH",

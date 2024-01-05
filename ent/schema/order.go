@@ -26,8 +26,10 @@ func (Order) Fields() []ent.Field {
 		field.Int("priority").
 			Default(0).
 			Range(0, 10),
-		field.Int("type"),
-		field.Int("status_code"),
+		field.Int("type").
+			Default(1),
+		field.Int("status_code").
+			Default(1),
 		field.UUID("manaagment_staff_id", uuid.UUID{}),
 		field.UUID("warehouse_staff_id", uuid.UUID{}).
 			Optional().

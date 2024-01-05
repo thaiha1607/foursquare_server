@@ -155,6 +155,10 @@ var (
 	DefaultPriority int
 	// PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
 	PriorityValidator func(int) error
+	// DefaultType holds the default value on creation for the "type" field.
+	DefaultType int
+	// DefaultStatusCode holds the default value on creation for the "status_code" field.
+	DefaultStatusCode int
 	// DefaultIsInternal holds the default value on creation for the "is_internal" field.
 	DefaultIsInternal bool
 )

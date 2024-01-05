@@ -10,7 +10,6 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
@@ -62,6 +61,10 @@ func init() {
 	financialtransaction.DefaultUpdatedAt = financialtransactionDescUpdatedAt.Default.(func() time.Time)
 	// financialtransaction.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	financialtransaction.UpdateDefaultUpdatedAt = financialtransactionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// financialtransactionDescType is the schema descriptor for type field.
+	financialtransactionDescType := financialtransactionFields[4].Descriptor()
+	// financialtransaction.DefaultType holds the default value on creation for the type field.
+	financialtransaction.DefaultType = financialtransactionDescType.Default.(int)
 	// financialtransactionDescID is the schema descriptor for id field.
 	financialtransactionDescID := financialtransactionFields[0].Descriptor()
 	// financialtransaction.DefaultID holds the default value on creation for the id field.
@@ -104,25 +107,6 @@ func init() {
 	invoicelineitemDescID := invoicelineitemFields[0].Descriptor()
 	// invoicelineitem.DefaultID holds the default value on creation for the id field.
 	invoicelineitem.DefaultID = invoicelineitemDescID.Default.(func() uuid.UUID)
-	invoicetypeMixin := schema.InvoiceType{}.Mixin()
-	invoicetypeMixinFields0 := invoicetypeMixin[0].Fields()
-	_ = invoicetypeMixinFields0
-	invoicetypeFields := schema.InvoiceType{}.Fields()
-	_ = invoicetypeFields
-	// invoicetypeDescCreatedAt is the schema descriptor for created_at field.
-	invoicetypeDescCreatedAt := invoicetypeMixinFields0[0].Descriptor()
-	// invoicetype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	invoicetype.DefaultCreatedAt = invoicetypeDescCreatedAt.Default.(func() time.Time)
-	// invoicetypeDescUpdatedAt is the schema descriptor for updated_at field.
-	invoicetypeDescUpdatedAt := invoicetypeMixinFields0[1].Descriptor()
-	// invoicetype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	invoicetype.DefaultUpdatedAt = invoicetypeDescUpdatedAt.Default.(func() time.Time)
-	// invoicetype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	invoicetype.UpdateDefaultUpdatedAt = invoicetypeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// invoicetypeDescInvoiceType is the schema descriptor for invoice_type field.
-	invoicetypeDescInvoiceType := invoicetypeFields[0].Descriptor()
-	// invoicetype.InvoiceTypeValidator is a validator for the "invoice_type" field. It is called by the builders before save.
-	invoicetype.InvoiceTypeValidator = invoicetypeDescInvoiceType.Validators[0].(func(string) error)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
@@ -171,6 +155,14 @@ func init() {
 	order.DefaultPriority = orderDescPriority.Default.(int)
 	// order.PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
 	order.PriorityValidator = orderDescPriority.Validators[0].(func(int) error)
+	// orderDescType is the schema descriptor for type field.
+	orderDescType := orderFields[6].Descriptor()
+	// order.DefaultType holds the default value on creation for the type field.
+	order.DefaultType = orderDescType.Default.(int)
+	// orderDescStatusCode is the schema descriptor for status_code field.
+	orderDescStatusCode := orderFields[7].Descriptor()
+	// order.DefaultStatusCode holds the default value on creation for the status_code field.
+	order.DefaultStatusCode = orderDescStatusCode.Default.(int)
 	// orderDescIsInternal is the schema descriptor for is_internal field.
 	orderDescIsInternal := orderFields[12].Descriptor()
 	// order.DefaultIsInternal holds the default value on creation for the is_internal field.

@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 )
 
@@ -34,7 +33,7 @@ type Invoice struct {
 	// Note holds the value of the "note" field.
 	Note *string `json:"note,omitempty"`
 	// Type holds the value of the "type" field.
-	Type int `json:"type,omitempty"`
+	Type invoice.Type `json:"type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status invoice.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -47,11 +46,9 @@ type Invoice struct {
 type InvoiceEdges struct {
 	// Order holds the value of the order edge.
 	Order *Order `json:"order,omitempty"`
-	// InvoiceType holds the value of the invoice_type edge.
-	InvoiceType *InvoiceType `json:"invoice_type,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
@@ -67,19 +64,6 @@ func (e InvoiceEdges) OrderOrErr() (*Order, error) {
 	return nil, &NotLoadedError{edge: "order"}
 }
 
-// InvoiceTypeOrErr returns the InvoiceType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e InvoiceEdges) InvoiceTypeOrErr() (*InvoiceType, error) {
-	if e.loadedTypes[1] {
-		if e.InvoiceType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: invoicetype.Label}
-		}
-		return e.InvoiceType, nil
-	}
-	return nil, &NotLoadedError{edge: "invoice_type"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Invoice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -87,9 +71,7 @@ func (*Invoice) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case invoice.FieldTotal:
 			values[i] = new(decimal.Decimal)
-		case invoice.FieldType:
-			values[i] = new(sql.NullInt64)
-		case invoice.FieldComment, invoice.FieldNote, invoice.FieldStatus:
+		case invoice.FieldComment, invoice.FieldNote, invoice.FieldType, invoice.FieldStatus:
 			values[i] = new(sql.NullString)
 		case invoice.FieldCreatedAt, invoice.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -155,10 +137,10 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 				*i.Note = value.String
 			}
 		case invoice.FieldType:
-			if value, ok := values[j].(*sql.NullInt64); !ok {
+			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[j])
 			} else if value.Valid {
-				i.Type = int(value.Int64)
+				i.Type = invoice.Type(value.String)
 			}
 		case invoice.FieldStatus:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -182,11 +164,6 @@ func (i *Invoice) Value(name string) (ent.Value, error) {
 // QueryOrder queries the "order" edge of the Invoice entity.
 func (i *Invoice) QueryOrder() *OrderQuery {
 	return NewInvoiceClient(i.config).QueryOrder(i)
-}
-
-// QueryInvoiceType queries the "invoice_type" edge of the Invoice entity.
-func (i *Invoice) QueryInvoiceType() *InvoiceTypeQuery {
-	return NewInvoiceClient(i.config).QueryInvoiceType(i)
 }
 
 // Update returns a builder for updating this Invoice.

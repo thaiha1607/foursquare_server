@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
@@ -114,13 +113,13 @@ func (iu *InvoiceUpdate) ClearNote() *InvoiceUpdate {
 }
 
 // SetType sets the "type" field.
-func (iu *InvoiceUpdate) SetType(i int) *InvoiceUpdate {
+func (iu *InvoiceUpdate) SetType(i invoice.Type) *InvoiceUpdate {
 	iu.mutation.SetType(i)
 	return iu
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableType(i *int) *InvoiceUpdate {
+func (iu *InvoiceUpdate) SetNillableType(i *invoice.Type) *InvoiceUpdate {
 	if i != nil {
 		iu.SetType(*i)
 	}
@@ -146,17 +145,6 @@ func (iu *InvoiceUpdate) SetOrder(o *Order) *InvoiceUpdate {
 	return iu.SetOrderID(o.ID)
 }
 
-// SetInvoiceTypeID sets the "invoice_type" edge to the InvoiceType entity by ID.
-func (iu *InvoiceUpdate) SetInvoiceTypeID(id int) *InvoiceUpdate {
-	iu.mutation.SetInvoiceTypeID(id)
-	return iu
-}
-
-// SetInvoiceType sets the "invoice_type" edge to the InvoiceType entity.
-func (iu *InvoiceUpdate) SetInvoiceType(i *InvoiceType) *InvoiceUpdate {
-	return iu.SetInvoiceTypeID(i.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iu *InvoiceUpdate) Mutation() *InvoiceMutation {
 	return iu.mutation
@@ -165,12 +153,6 @@ func (iu *InvoiceUpdate) Mutation() *InvoiceMutation {
 // ClearOrder clears the "order" edge to the Order entity.
 func (iu *InvoiceUpdate) ClearOrder() *InvoiceUpdate {
 	iu.mutation.ClearOrder()
-	return iu
-}
-
-// ClearInvoiceType clears the "invoice_type" edge to the InvoiceType entity.
-func (iu *InvoiceUpdate) ClearInvoiceType() *InvoiceUpdate {
-	iu.mutation.ClearInvoiceType()
 	return iu
 }
 
@@ -212,6 +194,11 @@ func (iu *InvoiceUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iu *InvoiceUpdate) check() error {
+	if v, ok := iu.mutation.GetType(); ok {
+		if err := invoice.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Invoice.type": %w`, err)}
+		}
+	}
 	if v, ok := iu.mutation.Status(); ok {
 		if err := invoice.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
@@ -219,9 +206,6 @@ func (iu *InvoiceUpdate) check() error {
 	}
 	if _, ok := iu.mutation.OrderID(); iu.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
-	}
-	if _, ok := iu.mutation.InvoiceTypeID(); iu.mutation.InvoiceTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_type"`)
 	}
 	return nil
 }
@@ -259,6 +243,9 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if iu.mutation.NoteCleared() {
 		_spec.ClearField(invoice.FieldNote, field.TypeString)
 	}
+	if value, ok := iu.mutation.GetType(); ok {
+		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
+	}
 	if value, ok := iu.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 	}
@@ -284,35 +271,6 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iu.mutation.InvoiceTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceTypeTable,
-			Columns: []string{invoice.InvoiceTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iu.mutation.InvoiceTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceTypeTable,
-			Columns: []string{invoice.InvoiceTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -422,13 +380,13 @@ func (iuo *InvoiceUpdateOne) ClearNote() *InvoiceUpdateOne {
 }
 
 // SetType sets the "type" field.
-func (iuo *InvoiceUpdateOne) SetType(i int) *InvoiceUpdateOne {
+func (iuo *InvoiceUpdateOne) SetType(i invoice.Type) *InvoiceUpdateOne {
 	iuo.mutation.SetType(i)
 	return iuo
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableType(i *int) *InvoiceUpdateOne {
+func (iuo *InvoiceUpdateOne) SetNillableType(i *invoice.Type) *InvoiceUpdateOne {
 	if i != nil {
 		iuo.SetType(*i)
 	}
@@ -454,17 +412,6 @@ func (iuo *InvoiceUpdateOne) SetOrder(o *Order) *InvoiceUpdateOne {
 	return iuo.SetOrderID(o.ID)
 }
 
-// SetInvoiceTypeID sets the "invoice_type" edge to the InvoiceType entity by ID.
-func (iuo *InvoiceUpdateOne) SetInvoiceTypeID(id int) *InvoiceUpdateOne {
-	iuo.mutation.SetInvoiceTypeID(id)
-	return iuo
-}
-
-// SetInvoiceType sets the "invoice_type" edge to the InvoiceType entity.
-func (iuo *InvoiceUpdateOne) SetInvoiceType(i *InvoiceType) *InvoiceUpdateOne {
-	return iuo.SetInvoiceTypeID(i.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iuo *InvoiceUpdateOne) Mutation() *InvoiceMutation {
 	return iuo.mutation
@@ -473,12 +420,6 @@ func (iuo *InvoiceUpdateOne) Mutation() *InvoiceMutation {
 // ClearOrder clears the "order" edge to the Order entity.
 func (iuo *InvoiceUpdateOne) ClearOrder() *InvoiceUpdateOne {
 	iuo.mutation.ClearOrder()
-	return iuo
-}
-
-// ClearInvoiceType clears the "invoice_type" edge to the InvoiceType entity.
-func (iuo *InvoiceUpdateOne) ClearInvoiceType() *InvoiceUpdateOne {
-	iuo.mutation.ClearInvoiceType()
 	return iuo
 }
 
@@ -533,6 +474,11 @@ func (iuo *InvoiceUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iuo *InvoiceUpdateOne) check() error {
+	if v, ok := iuo.mutation.GetType(); ok {
+		if err := invoice.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Invoice.type": %w`, err)}
+		}
+	}
 	if v, ok := iuo.mutation.Status(); ok {
 		if err := invoice.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
@@ -540,9 +486,6 @@ func (iuo *InvoiceUpdateOne) check() error {
 	}
 	if _, ok := iuo.mutation.OrderID(); iuo.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
-	}
-	if _, ok := iuo.mutation.InvoiceTypeID(); iuo.mutation.InvoiceTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Invoice.invoice_type"`)
 	}
 	return nil
 }
@@ -597,6 +540,9 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	if iuo.mutation.NoteCleared() {
 		_spec.ClearField(invoice.FieldNote, field.TypeString)
 	}
+	if value, ok := iuo.mutation.GetType(); ok {
+		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
+	}
 	if value, ok := iuo.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 	}
@@ -622,35 +568,6 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iuo.mutation.InvoiceTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceTypeTable,
-			Columns: []string{invoice.InvoiceTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iuo.mutation.InvoiceTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceTypeTable,
-			Columns: []string{invoice.InvoiceTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -112,9 +112,25 @@ func (oc *OrderCreate) SetType(i int) *OrderCreate {
 	return oc
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableType(i *int) *OrderCreate {
+	if i != nil {
+		oc.SetType(*i)
+	}
+	return oc
+}
+
 // SetStatusCode sets the "status_code" field.
 func (oc *OrderCreate) SetStatusCode(i int) *OrderCreate {
 	oc.mutation.SetStatusCode(i)
+	return oc
+}
+
+// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableStatusCode(i *int) *OrderCreate {
+	if i != nil {
+		oc.SetStatusCode(*i)
+	}
 	return oc
 }
 
@@ -296,6 +312,14 @@ func (oc *OrderCreate) defaults() {
 	if _, ok := oc.mutation.Priority(); !ok {
 		v := order.DefaultPriority
 		oc.mutation.SetPriority(v)
+	}
+	if _, ok := oc.mutation.GetType(); !ok {
+		v := order.DefaultType
+		oc.mutation.SetType(v)
+	}
+	if _, ok := oc.mutation.StatusCode(); !ok {
+		v := order.DefaultStatusCode
+		oc.mutation.SetStatusCode(v)
 	}
 	if _, ok := oc.mutation.IsInternal(); !ok {
 		v := order.DefaultIsInternal

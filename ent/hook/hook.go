@@ -57,18 +57,6 @@ func (f InvoiceLineItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceLineItemMutation", m)
 }
 
-// The InvoiceTypeFunc type is an adapter to allow the use of ordinary
-// function as InvoiceType mutator.
-type InvoiceTypeFunc func(context.Context, *ent.InvoiceTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f InvoiceTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.InvoiceTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceTypeMutation", m)
-}
-
 // The MessageFunc type is an adapter to allow the use of ordinary
 // function as Message mutator.
 type MessageFunc func(context.Context, *ent.MessageMutation) (ent.Value, error)

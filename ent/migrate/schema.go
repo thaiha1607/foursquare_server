@@ -54,7 +54,7 @@ var (
 		{Name: "comment", Type: field.TypeString, Nullable: true},
 		{Name: "payment_method", Type: field.TypeEnum, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
 		{Name: "invoice_id", Type: field.TypeUUID},
-		{Name: "type", Type: field.TypeInt},
+		{Name: "type", Type: field.TypeInt, Default: 1},
 	}
 	// FinancialTransactionsTable holds the schema information for the "financial_transactions" table.
 	FinancialTransactionsTable = &schema.Table{
@@ -84,9 +84,9 @@ var (
 		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "comment", Type: field.TypeString, Nullable: true},
 		{Name: "note", Type: field.TypeString, Nullable: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"PRO_FORMA", "REGULAR", "PAST_DUE", "INTERIM", "TIMESHEET", "FINAL", "CREDIT", "DEBIT", "MIXED", "COMMERCIAL", "RECURRING", "OTHER"}, Default: "PRO_FORMA"},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DRAFT", "ACTIVE", "SENT", "DISPUTED", "OVERDUE", "PARTIAL", "PAID", "VOID", "DEBT", "OTHER"}, Default: "DRAFT"},
 		{Name: "order_id", Type: field.TypeUUID},
-		{Name: "type", Type: field.TypeInt},
 	}
 	// InvoicesTable holds the schema information for the "invoices" table.
 	InvoicesTable = &schema.Table{
@@ -96,14 +96,8 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "invoices_orders_order",
-				Columns:    []*schema.Column{InvoicesColumns[7]},
-				RefColumns: []*schema.Column{OrdersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "invoices_invoice_types_invoice_type",
 				Columns:    []*schema.Column{InvoicesColumns[8]},
-				RefColumns: []*schema.Column{InvoiceTypesColumns[0]},
+				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -144,19 +138,6 @@ var (
 				Columns: []*schema.Column{InvoiceLineItemsColumns[5], InvoiceLineItemsColumns[6]},
 			},
 		},
-	}
-	// InvoiceTypesColumns holds the columns for the "invoice_types" table.
-	InvoiceTypesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "invoice_type", Type: field.TypeString, Unique: true},
-	}
-	// InvoiceTypesTable holds the schema information for the "invoice_types" table.
-	InvoiceTypesTable = &schema.Table{
-		Name:       "invoice_types",
-		Columns:    InvoiceTypesColumns,
-		PrimaryKey: []*schema.Column{InvoiceTypesColumns[0]},
 	}
 	// MessagesColumns holds the columns for the "messages" table.
 	MessagesColumns = []*schema.Column{
@@ -201,8 +182,8 @@ var (
 		{Name: "customer_id", Type: field.TypeUUID},
 		{Name: "created_by", Type: field.TypeUUID},
 		{Name: "parent_order_id", Type: field.TypeUUID, Unique: true, Nullable: true},
-		{Name: "status_code", Type: field.TypeInt},
-		{Name: "type", Type: field.TypeInt},
+		{Name: "status_code", Type: field.TypeInt, Default: 1},
+		{Name: "type", Type: field.TypeInt, Default: 1},
 		{Name: "manaagment_staff_id", Type: field.TypeUUID},
 		{Name: "warehouse_staff_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "delivery_staff_id", Type: field.TypeUUID, Nullable: true},
@@ -430,7 +411,6 @@ var (
 		FinancialTransactionsTable,
 		InvoicesTable,
 		InvoiceLineItemsTable,
-		InvoiceTypesTable,
 		MessagesTable,
 		OrdersTable,
 		OrderLineItemsTable,
@@ -453,14 +433,10 @@ func init() {
 		Table: "financial_transactions",
 	}
 	InvoicesTable.ForeignKeys[0].RefTable = OrdersTable
-	InvoicesTable.ForeignKeys[1].RefTable = InvoiceTypesTable
 	InvoiceLineItemsTable.ForeignKeys[0].RefTable = InvoicesTable
 	InvoiceLineItemsTable.ForeignKeys[1].RefTable = OrderLineItemsTable
 	InvoiceLineItemsTable.Annotation = &entsql.Annotation{
 		Table: "invoice_line_items",
-	}
-	InvoiceTypesTable.Annotation = &entsql.Annotation{
-		Table: "invoice_types",
 	}
 	MessagesTable.ForeignKeys[0].RefTable = ConversationsTable
 	MessagesTable.ForeignKeys[1].RefTable = UsersTable

@@ -34,8 +34,6 @@ const (
 	FieldStatus = "status"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
-	// EdgeInvoiceType holds the string denoting the invoice_type edge name in mutations.
-	EdgeInvoiceType = "invoice_type"
 	// Table holds the table name of the invoice in the database.
 	Table = "invoices"
 	// OrderTable is the table that holds the order relation/edge.
@@ -45,13 +43,6 @@ const (
 	OrderInverseTable = "orders"
 	// OrderColumn is the table column denoting the order relation/edge.
 	OrderColumn = "order_id"
-	// InvoiceTypeTable is the table that holds the invoice_type relation/edge.
-	InvoiceTypeTable = "invoices"
-	// InvoiceTypeInverseTable is the table name for the InvoiceType entity.
-	// It exists in this package in order to avoid circular dependency with the "invoicetype" package.
-	InvoiceTypeInverseTable = "invoice_types"
-	// InvoiceTypeColumn is the table column denoting the invoice_type relation/edge.
-	InvoiceTypeColumn = "type"
 )
 
 // Columns holds all SQL columns for invoice fields.
@@ -87,6 +78,42 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Type defines the type for the "type" enum field.
+type Type string
+
+// TypeProForma is the default value of the Type enum.
+const DefaultType = TypeProForma
+
+// Type values.
+const (
+	TypeProForma   Type = "PRO_FORMA"
+	TypeRegular    Type = "REGULAR"
+	TypePastDue    Type = "PAST_DUE"
+	TypeInterim    Type = "INTERIM"
+	TypeTimesheet  Type = "TIMESHEET"
+	TypeFinal      Type = "FINAL"
+	TypeCredit     Type = "CREDIT"
+	TypeDebit      Type = "DEBIT"
+	TypeMixed      Type = "MIXED"
+	TypeCommercial Type = "COMMERCIAL"
+	TypeRecurring  Type = "RECURRING"
+	TypeOther      Type = "OTHER"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeProForma, TypeRegular, TypePastDue, TypeInterim, TypeTimesheet, TypeFinal, TypeCredit, TypeDebit, TypeMixed, TypeCommercial, TypeRecurring, TypeOther:
+		return nil
+	default:
+		return fmt.Errorf("invoice: invalid enum value for type field: %q", _type)
+	}
+}
 
 // Status defines the type for the "status" enum field.
 type Status string
@@ -176,24 +203,10 @@ func ByOrderField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOrderStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByInvoiceTypeField orders the results by invoice_type field.
-func ByInvoiceTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newInvoiceTypeStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, OrderTable, OrderColumn),
-	)
-}
-func newInvoiceTypeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(InvoiceTypeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, InvoiceTypeTable, InvoiceTypeColumn),
 	)
 }

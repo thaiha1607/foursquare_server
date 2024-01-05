@@ -84,6 +84,14 @@ func (ftc *FinancialTransactionCreate) SetType(i int) *FinancialTransactionCreat
 	return ftc
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (ftc *FinancialTransactionCreate) SetNillableType(i *int) *FinancialTransactionCreate {
+	if i != nil {
+		ftc.SetType(*i)
+	}
+	return ftc
+}
+
 // SetPaymentMethod sets the "payment_method" field.
 func (ftc *FinancialTransactionCreate) SetPaymentMethod(fm financialtransaction.PaymentMethod) *FinancialTransactionCreate {
 	ftc.mutation.SetPaymentMethod(fm)
@@ -170,6 +178,10 @@ func (ftc *FinancialTransactionCreate) defaults() {
 	if _, ok := ftc.mutation.UpdatedAt(); !ok {
 		v := financialtransaction.DefaultUpdatedAt()
 		ftc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := ftc.mutation.GetType(); !ok {
+		v := financialtransaction.DefaultType
+		ftc.mutation.SetType(v)
 	}
 	if _, ok := ftc.mutation.PaymentMethod(); !ok {
 		v := financialtransaction.DefaultPaymentMethod

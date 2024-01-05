@@ -87,11 +87,6 @@ func Note(v string) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldNote, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v int) predicate.Invoice {
-	return predicate.Invoice(sql.FieldEQ(FieldType, v))
-}
-
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldCreatedAt, v))
@@ -383,22 +378,22 @@ func NoteContainsFold(v string) predicate.Invoice {
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v int) predicate.Invoice {
+func TypeEQ(v Type) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v int) predicate.Invoice {
+func TypeNEQ(v Type) predicate.Invoice {
 	return predicate.Invoice(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...int) predicate.Invoice {
+func TypeIn(vs ...Type) predicate.Invoice {
 	return predicate.Invoice(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...int) predicate.Invoice {
+func TypeNotIn(vs ...Type) predicate.Invoice {
 	return predicate.Invoice(sql.FieldNotIn(FieldType, vs...))
 }
 
@@ -437,29 +432,6 @@ func HasOrder() predicate.Invoice {
 func HasOrderWith(preds ...predicate.Order) predicate.Invoice {
 	return predicate.Invoice(func(s *sql.Selector) {
 		step := newOrderStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasInvoiceType applies the HasEdge predicate on the "invoice_type" edge.
-func HasInvoiceType() predicate.Invoice {
-	return predicate.Invoice(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, InvoiceTypeTable, InvoiceTypeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasInvoiceTypeWith applies the HasEdge predicate on the "invoice_type" edge with a given conditions (other predicates).
-func HasInvoiceTypeWith(preds ...predicate.InvoiceType) predicate.Invoice {
-	return predicate.Invoice(func(s *sql.Selector) {
-		step := newInvoiceTypeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

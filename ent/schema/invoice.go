@@ -32,7 +32,21 @@ func (Invoice) Fields() []ent.Field {
 		field.String("note").
 			Optional().
 			Nillable(),
-		field.Int("type"),
+		field.Enum("type").
+			NamedValues(
+				"ProForma", "PRO_FORMA",
+				"Regular", "REGULAR",
+				"PastDue", "PAST_DUE",
+				"Interim", "INTERIM",
+				"Timesheet", "TIMESHEET",
+				"Final", "FINAL",
+				"Credit", "CREDIT",
+				"Debit", "DEBIT",
+				"Mixed", "MIXED",
+				"Commercial", "COMMERCIAL",
+				"Recurring", "RECURRING",
+				"Other", "OTHER",
+			).Default("PRO_FORMA"),
 		field.Enum("status").
 			NamedValues(
 				"Draft", "DRAFT",
@@ -54,10 +68,6 @@ func (Invoice) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("order", Order.Type).
 			Field("order_id").
-			Unique().
-			Required(),
-		edge.To("invoice_type", InvoiceType.Type).
-			Field("type").
 			Unique().
 			Required(),
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 )
 
@@ -93,8 +92,16 @@ func (ic *InvoiceCreate) SetNillableNote(s *string) *InvoiceCreate {
 }
 
 // SetType sets the "type" field.
-func (ic *InvoiceCreate) SetType(i int) *InvoiceCreate {
+func (ic *InvoiceCreate) SetType(i invoice.Type) *InvoiceCreate {
 	ic.mutation.SetType(i)
+	return ic
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (ic *InvoiceCreate) SetNillableType(i *invoice.Type) *InvoiceCreate {
+	if i != nil {
+		ic.SetType(*i)
+	}
 	return ic
 }
 
@@ -129,17 +136,6 @@ func (ic *InvoiceCreate) SetNillableID(u *uuid.UUID) *InvoiceCreate {
 // SetOrder sets the "order" edge to the Order entity.
 func (ic *InvoiceCreate) SetOrder(o *Order) *InvoiceCreate {
 	return ic.SetOrderID(o.ID)
-}
-
-// SetInvoiceTypeID sets the "invoice_type" edge to the InvoiceType entity by ID.
-func (ic *InvoiceCreate) SetInvoiceTypeID(id int) *InvoiceCreate {
-	ic.mutation.SetInvoiceTypeID(id)
-	return ic
-}
-
-// SetInvoiceType sets the "invoice_type" edge to the InvoiceType entity.
-func (ic *InvoiceCreate) SetInvoiceType(i *InvoiceType) *InvoiceCreate {
-	return ic.SetInvoiceTypeID(i.ID)
 }
 
 // Mutation returns the InvoiceMutation object of the builder.
@@ -185,6 +181,10 @@ func (ic *InvoiceCreate) defaults() {
 		v := invoice.DefaultUpdatedAt()
 		ic.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ic.mutation.GetType(); !ok {
+		v := invoice.DefaultType
+		ic.mutation.SetType(v)
+	}
 	if _, ok := ic.mutation.Status(); !ok {
 		v := invoice.DefaultStatus
 		ic.mutation.SetStatus(v)
@@ -212,6 +212,11 @@ func (ic *InvoiceCreate) check() error {
 	if _, ok := ic.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Invoice.type"`)}
 	}
+	if v, ok := ic.mutation.GetType(); ok {
+		if err := invoice.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Invoice.type": %w`, err)}
+		}
+	}
 	if _, ok := ic.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Invoice.status"`)}
 	}
@@ -222,9 +227,6 @@ func (ic *InvoiceCreate) check() error {
 	}
 	if _, ok := ic.mutation.OrderID(); !ok {
 		return &ValidationError{Name: "order", err: errors.New(`ent: missing required edge "Invoice.order"`)}
-	}
-	if _, ok := ic.mutation.InvoiceTypeID(); !ok {
-		return &ValidationError{Name: "invoice_type", err: errors.New(`ent: missing required edge "Invoice.invoice_type"`)}
 	}
 	return nil
 }
@@ -281,6 +283,10 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 		_spec.SetField(invoice.FieldNote, field.TypeString, value)
 		_node.Note = &value
 	}
+	if value, ok := ic.mutation.GetType(); ok {
+		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
+		_node.Type = value
+	}
 	if value, ok := ic.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
@@ -300,23 +306,6 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.OrderID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ic.mutation.InvoiceTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.InvoiceTypeTable,
-			Columns: []string{invoice.InvoiceTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoicetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Type = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

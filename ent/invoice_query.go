@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicetype"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
@@ -20,12 +19,11 @@ import (
 // InvoiceQuery is the builder for querying Invoice entities.
 type InvoiceQuery struct {
 	config
-	ctx             *QueryContext
-	order           []invoice.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Invoice
-	withOrder       *OrderQuery
-	withInvoiceType *InvoiceTypeQuery
+	ctx        *QueryContext
+	order      []invoice.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Invoice
+	withOrder  *OrderQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,28 +75,6 @@ func (iq *InvoiceQuery) QueryOrder() *OrderQuery {
 			sqlgraph.From(invoice.Table, invoice.FieldID, selector),
 			sqlgraph.To(order.Table, order.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoice.OrderTable, invoice.OrderColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryInvoiceType chains the current query on the "invoice_type" edge.
-func (iq *InvoiceQuery) QueryInvoiceType() *InvoiceTypeQuery {
-	query := (&InvoiceTypeClient{config: iq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := iq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := iq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(invoice.Table, invoice.FieldID, selector),
-			sqlgraph.To(invoicetype.Table, invoicetype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, invoice.InvoiceTypeTable, invoice.InvoiceTypeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,13 +269,12 @@ func (iq *InvoiceQuery) Clone() *InvoiceQuery {
 		return nil
 	}
 	return &InvoiceQuery{
-		config:          iq.config,
-		ctx:             iq.ctx.Clone(),
-		order:           append([]invoice.OrderOption{}, iq.order...),
-		inters:          append([]Interceptor{}, iq.inters...),
-		predicates:      append([]predicate.Invoice{}, iq.predicates...),
-		withOrder:       iq.withOrder.Clone(),
-		withInvoiceType: iq.withInvoiceType.Clone(),
+		config:     iq.config,
+		ctx:        iq.ctx.Clone(),
+		order:      append([]invoice.OrderOption{}, iq.order...),
+		inters:     append([]Interceptor{}, iq.inters...),
+		predicates: append([]predicate.Invoice{}, iq.predicates...),
+		withOrder:  iq.withOrder.Clone(),
 		// clone intermediate query.
 		sql:  iq.sql.Clone(),
 		path: iq.path,
@@ -314,17 +289,6 @@ func (iq *InvoiceQuery) WithOrder(opts ...func(*OrderQuery)) *InvoiceQuery {
 		opt(query)
 	}
 	iq.withOrder = query
-	return iq
-}
-
-// WithInvoiceType tells the query-builder to eager-load the nodes that are connected to
-// the "invoice_type" edge. The optional arguments are used to configure the query builder of the edge.
-func (iq *InvoiceQuery) WithInvoiceType(opts ...func(*InvoiceTypeQuery)) *InvoiceQuery {
-	query := (&InvoiceTypeClient{config: iq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	iq.withInvoiceType = query
 	return iq
 }
 
@@ -406,9 +370,8 @@ func (iq *InvoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Invo
 	var (
 		nodes       = []*Invoice{}
 		_spec       = iq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			iq.withOrder != nil,
-			iq.withInvoiceType != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -432,12 +395,6 @@ func (iq *InvoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Invo
 	if query := iq.withOrder; query != nil {
 		if err := iq.loadOrder(ctx, query, nodes, nil,
 			func(n *Invoice, e *Order) { n.Edges.Order = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := iq.withInvoiceType; query != nil {
-		if err := iq.loadInvoiceType(ctx, query, nodes, nil,
-			func(n *Invoice, e *InvoiceType) { n.Edges.InvoiceType = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -473,35 +430,6 @@ func (iq *InvoiceQuery) loadOrder(ctx context.Context, query *OrderQuery, nodes 
 	}
 	return nil
 }
-func (iq *InvoiceQuery) loadInvoiceType(ctx context.Context, query *InvoiceTypeQuery, nodes []*Invoice, init func(*Invoice), assign func(*Invoice, *InvoiceType)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Invoice)
-	for i := range nodes {
-		fk := nodes[i].Type
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(invoicetype.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "type" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 
 func (iq *InvoiceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := iq.querySpec()
@@ -530,9 +458,6 @@ func (iq *InvoiceQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if iq.withOrder != nil {
 			_spec.Node.AddColumnOnce(invoice.FieldOrderID)
-		}
-		if iq.withInvoiceType != nil {
-			_spec.Node.AddColumnOnce(invoice.FieldType)
 		}
 	}
 	if ps := iq.predicates; len(ps) > 0 {

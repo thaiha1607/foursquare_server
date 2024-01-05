@@ -20,8 +20,6 @@ type Tx struct {
 	Invoice *InvoiceClient
 	// InvoiceLineItem is the client for interacting with the InvoiceLineItem builders.
 	InvoiceLineItem *InvoiceLineItemClient
-	// InvoiceType is the client for interacting with the InvoiceType builders.
-	InvoiceType *InvoiceTypeClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
@@ -177,7 +175,6 @@ func (tx *Tx) init() {
 	tx.FinancialTransaction = NewFinancialTransactionClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
 	tx.InvoiceLineItem = NewInvoiceLineItemClient(tx.config)
-	tx.InvoiceType = NewInvoiceTypeClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
