@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -36,7 +35,7 @@ type Order struct {
 	// Priority holds the value of the "priority" field.
 	Priority int `json:"priority,omitempty"`
 	// Type holds the value of the "type" field.
-	Type int `json:"type,omitempty"`
+	Type order.Type `json:"type,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
 	StatusCode int `json:"status_code,omitempty"`
 	// ManaagmentStaffID holds the value of the "manaagment_staff_id" field.
@@ -47,8 +46,6 @@ type Order struct {
 	DeliveryStaffID *uuid.UUID `json:"delivery_staff_id,omitempty"`
 	// InternalNote holds the value of the "internal_note" field.
 	InternalNote *string `json:"internal_note,omitempty"`
-	// IsInternal holds the value of the "is_internal" field.
-	IsInternal bool `json:"is_internal,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
@@ -65,8 +62,6 @@ type OrderEdges struct {
 	ParentOrder *Order `json:"parent_order,omitempty"`
 	// OrderStatus holds the value of the order_status edge.
 	OrderStatus *OrderStatusCode `json:"order_status,omitempty"`
-	// OrderType holds the value of the order_type edge.
-	OrderType *OrderType `json:"order_type,omitempty"`
 	// ManagementStaff holds the value of the management_staff edge.
 	ManagementStaff *User `json:"management_staff,omitempty"`
 	// WarehouseStaff holds the value of the warehouse_staff edge.
@@ -75,7 +70,7 @@ type OrderEdges struct {
 	DeliveryStaff *User `json:"delivery_staff,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [7]bool
 }
 
 // CustomerOrErr returns the Customer value or an error if the edge
@@ -130,23 +125,10 @@ func (e OrderEdges) OrderStatusOrErr() (*OrderStatusCode, error) {
 	return nil, &NotLoadedError{edge: "order_status"}
 }
 
-// OrderTypeOrErr returns the OrderType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) OrderTypeOrErr() (*OrderType, error) {
-	if e.loadedTypes[4] {
-		if e.OrderType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: ordertype.Label}
-		}
-		return e.OrderType, nil
-	}
-	return nil, &NotLoadedError{edge: "order_type"}
-}
-
 // ManagementStaffOrErr returns the ManagementStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) ManagementStaffOrErr() (*User, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		if e.ManagementStaff == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -159,7 +141,7 @@ func (e OrderEdges) ManagementStaffOrErr() (*User, error) {
 // WarehouseStaffOrErr returns the WarehouseStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) WarehouseStaffOrErr() (*User, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[5] {
 		if e.WarehouseStaff == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -172,7 +154,7 @@ func (e OrderEdges) WarehouseStaffOrErr() (*User, error) {
 // DeliveryStaffOrErr returns the DeliveryStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) DeliveryStaffOrErr() (*User, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[6] {
 		if e.DeliveryStaff == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -189,11 +171,9 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case order.FieldWarehouseStaffID, order.FieldDeliveryStaffID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case order.FieldIsInternal:
-			values[i] = new(sql.NullBool)
-		case order.FieldPriority, order.FieldType, order.FieldStatusCode:
+		case order.FieldPriority, order.FieldStatusCode:
 			values[i] = new(sql.NullInt64)
-		case order.FieldNote, order.FieldInternalNote:
+		case order.FieldNote, order.FieldType, order.FieldInternalNote:
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -264,10 +244,10 @@ func (o *Order) assignValues(columns []string, values []any) error {
 				o.Priority = int(value.Int64)
 			}
 		case order.FieldType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				o.Type = int(value.Int64)
+				o.Type = order.Type(value.String)
 			}
 		case order.FieldStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -302,12 +282,6 @@ func (o *Order) assignValues(columns []string, values []any) error {
 				o.InternalNote = new(string)
 				*o.InternalNote = value.String
 			}
-		case order.FieldIsInternal:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_internal", values[i])
-			} else if value.Valid {
-				o.IsInternal = value.Bool
-			}
 		default:
 			o.selectValues.Set(columns[i], values[i])
 		}
@@ -339,11 +313,6 @@ func (o *Order) QueryParentOrder() *OrderQuery {
 // QueryOrderStatus queries the "order_status" edge of the Order entity.
 func (o *Order) QueryOrderStatus() *OrderStatusCodeQuery {
 	return NewOrderClient(o.config).QueryOrderStatus(o)
-}
-
-// QueryOrderType queries the "order_type" edge of the Order entity.
-func (o *Order) QueryOrderType() *OrderTypeQuery {
-	return NewOrderClient(o.config).QueryOrderType(o)
 }
 
 // QueryManagementStaff queries the "management_staff" edge of the Order entity.
@@ -430,9 +399,6 @@ func (o *Order) String() string {
 		builder.WriteString("internal_note=")
 		builder.WriteString(*v)
 	}
-	builder.WriteString(", ")
-	builder.WriteString("is_internal=")
-	builder.WriteString(fmt.Sprintf("%v", o.IsInternal))
 	builder.WriteByte(')')
 	return builder.String()
 }

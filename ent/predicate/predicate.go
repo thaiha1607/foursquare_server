@@ -30,9 +30,6 @@ type OrderLineItem func(*sql.Selector)
 // OrderStatusCode is the predicate function for orderstatuscode builders.
 type OrderStatusCode func(*sql.Selector)
 
-// OrderType is the predicate function for ordertype builders.
-type OrderType func(*sql.Selector)
-
 // Product is the predicate function for product builders.
 type Product func(*sql.Selector)
 
@@ -41,9 +38,6 @@ type ProductTag func(*sql.Selector)
 
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
-
-// TransactionType is the predicate function for transactiontype builders.
-type TransactionType func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

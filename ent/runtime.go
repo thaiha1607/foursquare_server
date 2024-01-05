@@ -14,12 +14,10 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/schema"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
-	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -61,10 +59,10 @@ func init() {
 	financialtransaction.DefaultUpdatedAt = financialtransactionDescUpdatedAt.Default.(func() time.Time)
 	// financialtransaction.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	financialtransaction.UpdateDefaultUpdatedAt = financialtransactionDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// financialtransactionDescType is the schema descriptor for type field.
-	financialtransactionDescType := financialtransactionFields[4].Descriptor()
-	// financialtransaction.DefaultType holds the default value on creation for the type field.
-	financialtransaction.DefaultType = financialtransactionDescType.Default.(int)
+	// financialtransactionDescIsInternal is the schema descriptor for is_internal field.
+	financialtransactionDescIsInternal := financialtransactionFields[4].Descriptor()
+	// financialtransaction.DefaultIsInternal holds the default value on creation for the is_internal field.
+	financialtransaction.DefaultIsInternal = financialtransactionDescIsInternal.Default.(bool)
 	// financialtransactionDescID is the schema descriptor for id field.
 	financialtransactionDescID := financialtransactionFields[0].Descriptor()
 	// financialtransaction.DefaultID holds the default value on creation for the id field.
@@ -155,18 +153,10 @@ func init() {
 	order.DefaultPriority = orderDescPriority.Default.(int)
 	// order.PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
 	order.PriorityValidator = orderDescPriority.Validators[0].(func(int) error)
-	// orderDescType is the schema descriptor for type field.
-	orderDescType := orderFields[6].Descriptor()
-	// order.DefaultType holds the default value on creation for the type field.
-	order.DefaultType = orderDescType.Default.(int)
 	// orderDescStatusCode is the schema descriptor for status_code field.
 	orderDescStatusCode := orderFields[7].Descriptor()
 	// order.DefaultStatusCode holds the default value on creation for the status_code field.
 	order.DefaultStatusCode = orderDescStatusCode.Default.(int)
-	// orderDescIsInternal is the schema descriptor for is_internal field.
-	orderDescIsInternal := orderFields[12].Descriptor()
-	// order.DefaultIsInternal holds the default value on creation for the is_internal field.
-	order.DefaultIsInternal = orderDescIsInternal.Default.(bool)
 	orderlineitemMixin := schema.OrderLineItem{}.Mixin()
 	orderlineitemMixinFields0 := orderlineitemMixin[0].Fields()
 	_ = orderlineitemMixinFields0
@@ -205,25 +195,6 @@ func init() {
 	orderstatuscodeDescOrderStatus := orderstatuscodeFields[0].Descriptor()
 	// orderstatuscode.OrderStatusValidator is a validator for the "order_status" field. It is called by the builders before save.
 	orderstatuscode.OrderStatusValidator = orderstatuscodeDescOrderStatus.Validators[0].(func(string) error)
-	ordertypeMixin := schema.OrderType{}.Mixin()
-	ordertypeMixinFields0 := ordertypeMixin[0].Fields()
-	_ = ordertypeMixinFields0
-	ordertypeFields := schema.OrderType{}.Fields()
-	_ = ordertypeFields
-	// ordertypeDescCreatedAt is the schema descriptor for created_at field.
-	ordertypeDescCreatedAt := ordertypeMixinFields0[0].Descriptor()
-	// ordertype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	ordertype.DefaultCreatedAt = ordertypeDescCreatedAt.Default.(func() time.Time)
-	// ordertypeDescUpdatedAt is the schema descriptor for updated_at field.
-	ordertypeDescUpdatedAt := ordertypeMixinFields0[1].Descriptor()
-	// ordertype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	ordertype.DefaultUpdatedAt = ordertypeDescUpdatedAt.Default.(func() time.Time)
-	// ordertype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	ordertype.UpdateDefaultUpdatedAt = ordertypeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// ordertypeDescOrderType is the schema descriptor for order_type field.
-	ordertypeDescOrderType := ordertypeFields[0].Descriptor()
-	// ordertype.OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
-	ordertype.OrderTypeValidator = ordertypeDescOrderType.Validators[0].(func(string) error)
 	productMixin := schema.Product{}.Mixin()
 	productMixinFields0 := productMixin[0].Fields()
 	_ = productMixinFields0
@@ -285,25 +256,6 @@ func init() {
 	tagDescTitle := tagFields[1].Descriptor()
 	// tag.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	tag.TitleValidator = tagDescTitle.Validators[0].(func(string) error)
-	transactiontypeMixin := schema.TransactionType{}.Mixin()
-	transactiontypeMixinFields0 := transactiontypeMixin[0].Fields()
-	_ = transactiontypeMixinFields0
-	transactiontypeFields := schema.TransactionType{}.Fields()
-	_ = transactiontypeFields
-	// transactiontypeDescCreatedAt is the schema descriptor for created_at field.
-	transactiontypeDescCreatedAt := transactiontypeMixinFields0[0].Descriptor()
-	// transactiontype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	transactiontype.DefaultCreatedAt = transactiontypeDescCreatedAt.Default.(func() time.Time)
-	// transactiontypeDescUpdatedAt is the schema descriptor for updated_at field.
-	transactiontypeDescUpdatedAt := transactiontypeMixinFields0[1].Descriptor()
-	// transactiontype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	transactiontype.DefaultUpdatedAt = transactiontypeDescUpdatedAt.Default.(func() time.Time)
-	// transactiontype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	transactiontype.UpdateDefaultUpdatedAt = transactiontypeDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// transactiontypeDescTransactionType is the schema descriptor for transaction_type field.
-	transactiontypeDescTransactionType := transactiontypeFields[0].Descriptor()
-	// transactiontype.TransactionTypeValidator is a validator for the "transaction_type" field. It is called by the builders before save.
-	transactiontype.TransactionTypeValidator = transactiontypeDescTransactionType.Validators[0].(func(string) error)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
@@ -345,16 +297,12 @@ func init() {
 	userDescPasswordHash := userFields[6].Descriptor()
 	// user.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	user.PasswordHashValidator = userDescPasswordHash.Validators[0].(func(string) error)
-	// userDescUsername is the schema descriptor for username field.
-	userDescUsername := userFields[7].Descriptor()
-	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
 	// userDescVerified is the schema descriptor for verified field.
-	userDescVerified := userFields[8].Descriptor()
+	userDescVerified := userFields[7].Descriptor()
 	// user.DefaultVerified holds the default value on creation for the verified field.
 	user.DefaultVerified = userDescVerified.Default.(bool)
 	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userFields[9].Descriptor()
+	userDescPhone := userFields[8].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 	// userDescID is the schema descriptor for id field.

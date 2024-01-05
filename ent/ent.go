@@ -20,11 +20,9 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
-	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -94,11 +92,9 @@ func checkColumn(table, column string) error {
 			order.Table:                order.ValidColumn,
 			orderlineitem.Table:        orderlineitem.ValidColumn,
 			orderstatuscode.Table:      orderstatuscode.ValidColumn,
-			ordertype.Table:            ordertype.ValidColumn,
 			product.Table:              product.ValidColumn,
 			producttag.Table:           producttag.ValidColumn,
 			tag.Table:                  tag.ValidColumn,
-			transactiontype.Table:      transactiontype.ValidColumn,
 			user.Table:                 user.ValidColumn,
 		})
 	})

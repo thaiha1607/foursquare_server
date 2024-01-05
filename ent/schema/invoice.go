@@ -19,13 +19,15 @@ func (Invoice) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("order_id", uuid.UUID{}),
+		field.UUID("order_id", uuid.UUID{}).
+			Immutable(),
 		field.Float("total").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
-			}),
+			}).
+			Immutable(),
 		field.String("comment").
 			Optional().
 			Nillable(),
@@ -46,7 +48,8 @@ func (Invoice) Fields() []ent.Field {
 				"Commercial", "COMMERCIAL",
 				"Recurring", "RECURRING",
 				"Other", "OTHER",
-			).Default("PRO_FORMA"),
+			).Default("PRO_FORMA").
+			Immutable(),
 		field.Enum("status").
 			NamedValues(
 				"Draft", "DRAFT",
@@ -69,7 +72,8 @@ func (Invoice) Edges() []ent.Edge {
 		edge.To("order", Order.Type).
 			Field("order_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

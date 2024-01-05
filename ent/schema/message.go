@@ -17,8 +17,10 @@ func (Message) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("conversation_id", uuid.UUID{}),
-		field.UUID("sender_id", uuid.UUID{}),
+		field.UUID("conversation_id", uuid.UUID{}).
+			Immutable(),
+		field.UUID("sender_id", uuid.UUID{}).
+			Immutable(),
 		field.Enum("type").
 			NamedValues(
 				"Text", "TEXT",
@@ -27,7 +29,8 @@ func (Message) Fields() []ent.Field {
 				"Audio", "AUDIO",
 				"File", "FILE",
 				"Other", "OTHER",
-			).Default("TEXT"),
+			).Default("TEXT").
+			Immutable(),
 		field.String("content").
 			NotEmpty(),
 		field.Bool("is_read").
@@ -41,11 +44,13 @@ func (Message) Edges() []ent.Edge {
 		edge.To("conversation", Conversation.Type).
 			Field("conversation_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("sender", User.Type).
 			Field("sender_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

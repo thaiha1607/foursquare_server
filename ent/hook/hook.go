@@ -105,18 +105,6 @@ func (f OrderStatusCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderStatusCodeMutation", m)
 }
 
-// The OrderTypeFunc type is an adapter to allow the use of ordinary
-// function as OrderType mutator.
-type OrderTypeFunc func(context.Context, *ent.OrderTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f OrderTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.OrderTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderTypeMutation", m)
-}
-
 // The ProductFunc type is an adapter to allow the use of ordinary
 // function as Product mutator.
 type ProductFunc func(context.Context, *ent.ProductMutation) (ent.Value, error)
@@ -151,18 +139,6 @@ func (f TagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagMutation", m)
-}
-
-// The TransactionTypeFunc type is an adapter to allow the use of ordinary
-// function as TransactionType mutator.
-type TransactionTypeFunc func(context.Context, *ent.TransactionTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f TransactionTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TransactionTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TransactionTypeMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

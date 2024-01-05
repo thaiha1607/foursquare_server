@@ -29,8 +29,10 @@ func (Conversation) Fields() []ent.Field {
 		field.String("title").
 			Optional().
 			Nillable(),
-		field.UUID("user_one_id", uuid.UUID{}),
-		field.UUID("user_two_id", uuid.UUID{}),
+		field.UUID("user_one_id", uuid.UUID{}).
+			Immutable(),
+		field.UUID("user_two_id", uuid.UUID{}).
+			Immutable(),
 	}
 }
 
@@ -40,11 +42,13 @@ func (Conversation) Edges() []ent.Edge {
 		edge.To("user_one", User.Type).
 			Field("user_one_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("user_two", User.Type).
 			Field("user_two_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

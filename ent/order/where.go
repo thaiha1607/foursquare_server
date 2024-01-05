@@ -91,11 +91,6 @@ func Priority(v int) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldPriority, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v int) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldType, v))
-}
-
 // StatusCode applies equality check predicate on the "status_code" field. It's identical to StatusCodeEQ.
 func StatusCode(v int) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldStatusCode, v))
@@ -119,11 +114,6 @@ func DeliveryStaffID(v uuid.UUID) predicate.Order {
 // InternalNote applies equality check predicate on the "internal_note" field. It's identical to InternalNoteEQ.
 func InternalNote(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldInternalNote, v))
-}
-
-// IsInternal applies equality check predicate on the "is_internal" field. It's identical to IsInternalEQ.
-func IsInternal(v bool) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldIsInternal, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -392,22 +382,22 @@ func PriorityLTE(v int) predicate.Order {
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v int) predicate.Order {
+func TypeEQ(v Type) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v int) predicate.Order {
+func TypeNEQ(v Type) predicate.Order {
 	return predicate.Order(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...int) predicate.Order {
+func TypeIn(vs ...Type) predicate.Order {
 	return predicate.Order(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...int) predicate.Order {
+func TypeNotIn(vs ...Type) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldType, vs...))
 }
 
@@ -586,16 +576,6 @@ func InternalNoteContainsFold(v string) predicate.Order {
 	return predicate.Order(sql.FieldContainsFold(FieldInternalNote, v))
 }
 
-// IsInternalEQ applies the EQ predicate on the "is_internal" field.
-func IsInternalEQ(v bool) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldIsInternal, v))
-}
-
-// IsInternalNEQ applies the NEQ predicate on the "is_internal" field.
-func IsInternalNEQ(v bool) predicate.Order {
-	return predicate.Order(sql.FieldNEQ(FieldIsInternal, v))
-}
-
 // HasCustomer applies the HasEdge predicate on the "customer" edge.
 func HasCustomer() predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
@@ -680,29 +660,6 @@ func HasOrderStatus() predicate.Order {
 func HasOrderStatusWith(preds ...predicate.OrderStatusCode) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newOrderStatusStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasOrderType applies the HasEdge predicate on the "order_type" edge.
-func HasOrderType() predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, OrderTypeTable, OrderTypeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasOrderTypeWith applies the HasEdge predicate on the "order_type" edge with a given conditions (other predicates).
-func HasOrderTypeWith(preds ...predicate.OrderType) predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := newOrderTypeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

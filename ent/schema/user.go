@@ -26,20 +26,21 @@ func (User) Fields() []ent.Field {
 					_, err := mail.ParseAddress(s)
 					return err
 				},
-			),
+			).
+			Unique(),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.Time("last_reset").
-			Optional(),
+			Optional().
+			Nillable(),
 		field.Time("last_verification").
-			Optional(),
+			Optional().
+			Nillable(),
 		field.String("name").
 			NotEmpty(),
 		field.Text("password_hash").
 			NotEmpty().
 			Sensitive(),
-		field.String("username").
-			NotEmpty(),
 		field.Bool("verified").
 			Default(false),
 		field.String("phone").
@@ -54,11 +55,14 @@ func (User) Fields() []ent.Field {
 				"Management", "MANAGEMENT",
 			).Default("CUSTOMER"),
 		field.String("address").
-			Optional(),
+			Optional().
+			Nillable(),
 		field.String("postal_code").
-			Optional(),
+			Optional().
+			Nillable(),
 		field.String("other_address_info").
-			Optional(),
+			Optional().
+			Nillable(),
 	}
 }
 

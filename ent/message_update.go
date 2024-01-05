@@ -11,11 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // MessageUpdate is the builder for updating Message entities.
@@ -34,48 +31,6 @@ func (mu *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
 // SetUpdatedAt sets the "updated_at" field.
 func (mu *MessageUpdate) SetUpdatedAt(t time.Time) *MessageUpdate {
 	mu.mutation.SetUpdatedAt(t)
-	return mu
-}
-
-// SetConversationID sets the "conversation_id" field.
-func (mu *MessageUpdate) SetConversationID(u uuid.UUID) *MessageUpdate {
-	mu.mutation.SetConversationID(u)
-	return mu
-}
-
-// SetNillableConversationID sets the "conversation_id" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableConversationID(u *uuid.UUID) *MessageUpdate {
-	if u != nil {
-		mu.SetConversationID(*u)
-	}
-	return mu
-}
-
-// SetSenderID sets the "sender_id" field.
-func (mu *MessageUpdate) SetSenderID(u uuid.UUID) *MessageUpdate {
-	mu.mutation.SetSenderID(u)
-	return mu
-}
-
-// SetNillableSenderID sets the "sender_id" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableSenderID(u *uuid.UUID) *MessageUpdate {
-	if u != nil {
-		mu.SetSenderID(*u)
-	}
-	return mu
-}
-
-// SetType sets the "type" field.
-func (mu *MessageUpdate) SetType(m message.Type) *MessageUpdate {
-	mu.mutation.SetType(m)
-	return mu
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableType(m *message.Type) *MessageUpdate {
-	if m != nil {
-		mu.SetType(*m)
-	}
 	return mu
 }
 
@@ -107,31 +62,9 @@ func (mu *MessageUpdate) SetNillableIsRead(b *bool) *MessageUpdate {
 	return mu
 }
 
-// SetConversation sets the "conversation" edge to the Conversation entity.
-func (mu *MessageUpdate) SetConversation(c *Conversation) *MessageUpdate {
-	return mu.SetConversationID(c.ID)
-}
-
-// SetSender sets the "sender" edge to the User entity.
-func (mu *MessageUpdate) SetSender(u *User) *MessageUpdate {
-	return mu.SetSenderID(u.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (mu *MessageUpdate) Mutation() *MessageMutation {
 	return mu.mutation
-}
-
-// ClearConversation clears the "conversation" edge to the Conversation entity.
-func (mu *MessageUpdate) ClearConversation() *MessageUpdate {
-	mu.mutation.ClearConversation()
-	return mu
-}
-
-// ClearSender clears the "sender" edge to the User entity.
-func (mu *MessageUpdate) ClearSender() *MessageUpdate {
-	mu.mutation.ClearSender()
-	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -172,11 +105,6 @@ func (mu *MessageUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mu *MessageUpdate) check() error {
-	if v, ok := mu.mutation.GetType(); ok {
-		if err := message.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Message.type": %w`, err)}
-		}
-	}
 	if v, ok := mu.mutation.Content(); ok {
 		if err := message.ContentValidator(v); err != nil {
 			return &ValidationError{Name: "content", err: fmt.Errorf(`ent: validator failed for field "Message.content": %w`, err)}
@@ -206,72 +134,11 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := mu.mutation.GetType(); ok {
-		_spec.SetField(message.FieldType, field.TypeEnum, value)
-	}
 	if value, ok := mu.mutation.Content(); ok {
 		_spec.SetField(message.FieldContent, field.TypeString, value)
 	}
 	if value, ok := mu.mutation.IsRead(); ok {
 		_spec.SetField(message.FieldIsRead, field.TypeBool, value)
-	}
-	if mu.mutation.ConversationCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.ConversationTable,
-			Columns: []string{message.ConversationColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(conversation.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.ConversationIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.ConversationTable,
-			Columns: []string{message.ConversationColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(conversation.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if mu.mutation.SenderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.SenderTable,
-			Columns: []string{message.SenderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.SenderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.SenderTable,
-			Columns: []string{message.SenderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -296,48 +163,6 @@ type MessageUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (muo *MessageUpdateOne) SetUpdatedAt(t time.Time) *MessageUpdateOne {
 	muo.mutation.SetUpdatedAt(t)
-	return muo
-}
-
-// SetConversationID sets the "conversation_id" field.
-func (muo *MessageUpdateOne) SetConversationID(u uuid.UUID) *MessageUpdateOne {
-	muo.mutation.SetConversationID(u)
-	return muo
-}
-
-// SetNillableConversationID sets the "conversation_id" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableConversationID(u *uuid.UUID) *MessageUpdateOne {
-	if u != nil {
-		muo.SetConversationID(*u)
-	}
-	return muo
-}
-
-// SetSenderID sets the "sender_id" field.
-func (muo *MessageUpdateOne) SetSenderID(u uuid.UUID) *MessageUpdateOne {
-	muo.mutation.SetSenderID(u)
-	return muo
-}
-
-// SetNillableSenderID sets the "sender_id" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableSenderID(u *uuid.UUID) *MessageUpdateOne {
-	if u != nil {
-		muo.SetSenderID(*u)
-	}
-	return muo
-}
-
-// SetType sets the "type" field.
-func (muo *MessageUpdateOne) SetType(m message.Type) *MessageUpdateOne {
-	muo.mutation.SetType(m)
-	return muo
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableType(m *message.Type) *MessageUpdateOne {
-	if m != nil {
-		muo.SetType(*m)
-	}
 	return muo
 }
 
@@ -369,31 +194,9 @@ func (muo *MessageUpdateOne) SetNillableIsRead(b *bool) *MessageUpdateOne {
 	return muo
 }
 
-// SetConversation sets the "conversation" edge to the Conversation entity.
-func (muo *MessageUpdateOne) SetConversation(c *Conversation) *MessageUpdateOne {
-	return muo.SetConversationID(c.ID)
-}
-
-// SetSender sets the "sender" edge to the User entity.
-func (muo *MessageUpdateOne) SetSender(u *User) *MessageUpdateOne {
-	return muo.SetSenderID(u.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (muo *MessageUpdateOne) Mutation() *MessageMutation {
 	return muo.mutation
-}
-
-// ClearConversation clears the "conversation" edge to the Conversation entity.
-func (muo *MessageUpdateOne) ClearConversation() *MessageUpdateOne {
-	muo.mutation.ClearConversation()
-	return muo
-}
-
-// ClearSender clears the "sender" edge to the User entity.
-func (muo *MessageUpdateOne) ClearSender() *MessageUpdateOne {
-	muo.mutation.ClearSender()
-	return muo
 }
 
 // Where appends a list predicates to the MessageUpdate builder.
@@ -447,11 +250,6 @@ func (muo *MessageUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (muo *MessageUpdateOne) check() error {
-	if v, ok := muo.mutation.GetType(); ok {
-		if err := message.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Message.type": %w`, err)}
-		}
-	}
 	if v, ok := muo.mutation.Content(); ok {
 		if err := message.ContentValidator(v); err != nil {
 			return &ValidationError{Name: "content", err: fmt.Errorf(`ent: validator failed for field "Message.content": %w`, err)}
@@ -498,72 +296,11 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 	if value, ok := muo.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := muo.mutation.GetType(); ok {
-		_spec.SetField(message.FieldType, field.TypeEnum, value)
-	}
 	if value, ok := muo.mutation.Content(); ok {
 		_spec.SetField(message.FieldContent, field.TypeString, value)
 	}
 	if value, ok := muo.mutation.IsRead(); ok {
 		_spec.SetField(message.FieldIsRead, field.TypeBool, value)
-	}
-	if muo.mutation.ConversationCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.ConversationTable,
-			Columns: []string{message.ConversationColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(conversation.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.ConversationIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.ConversationTable,
-			Columns: []string{message.ConversationColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(conversation.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if muo.mutation.SenderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.SenderTable,
-			Columns: []string{message.SenderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.SenderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   message.SenderTable,
-			Columns: []string{message.SenderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Message{config: muo.config}
 	_spec.Assign = _node.assignValues

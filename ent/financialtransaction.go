@@ -13,7 +13,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
 
 // FinancialTransaction is the model entity for the FinancialTransaction schema.
@@ -31,8 +30,8 @@ type FinancialTransaction struct {
 	Amount decimal.Decimal `json:"amount,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment *string `json:"comment,omitempty"`
-	// Type holds the value of the "type" field.
-	Type int `json:"type,omitempty"`
+	// IsInternal holds the value of the "is_internal" field.
+	IsInternal bool `json:"is_internal,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
 	PaymentMethod financialtransaction.PaymentMethod `json:"payment_method,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -45,11 +44,9 @@ type FinancialTransaction struct {
 type FinancialTransactionEdges struct {
 	// Invoice holds the value of the invoice edge.
 	Invoice *Invoice `json:"invoice,omitempty"`
-	// TransactionType holds the value of the transaction_type edge.
-	TransactionType *TransactionType `json:"transaction_type,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // InvoiceOrErr returns the Invoice value or an error if the edge
@@ -65,19 +62,6 @@ func (e FinancialTransactionEdges) InvoiceOrErr() (*Invoice, error) {
 	return nil, &NotLoadedError{edge: "invoice"}
 }
 
-// TransactionTypeOrErr returns the TransactionType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e FinancialTransactionEdges) TransactionTypeOrErr() (*TransactionType, error) {
-	if e.loadedTypes[1] {
-		if e.TransactionType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: transactiontype.Label}
-		}
-		return e.TransactionType, nil
-	}
-	return nil, &NotLoadedError{edge: "transaction_type"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*FinancialTransaction) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -85,8 +69,8 @@ func (*FinancialTransaction) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case financialtransaction.FieldAmount:
 			values[i] = new(decimal.Decimal)
-		case financialtransaction.FieldType:
-			values[i] = new(sql.NullInt64)
+		case financialtransaction.FieldIsInternal:
+			values[i] = new(sql.NullBool)
 		case financialtransaction.FieldComment, financialtransaction.FieldPaymentMethod:
 			values[i] = new(sql.NullString)
 		case financialtransaction.FieldCreatedAt, financialtransaction.FieldUpdatedAt:
@@ -145,11 +129,11 @@ func (ft *FinancialTransaction) assignValues(columns []string, values []any) err
 				ft.Comment = new(string)
 				*ft.Comment = value.String
 			}
-		case financialtransaction.FieldType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
+		case financialtransaction.FieldIsInternal:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_internal", values[i])
 			} else if value.Valid {
-				ft.Type = int(value.Int64)
+				ft.IsInternal = value.Bool
 			}
 		case financialtransaction.FieldPaymentMethod:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -173,11 +157,6 @@ func (ft *FinancialTransaction) Value(name string) (ent.Value, error) {
 // QueryInvoice queries the "invoice" edge of the FinancialTransaction entity.
 func (ft *FinancialTransaction) QueryInvoice() *InvoiceQuery {
 	return NewFinancialTransactionClient(ft.config).QueryInvoice(ft)
-}
-
-// QueryTransactionType queries the "transaction_type" edge of the FinancialTransaction entity.
-func (ft *FinancialTransaction) QueryTransactionType() *TransactionTypeQuery {
-	return NewFinancialTransactionClient(ft.config).QueryTransactionType(ft)
 }
 
 // Update returns a builder for updating this FinancialTransaction.
@@ -220,8 +199,8 @@ func (ft *FinancialTransaction) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", ft.Type))
+	builder.WriteString("is_internal=")
+	builder.WriteString(fmt.Sprintf("%v", ft.IsInternal))
 	builder.WriteString(", ")
 	builder.WriteString("payment_method=")
 	builder.WriteString(fmt.Sprintf("%v", ft.PaymentMethod))

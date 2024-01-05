@@ -52,9 +52,9 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "amount", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "comment", Type: field.TypeString, Nullable: true},
+		{Name: "is_internal", Type: field.TypeBool, Default: false},
 		{Name: "payment_method", Type: field.TypeEnum, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
 		{Name: "invoice_id", Type: field.TypeUUID},
-		{Name: "type", Type: field.TypeInt, Default: 1},
 	}
 	// FinancialTransactionsTable holds the schema information for the "financial_transactions" table.
 	FinancialTransactionsTable = &schema.Table{
@@ -64,14 +64,8 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "financial_transactions_invoices_invoice",
-				Columns:    []*schema.Column{FinancialTransactionsColumns[6]},
-				RefColumns: []*schema.Column{InvoicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "financial_transactions_transaction_types_transaction_type",
 				Columns:    []*schema.Column{FinancialTransactionsColumns[7]},
-				RefColumns: []*schema.Column{TransactionTypesColumns[0]},
+				RefColumns: []*schema.Column{InvoicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -177,13 +171,12 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "note", Type: field.TypeString, Nullable: true},
 		{Name: "priority", Type: field.TypeInt, Default: 0},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SALE", "RETURN", "EXCHANGE", "TRANSFER", "INTERNAL", "OTHER"}, Default: "SALE"},
 		{Name: "internal_note", Type: field.TypeString, Nullable: true},
-		{Name: "is_internal", Type: field.TypeBool, Default: false},
 		{Name: "customer_id", Type: field.TypeUUID},
 		{Name: "created_by", Type: field.TypeUUID},
 		{Name: "parent_order_id", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "status_code", Type: field.TypeInt, Default: 1},
-		{Name: "type", Type: field.TypeInt, Default: 1},
 		{Name: "manaagment_staff_id", Type: field.TypeUUID},
 		{Name: "warehouse_staff_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "delivery_staff_id", Type: field.TypeUUID, Nullable: true},
@@ -219,26 +212,20 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_order_types_order_type",
-				Columns:    []*schema.Column{OrdersColumns[11]},
-				RefColumns: []*schema.Column{OrderTypesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
 				Symbol:     "orders_users_management_staff",
-				Columns:    []*schema.Column{OrdersColumns[12]},
+				Columns:    []*schema.Column{OrdersColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "orders_users_warehouse_staff",
-				Columns:    []*schema.Column{OrdersColumns[13]},
+				Columns:    []*schema.Column{OrdersColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "orders_users_delivery_staff",
-				Columns:    []*schema.Column{OrdersColumns[14]},
+				Columns:    []*schema.Column{OrdersColumns[13]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -292,19 +279,6 @@ var (
 		Name:       "order_status_codes",
 		Columns:    OrderStatusCodesColumns,
 		PrimaryKey: []*schema.Column{OrderStatusCodesColumns[0]},
-	}
-	// OrderTypesColumns holds the columns for the "order_types" table.
-	OrderTypesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "order_type", Type: field.TypeString, Unique: true},
-	}
-	// OrderTypesTable holds the schema information for the "order_types" table.
-	OrderTypesTable = &schema.Table{
-		Name:       "order_types",
-		Columns:    OrderTypesColumns,
-		PrimaryKey: []*schema.Column{OrderTypesColumns[0]},
 	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
@@ -367,31 +341,17 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
-	// TransactionTypesColumns holds the columns for the "transaction_types" table.
-	TransactionTypesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "transaction_type", Type: field.TypeString, Unique: true},
-	}
-	// TransactionTypesTable holds the schema information for the "transaction_types" table.
-	TransactionTypesTable = &schema.Table{
-		Name:       "transaction_types",
-		Columns:    TransactionTypesColumns,
-		PrimaryKey: []*schema.Column{TransactionTypesColumns[0]},
-	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "avatar_url", Type: field.TypeJSON, Nullable: true},
-		{Name: "email", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
 		{Name: "last_verification", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "password_hash", Type: field.TypeString, Size: 2147483647},
-		{Name: "username", Type: field.TypeString},
 		{Name: "verified", Type: field.TypeBool, Default: false},
 		{Name: "phone", Type: field.TypeString, Unique: true},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
@@ -415,11 +375,9 @@ var (
 		OrdersTable,
 		OrderLineItemsTable,
 		OrderStatusCodesTable,
-		OrderTypesTable,
 		ProductsTable,
 		ProductTagsTable,
 		TagsTable,
-		TransactionTypesTable,
 		UsersTable,
 	}
 )
@@ -428,7 +386,6 @@ func init() {
 	ConversationsTable.ForeignKeys[0].RefTable = UsersTable
 	ConversationsTable.ForeignKeys[1].RefTable = UsersTable
 	FinancialTransactionsTable.ForeignKeys[0].RefTable = InvoicesTable
-	FinancialTransactionsTable.ForeignKeys[1].RefTable = TransactionTypesTable
 	FinancialTransactionsTable.Annotation = &entsql.Annotation{
 		Table: "financial_transactions",
 	}
@@ -444,10 +401,9 @@ func init() {
 	OrdersTable.ForeignKeys[1].RefTable = UsersTable
 	OrdersTable.ForeignKeys[2].RefTable = OrdersTable
 	OrdersTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
-	OrdersTable.ForeignKeys[4].RefTable = OrderTypesTable
+	OrdersTable.ForeignKeys[4].RefTable = UsersTable
 	OrdersTable.ForeignKeys[5].RefTable = UsersTable
 	OrdersTable.ForeignKeys[6].RefTable = UsersTable
-	OrdersTable.ForeignKeys[7].RefTable = UsersTable
 	OrderLineItemsTable.ForeignKeys[0].RefTable = OrdersTable
 	OrderLineItemsTable.ForeignKeys[1].RefTable = ProductsTable
 	OrderLineItemsTable.Annotation = &entsql.Annotation{
@@ -456,15 +412,9 @@ func init() {
 	OrderStatusCodesTable.Annotation = &entsql.Annotation{
 		Table: "order_status_codes",
 	}
-	OrderTypesTable.Annotation = &entsql.Annotation{
-		Table: "order_types",
-	}
 	ProductTagsTable.ForeignKeys[0].RefTable = ProductsTable
 	ProductTagsTable.ForeignKeys[1].RefTable = TagsTable
 	ProductTagsTable.Annotation = &entsql.Annotation{
 		Table: "product_tags",
-	}
-	TransactionTypesTable.Annotation = &entsql.Annotation{
-		Table: "transaction_types",
 	}
 }

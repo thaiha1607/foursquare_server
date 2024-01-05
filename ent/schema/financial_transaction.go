@@ -28,17 +28,20 @@ func (FinancialTransaction) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("invoice_id", uuid.UUID{}),
+		field.UUID("invoice_id", uuid.UUID{}).
+			Immutable(),
 		field.Float("amount").GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
-			}),
+			}).
+			Immutable(),
 		field.String("comment").
 			Optional().
 			Nillable(),
-		field.Int("type").
-			Default(1),
+		field.Bool("is_internal").
+			Default(false).
+			Immutable(),
 		field.Enum("payment_method").
 			NamedValues(
 				"Cash", "CASH",
@@ -49,7 +52,8 @@ func (FinancialTransaction) Fields() []ent.Field {
 				"PrepaidCard", "PREPAID_CARD",
 				"Check", "CHECK",
 				"Other", "OTHER",
-			).Default("CASH"),
+			).Default("CASH").
+			Immutable(),
 	}
 }
 
@@ -59,11 +63,8 @@ func (FinancialTransaction) Edges() []ent.Edge {
 		edge.To("invoice", Invoice.Type).
 			Field("invoice_id").
 			Unique().
-			Required(),
-		edge.To("transaction_type", TransactionType.Type).
-			Field("type").
-			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

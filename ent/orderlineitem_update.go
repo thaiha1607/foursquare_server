@@ -11,12 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
 )
 
 // OrderLineItemUpdate is the builder for updating OrderLineItem entities.
@@ -35,34 +32,6 @@ func (oliu *OrderLineItemUpdate) Where(ps ...predicate.OrderLineItem) *OrderLine
 // SetUpdatedAt sets the "updated_at" field.
 func (oliu *OrderLineItemUpdate) SetUpdatedAt(t time.Time) *OrderLineItemUpdate {
 	oliu.mutation.SetUpdatedAt(t)
-	return oliu
-}
-
-// SetOrderID sets the "order_id" field.
-func (oliu *OrderLineItemUpdate) SetOrderID(u uuid.UUID) *OrderLineItemUpdate {
-	oliu.mutation.SetOrderID(u)
-	return oliu
-}
-
-// SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (oliu *OrderLineItemUpdate) SetNillableOrderID(u *uuid.UUID) *OrderLineItemUpdate {
-	if u != nil {
-		oliu.SetOrderID(*u)
-	}
-	return oliu
-}
-
-// SetProductID sets the "product_id" field.
-func (oliu *OrderLineItemUpdate) SetProductID(u uuid.UUID) *OrderLineItemUpdate {
-	oliu.mutation.SetProductID(u)
-	return oliu
-}
-
-// SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (oliu *OrderLineItemUpdate) SetNillableProductID(u *uuid.UUID) *OrderLineItemUpdate {
-	if u != nil {
-		oliu.SetProductID(*u)
-	}
 	return oliu
 }
 
@@ -87,31 +56,9 @@ func (oliu *OrderLineItemUpdate) AddQty(d decimal.Decimal) *OrderLineItemUpdate 
 	return oliu
 }
 
-// SetOrder sets the "order" edge to the Order entity.
-func (oliu *OrderLineItemUpdate) SetOrder(o *Order) *OrderLineItemUpdate {
-	return oliu.SetOrderID(o.ID)
-}
-
-// SetProduct sets the "product" edge to the Product entity.
-func (oliu *OrderLineItemUpdate) SetProduct(p *Product) *OrderLineItemUpdate {
-	return oliu.SetProductID(p.ID)
-}
-
 // Mutation returns the OrderLineItemMutation object of the builder.
 func (oliu *OrderLineItemUpdate) Mutation() *OrderLineItemMutation {
 	return oliu.mutation
-}
-
-// ClearOrder clears the "order" edge to the Order entity.
-func (oliu *OrderLineItemUpdate) ClearOrder() *OrderLineItemUpdate {
-	oliu.mutation.ClearOrder()
-	return oliu
-}
-
-// ClearProduct clears the "product" edge to the Product entity.
-func (oliu *OrderLineItemUpdate) ClearProduct() *OrderLineItemUpdate {
-	oliu.mutation.ClearProduct()
-	return oliu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -182,64 +129,6 @@ func (oliu *OrderLineItemUpdate) sqlSave(ctx context.Context) (n int, err error)
 	if value, ok := oliu.mutation.AddedQty(); ok {
 		_spec.AddField(orderlineitem.FieldQty, field.TypeFloat64, value)
 	}
-	if oliu.mutation.OrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.OrderTable,
-			Columns: []string{orderlineitem.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oliu.mutation.OrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.OrderTable,
-			Columns: []string{orderlineitem.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if oliu.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.ProductTable,
-			Columns: []string{orderlineitem.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oliu.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.ProductTable,
-			Columns: []string{orderlineitem.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, oliu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{orderlineitem.Label}
@@ -266,34 +155,6 @@ func (oliuo *OrderLineItemUpdateOne) SetUpdatedAt(t time.Time) *OrderLineItemUpd
 	return oliuo
 }
 
-// SetOrderID sets the "order_id" field.
-func (oliuo *OrderLineItemUpdateOne) SetOrderID(u uuid.UUID) *OrderLineItemUpdateOne {
-	oliuo.mutation.SetOrderID(u)
-	return oliuo
-}
-
-// SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (oliuo *OrderLineItemUpdateOne) SetNillableOrderID(u *uuid.UUID) *OrderLineItemUpdateOne {
-	if u != nil {
-		oliuo.SetOrderID(*u)
-	}
-	return oliuo
-}
-
-// SetProductID sets the "product_id" field.
-func (oliuo *OrderLineItemUpdateOne) SetProductID(u uuid.UUID) *OrderLineItemUpdateOne {
-	oliuo.mutation.SetProductID(u)
-	return oliuo
-}
-
-// SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (oliuo *OrderLineItemUpdateOne) SetNillableProductID(u *uuid.UUID) *OrderLineItemUpdateOne {
-	if u != nil {
-		oliuo.SetProductID(*u)
-	}
-	return oliuo
-}
-
 // SetQty sets the "qty" field.
 func (oliuo *OrderLineItemUpdateOne) SetQty(d decimal.Decimal) *OrderLineItemUpdateOne {
 	oliuo.mutation.ResetQty()
@@ -315,31 +176,9 @@ func (oliuo *OrderLineItemUpdateOne) AddQty(d decimal.Decimal) *OrderLineItemUpd
 	return oliuo
 }
 
-// SetOrder sets the "order" edge to the Order entity.
-func (oliuo *OrderLineItemUpdateOne) SetOrder(o *Order) *OrderLineItemUpdateOne {
-	return oliuo.SetOrderID(o.ID)
-}
-
-// SetProduct sets the "product" edge to the Product entity.
-func (oliuo *OrderLineItemUpdateOne) SetProduct(p *Product) *OrderLineItemUpdateOne {
-	return oliuo.SetProductID(p.ID)
-}
-
 // Mutation returns the OrderLineItemMutation object of the builder.
 func (oliuo *OrderLineItemUpdateOne) Mutation() *OrderLineItemMutation {
 	return oliuo.mutation
-}
-
-// ClearOrder clears the "order" edge to the Order entity.
-func (oliuo *OrderLineItemUpdateOne) ClearOrder() *OrderLineItemUpdateOne {
-	oliuo.mutation.ClearOrder()
-	return oliuo
-}
-
-// ClearProduct clears the "product" edge to the Product entity.
-func (oliuo *OrderLineItemUpdateOne) ClearProduct() *OrderLineItemUpdateOne {
-	oliuo.mutation.ClearProduct()
-	return oliuo
 }
 
 // Where appends a list predicates to the OrderLineItemUpdate builder.
@@ -439,64 +278,6 @@ func (oliuo *OrderLineItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderL
 	}
 	if value, ok := oliuo.mutation.AddedQty(); ok {
 		_spec.AddField(orderlineitem.FieldQty, field.TypeFloat64, value)
-	}
-	if oliuo.mutation.OrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.OrderTable,
-			Columns: []string{orderlineitem.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oliuo.mutation.OrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.OrderTable,
-			Columns: []string{orderlineitem.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if oliuo.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.ProductTable,
-			Columns: []string{orderlineitem.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oliuo.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderlineitem.ProductTable,
-			Columns: []string{orderlineitem.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &OrderLineItem{config: oliuo.config}
 	_spec.Assign = _node.assignValues

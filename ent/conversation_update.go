@@ -11,10 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // ConversationUpdate is the builder for updating Conversation entities.
@@ -56,59 +54,9 @@ func (cu *ConversationUpdate) ClearTitle() *ConversationUpdate {
 	return cu
 }
 
-// SetUserOneID sets the "user_one_id" field.
-func (cu *ConversationUpdate) SetUserOneID(u uuid.UUID) *ConversationUpdate {
-	cu.mutation.SetUserOneID(u)
-	return cu
-}
-
-// SetNillableUserOneID sets the "user_one_id" field if the given value is not nil.
-func (cu *ConversationUpdate) SetNillableUserOneID(u *uuid.UUID) *ConversationUpdate {
-	if u != nil {
-		cu.SetUserOneID(*u)
-	}
-	return cu
-}
-
-// SetUserTwoID sets the "user_two_id" field.
-func (cu *ConversationUpdate) SetUserTwoID(u uuid.UUID) *ConversationUpdate {
-	cu.mutation.SetUserTwoID(u)
-	return cu
-}
-
-// SetNillableUserTwoID sets the "user_two_id" field if the given value is not nil.
-func (cu *ConversationUpdate) SetNillableUserTwoID(u *uuid.UUID) *ConversationUpdate {
-	if u != nil {
-		cu.SetUserTwoID(*u)
-	}
-	return cu
-}
-
-// SetUserOne sets the "user_one" edge to the User entity.
-func (cu *ConversationUpdate) SetUserOne(u *User) *ConversationUpdate {
-	return cu.SetUserOneID(u.ID)
-}
-
-// SetUserTwo sets the "user_two" edge to the User entity.
-func (cu *ConversationUpdate) SetUserTwo(u *User) *ConversationUpdate {
-	return cu.SetUserTwoID(u.ID)
-}
-
 // Mutation returns the ConversationMutation object of the builder.
 func (cu *ConversationUpdate) Mutation() *ConversationMutation {
 	return cu.mutation
-}
-
-// ClearUserOne clears the "user_one" edge to the User entity.
-func (cu *ConversationUpdate) ClearUserOne() *ConversationUpdate {
-	cu.mutation.ClearUserOne()
-	return cu
-}
-
-// ClearUserTwo clears the "user_two" edge to the User entity.
-func (cu *ConversationUpdate) ClearUserTwo() *ConversationUpdate {
-	cu.mutation.ClearUserTwo()
-	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -179,64 +127,6 @@ func (cu *ConversationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.TitleCleared() {
 		_spec.ClearField(conversation.FieldTitle, field.TypeString)
 	}
-	if cu.mutation.UserOneCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserOneTable,
-			Columns: []string{conversation.UserOneColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.UserOneIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserOneTable,
-			Columns: []string{conversation.UserOneColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.UserTwoCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserTwoTable,
-			Columns: []string{conversation.UserTwoColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.UserTwoIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserTwoTable,
-			Columns: []string{conversation.UserTwoColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{conversation.Label}
@@ -283,59 +173,9 @@ func (cuo *ConversationUpdateOne) ClearTitle() *ConversationUpdateOne {
 	return cuo
 }
 
-// SetUserOneID sets the "user_one_id" field.
-func (cuo *ConversationUpdateOne) SetUserOneID(u uuid.UUID) *ConversationUpdateOne {
-	cuo.mutation.SetUserOneID(u)
-	return cuo
-}
-
-// SetNillableUserOneID sets the "user_one_id" field if the given value is not nil.
-func (cuo *ConversationUpdateOne) SetNillableUserOneID(u *uuid.UUID) *ConversationUpdateOne {
-	if u != nil {
-		cuo.SetUserOneID(*u)
-	}
-	return cuo
-}
-
-// SetUserTwoID sets the "user_two_id" field.
-func (cuo *ConversationUpdateOne) SetUserTwoID(u uuid.UUID) *ConversationUpdateOne {
-	cuo.mutation.SetUserTwoID(u)
-	return cuo
-}
-
-// SetNillableUserTwoID sets the "user_two_id" field if the given value is not nil.
-func (cuo *ConversationUpdateOne) SetNillableUserTwoID(u *uuid.UUID) *ConversationUpdateOne {
-	if u != nil {
-		cuo.SetUserTwoID(*u)
-	}
-	return cuo
-}
-
-// SetUserOne sets the "user_one" edge to the User entity.
-func (cuo *ConversationUpdateOne) SetUserOne(u *User) *ConversationUpdateOne {
-	return cuo.SetUserOneID(u.ID)
-}
-
-// SetUserTwo sets the "user_two" edge to the User entity.
-func (cuo *ConversationUpdateOne) SetUserTwo(u *User) *ConversationUpdateOne {
-	return cuo.SetUserTwoID(u.ID)
-}
-
 // Mutation returns the ConversationMutation object of the builder.
 func (cuo *ConversationUpdateOne) Mutation() *ConversationMutation {
 	return cuo.mutation
-}
-
-// ClearUserOne clears the "user_one" edge to the User entity.
-func (cuo *ConversationUpdateOne) ClearUserOne() *ConversationUpdateOne {
-	cuo.mutation.ClearUserOne()
-	return cuo
-}
-
-// ClearUserTwo clears the "user_two" edge to the User entity.
-func (cuo *ConversationUpdateOne) ClearUserTwo() *ConversationUpdateOne {
-	cuo.mutation.ClearUserTwo()
-	return cuo
 }
 
 // Where appends a list predicates to the ConversationUpdate builder.
@@ -435,64 +275,6 @@ func (cuo *ConversationUpdateOne) sqlSave(ctx context.Context) (_node *Conversat
 	}
 	if cuo.mutation.TitleCleared() {
 		_spec.ClearField(conversation.FieldTitle, field.TypeString)
-	}
-	if cuo.mutation.UserOneCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserOneTable,
-			Columns: []string{conversation.UserOneColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.UserOneIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserOneTable,
-			Columns: []string{conversation.UserOneColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.UserTwoCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserTwoTable,
-			Columns: []string{conversation.UserTwoColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.UserTwoIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   conversation.UserTwoTable,
-			Columns: []string{conversation.UserTwoColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Conversation{config: cuo.config}
 	_spec.Assign = _node.assignValues

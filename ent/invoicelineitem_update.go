@@ -11,11 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
-	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
-	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
 
@@ -38,101 +34,9 @@ func (iliu *InvoiceLineItemUpdate) SetUpdatedAt(t time.Time) *InvoiceLineItemUpd
 	return iliu
 }
 
-// SetInvoiceID sets the "invoice_id" field.
-func (iliu *InvoiceLineItemUpdate) SetInvoiceID(u uuid.UUID) *InvoiceLineItemUpdate {
-	iliu.mutation.SetInvoiceID(u)
-	return iliu
-}
-
-// SetNillableInvoiceID sets the "invoice_id" field if the given value is not nil.
-func (iliu *InvoiceLineItemUpdate) SetNillableInvoiceID(u *uuid.UUID) *InvoiceLineItemUpdate {
-	if u != nil {
-		iliu.SetInvoiceID(*u)
-	}
-	return iliu
-}
-
-// SetOrderLineItemID sets the "order_line_item_id" field.
-func (iliu *InvoiceLineItemUpdate) SetOrderLineItemID(u uuid.UUID) *InvoiceLineItemUpdate {
-	iliu.mutation.SetOrderLineItemID(u)
-	return iliu
-}
-
-// SetNillableOrderLineItemID sets the "order_line_item_id" field if the given value is not nil.
-func (iliu *InvoiceLineItemUpdate) SetNillableOrderLineItemID(u *uuid.UUID) *InvoiceLineItemUpdate {
-	if u != nil {
-		iliu.SetOrderLineItemID(*u)
-	}
-	return iliu
-}
-
-// SetQty sets the "qty" field.
-func (iliu *InvoiceLineItemUpdate) SetQty(d decimal.Decimal) *InvoiceLineItemUpdate {
-	iliu.mutation.ResetQty()
-	iliu.mutation.SetQty(d)
-	return iliu
-}
-
-// SetNillableQty sets the "qty" field if the given value is not nil.
-func (iliu *InvoiceLineItemUpdate) SetNillableQty(d *decimal.Decimal) *InvoiceLineItemUpdate {
-	if d != nil {
-		iliu.SetQty(*d)
-	}
-	return iliu
-}
-
-// AddQty adds d to the "qty" field.
-func (iliu *InvoiceLineItemUpdate) AddQty(d decimal.Decimal) *InvoiceLineItemUpdate {
-	iliu.mutation.AddQty(d)
-	return iliu
-}
-
-// SetTotal sets the "total" field.
-func (iliu *InvoiceLineItemUpdate) SetTotal(d decimal.Decimal) *InvoiceLineItemUpdate {
-	iliu.mutation.ResetTotal()
-	iliu.mutation.SetTotal(d)
-	return iliu
-}
-
-// SetNillableTotal sets the "total" field if the given value is not nil.
-func (iliu *InvoiceLineItemUpdate) SetNillableTotal(d *decimal.Decimal) *InvoiceLineItemUpdate {
-	if d != nil {
-		iliu.SetTotal(*d)
-	}
-	return iliu
-}
-
-// AddTotal adds d to the "total" field.
-func (iliu *InvoiceLineItemUpdate) AddTotal(d decimal.Decimal) *InvoiceLineItemUpdate {
-	iliu.mutation.AddTotal(d)
-	return iliu
-}
-
-// SetInvoice sets the "invoice" edge to the Invoice entity.
-func (iliu *InvoiceLineItemUpdate) SetInvoice(i *Invoice) *InvoiceLineItemUpdate {
-	return iliu.SetInvoiceID(i.ID)
-}
-
-// SetOrderLineItem sets the "order_line_item" edge to the OrderLineItem entity.
-func (iliu *InvoiceLineItemUpdate) SetOrderLineItem(o *OrderLineItem) *InvoiceLineItemUpdate {
-	return iliu.SetOrderLineItemID(o.ID)
-}
-
 // Mutation returns the InvoiceLineItemMutation object of the builder.
 func (iliu *InvoiceLineItemUpdate) Mutation() *InvoiceLineItemMutation {
 	return iliu.mutation
-}
-
-// ClearInvoice clears the "invoice" edge to the Invoice entity.
-func (iliu *InvoiceLineItemUpdate) ClearInvoice() *InvoiceLineItemUpdate {
-	iliu.mutation.ClearInvoice()
-	return iliu
-}
-
-// ClearOrderLineItem clears the "order_line_item" edge to the OrderLineItem entity.
-func (iliu *InvoiceLineItemUpdate) ClearOrderLineItem() *InvoiceLineItemUpdate {
-	iliu.mutation.ClearOrderLineItem()
-	return iliu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -197,76 +101,6 @@ func (iliu *InvoiceLineItemUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := iliu.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoicelineitem.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iliu.mutation.Qty(); ok {
-		_spec.SetField(invoicelineitem.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := iliu.mutation.AddedQty(); ok {
-		_spec.AddField(invoicelineitem.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := iliu.mutation.Total(); ok {
-		_spec.SetField(invoicelineitem.FieldTotal, field.TypeFloat64, value)
-	}
-	if value, ok := iliu.mutation.AddedTotal(); ok {
-		_spec.AddField(invoicelineitem.FieldTotal, field.TypeFloat64, value)
-	}
-	if iliu.mutation.InvoiceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.InvoiceTable,
-			Columns: []string{invoicelineitem.InvoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoice.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iliu.mutation.InvoiceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.InvoiceTable,
-			Columns: []string{invoicelineitem.InvoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoice.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iliu.mutation.OrderLineItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.OrderLineItemTable,
-			Columns: []string{invoicelineitem.OrderLineItemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderlineitem.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iliu.mutation.OrderLineItemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.OrderLineItemTable,
-			Columns: []string{invoicelineitem.OrderLineItemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderlineitem.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iliu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invoicelineitem.Label}
@@ -293,101 +127,9 @@ func (iliuo *InvoiceLineItemUpdateOne) SetUpdatedAt(t time.Time) *InvoiceLineIte
 	return iliuo
 }
 
-// SetInvoiceID sets the "invoice_id" field.
-func (iliuo *InvoiceLineItemUpdateOne) SetInvoiceID(u uuid.UUID) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.SetInvoiceID(u)
-	return iliuo
-}
-
-// SetNillableInvoiceID sets the "invoice_id" field if the given value is not nil.
-func (iliuo *InvoiceLineItemUpdateOne) SetNillableInvoiceID(u *uuid.UUID) *InvoiceLineItemUpdateOne {
-	if u != nil {
-		iliuo.SetInvoiceID(*u)
-	}
-	return iliuo
-}
-
-// SetOrderLineItemID sets the "order_line_item_id" field.
-func (iliuo *InvoiceLineItemUpdateOne) SetOrderLineItemID(u uuid.UUID) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.SetOrderLineItemID(u)
-	return iliuo
-}
-
-// SetNillableOrderLineItemID sets the "order_line_item_id" field if the given value is not nil.
-func (iliuo *InvoiceLineItemUpdateOne) SetNillableOrderLineItemID(u *uuid.UUID) *InvoiceLineItemUpdateOne {
-	if u != nil {
-		iliuo.SetOrderLineItemID(*u)
-	}
-	return iliuo
-}
-
-// SetQty sets the "qty" field.
-func (iliuo *InvoiceLineItemUpdateOne) SetQty(d decimal.Decimal) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.ResetQty()
-	iliuo.mutation.SetQty(d)
-	return iliuo
-}
-
-// SetNillableQty sets the "qty" field if the given value is not nil.
-func (iliuo *InvoiceLineItemUpdateOne) SetNillableQty(d *decimal.Decimal) *InvoiceLineItemUpdateOne {
-	if d != nil {
-		iliuo.SetQty(*d)
-	}
-	return iliuo
-}
-
-// AddQty adds d to the "qty" field.
-func (iliuo *InvoiceLineItemUpdateOne) AddQty(d decimal.Decimal) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.AddQty(d)
-	return iliuo
-}
-
-// SetTotal sets the "total" field.
-func (iliuo *InvoiceLineItemUpdateOne) SetTotal(d decimal.Decimal) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.ResetTotal()
-	iliuo.mutation.SetTotal(d)
-	return iliuo
-}
-
-// SetNillableTotal sets the "total" field if the given value is not nil.
-func (iliuo *InvoiceLineItemUpdateOne) SetNillableTotal(d *decimal.Decimal) *InvoiceLineItemUpdateOne {
-	if d != nil {
-		iliuo.SetTotal(*d)
-	}
-	return iliuo
-}
-
-// AddTotal adds d to the "total" field.
-func (iliuo *InvoiceLineItemUpdateOne) AddTotal(d decimal.Decimal) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.AddTotal(d)
-	return iliuo
-}
-
-// SetInvoice sets the "invoice" edge to the Invoice entity.
-func (iliuo *InvoiceLineItemUpdateOne) SetInvoice(i *Invoice) *InvoiceLineItemUpdateOne {
-	return iliuo.SetInvoiceID(i.ID)
-}
-
-// SetOrderLineItem sets the "order_line_item" edge to the OrderLineItem entity.
-func (iliuo *InvoiceLineItemUpdateOne) SetOrderLineItem(o *OrderLineItem) *InvoiceLineItemUpdateOne {
-	return iliuo.SetOrderLineItemID(o.ID)
-}
-
 // Mutation returns the InvoiceLineItemMutation object of the builder.
 func (iliuo *InvoiceLineItemUpdateOne) Mutation() *InvoiceLineItemMutation {
 	return iliuo.mutation
-}
-
-// ClearInvoice clears the "invoice" edge to the Invoice entity.
-func (iliuo *InvoiceLineItemUpdateOne) ClearInvoice() *InvoiceLineItemUpdateOne {
-	iliuo.mutation.ClearInvoice()
-	return iliuo
-}
-
-// ClearOrderLineItem clears the "order_line_item" edge to the OrderLineItem entity.
-func (iliuo *InvoiceLineItemUpdateOne) ClearOrderLineItem() *InvoiceLineItemUpdateOne {
-	iliuo.mutation.ClearOrderLineItem()
-	return iliuo
 }
 
 // Where appends a list predicates to the InvoiceLineItemUpdate builder.
@@ -481,76 +223,6 @@ func (iliuo *InvoiceLineItemUpdateOne) sqlSave(ctx context.Context) (_node *Invo
 	}
 	if value, ok := iliuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoicelineitem.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := iliuo.mutation.Qty(); ok {
-		_spec.SetField(invoicelineitem.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := iliuo.mutation.AddedQty(); ok {
-		_spec.AddField(invoicelineitem.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := iliuo.mutation.Total(); ok {
-		_spec.SetField(invoicelineitem.FieldTotal, field.TypeFloat64, value)
-	}
-	if value, ok := iliuo.mutation.AddedTotal(); ok {
-		_spec.AddField(invoicelineitem.FieldTotal, field.TypeFloat64, value)
-	}
-	if iliuo.mutation.InvoiceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.InvoiceTable,
-			Columns: []string{invoicelineitem.InvoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoice.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iliuo.mutation.InvoiceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.InvoiceTable,
-			Columns: []string{invoicelineitem.InvoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(invoice.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iliuo.mutation.OrderLineItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.OrderLineItemTable,
-			Columns: []string{invoicelineitem.OrderLineItemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderlineitem.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iliuo.mutation.OrderLineItemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoicelineitem.OrderLineItemTable,
-			Columns: []string{invoicelineitem.OrderLineItemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderlineitem.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &InvoiceLineItem{config: iliuo.config}
 	_spec.Assign = _node.assignValues

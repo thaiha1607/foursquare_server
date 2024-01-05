@@ -16,18 +16,29 @@ type Order struct {
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}),
-		field.UUID("customer_id", uuid.UUID{}),
+		field.UUID("customer_id", uuid.UUID{}).
+			Immutable(),
 		field.String("note").
 			Optional().
 			Nillable(),
-		field.UUID("created_by", uuid.UUID{}),
+		field.UUID("created_by", uuid.UUID{}).
+			Immutable(),
 		field.UUID("parent_order_id", uuid.UUID{}).
 			Optional(),
 		field.Int("priority").
 			Default(0).
 			Range(0, 10),
-		field.Int("type").
-			Default(1),
+		field.Enum("type").
+			NamedValues(
+				"Sale", "SALE",
+				"Return", "RETURN",
+				"Exchange", "EXCHANGE",
+				"Transfer", "TRANSFER",
+				"Internal", "INTERNAL",
+				"Other", "OTHER",
+			).
+			Default("SALE").
+			Immutable(),
 		field.Int("status_code").
 			Default(1),
 		field.UUID("manaagment_staff_id", uuid.UUID{}),
@@ -40,8 +51,6 @@ func (Order) Fields() []ent.Field {
 		field.String("internal_note").
 			Optional().
 			Nillable(),
-		field.Bool("is_internal").
-			Default(false),
 	}
 }
 
@@ -51,20 +60,18 @@ func (Order) Edges() []ent.Edge {
 		edge.To("customer", User.Type).
 			Field("customer_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("creator", User.Type).
 			Field("created_by").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("parent_order", Order.Type).
 			Field("parent_order_id").
 			Unique(),
 		edge.To("order_status", OrderStatusCode.Type).
 			Field("status_code").
-			Unique().
-			Required(),
-		edge.To("order_type", OrderType.Type).
-			Field("type").
 			Unique().
 			Required(),
 		edge.To("management_staff", User.Type).

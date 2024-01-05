@@ -11,10 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
 
@@ -34,41 +31,6 @@ func (iu *InvoiceUpdate) Where(ps ...predicate.Invoice) *InvoiceUpdate {
 // SetUpdatedAt sets the "updated_at" field.
 func (iu *InvoiceUpdate) SetUpdatedAt(t time.Time) *InvoiceUpdate {
 	iu.mutation.SetUpdatedAt(t)
-	return iu
-}
-
-// SetOrderID sets the "order_id" field.
-func (iu *InvoiceUpdate) SetOrderID(u uuid.UUID) *InvoiceUpdate {
-	iu.mutation.SetOrderID(u)
-	return iu
-}
-
-// SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableOrderID(u *uuid.UUID) *InvoiceUpdate {
-	if u != nil {
-		iu.SetOrderID(*u)
-	}
-	return iu
-}
-
-// SetTotal sets the "total" field.
-func (iu *InvoiceUpdate) SetTotal(d decimal.Decimal) *InvoiceUpdate {
-	iu.mutation.ResetTotal()
-	iu.mutation.SetTotal(d)
-	return iu
-}
-
-// SetNillableTotal sets the "total" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableTotal(d *decimal.Decimal) *InvoiceUpdate {
-	if d != nil {
-		iu.SetTotal(*d)
-	}
-	return iu
-}
-
-// AddTotal adds d to the "total" field.
-func (iu *InvoiceUpdate) AddTotal(d decimal.Decimal) *InvoiceUpdate {
-	iu.mutation.AddTotal(d)
 	return iu
 }
 
@@ -112,20 +74,6 @@ func (iu *InvoiceUpdate) ClearNote() *InvoiceUpdate {
 	return iu
 }
 
-// SetType sets the "type" field.
-func (iu *InvoiceUpdate) SetType(i invoice.Type) *InvoiceUpdate {
-	iu.mutation.SetType(i)
-	return iu
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableType(i *invoice.Type) *InvoiceUpdate {
-	if i != nil {
-		iu.SetType(*i)
-	}
-	return iu
-}
-
 // SetStatus sets the "status" field.
 func (iu *InvoiceUpdate) SetStatus(i invoice.Status) *InvoiceUpdate {
 	iu.mutation.SetStatus(i)
@@ -140,20 +88,9 @@ func (iu *InvoiceUpdate) SetNillableStatus(i *invoice.Status) *InvoiceUpdate {
 	return iu
 }
 
-// SetOrder sets the "order" edge to the Order entity.
-func (iu *InvoiceUpdate) SetOrder(o *Order) *InvoiceUpdate {
-	return iu.SetOrderID(o.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iu *InvoiceUpdate) Mutation() *InvoiceMutation {
 	return iu.mutation
-}
-
-// ClearOrder clears the "order" edge to the Order entity.
-func (iu *InvoiceUpdate) ClearOrder() *InvoiceUpdate {
-	iu.mutation.ClearOrder()
-	return iu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -194,11 +131,6 @@ func (iu *InvoiceUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iu *InvoiceUpdate) check() error {
-	if v, ok := iu.mutation.GetType(); ok {
-		if err := invoice.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Invoice.type": %w`, err)}
-		}
-	}
 	if v, ok := iu.mutation.Status(); ok {
 		if err := invoice.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
@@ -225,12 +157,6 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoice.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iu.mutation.Total(); ok {
-		_spec.SetField(invoice.FieldTotal, field.TypeFloat64, value)
-	}
-	if value, ok := iu.mutation.AddedTotal(); ok {
-		_spec.AddField(invoice.FieldTotal, field.TypeFloat64, value)
-	}
 	if value, ok := iu.mutation.Comment(); ok {
 		_spec.SetField(invoice.FieldComment, field.TypeString, value)
 	}
@@ -243,40 +169,8 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if iu.mutation.NoteCleared() {
 		_spec.ClearField(invoice.FieldNote, field.TypeString)
 	}
-	if value, ok := iu.mutation.GetType(); ok {
-		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
-	}
 	if value, ok := iu.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
-	}
-	if iu.mutation.OrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.OrderTable,
-			Columns: []string{invoice.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iu.mutation.OrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.OrderTable,
-			Columns: []string{invoice.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -301,41 +195,6 @@ type InvoiceUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (iuo *InvoiceUpdateOne) SetUpdatedAt(t time.Time) *InvoiceUpdateOne {
 	iuo.mutation.SetUpdatedAt(t)
-	return iuo
-}
-
-// SetOrderID sets the "order_id" field.
-func (iuo *InvoiceUpdateOne) SetOrderID(u uuid.UUID) *InvoiceUpdateOne {
-	iuo.mutation.SetOrderID(u)
-	return iuo
-}
-
-// SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableOrderID(u *uuid.UUID) *InvoiceUpdateOne {
-	if u != nil {
-		iuo.SetOrderID(*u)
-	}
-	return iuo
-}
-
-// SetTotal sets the "total" field.
-func (iuo *InvoiceUpdateOne) SetTotal(d decimal.Decimal) *InvoiceUpdateOne {
-	iuo.mutation.ResetTotal()
-	iuo.mutation.SetTotal(d)
-	return iuo
-}
-
-// SetNillableTotal sets the "total" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableTotal(d *decimal.Decimal) *InvoiceUpdateOne {
-	if d != nil {
-		iuo.SetTotal(*d)
-	}
-	return iuo
-}
-
-// AddTotal adds d to the "total" field.
-func (iuo *InvoiceUpdateOne) AddTotal(d decimal.Decimal) *InvoiceUpdateOne {
-	iuo.mutation.AddTotal(d)
 	return iuo
 }
 
@@ -379,20 +238,6 @@ func (iuo *InvoiceUpdateOne) ClearNote() *InvoiceUpdateOne {
 	return iuo
 }
 
-// SetType sets the "type" field.
-func (iuo *InvoiceUpdateOne) SetType(i invoice.Type) *InvoiceUpdateOne {
-	iuo.mutation.SetType(i)
-	return iuo
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableType(i *invoice.Type) *InvoiceUpdateOne {
-	if i != nil {
-		iuo.SetType(*i)
-	}
-	return iuo
-}
-
 // SetStatus sets the "status" field.
 func (iuo *InvoiceUpdateOne) SetStatus(i invoice.Status) *InvoiceUpdateOne {
 	iuo.mutation.SetStatus(i)
@@ -407,20 +252,9 @@ func (iuo *InvoiceUpdateOne) SetNillableStatus(i *invoice.Status) *InvoiceUpdate
 	return iuo
 }
 
-// SetOrder sets the "order" edge to the Order entity.
-func (iuo *InvoiceUpdateOne) SetOrder(o *Order) *InvoiceUpdateOne {
-	return iuo.SetOrderID(o.ID)
-}
-
 // Mutation returns the InvoiceMutation object of the builder.
 func (iuo *InvoiceUpdateOne) Mutation() *InvoiceMutation {
 	return iuo.mutation
-}
-
-// ClearOrder clears the "order" edge to the Order entity.
-func (iuo *InvoiceUpdateOne) ClearOrder() *InvoiceUpdateOne {
-	iuo.mutation.ClearOrder()
-	return iuo
 }
 
 // Where appends a list predicates to the InvoiceUpdate builder.
@@ -474,11 +308,6 @@ func (iuo *InvoiceUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iuo *InvoiceUpdateOne) check() error {
-	if v, ok := iuo.mutation.GetType(); ok {
-		if err := invoice.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Invoice.type": %w`, err)}
-		}
-	}
 	if v, ok := iuo.mutation.Status(); ok {
 		if err := invoice.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
@@ -522,12 +351,6 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	if value, ok := iuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoice.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iuo.mutation.Total(); ok {
-		_spec.SetField(invoice.FieldTotal, field.TypeFloat64, value)
-	}
-	if value, ok := iuo.mutation.AddedTotal(); ok {
-		_spec.AddField(invoice.FieldTotal, field.TypeFloat64, value)
-	}
 	if value, ok := iuo.mutation.Comment(); ok {
 		_spec.SetField(invoice.FieldComment, field.TypeString, value)
 	}
@@ -540,40 +363,8 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	if iuo.mutation.NoteCleared() {
 		_spec.ClearField(invoice.FieldNote, field.TypeString)
 	}
-	if value, ok := iuo.mutation.GetType(); ok {
-		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
-	}
 	if value, ok := iuo.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
-	}
-	if iuo.mutation.OrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.OrderTable,
-			Columns: []string{invoice.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iuo.mutation.OrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   invoice.OrderTable,
-			Columns: []string{invoice.OrderColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Invoice{config: iuo.config}
 	_spec.Assign = _node.assignValues

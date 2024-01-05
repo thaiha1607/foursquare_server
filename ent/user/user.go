@@ -31,8 +31,6 @@ const (
 	FieldName = "name"
 	// FieldPasswordHash holds the string denoting the password_hash field in the database.
 	FieldPasswordHash = "password_hash"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
 	// FieldVerified holds the string denoting the verified field in the database.
 	FieldVerified = "verified"
 	// FieldPhone holds the string denoting the phone field in the database.
@@ -60,7 +58,6 @@ var Columns = []string{
 	FieldLastVerification,
 	FieldName,
 	FieldPasswordHash,
-	FieldUsername,
 	FieldVerified,
 	FieldPhone,
 	FieldRole,
@@ -92,8 +89,6 @@ var (
 	NameValidator func(string) error
 	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	PasswordHashValidator func(string) error
-	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	UsernameValidator func(string) error
 	// DefaultVerified holds the default value on creation for the "verified" field.
 	DefaultVerified bool
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
@@ -172,11 +167,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByPasswordHash orders the results by the password_hash field.
 func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPasswordHash, opts...).ToFunc()
-}
-
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
 }
 
 // ByVerified orders the results by the verified field.

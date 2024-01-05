@@ -102,12 +102,6 @@ func (uc *UserCreate) SetPasswordHash(s string) *UserCreate {
 	return uc
 }
 
-// SetUsername sets the "username" field.
-func (uc *UserCreate) SetUsername(s string) *UserCreate {
-	uc.mutation.SetUsername(s)
-	return uc
-}
-
 // SetVerified sets the "verified" field.
 func (uc *UserCreate) SetVerified(b bool) *UserCreate {
 	uc.mutation.SetVerified(b)
@@ -287,14 +281,6 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "User.username"`)}
-	}
-	if v, ok := uc.mutation.Username(); ok {
-		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
-		}
-	}
 	if _, ok := uc.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "User.verified"`)}
 	}
@@ -367,11 +353,11 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := uc.mutation.LastReset(); ok {
 		_spec.SetField(user.FieldLastReset, field.TypeTime, value)
-		_node.LastReset = value
+		_node.LastReset = &value
 	}
 	if value, ok := uc.mutation.LastVerification(); ok {
 		_spec.SetField(user.FieldLastVerification, field.TypeTime, value)
-		_node.LastVerification = value
+		_node.LastVerification = &value
 	}
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
@@ -380,10 +366,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
 		_node.PasswordHash = value
-	}
-	if value, ok := uc.mutation.Username(); ok {
-		_spec.SetField(user.FieldUsername, field.TypeString, value)
-		_node.Username = value
 	}
 	if value, ok := uc.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
@@ -399,15 +381,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := uc.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
-		_node.Address = value
+		_node.Address = &value
 	}
 	if value, ok := uc.mutation.PostalCode(); ok {
 		_spec.SetField(user.FieldPostalCode, field.TypeString, value)
-		_node.PostalCode = value
+		_node.PostalCode = &value
 	}
 	if value, ok := uc.mutation.OtherAddressInfo(); ok {
 		_spec.SetField(user.FieldOtherAddressInfo, field.TypeString, value)
-		_node.OtherAddressInfo = value
+		_node.OtherAddressInfo = &value
 	}
 	return _node, _spec
 }

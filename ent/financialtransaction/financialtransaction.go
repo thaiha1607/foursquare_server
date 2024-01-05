@@ -26,14 +26,12 @@ const (
 	FieldAmount = "amount"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
+	// FieldIsInternal holds the string denoting the is_internal field in the database.
+	FieldIsInternal = "is_internal"
 	// FieldPaymentMethod holds the string denoting the payment_method field in the database.
 	FieldPaymentMethod = "payment_method"
 	// EdgeInvoice holds the string denoting the invoice edge name in mutations.
 	EdgeInvoice = "invoice"
-	// EdgeTransactionType holds the string denoting the transaction_type edge name in mutations.
-	EdgeTransactionType = "transaction_type"
 	// Table holds the table name of the financialtransaction in the database.
 	Table = "financial_transactions"
 	// InvoiceTable is the table that holds the invoice relation/edge.
@@ -43,13 +41,6 @@ const (
 	InvoiceInverseTable = "invoices"
 	// InvoiceColumn is the table column denoting the invoice relation/edge.
 	InvoiceColumn = "invoice_id"
-	// TransactionTypeTable is the table that holds the transaction_type relation/edge.
-	TransactionTypeTable = "financial_transactions"
-	// TransactionTypeInverseTable is the table name for the TransactionType entity.
-	// It exists in this package in order to avoid circular dependency with the "transactiontype" package.
-	TransactionTypeInverseTable = "transaction_types"
-	// TransactionTypeColumn is the table column denoting the transaction_type relation/edge.
-	TransactionTypeColumn = "type"
 )
 
 // Columns holds all SQL columns for financialtransaction fields.
@@ -60,7 +51,7 @@ var Columns = []string{
 	FieldInvoiceID,
 	FieldAmount,
 	FieldComment,
-	FieldType,
+	FieldIsInternal,
 	FieldPaymentMethod,
 }
 
@@ -81,8 +72,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultType holds the default value on creation for the "type" field.
-	DefaultType int
+	// DefaultIsInternal holds the default value on creation for the "is_internal" field.
+	DefaultIsInternal bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -152,9 +143,9 @@ func ByComment(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldComment, opts...).ToFunc()
 }
 
-// ByType orders the results by the type field.
-func ByType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldType, opts...).ToFunc()
+// ByIsInternal orders the results by the is_internal field.
+func ByIsInternal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsInternal, opts...).ToFunc()
 }
 
 // ByPaymentMethod orders the results by the payment_method field.
@@ -168,24 +159,10 @@ func ByInvoiceField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newInvoiceStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByTransactionTypeField orders the results by transaction_type field.
-func ByTransactionTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTransactionTypeStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newInvoiceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(InvoiceInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, InvoiceTable, InvoiceColumn),
-	)
-}
-func newTransactionTypeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TransactionTypeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, TransactionTypeTable, TransactionTypeColumn),
 	)
 }

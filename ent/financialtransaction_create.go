@@ -14,7 +14,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 )
 
 // FinancialTransactionCreate is the builder for creating a FinancialTransaction entity.
@@ -78,16 +77,16 @@ func (ftc *FinancialTransactionCreate) SetNillableComment(s *string) *FinancialT
 	return ftc
 }
 
-// SetType sets the "type" field.
-func (ftc *FinancialTransactionCreate) SetType(i int) *FinancialTransactionCreate {
-	ftc.mutation.SetType(i)
+// SetIsInternal sets the "is_internal" field.
+func (ftc *FinancialTransactionCreate) SetIsInternal(b bool) *FinancialTransactionCreate {
+	ftc.mutation.SetIsInternal(b)
 	return ftc
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (ftc *FinancialTransactionCreate) SetNillableType(i *int) *FinancialTransactionCreate {
-	if i != nil {
-		ftc.SetType(*i)
+// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
+func (ftc *FinancialTransactionCreate) SetNillableIsInternal(b *bool) *FinancialTransactionCreate {
+	if b != nil {
+		ftc.SetIsInternal(*b)
 	}
 	return ftc
 }
@@ -123,17 +122,6 @@ func (ftc *FinancialTransactionCreate) SetNillableID(u *uuid.UUID) *FinancialTra
 // SetInvoice sets the "invoice" edge to the Invoice entity.
 func (ftc *FinancialTransactionCreate) SetInvoice(i *Invoice) *FinancialTransactionCreate {
 	return ftc.SetInvoiceID(i.ID)
-}
-
-// SetTransactionTypeID sets the "transaction_type" edge to the TransactionType entity by ID.
-func (ftc *FinancialTransactionCreate) SetTransactionTypeID(id int) *FinancialTransactionCreate {
-	ftc.mutation.SetTransactionTypeID(id)
-	return ftc
-}
-
-// SetTransactionType sets the "transaction_type" edge to the TransactionType entity.
-func (ftc *FinancialTransactionCreate) SetTransactionType(t *TransactionType) *FinancialTransactionCreate {
-	return ftc.SetTransactionTypeID(t.ID)
 }
 
 // Mutation returns the FinancialTransactionMutation object of the builder.
@@ -179,9 +167,9 @@ func (ftc *FinancialTransactionCreate) defaults() {
 		v := financialtransaction.DefaultUpdatedAt()
 		ftc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := ftc.mutation.GetType(); !ok {
-		v := financialtransaction.DefaultType
-		ftc.mutation.SetType(v)
+	if _, ok := ftc.mutation.IsInternal(); !ok {
+		v := financialtransaction.DefaultIsInternal
+		ftc.mutation.SetIsInternal(v)
 	}
 	if _, ok := ftc.mutation.PaymentMethod(); !ok {
 		v := financialtransaction.DefaultPaymentMethod
@@ -207,8 +195,8 @@ func (ftc *FinancialTransactionCreate) check() error {
 	if _, ok := ftc.mutation.Amount(); !ok {
 		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "FinancialTransaction.amount"`)}
 	}
-	if _, ok := ftc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "FinancialTransaction.type"`)}
+	if _, ok := ftc.mutation.IsInternal(); !ok {
+		return &ValidationError{Name: "is_internal", err: errors.New(`ent: missing required field "FinancialTransaction.is_internal"`)}
 	}
 	if _, ok := ftc.mutation.PaymentMethod(); !ok {
 		return &ValidationError{Name: "payment_method", err: errors.New(`ent: missing required field "FinancialTransaction.payment_method"`)}
@@ -220,9 +208,6 @@ func (ftc *FinancialTransactionCreate) check() error {
 	}
 	if _, ok := ftc.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice", err: errors.New(`ent: missing required edge "FinancialTransaction.invoice"`)}
-	}
-	if _, ok := ftc.mutation.TransactionTypeID(); !ok {
-		return &ValidationError{Name: "transaction_type", err: errors.New(`ent: missing required edge "FinancialTransaction.transaction_type"`)}
 	}
 	return nil
 }
@@ -275,6 +260,10 @@ func (ftc *FinancialTransactionCreate) createSpec() (*FinancialTransaction, *sql
 		_spec.SetField(financialtransaction.FieldComment, field.TypeString, value)
 		_node.Comment = &value
 	}
+	if value, ok := ftc.mutation.IsInternal(); ok {
+		_spec.SetField(financialtransaction.FieldIsInternal, field.TypeBool, value)
+		_node.IsInternal = value
+	}
 	if value, ok := ftc.mutation.PaymentMethod(); ok {
 		_spec.SetField(financialtransaction.FieldPaymentMethod, field.TypeEnum, value)
 		_node.PaymentMethod = value
@@ -294,23 +283,6 @@ func (ftc *FinancialTransactionCreate) createSpec() (*FinancialTransaction, *sql
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.InvoiceID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ftc.mutation.TransactionTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   financialtransaction.TransactionTypeTable,
-			Columns: []string{financialtransaction.TransactionTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiontype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Type = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

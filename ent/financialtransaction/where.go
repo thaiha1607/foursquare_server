@@ -82,9 +82,9 @@ func Comment(v string) predicate.FinancialTransaction {
 	return predicate.FinancialTransaction(sql.FieldEQ(FieldComment, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v int) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(sql.FieldEQ(FieldType, v))
+// IsInternal applies equality check predicate on the "is_internal" field. It's identical to IsInternalEQ.
+func IsInternal(v bool) predicate.FinancialTransaction {
+	return predicate.FinancialTransaction(sql.FieldEQ(FieldIsInternal, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -302,24 +302,14 @@ func CommentContainsFold(v string) predicate.FinancialTransaction {
 	return predicate.FinancialTransaction(sql.FieldContainsFold(FieldComment, v))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v int) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(sql.FieldEQ(FieldType, v))
+// IsInternalEQ applies the EQ predicate on the "is_internal" field.
+func IsInternalEQ(v bool) predicate.FinancialTransaction {
+	return predicate.FinancialTransaction(sql.FieldEQ(FieldIsInternal, v))
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v int) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(sql.FieldNEQ(FieldType, v))
-}
-
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...int) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(sql.FieldIn(FieldType, vs...))
-}
-
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...int) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(sql.FieldNotIn(FieldType, vs...))
+// IsInternalNEQ applies the NEQ predicate on the "is_internal" field.
+func IsInternalNEQ(v bool) predicate.FinancialTransaction {
+	return predicate.FinancialTransaction(sql.FieldNEQ(FieldIsInternal, v))
 }
 
 // PaymentMethodEQ applies the EQ predicate on the "payment_method" field.
@@ -357,29 +347,6 @@ func HasInvoice() predicate.FinancialTransaction {
 func HasInvoiceWith(preds ...predicate.Invoice) predicate.FinancialTransaction {
 	return predicate.FinancialTransaction(func(s *sql.Selector) {
 		step := newInvoiceStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasTransactionType applies the HasEdge predicate on the "transaction_type" edge.
-func HasTransactionType() predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, TransactionTypeTable, TransactionTypeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasTransactionTypeWith applies the HasEdge predicate on the "transaction_type" edge with a given conditions (other predicates).
-func HasTransactionTypeWith(preds ...predicate.TransactionType) predicate.FinancialTransaction {
-	return predicate.FinancialTransaction(func(s *sql.Selector) {
-		step := newTransactionTypeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

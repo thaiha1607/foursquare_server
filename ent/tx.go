@@ -28,16 +28,12 @@ type Tx struct {
 	OrderLineItem *OrderLineItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
 	OrderStatusCode *OrderStatusCodeClient
-	// OrderType is the client for interacting with the OrderType builders.
-	OrderType *OrderTypeClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// ProductTag is the client for interacting with the ProductTag builders.
 	ProductTag *ProductTagClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
-	// TransactionType is the client for interacting with the TransactionType builders.
-	TransactionType *TransactionTypeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -179,11 +175,9 @@ func (tx *Tx) init() {
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
-	tx.OrderType = NewOrderTypeClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
-	tx.TransactionType = NewTransactionTypeClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

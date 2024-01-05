@@ -24,11 +24,9 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
-	"github.com/thaiha1607/foursquare_server/ent/transactiontype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -53,16 +51,12 @@ type Client struct {
 	OrderLineItem *OrderLineItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
 	OrderStatusCode *OrderStatusCodeClient
-	// OrderType is the client for interacting with the OrderType builders.
-	OrderType *OrderTypeClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// ProductTag is the client for interacting with the ProductTag builders.
 	ProductTag *ProductTagClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
-	// TransactionType is the client for interacting with the TransactionType builders.
-	TransactionType *TransactionTypeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -84,11 +78,9 @@ func (c *Client) init() {
 	c.Order = NewOrderClient(c.config)
 	c.OrderLineItem = NewOrderLineItemClient(c.config)
 	c.OrderStatusCode = NewOrderStatusCodeClient(c.config)
-	c.OrderType = NewOrderTypeClient(c.config)
 	c.Product = NewProductClient(c.config)
 	c.ProductTag = NewProductTagClient(c.config)
 	c.Tag = NewTagClient(c.config)
-	c.TransactionType = NewTransactionTypeClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -190,11 +182,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Order:                NewOrderClient(cfg),
 		OrderLineItem:        NewOrderLineItemClient(cfg),
 		OrderStatusCode:      NewOrderStatusCodeClient(cfg),
-		OrderType:            NewOrderTypeClient(cfg),
 		Product:              NewProductClient(cfg),
 		ProductTag:           NewProductTagClient(cfg),
 		Tag:                  NewTagClient(cfg),
-		TransactionType:      NewTransactionTypeClient(cfg),
 		User:                 NewUserClient(cfg),
 	}, nil
 }
@@ -223,11 +213,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Order:                NewOrderClient(cfg),
 		OrderLineItem:        NewOrderLineItemClient(cfg),
 		OrderStatusCode:      NewOrderStatusCodeClient(cfg),
-		OrderType:            NewOrderTypeClient(cfg),
 		Product:              NewProductClient(cfg),
 		ProductTag:           NewProductTagClient(cfg),
 		Tag:                  NewTagClient(cfg),
-		TransactionType:      NewTransactionTypeClient(cfg),
 		User:                 NewUserClient(cfg),
 	}, nil
 }
@@ -259,8 +247,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Conversation, c.FinancialTransaction, c.Invoice, c.InvoiceLineItem, c.Message,
-		c.Order, c.OrderLineItem, c.OrderStatusCode, c.OrderType, c.Product,
-		c.ProductTag, c.Tag, c.TransactionType, c.User,
+		c.Order, c.OrderLineItem, c.OrderStatusCode, c.Product, c.ProductTag, c.Tag,
+		c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -271,8 +259,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Conversation, c.FinancialTransaction, c.Invoice, c.InvoiceLineItem, c.Message,
-		c.Order, c.OrderLineItem, c.OrderStatusCode, c.OrderType, c.Product,
-		c.ProductTag, c.Tag, c.TransactionType, c.User,
+		c.Order, c.OrderLineItem, c.OrderStatusCode, c.Product, c.ProductTag, c.Tag,
+		c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -297,16 +285,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.OrderLineItem.mutate(ctx, m)
 	case *OrderStatusCodeMutation:
 		return c.OrderStatusCode.mutate(ctx, m)
-	case *OrderTypeMutation:
-		return c.OrderType.mutate(ctx, m)
 	case *ProductMutation:
 		return c.Product.mutate(ctx, m)
 	case *ProductTagMutation:
 		return c.ProductTag.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
-	case *TransactionTypeMutation:
-		return c.TransactionType.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -596,22 +580,6 @@ func (c *FinancialTransactionClient) QueryInvoice(ft *FinancialTransaction) *Inv
 			sqlgraph.From(financialtransaction.Table, financialtransaction.FieldID, id),
 			sqlgraph.To(invoice.Table, invoice.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, financialtransaction.InvoiceTable, financialtransaction.InvoiceColumn),
-		)
-		fromV = sqlgraph.Neighbors(ft.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTransactionType queries the transaction_type edge of a FinancialTransaction.
-func (c *FinancialTransactionClient) QueryTransactionType(ft *FinancialTransaction) *TransactionTypeQuery {
-	query := (&TransactionTypeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ft.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(financialtransaction.Table, financialtransaction.FieldID, id),
-			sqlgraph.To(transactiontype.Table, transactiontype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, financialtransaction.TransactionTypeTable, financialtransaction.TransactionTypeColumn),
 		)
 		fromV = sqlgraph.Neighbors(ft.driver.Dialect(), step)
 		return fromV, nil
@@ -1295,22 +1263,6 @@ func (c *OrderClient) QueryOrderStatus(o *Order) *OrderStatusCodeQuery {
 	return query
 }
 
-// QueryOrderType queries the order_type edge of a Order.
-func (c *OrderClient) QueryOrderType(o *Order) *OrderTypeQuery {
-	query := (&OrderTypeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := o.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(order.Table, order.FieldID, id),
-			sqlgraph.To(ordertype.Table, ordertype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, order.OrderTypeTable, order.OrderTypeColumn),
-		)
-		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryManagementStaff queries the management_staff edge of a Order.
 func (c *OrderClient) QueryManagementStaff(o *Order) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -1679,139 +1631,6 @@ func (c *OrderStatusCodeClient) mutate(ctx context.Context, m *OrderStatusCodeMu
 		return (&OrderStatusCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown OrderStatusCode mutation op: %q", m.Op())
-	}
-}
-
-// OrderTypeClient is a client for the OrderType schema.
-type OrderTypeClient struct {
-	config
-}
-
-// NewOrderTypeClient returns a client for the OrderType from the given config.
-func NewOrderTypeClient(c config) *OrderTypeClient {
-	return &OrderTypeClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `ordertype.Hooks(f(g(h())))`.
-func (c *OrderTypeClient) Use(hooks ...Hook) {
-	c.hooks.OrderType = append(c.hooks.OrderType, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `ordertype.Intercept(f(g(h())))`.
-func (c *OrderTypeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.OrderType = append(c.inters.OrderType, interceptors...)
-}
-
-// Create returns a builder for creating a OrderType entity.
-func (c *OrderTypeClient) Create() *OrderTypeCreate {
-	mutation := newOrderTypeMutation(c.config, OpCreate)
-	return &OrderTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of OrderType entities.
-func (c *OrderTypeClient) CreateBulk(builders ...*OrderTypeCreate) *OrderTypeCreateBulk {
-	return &OrderTypeCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *OrderTypeClient) MapCreateBulk(slice any, setFunc func(*OrderTypeCreate, int)) *OrderTypeCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &OrderTypeCreateBulk{err: fmt.Errorf("calling to OrderTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*OrderTypeCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &OrderTypeCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for OrderType.
-func (c *OrderTypeClient) Update() *OrderTypeUpdate {
-	mutation := newOrderTypeMutation(c.config, OpUpdate)
-	return &OrderTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *OrderTypeClient) UpdateOne(ot *OrderType) *OrderTypeUpdateOne {
-	mutation := newOrderTypeMutation(c.config, OpUpdateOne, withOrderType(ot))
-	return &OrderTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *OrderTypeClient) UpdateOneID(id int) *OrderTypeUpdateOne {
-	mutation := newOrderTypeMutation(c.config, OpUpdateOne, withOrderTypeID(id))
-	return &OrderTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for OrderType.
-func (c *OrderTypeClient) Delete() *OrderTypeDelete {
-	mutation := newOrderTypeMutation(c.config, OpDelete)
-	return &OrderTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *OrderTypeClient) DeleteOne(ot *OrderType) *OrderTypeDeleteOne {
-	return c.DeleteOneID(ot.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *OrderTypeClient) DeleteOneID(id int) *OrderTypeDeleteOne {
-	builder := c.Delete().Where(ordertype.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &OrderTypeDeleteOne{builder}
-}
-
-// Query returns a query builder for OrderType.
-func (c *OrderTypeClient) Query() *OrderTypeQuery {
-	return &OrderTypeQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeOrderType},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a OrderType entity by its id.
-func (c *OrderTypeClient) Get(ctx context.Context, id int) (*OrderType, error) {
-	return c.Query().Where(ordertype.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *OrderTypeClient) GetX(ctx context.Context, id int) *OrderType {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *OrderTypeClient) Hooks() []Hook {
-	return c.hooks.OrderType
-}
-
-// Interceptors returns the client interceptors.
-func (c *OrderTypeClient) Interceptors() []Interceptor {
-	return c.inters.OrderType
-}
-
-func (c *OrderTypeClient) mutate(ctx context.Context, m *OrderTypeMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&OrderTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&OrderTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&OrderTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&OrderTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown OrderType mutation op: %q", m.Op())
 	}
 }
 
@@ -2261,139 +2080,6 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 	}
 }
 
-// TransactionTypeClient is a client for the TransactionType schema.
-type TransactionTypeClient struct {
-	config
-}
-
-// NewTransactionTypeClient returns a client for the TransactionType from the given config.
-func NewTransactionTypeClient(c config) *TransactionTypeClient {
-	return &TransactionTypeClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `transactiontype.Hooks(f(g(h())))`.
-func (c *TransactionTypeClient) Use(hooks ...Hook) {
-	c.hooks.TransactionType = append(c.hooks.TransactionType, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `transactiontype.Intercept(f(g(h())))`.
-func (c *TransactionTypeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TransactionType = append(c.inters.TransactionType, interceptors...)
-}
-
-// Create returns a builder for creating a TransactionType entity.
-func (c *TransactionTypeClient) Create() *TransactionTypeCreate {
-	mutation := newTransactionTypeMutation(c.config, OpCreate)
-	return &TransactionTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of TransactionType entities.
-func (c *TransactionTypeClient) CreateBulk(builders ...*TransactionTypeCreate) *TransactionTypeCreateBulk {
-	return &TransactionTypeCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *TransactionTypeClient) MapCreateBulk(slice any, setFunc func(*TransactionTypeCreate, int)) *TransactionTypeCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &TransactionTypeCreateBulk{err: fmt.Errorf("calling to TransactionTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*TransactionTypeCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &TransactionTypeCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for TransactionType.
-func (c *TransactionTypeClient) Update() *TransactionTypeUpdate {
-	mutation := newTransactionTypeMutation(c.config, OpUpdate)
-	return &TransactionTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *TransactionTypeClient) UpdateOne(tt *TransactionType) *TransactionTypeUpdateOne {
-	mutation := newTransactionTypeMutation(c.config, OpUpdateOne, withTransactionType(tt))
-	return &TransactionTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *TransactionTypeClient) UpdateOneID(id int) *TransactionTypeUpdateOne {
-	mutation := newTransactionTypeMutation(c.config, OpUpdateOne, withTransactionTypeID(id))
-	return &TransactionTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for TransactionType.
-func (c *TransactionTypeClient) Delete() *TransactionTypeDelete {
-	mutation := newTransactionTypeMutation(c.config, OpDelete)
-	return &TransactionTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *TransactionTypeClient) DeleteOne(tt *TransactionType) *TransactionTypeDeleteOne {
-	return c.DeleteOneID(tt.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TransactionTypeClient) DeleteOneID(id int) *TransactionTypeDeleteOne {
-	builder := c.Delete().Where(transactiontype.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &TransactionTypeDeleteOne{builder}
-}
-
-// Query returns a query builder for TransactionType.
-func (c *TransactionTypeClient) Query() *TransactionTypeQuery {
-	return &TransactionTypeQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeTransactionType},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a TransactionType entity by its id.
-func (c *TransactionTypeClient) Get(ctx context.Context, id int) (*TransactionType, error) {
-	return c.Query().Where(transactiontype.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *TransactionTypeClient) GetX(ctx context.Context, id int) *TransactionType {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *TransactionTypeClient) Hooks() []Hook {
-	return c.hooks.TransactionType
-}
-
-// Interceptors returns the client interceptors.
-func (c *TransactionTypeClient) Interceptors() []Interceptor {
-	return c.inters.TransactionType
-}
-
-func (c *TransactionTypeClient) mutate(ctx context.Context, m *TransactionTypeMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&TransactionTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&TransactionTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&TransactionTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&TransactionTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown TransactionType mutation op: %q", m.Op())
-	}
-}
-
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -2531,12 +2217,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 type (
 	hooks struct {
 		Conversation, FinancialTransaction, Invoice, InvoiceLineItem, Message, Order,
-		OrderLineItem, OrderStatusCode, OrderType, Product, ProductTag, Tag,
-		TransactionType, User []ent.Hook
+		OrderLineItem, OrderStatusCode, Product, ProductTag, Tag, User []ent.Hook
 	}
 	inters struct {
 		Conversation, FinancialTransaction, Invoice, InvoiceLineItem, Message, Order,
-		OrderLineItem, OrderStatusCode, OrderType, Product, ProductTag, Tag,
-		TransactionType, User []ent.Interceptor
+		OrderLineItem, OrderStatusCode, Product, ProductTag, Tag,
+		User []ent.Interceptor
 	}
 )

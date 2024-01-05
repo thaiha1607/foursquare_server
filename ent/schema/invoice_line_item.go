@@ -29,20 +29,24 @@ func (InvoiceLineItem) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("invoice_id", uuid.UUID{}),
-		field.UUID("order_line_item_id", uuid.UUID{}),
+		field.UUID("invoice_id", uuid.UUID{}).
+			Immutable(),
+		field.UUID("order_line_item_id", uuid.UUID{}).
+			Immutable(),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
-			}),
+			}).
+			Immutable(),
 		field.Float("total").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
-			}),
+			}).
+			Immutable(),
 	}
 }
 
@@ -52,11 +56,13 @@ func (InvoiceLineItem) Edges() []ent.Edge {
 		edge.To("invoice", Invoice.Type).
 			Field("invoice_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("order_line_item", OrderLineItem.Type).
 			Field("order_line_item_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

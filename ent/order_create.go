@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
@@ -107,15 +106,15 @@ func (oc *OrderCreate) SetNillablePriority(i *int) *OrderCreate {
 }
 
 // SetType sets the "type" field.
-func (oc *OrderCreate) SetType(i int) *OrderCreate {
-	oc.mutation.SetType(i)
+func (oc *OrderCreate) SetType(o order.Type) *OrderCreate {
+	oc.mutation.SetType(o)
 	return oc
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (oc *OrderCreate) SetNillableType(i *int) *OrderCreate {
-	if i != nil {
-		oc.SetType(*i)
+func (oc *OrderCreate) SetNillableType(o *order.Type) *OrderCreate {
+	if o != nil {
+		oc.SetType(*o)
 	}
 	return oc
 }
@@ -182,20 +181,6 @@ func (oc *OrderCreate) SetNillableInternalNote(s *string) *OrderCreate {
 	return oc
 }
 
-// SetIsInternal sets the "is_internal" field.
-func (oc *OrderCreate) SetIsInternal(b bool) *OrderCreate {
-	oc.mutation.SetIsInternal(b)
-	return oc
-}
-
-// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
-func (oc *OrderCreate) SetNillableIsInternal(b *bool) *OrderCreate {
-	if b != nil {
-		oc.SetIsInternal(*b)
-	}
-	return oc
-}
-
 // SetID sets the "id" field.
 func (oc *OrderCreate) SetID(u uuid.UUID) *OrderCreate {
 	oc.mutation.SetID(u)
@@ -232,17 +217,6 @@ func (oc *OrderCreate) SetOrderStatusID(id int) *OrderCreate {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (oc *OrderCreate) SetOrderStatus(o *OrderStatusCode) *OrderCreate {
 	return oc.SetOrderStatusID(o.ID)
-}
-
-// SetOrderTypeID sets the "order_type" edge to the OrderType entity by ID.
-func (oc *OrderCreate) SetOrderTypeID(id int) *OrderCreate {
-	oc.mutation.SetOrderTypeID(id)
-	return oc
-}
-
-// SetOrderType sets the "order_type" edge to the OrderType entity.
-func (oc *OrderCreate) SetOrderType(o *OrderType) *OrderCreate {
-	return oc.SetOrderTypeID(o.ID)
 }
 
 // SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
@@ -321,10 +295,6 @@ func (oc *OrderCreate) defaults() {
 		v := order.DefaultStatusCode
 		oc.mutation.SetStatusCode(v)
 	}
-	if _, ok := oc.mutation.IsInternal(); !ok {
-		v := order.DefaultIsInternal
-		oc.mutation.SetIsInternal(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -352,14 +322,16 @@ func (oc *OrderCreate) check() error {
 	if _, ok := oc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Order.type"`)}
 	}
+	if v, ok := oc.mutation.GetType(); ok {
+		if err := order.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Order.type": %w`, err)}
+		}
+	}
 	if _, ok := oc.mutation.StatusCode(); !ok {
 		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Order.status_code"`)}
 	}
 	if _, ok := oc.mutation.ManaagmentStaffID(); !ok {
 		return &ValidationError{Name: "manaagment_staff_id", err: errors.New(`ent: missing required field "Order.manaagment_staff_id"`)}
-	}
-	if _, ok := oc.mutation.IsInternal(); !ok {
-		return &ValidationError{Name: "is_internal", err: errors.New(`ent: missing required field "Order.is_internal"`)}
 	}
 	if _, ok := oc.mutation.CustomerID(); !ok {
 		return &ValidationError{Name: "customer", err: errors.New(`ent: missing required edge "Order.customer"`)}
@@ -369,9 +341,6 @@ func (oc *OrderCreate) check() error {
 	}
 	if _, ok := oc.mutation.OrderStatusID(); !ok {
 		return &ValidationError{Name: "order_status", err: errors.New(`ent: missing required edge "Order.order_status"`)}
-	}
-	if _, ok := oc.mutation.OrderTypeID(); !ok {
-		return &ValidationError{Name: "order_type", err: errors.New(`ent: missing required edge "Order.order_type"`)}
 	}
 	if _, ok := oc.mutation.ManagementStaffID(); !ok {
 		return &ValidationError{Name: "management_staff", err: errors.New(`ent: missing required edge "Order.management_staff"`)}
@@ -427,13 +396,13 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_spec.SetField(order.FieldPriority, field.TypeInt, value)
 		_node.Priority = value
 	}
+	if value, ok := oc.mutation.GetType(); ok {
+		_spec.SetField(order.FieldType, field.TypeEnum, value)
+		_node.Type = value
+	}
 	if value, ok := oc.mutation.InternalNote(); ok {
 		_spec.SetField(order.FieldInternalNote, field.TypeString, value)
 		_node.InternalNote = &value
-	}
-	if value, ok := oc.mutation.IsInternal(); ok {
-		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-		_node.IsInternal = value
 	}
 	if nodes := oc.mutation.CustomerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -501,23 +470,6 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.StatusCode = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := oc.mutation.OrderTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.OrderTypeTable,
-			Columns: []string{order.OrderTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ordertype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.Type = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := oc.mutation.ManagementStaffIDs(); len(nodes) > 0 {

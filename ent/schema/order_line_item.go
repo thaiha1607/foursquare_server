@@ -29,8 +29,10 @@ func (OrderLineItem) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.UUID("order_id", uuid.UUID{}),
-		field.UUID("product_id", uuid.UUID{}),
+		field.UUID("order_id", uuid.UUID{}).
+			Immutable(),
+		field.UUID("product_id", uuid.UUID{}).
+			Immutable(),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
@@ -46,11 +48,13 @@ func (OrderLineItem) Edges() []ent.Edge {
 		edge.To("order", Order.Type).
 			Field("order_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("product", Product.Type).
 			Field("product_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 	}
 }
 

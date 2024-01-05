@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/ordertype"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/user"
 )
@@ -38,20 +37,6 @@ func (ou *OrderUpdate) SetUpdatedAt(t time.Time) *OrderUpdate {
 	return ou
 }
 
-// SetCustomerID sets the "customer_id" field.
-func (ou *OrderUpdate) SetCustomerID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetCustomerID(u)
-	return ou
-}
-
-// SetNillableCustomerID sets the "customer_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableCustomerID(u *uuid.UUID) *OrderUpdate {
-	if u != nil {
-		ou.SetCustomerID(*u)
-	}
-	return ou
-}
-
 // SetNote sets the "note" field.
 func (ou *OrderUpdate) SetNote(s string) *OrderUpdate {
 	ou.mutation.SetNote(s)
@@ -69,20 +54,6 @@ func (ou *OrderUpdate) SetNillableNote(s *string) *OrderUpdate {
 // ClearNote clears the value of the "note" field.
 func (ou *OrderUpdate) ClearNote() *OrderUpdate {
 	ou.mutation.ClearNote()
-	return ou
-}
-
-// SetCreatedBy sets the "created_by" field.
-func (ou *OrderUpdate) SetCreatedBy(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetCreatedBy(u)
-	return ou
-}
-
-// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableCreatedBy(u *uuid.UUID) *OrderUpdate {
-	if u != nil {
-		ou.SetCreatedBy(*u)
-	}
 	return ou
 }
 
@@ -124,20 +95,6 @@ func (ou *OrderUpdate) SetNillablePriority(i *int) *OrderUpdate {
 // AddPriority adds i to the "priority" field.
 func (ou *OrderUpdate) AddPriority(i int) *OrderUpdate {
 	ou.mutation.AddPriority(i)
-	return ou
-}
-
-// SetType sets the "type" field.
-func (ou *OrderUpdate) SetType(i int) *OrderUpdate {
-	ou.mutation.SetType(i)
-	return ou
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableType(i *int) *OrderUpdate {
-	if i != nil {
-		ou.SetType(*i)
-	}
 	return ou
 }
 
@@ -229,36 +186,6 @@ func (ou *OrderUpdate) ClearInternalNote() *OrderUpdate {
 	return ou
 }
 
-// SetIsInternal sets the "is_internal" field.
-func (ou *OrderUpdate) SetIsInternal(b bool) *OrderUpdate {
-	ou.mutation.SetIsInternal(b)
-	return ou
-}
-
-// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableIsInternal(b *bool) *OrderUpdate {
-	if b != nil {
-		ou.SetIsInternal(*b)
-	}
-	return ou
-}
-
-// SetCustomer sets the "customer" edge to the User entity.
-func (ou *OrderUpdate) SetCustomer(u *User) *OrderUpdate {
-	return ou.SetCustomerID(u.ID)
-}
-
-// SetCreatorID sets the "creator" edge to the User entity by ID.
-func (ou *OrderUpdate) SetCreatorID(id uuid.UUID) *OrderUpdate {
-	ou.mutation.SetCreatorID(id)
-	return ou
-}
-
-// SetCreator sets the "creator" edge to the User entity.
-func (ou *OrderUpdate) SetCreator(u *User) *OrderUpdate {
-	return ou.SetCreatorID(u.ID)
-}
-
 // SetParentOrder sets the "parent_order" edge to the Order entity.
 func (ou *OrderUpdate) SetParentOrder(o *Order) *OrderUpdate {
 	return ou.SetParentOrderID(o.ID)
@@ -273,17 +200,6 @@ func (ou *OrderUpdate) SetOrderStatusID(id int) *OrderUpdate {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (ou *OrderUpdate) SetOrderStatus(o *OrderStatusCode) *OrderUpdate {
 	return ou.SetOrderStatusID(o.ID)
-}
-
-// SetOrderTypeID sets the "order_type" edge to the OrderType entity by ID.
-func (ou *OrderUpdate) SetOrderTypeID(id int) *OrderUpdate {
-	ou.mutation.SetOrderTypeID(id)
-	return ou
-}
-
-// SetOrderType sets the "order_type" edge to the OrderType entity.
-func (ou *OrderUpdate) SetOrderType(o *OrderType) *OrderUpdate {
-	return ou.SetOrderTypeID(o.ID)
 }
 
 // SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
@@ -312,18 +228,6 @@ func (ou *OrderUpdate) Mutation() *OrderMutation {
 	return ou.mutation
 }
 
-// ClearCustomer clears the "customer" edge to the User entity.
-func (ou *OrderUpdate) ClearCustomer() *OrderUpdate {
-	ou.mutation.ClearCustomer()
-	return ou
-}
-
-// ClearCreator clears the "creator" edge to the User entity.
-func (ou *OrderUpdate) ClearCreator() *OrderUpdate {
-	ou.mutation.ClearCreator()
-	return ou
-}
-
 // ClearParentOrder clears the "parent_order" edge to the Order entity.
 func (ou *OrderUpdate) ClearParentOrder() *OrderUpdate {
 	ou.mutation.ClearParentOrder()
@@ -333,12 +237,6 @@ func (ou *OrderUpdate) ClearParentOrder() *OrderUpdate {
 // ClearOrderStatus clears the "order_status" edge to the OrderStatusCode entity.
 func (ou *OrderUpdate) ClearOrderStatus() *OrderUpdate {
 	ou.mutation.ClearOrderStatus()
-	return ou
-}
-
-// ClearOrderType clears the "order_type" edge to the OrderType entity.
-func (ou *OrderUpdate) ClearOrderType() *OrderUpdate {
-	ou.mutation.ClearOrderType()
 	return ou
 }
 
@@ -412,9 +310,6 @@ func (ou *OrderUpdate) check() error {
 	if _, ok := ou.mutation.OrderStatusID(); ou.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ou.mutation.OrderTypeID(); ou.mutation.OrderTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.order_type"`)
-	}
 	if _, ok := ou.mutation.ManagementStaffID(); ou.mutation.ManagementStaffCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.management_staff"`)
 	}
@@ -453,67 +348,6 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ou.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
-	}
-	if value, ok := ou.mutation.IsInternal(); ok {
-		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-	}
-	if ou.mutation.CustomerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CustomerTable,
-			Columns: []string{order.CustomerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.CustomerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CustomerTable,
-			Columns: []string{order.CustomerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ou.mutation.CreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CreatorTable,
-			Columns: []string{order.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.CreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CreatorTable,
-			Columns: []string{order.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ou.mutation.ParentOrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -566,35 +400,6 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ou.mutation.OrderTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.OrderTypeTable,
-			Columns: []string{order.OrderTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ordertype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.OrderTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.OrderTypeTable,
-			Columns: []string{order.OrderTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ordertype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -715,20 +520,6 @@ func (ouo *OrderUpdateOne) SetUpdatedAt(t time.Time) *OrderUpdateOne {
 	return ouo
 }
 
-// SetCustomerID sets the "customer_id" field.
-func (ouo *OrderUpdateOne) SetCustomerID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetCustomerID(u)
-	return ouo
-}
-
-// SetNillableCustomerID sets the "customer_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableCustomerID(u *uuid.UUID) *OrderUpdateOne {
-	if u != nil {
-		ouo.SetCustomerID(*u)
-	}
-	return ouo
-}
-
 // SetNote sets the "note" field.
 func (ouo *OrderUpdateOne) SetNote(s string) *OrderUpdateOne {
 	ouo.mutation.SetNote(s)
@@ -746,20 +537,6 @@ func (ouo *OrderUpdateOne) SetNillableNote(s *string) *OrderUpdateOne {
 // ClearNote clears the value of the "note" field.
 func (ouo *OrderUpdateOne) ClearNote() *OrderUpdateOne {
 	ouo.mutation.ClearNote()
-	return ouo
-}
-
-// SetCreatedBy sets the "created_by" field.
-func (ouo *OrderUpdateOne) SetCreatedBy(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetCreatedBy(u)
-	return ouo
-}
-
-// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableCreatedBy(u *uuid.UUID) *OrderUpdateOne {
-	if u != nil {
-		ouo.SetCreatedBy(*u)
-	}
 	return ouo
 }
 
@@ -801,20 +578,6 @@ func (ouo *OrderUpdateOne) SetNillablePriority(i *int) *OrderUpdateOne {
 // AddPriority adds i to the "priority" field.
 func (ouo *OrderUpdateOne) AddPriority(i int) *OrderUpdateOne {
 	ouo.mutation.AddPriority(i)
-	return ouo
-}
-
-// SetType sets the "type" field.
-func (ouo *OrderUpdateOne) SetType(i int) *OrderUpdateOne {
-	ouo.mutation.SetType(i)
-	return ouo
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableType(i *int) *OrderUpdateOne {
-	if i != nil {
-		ouo.SetType(*i)
-	}
 	return ouo
 }
 
@@ -906,36 +669,6 @@ func (ouo *OrderUpdateOne) ClearInternalNote() *OrderUpdateOne {
 	return ouo
 }
 
-// SetIsInternal sets the "is_internal" field.
-func (ouo *OrderUpdateOne) SetIsInternal(b bool) *OrderUpdateOne {
-	ouo.mutation.SetIsInternal(b)
-	return ouo
-}
-
-// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableIsInternal(b *bool) *OrderUpdateOne {
-	if b != nil {
-		ouo.SetIsInternal(*b)
-	}
-	return ouo
-}
-
-// SetCustomer sets the "customer" edge to the User entity.
-func (ouo *OrderUpdateOne) SetCustomer(u *User) *OrderUpdateOne {
-	return ouo.SetCustomerID(u.ID)
-}
-
-// SetCreatorID sets the "creator" edge to the User entity by ID.
-func (ouo *OrderUpdateOne) SetCreatorID(id uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetCreatorID(id)
-	return ouo
-}
-
-// SetCreator sets the "creator" edge to the User entity.
-func (ouo *OrderUpdateOne) SetCreator(u *User) *OrderUpdateOne {
-	return ouo.SetCreatorID(u.ID)
-}
-
 // SetParentOrder sets the "parent_order" edge to the Order entity.
 func (ouo *OrderUpdateOne) SetParentOrder(o *Order) *OrderUpdateOne {
 	return ouo.SetParentOrderID(o.ID)
@@ -950,17 +683,6 @@ func (ouo *OrderUpdateOne) SetOrderStatusID(id int) *OrderUpdateOne {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (ouo *OrderUpdateOne) SetOrderStatus(o *OrderStatusCode) *OrderUpdateOne {
 	return ouo.SetOrderStatusID(o.ID)
-}
-
-// SetOrderTypeID sets the "order_type" edge to the OrderType entity by ID.
-func (ouo *OrderUpdateOne) SetOrderTypeID(id int) *OrderUpdateOne {
-	ouo.mutation.SetOrderTypeID(id)
-	return ouo
-}
-
-// SetOrderType sets the "order_type" edge to the OrderType entity.
-func (ouo *OrderUpdateOne) SetOrderType(o *OrderType) *OrderUpdateOne {
-	return ouo.SetOrderTypeID(o.ID)
 }
 
 // SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
@@ -989,18 +711,6 @@ func (ouo *OrderUpdateOne) Mutation() *OrderMutation {
 	return ouo.mutation
 }
 
-// ClearCustomer clears the "customer" edge to the User entity.
-func (ouo *OrderUpdateOne) ClearCustomer() *OrderUpdateOne {
-	ouo.mutation.ClearCustomer()
-	return ouo
-}
-
-// ClearCreator clears the "creator" edge to the User entity.
-func (ouo *OrderUpdateOne) ClearCreator() *OrderUpdateOne {
-	ouo.mutation.ClearCreator()
-	return ouo
-}
-
 // ClearParentOrder clears the "parent_order" edge to the Order entity.
 func (ouo *OrderUpdateOne) ClearParentOrder() *OrderUpdateOne {
 	ouo.mutation.ClearParentOrder()
@@ -1010,12 +720,6 @@ func (ouo *OrderUpdateOne) ClearParentOrder() *OrderUpdateOne {
 // ClearOrderStatus clears the "order_status" edge to the OrderStatusCode entity.
 func (ouo *OrderUpdateOne) ClearOrderStatus() *OrderUpdateOne {
 	ouo.mutation.ClearOrderStatus()
-	return ouo
-}
-
-// ClearOrderType clears the "order_type" edge to the OrderType entity.
-func (ouo *OrderUpdateOne) ClearOrderType() *OrderUpdateOne {
-	ouo.mutation.ClearOrderType()
 	return ouo
 }
 
@@ -1102,9 +806,6 @@ func (ouo *OrderUpdateOne) check() error {
 	if _, ok := ouo.mutation.OrderStatusID(); ouo.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ouo.mutation.OrderTypeID(); ouo.mutation.OrderTypeCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.order_type"`)
-	}
 	if _, ok := ouo.mutation.ManagementStaffID(); ouo.mutation.ManagementStaffCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.management_staff"`)
 	}
@@ -1161,67 +862,6 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 	if ouo.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
 	}
-	if value, ok := ouo.mutation.IsInternal(); ok {
-		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-	}
-	if ouo.mutation.CustomerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CustomerTable,
-			Columns: []string{order.CustomerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.CustomerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CustomerTable,
-			Columns: []string{order.CustomerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ouo.mutation.CreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CreatorTable,
-			Columns: []string{order.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.CreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.CreatorTable,
-			Columns: []string{order.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if ouo.mutation.ParentOrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -1273,35 +913,6 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ouo.mutation.OrderTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.OrderTypeTable,
-			Columns: []string{order.OrderTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ordertype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.OrderTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.OrderTypeTable,
-			Columns: []string{order.OrderTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ordertype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
