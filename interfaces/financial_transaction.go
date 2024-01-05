@@ -9,7 +9,7 @@ import (
 
 // FinancialTransactionService describes the service.
 type FinancialTransactionService interface {
-	Fetch(ctx context.Context) ([]*ent.FinancialTransaction, string, error)
+	Fetch(ctx context.Context) ([]*ent.FinancialTransaction, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.FinancialTransaction, error)
 	Update(ctx context.Context, obj *ent.FinancialTransaction) error
 	Store(context.Context, *ent.FinancialTransaction) error
@@ -18,7 +18,7 @@ type FinancialTransactionService interface {
 
 // FinancialTransactionRepository describes the repository.
 type FinancialTransactionRepository interface {
-	Fetch(ctx context.Context) ([]*ent.FinancialTransaction, string, error)
+	Fetch(ctx context.Context) ([]*ent.FinancialTransaction, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.FinancialTransaction, error)
 	Update(ctx context.Context, obj *ent.FinancialTransaction) error
 	Store(context.Context, *ent.FinancialTransaction) error

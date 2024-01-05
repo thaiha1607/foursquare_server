@@ -9,7 +9,7 @@ import (
 
 // MessageService describes the service.
 type MessageService interface {
-	Fetch(ctx context.Context) ([]*ent.Message, string, error)
+	Fetch(ctx context.Context) ([]*ent.Message, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error)
 	Update(ctx context.Context, obj *ent.Message) error
 	Store(context.Context, *ent.Message) error
@@ -18,7 +18,7 @@ type MessageService interface {
 
 // MessageRepository describes the repository.
 type MessageRepository interface {
-	Fetch(ctx context.Context) ([]*ent.Message, string, error)
+	Fetch(ctx context.Context) ([]*ent.Message, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error)
 	Update(ctx context.Context, obj *ent.Message) error
 	Store(context.Context, *ent.Message) error

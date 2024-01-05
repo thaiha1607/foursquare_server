@@ -9,7 +9,7 @@ import (
 
 // InvoiceLineItemService describes the service.
 type InvoiceLineItemService interface {
-	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, string, error)
+	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.InvoiceLineItem, error)
 	Update(ctx context.Context, obj *ent.InvoiceLineItem) error
 	Store(context.Context, *ent.InvoiceLineItem) error
@@ -18,7 +18,7 @@ type InvoiceLineItemService interface {
 
 // InvoiceLineItemRepository describes the repository.
 type InvoiceLineItemRepository interface {
-	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, string, error)
+	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.InvoiceLineItem, error)
 	Update(ctx context.Context, obj *ent.InvoiceLineItem) error
 	Store(context.Context, *ent.InvoiceLineItem) error

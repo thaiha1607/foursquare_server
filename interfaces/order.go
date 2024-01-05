@@ -9,7 +9,7 @@ import (
 
 // OrderService describes the service.
 type OrderService interface {
-	Fetch(ctx context.Context) ([]*ent.Order, string, error)
+	Fetch(ctx context.Context) ([]*ent.Order, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Order, error)
 	Update(ctx context.Context, obj *ent.Order) error
 	Store(context.Context, *ent.Order) error
@@ -18,7 +18,7 @@ type OrderService interface {
 
 // OrderRepository describes the repository.
 type OrderRepository interface {
-	Fetch(ctx context.Context) ([]*ent.Order, string, error)
+	Fetch(ctx context.Context) ([]*ent.Order, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Order, error)
 	Update(ctx context.Context, obj *ent.Order) error
 	Store(context.Context, *ent.Order) error

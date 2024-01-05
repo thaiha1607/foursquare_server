@@ -9,7 +9,7 @@ import (
 
 // ConversationService describes the service.
 type ConversationService interface {
-	Fetch(ctx context.Context) ([]*ent.Conversation, string, error)
+	Fetch(ctx context.Context) ([]*ent.Conversation, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error)
 	Update(ctx context.Context, obj *ent.Conversation) error
 	Store(context.Context, *ent.Conversation) error
@@ -18,7 +18,7 @@ type ConversationService interface {
 
 // ConversationRepository describes the repository.
 type ConversationRepository interface {
-	Fetch(ctx context.Context) ([]*ent.Conversation, string, error)
+	Fetch(ctx context.Context) ([]*ent.Conversation, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error)
 	Update(ctx context.Context, obj *ent.Conversation) error
 	Store(context.Context, *ent.Conversation) error

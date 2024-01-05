@@ -9,7 +9,7 @@ import (
 
 // ProductService describes the service.
 type ProductService interface {
-	Fetch(ctx context.Context) ([]*ent.Product, string, error)
+	Fetch(ctx context.Context) ([]*ent.Product, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Product, error)
 	Update(ctx context.Context, obj *ent.Product) error
 	Store(context.Context, *ent.Product) error
@@ -18,7 +18,7 @@ type ProductService interface {
 
 // ProductRepository describes the repository.
 type ProductRepository interface {
-	Fetch(ctx context.Context) ([]*ent.Product, string, error)
+	Fetch(ctx context.Context) ([]*ent.Product, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Product, error)
 	Update(ctx context.Context, obj *ent.Product) error
 	Store(context.Context, *ent.Product) error

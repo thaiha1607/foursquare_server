@@ -9,7 +9,7 @@ import (
 
 // UserService describes the service.
 type UserService interface {
-	Fetch(ctx context.Context) ([]*ent.User, string, error)
+	Fetch(ctx context.Context) ([]*ent.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.User, error)
 	Update(ctx context.Context, obj *ent.User) error
 	Store(context.Context, *ent.User) error
@@ -18,7 +18,7 @@ type UserService interface {
 
 // UserRepository describes the repository.
 type UserRepository interface {
-	Fetch(ctx context.Context) ([]*ent.User, string, error)
+	Fetch(ctx context.Context) ([]*ent.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.User, error)
 	Update(ctx context.Context, obj *ent.User) error
 	Store(context.Context, *ent.User) error
