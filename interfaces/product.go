@@ -11,8 +11,8 @@ import (
 type ProductService interface {
 	Fetch(ctx context.Context) ([]*ent.Product, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Product, error)
-	Update(ctx context.Context, obj *ent.Product) error
-	Store(context.Context, *ent.Product) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Product) error
+	Store(ctx context.Context, obj *ent.Product) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -20,7 +20,7 @@ type ProductService interface {
 type ProductRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Product, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Product, error)
-	Update(ctx context.Context, obj *ent.Product) error
-	Store(context.Context, *ent.Product) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Product) error
+	Store(ctx context.Context, obj *ent.Product) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }

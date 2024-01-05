@@ -11,8 +11,8 @@ import (
 type MessageService interface {
 	Fetch(ctx context.Context) ([]*ent.Message, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error)
-	Update(ctx context.Context, obj *ent.Message) error
-	Store(context.Context, *ent.Message) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Message) error
+	Store(ctx context.Context, obj *ent.Message) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -20,7 +20,7 @@ type MessageService interface {
 type MessageRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Message, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error)
-	Update(ctx context.Context, obj *ent.Message) error
-	Store(context.Context, *ent.Message) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Message) error
+	Store(ctx context.Context, obj *ent.Message) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
