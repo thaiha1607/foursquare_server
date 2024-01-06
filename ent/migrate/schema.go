@@ -99,10 +99,9 @@ var (
 	// InvoiceLineItemsColumns holds the columns for the "invoice_line_items" table.
 	InvoiceLineItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "created_at", Type: field.TypeTime},
 		{Name: "invoice_id", Type: field.TypeUUID},
 		{Name: "order_line_item_id", Type: field.TypeUUID},
 	}
@@ -114,13 +113,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "invoice_line_items_invoices_invoice",
-				Columns:    []*schema.Column{InvoiceLineItemsColumns[5]},
+				Columns:    []*schema.Column{InvoiceLineItemsColumns[4]},
 				RefColumns: []*schema.Column{InvoicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "invoice_line_items_order_line_items_order_line_item",
-				Columns:    []*schema.Column{InvoiceLineItemsColumns[6]},
+				Columns:    []*schema.Column{InvoiceLineItemsColumns[5]},
 				RefColumns: []*schema.Column{OrderLineItemsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -129,7 +128,7 @@ var (
 			{
 				Name:    "invoicelineitem_invoice_id_order_line_item_id",
 				Unique:  true,
-				Columns: []*schema.Column{InvoiceLineItemsColumns[5], InvoiceLineItemsColumns[6]},
+				Columns: []*schema.Column{InvoiceLineItemsColumns[4], InvoiceLineItemsColumns[5]},
 			},
 		},
 	}
@@ -304,7 +303,6 @@ var (
 	// ProductTagsColumns holds the columns for the "product_tags" table.
 	ProductTagsColumns = []*schema.Column{
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "product_id", Type: field.TypeUUID},
 		{Name: "tag_id", Type: field.TypeUUID},
 	}
@@ -312,17 +310,17 @@ var (
 	ProductTagsTable = &schema.Table{
 		Name:       "product_tags",
 		Columns:    ProductTagsColumns,
-		PrimaryKey: []*schema.Column{ProductTagsColumns[2], ProductTagsColumns[3]},
+		PrimaryKey: []*schema.Column{ProductTagsColumns[1], ProductTagsColumns[2]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "product_tags_products_products",
-				Columns:    []*schema.Column{ProductTagsColumns[2]},
+				Columns:    []*schema.Column{ProductTagsColumns[1]},
 				RefColumns: []*schema.Column{ProductsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "product_tags_tags_tags",
-				Columns:    []*schema.Column{ProductTagsColumns[3]},
+				Columns:    []*schema.Column{ProductTagsColumns[2]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

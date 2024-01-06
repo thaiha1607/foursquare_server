@@ -334,12 +334,12 @@ func (iliq *InvoiceLineItemQuery) WithOrderLineItem(opts ...func(*OrderLineItemQ
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.InvoiceLineItem.Query().
-//		GroupBy(invoicelineitem.FieldCreatedAt).
+//		GroupBy(invoicelineitem.FieldInvoiceID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (iliq *InvoiceLineItemQuery) GroupBy(field string, fields ...string) *InvoiceLineItemGroupBy {
@@ -357,11 +357,11 @@ func (iliq *InvoiceLineItemQuery) GroupBy(field string, fields ...string) *Invoi
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
 //	}
 //
 //	client.InvoiceLineItem.Query().
-//		Select(invoicelineitem.FieldCreatedAt).
+//		Select(invoicelineitem.FieldInvoiceID).
 //		Scan(ctx, &v)
 func (iliq *InvoiceLineItemQuery) Select(fields ...string) *InvoiceLineItemSelect {
 	iliq.ctx.Fields = append(iliq.ctx.Fields, fields...)

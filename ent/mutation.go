@@ -2337,12 +2337,11 @@ type InvoiceLineItemMutation struct {
 	op                     Op
 	typ                    string
 	id                     *uuid.UUID
-	created_at             *time.Time
-	updated_at             *time.Time
 	qty                    *decimal.Decimal
 	addqty                 *decimal.Decimal
 	total                  *decimal.Decimal
 	addtotal               *decimal.Decimal
+	created_at             *time.Time
 	clearedFields          map[string]struct{}
 	invoice                *uuid.UUID
 	clearedinvoice         bool
@@ -2455,78 +2454,6 @@ func (m *InvoiceLineItemMutation) IDs(ctx context.Context) ([]uuid.UUID, error) 
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *InvoiceLineItemMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *InvoiceLineItemMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the InvoiceLineItem entity.
-// If the InvoiceLineItem object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceLineItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *InvoiceLineItemMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *InvoiceLineItemMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *InvoiceLineItemMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the InvoiceLineItem entity.
-// If the InvoiceLineItem object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceLineItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *InvoiceLineItemMutation) ResetUpdatedAt() {
-	m.updated_at = nil
 }
 
 // SetInvoiceID sets the "invoice_id" field.
@@ -2713,6 +2640,42 @@ func (m *InvoiceLineItemMutation) ResetTotal() {
 	m.addtotal = nil
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *InvoiceLineItemMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *InvoiceLineItemMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the InvoiceLineItem entity.
+// If the InvoiceLineItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvoiceLineItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *InvoiceLineItemMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
 // ClearInvoice clears the "invoice" edge to the Invoice entity.
 func (m *InvoiceLineItemMutation) ClearInvoice() {
 	m.clearedinvoice = true
@@ -2801,13 +2764,7 @@ func (m *InvoiceLineItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *InvoiceLineItemMutation) Fields() []string {
-	fields := make([]string, 0, 6)
-	if m.created_at != nil {
-		fields = append(fields, invoicelineitem.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, invoicelineitem.FieldUpdatedAt)
-	}
+	fields := make([]string, 0, 5)
 	if m.invoice != nil {
 		fields = append(fields, invoicelineitem.FieldInvoiceID)
 	}
@@ -2820,6 +2777,9 @@ func (m *InvoiceLineItemMutation) Fields() []string {
 	if m.total != nil {
 		fields = append(fields, invoicelineitem.FieldTotal)
 	}
+	if m.created_at != nil {
+		fields = append(fields, invoicelineitem.FieldCreatedAt)
+	}
 	return fields
 }
 
@@ -2828,10 +2788,6 @@ func (m *InvoiceLineItemMutation) Fields() []string {
 // schema.
 func (m *InvoiceLineItemMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case invoicelineitem.FieldCreatedAt:
-		return m.CreatedAt()
-	case invoicelineitem.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case invoicelineitem.FieldInvoiceID:
 		return m.InvoiceID()
 	case invoicelineitem.FieldOrderLineItemID:
@@ -2840,6 +2796,8 @@ func (m *InvoiceLineItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Qty()
 	case invoicelineitem.FieldTotal:
 		return m.Total()
+	case invoicelineitem.FieldCreatedAt:
+		return m.CreatedAt()
 	}
 	return nil, false
 }
@@ -2849,10 +2807,6 @@ func (m *InvoiceLineItemMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *InvoiceLineItemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case invoicelineitem.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case invoicelineitem.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	case invoicelineitem.FieldInvoiceID:
 		return m.OldInvoiceID(ctx)
 	case invoicelineitem.FieldOrderLineItemID:
@@ -2861,6 +2815,8 @@ func (m *InvoiceLineItemMutation) OldField(ctx context.Context, name string) (en
 		return m.OldQty(ctx)
 	case invoicelineitem.FieldTotal:
 		return m.OldTotal(ctx)
+	case invoicelineitem.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown InvoiceLineItem field %s", name)
 }
@@ -2870,20 +2826,6 @@ func (m *InvoiceLineItemMutation) OldField(ctx context.Context, name string) (en
 // type.
 func (m *InvoiceLineItemMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case invoicelineitem.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case invoicelineitem.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
 	case invoicelineitem.FieldInvoiceID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -2911,6 +2853,13 @@ func (m *InvoiceLineItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotal(v)
+		return nil
+	case invoicelineitem.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown InvoiceLineItem field %s", name)
@@ -2988,12 +2937,6 @@ func (m *InvoiceLineItemMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *InvoiceLineItemMutation) ResetField(name string) error {
 	switch name {
-	case invoicelineitem.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case invoicelineitem.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
 	case invoicelineitem.FieldInvoiceID:
 		m.ResetInvoiceID()
 		return nil
@@ -3005,6 +2948,9 @@ func (m *InvoiceLineItemMutation) ResetField(name string) error {
 		return nil
 	case invoicelineitem.FieldTotal:
 		m.ResetTotal()
+		return nil
+	case invoicelineitem.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown InvoiceLineItem field %s", name)
@@ -7634,7 +7580,6 @@ type ProductTagMutation struct {
 	op              Op
 	typ             string
 	created_at      *time.Time
-	updated_at      *time.Time
 	clearedFields   map[string]struct{}
 	products        *uuid.UUID
 	clearedproducts bool
@@ -7683,44 +7628,6 @@ func (m ProductTagMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *ProductTagMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *ProductTagMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *ProductTagMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *ProductTagMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *ProductTagMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *ProductTagMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
 // SetProductID sets the "product_id" field.
 func (m *ProductTagMutation) SetProductID(u uuid.UUID) {
 	m.products = &u
@@ -7757,6 +7664,25 @@ func (m *ProductTagMutation) TagID() (r uuid.UUID, exists bool) {
 // ResetTagID resets all changes to the "tag_id" field.
 func (m *ProductTagMutation) ResetTagID() {
 	m.tags = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProductTagMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProductTagMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProductTagMutation) ResetCreatedAt() {
+	m.created_at = nil
 }
 
 // SetProductsID sets the "products" edge to the Product entity by id.
@@ -7873,18 +7799,15 @@ func (m *ProductTagMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProductTagMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.created_at != nil {
-		fields = append(fields, producttag.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, producttag.FieldUpdatedAt)
-	}
+	fields := make([]string, 0, 3)
 	if m.products != nil {
 		fields = append(fields, producttag.FieldProductID)
 	}
 	if m.tags != nil {
 		fields = append(fields, producttag.FieldTagID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, producttag.FieldCreatedAt)
 	}
 	return fields
 }
@@ -7894,14 +7817,12 @@ func (m *ProductTagMutation) Fields() []string {
 // schema.
 func (m *ProductTagMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case producttag.FieldCreatedAt:
-		return m.CreatedAt()
-	case producttag.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case producttag.FieldProductID:
 		return m.ProductID()
 	case producttag.FieldTagID:
 		return m.TagID()
+	case producttag.FieldCreatedAt:
+		return m.CreatedAt()
 	}
 	return nil, false
 }
@@ -7918,20 +7839,6 @@ func (m *ProductTagMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *ProductTagMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case producttag.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case producttag.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
 	case producttag.FieldProductID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -7945,6 +7852,13 @@ func (m *ProductTagMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTagID(v)
+		return nil
+	case producttag.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ProductTag field %s", name)
@@ -7995,17 +7909,14 @@ func (m *ProductTagMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ProductTagMutation) ResetField(name string) error {
 	switch name {
-	case producttag.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case producttag.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
 	case producttag.FieldProductID:
 		m.ResetProductID()
 		return nil
 	case producttag.FieldTagID:
 		m.ResetTagID()
+		return nil
+	case producttag.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown ProductTag field %s", name)

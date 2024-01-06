@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/entsql"
@@ -47,6 +49,9 @@ func (InvoiceLineItem) Fields() []ent.Field {
 				dialect.MySQL:    "decimal(12,2)",
 			}).
 			Immutable(),
+		field.Time("created_at").
+			Immutable().
+			Default(time.Now),
 	}
 }
 
@@ -71,12 +76,5 @@ func (InvoiceLineItem) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("invoice_id", "order_line_item_id").
 			Unique(),
-	}
-}
-
-// Mixin of the InvoiceLineItem.
-func (InvoiceLineItem) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		TimeMixin{},
 	}
 }

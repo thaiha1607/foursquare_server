@@ -18,14 +18,12 @@ import (
 // ProductTag is the model entity for the ProductTag schema.
 type ProductTag struct {
 	config `json:"-"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uuid.UUID `json:"product_id,omitempty"`
 	// TagID holds the value of the "tag_id" field.
 	TagID uuid.UUID `json:"tag_id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductTagQuery when eager-loading is set.
 	Edges        ProductTagEdges `json:"edges"`
@@ -74,7 +72,7 @@ func (*ProductTag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case producttag.FieldCreatedAt, producttag.FieldUpdatedAt:
+		case producttag.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case producttag.FieldProductID, producttag.FieldTagID:
 			values[i] = new(uuid.UUID)
@@ -93,18 +91,6 @@ func (pt *ProductTag) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case producttag.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				pt.CreatedAt = value.Time
-			}
-		case producttag.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				pt.UpdatedAt = value.Time
-			}
 		case producttag.FieldProductID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
@@ -116,6 +102,12 @@ func (pt *ProductTag) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tag_id", values[i])
 			} else if value != nil {
 				pt.TagID = *value
+			}
+		case producttag.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				pt.CreatedAt = value.Time
 			}
 		default:
 			pt.selectValues.Set(columns[i], values[i])
@@ -162,17 +154,14 @@ func (pt *ProductTag) Unwrap() *ProductTag {
 func (pt *ProductTag) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductTag(")
-	builder.WriteString("created_at=")
-	builder.WriteString(pt.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pt.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
 	builder.WriteString("product_id=")
 	builder.WriteString(fmt.Sprintf("%v", pt.ProductID))
 	builder.WriteString(", ")
 	builder.WriteString("tag_id=")
 	builder.WriteString(fmt.Sprintf("%v", pt.TagID))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(pt.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

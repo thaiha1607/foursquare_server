@@ -11,7 +11,6 @@ import (
 type InvoiceLineItemService interface {
 	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.InvoiceLineItem, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.InvoiceLineItem) error
 	Store(ctx context.Context, obj *ent.InvoiceLineItem) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -20,7 +19,6 @@ type InvoiceLineItemService interface {
 type InvoiceLineItemRepository interface {
 	Fetch(ctx context.Context) ([]*ent.InvoiceLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.InvoiceLineItem, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.InvoiceLineItem) error
 	Store(ctx context.Context, obj *ent.InvoiceLineItem) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }

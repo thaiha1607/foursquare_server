@@ -6,16 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
-	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
 // ProductTagUpdate is the builder for updating ProductTag entities.
@@ -31,82 +27,13 @@ func (ptu *ProductTagUpdate) Where(ps ...predicate.ProductTag) *ProductTagUpdate
 	return ptu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ptu *ProductTagUpdate) SetUpdatedAt(t time.Time) *ProductTagUpdate {
-	ptu.mutation.SetUpdatedAt(t)
-	return ptu
-}
-
-// SetProductID sets the "product_id" field.
-func (ptu *ProductTagUpdate) SetProductID(u uuid.UUID) *ProductTagUpdate {
-	ptu.mutation.SetProductID(u)
-	return ptu
-}
-
-// SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (ptu *ProductTagUpdate) SetNillableProductID(u *uuid.UUID) *ProductTagUpdate {
-	if u != nil {
-		ptu.SetProductID(*u)
-	}
-	return ptu
-}
-
-// SetTagID sets the "tag_id" field.
-func (ptu *ProductTagUpdate) SetTagID(u uuid.UUID) *ProductTagUpdate {
-	ptu.mutation.SetTagID(u)
-	return ptu
-}
-
-// SetNillableTagID sets the "tag_id" field if the given value is not nil.
-func (ptu *ProductTagUpdate) SetNillableTagID(u *uuid.UUID) *ProductTagUpdate {
-	if u != nil {
-		ptu.SetTagID(*u)
-	}
-	return ptu
-}
-
-// SetProductsID sets the "products" edge to the Product entity by ID.
-func (ptu *ProductTagUpdate) SetProductsID(id uuid.UUID) *ProductTagUpdate {
-	ptu.mutation.SetProductsID(id)
-	return ptu
-}
-
-// SetProducts sets the "products" edge to the Product entity.
-func (ptu *ProductTagUpdate) SetProducts(p *Product) *ProductTagUpdate {
-	return ptu.SetProductsID(p.ID)
-}
-
-// SetTagsID sets the "tags" edge to the Tag entity by ID.
-func (ptu *ProductTagUpdate) SetTagsID(id uuid.UUID) *ProductTagUpdate {
-	ptu.mutation.SetTagsID(id)
-	return ptu
-}
-
-// SetTags sets the "tags" edge to the Tag entity.
-func (ptu *ProductTagUpdate) SetTags(t *Tag) *ProductTagUpdate {
-	return ptu.SetTagsID(t.ID)
-}
-
 // Mutation returns the ProductTagMutation object of the builder.
 func (ptu *ProductTagUpdate) Mutation() *ProductTagMutation {
 	return ptu.mutation
 }
 
-// ClearProducts clears the "products" edge to the Product entity.
-func (ptu *ProductTagUpdate) ClearProducts() *ProductTagUpdate {
-	ptu.mutation.ClearProducts()
-	return ptu
-}
-
-// ClearTags clears the "tags" edge to the Tag entity.
-func (ptu *ProductTagUpdate) ClearTags() *ProductTagUpdate {
-	ptu.mutation.ClearTags()
-	return ptu
-}
-
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ptu *ProductTagUpdate) Save(ctx context.Context) (int, error) {
-	ptu.defaults()
 	return withHooks(ctx, ptu.sqlSave, ptu.mutation, ptu.hooks)
 }
 
@@ -129,14 +56,6 @@ func (ptu *ProductTagUpdate) Exec(ctx context.Context) error {
 func (ptu *ProductTagUpdate) ExecX(ctx context.Context) {
 	if err := ptu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ptu *ProductTagUpdate) defaults() {
-	if _, ok := ptu.mutation.UpdatedAt(); !ok {
-		v := producttag.UpdateDefaultUpdatedAt()
-		ptu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -163,67 +82,6 @@ func (ptu *ProductTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ptu.mutation.UpdatedAt(); ok {
-		_spec.SetField(producttag.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if ptu.mutation.ProductsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.ProductsTable,
-			Columns: []string{producttag.ProductsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ptu.mutation.ProductsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.ProductsTable,
-			Columns: []string{producttag.ProductsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ptu.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.TagsTable,
-			Columns: []string{producttag.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ptu.mutation.TagsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.TagsTable,
-			Columns: []string{producttag.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ptu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{producttag.Label}
@@ -244,77 +102,9 @@ type ProductTagUpdateOne struct {
 	mutation *ProductTagMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ptuo *ProductTagUpdateOne) SetUpdatedAt(t time.Time) *ProductTagUpdateOne {
-	ptuo.mutation.SetUpdatedAt(t)
-	return ptuo
-}
-
-// SetProductID sets the "product_id" field.
-func (ptuo *ProductTagUpdateOne) SetProductID(u uuid.UUID) *ProductTagUpdateOne {
-	ptuo.mutation.SetProductID(u)
-	return ptuo
-}
-
-// SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (ptuo *ProductTagUpdateOne) SetNillableProductID(u *uuid.UUID) *ProductTagUpdateOne {
-	if u != nil {
-		ptuo.SetProductID(*u)
-	}
-	return ptuo
-}
-
-// SetTagID sets the "tag_id" field.
-func (ptuo *ProductTagUpdateOne) SetTagID(u uuid.UUID) *ProductTagUpdateOne {
-	ptuo.mutation.SetTagID(u)
-	return ptuo
-}
-
-// SetNillableTagID sets the "tag_id" field if the given value is not nil.
-func (ptuo *ProductTagUpdateOne) SetNillableTagID(u *uuid.UUID) *ProductTagUpdateOne {
-	if u != nil {
-		ptuo.SetTagID(*u)
-	}
-	return ptuo
-}
-
-// SetProductsID sets the "products" edge to the Product entity by ID.
-func (ptuo *ProductTagUpdateOne) SetProductsID(id uuid.UUID) *ProductTagUpdateOne {
-	ptuo.mutation.SetProductsID(id)
-	return ptuo
-}
-
-// SetProducts sets the "products" edge to the Product entity.
-func (ptuo *ProductTagUpdateOne) SetProducts(p *Product) *ProductTagUpdateOne {
-	return ptuo.SetProductsID(p.ID)
-}
-
-// SetTagsID sets the "tags" edge to the Tag entity by ID.
-func (ptuo *ProductTagUpdateOne) SetTagsID(id uuid.UUID) *ProductTagUpdateOne {
-	ptuo.mutation.SetTagsID(id)
-	return ptuo
-}
-
-// SetTags sets the "tags" edge to the Tag entity.
-func (ptuo *ProductTagUpdateOne) SetTags(t *Tag) *ProductTagUpdateOne {
-	return ptuo.SetTagsID(t.ID)
-}
-
 // Mutation returns the ProductTagMutation object of the builder.
 func (ptuo *ProductTagUpdateOne) Mutation() *ProductTagMutation {
 	return ptuo.mutation
-}
-
-// ClearProducts clears the "products" edge to the Product entity.
-func (ptuo *ProductTagUpdateOne) ClearProducts() *ProductTagUpdateOne {
-	ptuo.mutation.ClearProducts()
-	return ptuo
-}
-
-// ClearTags clears the "tags" edge to the Tag entity.
-func (ptuo *ProductTagUpdateOne) ClearTags() *ProductTagUpdateOne {
-	ptuo.mutation.ClearTags()
-	return ptuo
 }
 
 // Where appends a list predicates to the ProductTagUpdate builder.
@@ -332,7 +122,6 @@ func (ptuo *ProductTagUpdateOne) Select(field string, fields ...string) *Product
 
 // Save executes the query and returns the updated ProductTag entity.
 func (ptuo *ProductTagUpdateOne) Save(ctx context.Context) (*ProductTag, error) {
-	ptuo.defaults()
 	return withHooks(ctx, ptuo.sqlSave, ptuo.mutation, ptuo.hooks)
 }
 
@@ -355,14 +144,6 @@ func (ptuo *ProductTagUpdateOne) Exec(ctx context.Context) error {
 func (ptuo *ProductTagUpdateOne) ExecX(ctx context.Context) {
 	if err := ptuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ptuo *ProductTagUpdateOne) defaults() {
-	if _, ok := ptuo.mutation.UpdatedAt(); !ok {
-		v := producttag.UpdateDefaultUpdatedAt()
-		ptuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -407,67 +188,6 @@ func (ptuo *ProductTagUpdateOne) sqlSave(ctx context.Context) (_node *ProductTag
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := ptuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(producttag.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if ptuo.mutation.ProductsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.ProductsTable,
-			Columns: []string{producttag.ProductsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ptuo.mutation.ProductsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.ProductsTable,
-			Columns: []string{producttag.ProductsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ptuo.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.TagsTable,
-			Columns: []string{producttag.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ptuo.mutation.TagsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   producttag.TagsTable,
-			Columns: []string{producttag.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ProductTag{config: ptuo.config}
 	_spec.Assign = _node.assignValues

@@ -21,10 +21,6 @@ type InvoiceLineItem struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// InvoiceID holds the value of the "invoice_id" field.
 	InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
 	// OrderLineItemID holds the value of the "order_line_item_id" field.
@@ -33,6 +29,8 @@ type InvoiceLineItem struct {
 	Qty decimal.Decimal `json:"qty,omitempty"`
 	// Total holds the value of the "total" field.
 	Total decimal.Decimal `json:"total,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the InvoiceLineItemQuery when eager-loading is set.
 	Edges        InvoiceLineItemEdges `json:"edges"`
@@ -83,7 +81,7 @@ func (*InvoiceLineItem) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case invoicelineitem.FieldQty, invoicelineitem.FieldTotal:
 			values[i] = new(decimal.Decimal)
-		case invoicelineitem.FieldCreatedAt, invoicelineitem.FieldUpdatedAt:
+		case invoicelineitem.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case invoicelineitem.FieldID, invoicelineitem.FieldInvoiceID, invoicelineitem.FieldOrderLineItemID:
 			values[i] = new(uuid.UUID)
@@ -108,18 +106,6 @@ func (ili *InvoiceLineItem) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				ili.ID = *value
 			}
-		case invoicelineitem.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				ili.CreatedAt = value.Time
-			}
-		case invoicelineitem.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				ili.UpdatedAt = value.Time
-			}
 		case invoicelineitem.FieldInvoiceID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field invoice_id", values[i])
@@ -143,6 +129,12 @@ func (ili *InvoiceLineItem) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field total", values[i])
 			} else if value != nil {
 				ili.Total = *value
+			}
+		case invoicelineitem.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				ili.CreatedAt = value.Time
 			}
 		default:
 			ili.selectValues.Set(columns[i], values[i])
@@ -190,12 +182,6 @@ func (ili *InvoiceLineItem) String() string {
 	var builder strings.Builder
 	builder.WriteString("InvoiceLineItem(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ili.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(ili.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(ili.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
 	builder.WriteString("invoice_id=")
 	builder.WriteString(fmt.Sprintf("%v", ili.InvoiceID))
 	builder.WriteString(", ")
@@ -207,6 +193,9 @@ func (ili *InvoiceLineItem) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("total=")
 	builder.WriteString(fmt.Sprintf("%v", ili.Total))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(ili.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

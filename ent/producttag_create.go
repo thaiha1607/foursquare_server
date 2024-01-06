@@ -23,6 +23,18 @@ type ProductTagCreate struct {
 	hooks    []Hook
 }
 
+// SetProductID sets the "product_id" field.
+func (ptc *ProductTagCreate) SetProductID(u uuid.UUID) *ProductTagCreate {
+	ptc.mutation.SetProductID(u)
+	return ptc
+}
+
+// SetTagID sets the "tag_id" field.
+func (ptc *ProductTagCreate) SetTagID(u uuid.UUID) *ProductTagCreate {
+	ptc.mutation.SetTagID(u)
+	return ptc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ptc *ProductTagCreate) SetCreatedAt(t time.Time) *ProductTagCreate {
 	ptc.mutation.SetCreatedAt(t)
@@ -34,32 +46,6 @@ func (ptc *ProductTagCreate) SetNillableCreatedAt(t *time.Time) *ProductTagCreat
 	if t != nil {
 		ptc.SetCreatedAt(*t)
 	}
-	return ptc
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (ptc *ProductTagCreate) SetUpdatedAt(t time.Time) *ProductTagCreate {
-	ptc.mutation.SetUpdatedAt(t)
-	return ptc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ptc *ProductTagCreate) SetNillableUpdatedAt(t *time.Time) *ProductTagCreate {
-	if t != nil {
-		ptc.SetUpdatedAt(*t)
-	}
-	return ptc
-}
-
-// SetProductID sets the "product_id" field.
-func (ptc *ProductTagCreate) SetProductID(u uuid.UUID) *ProductTagCreate {
-	ptc.mutation.SetProductID(u)
-	return ptc
-}
-
-// SetTagID sets the "tag_id" field.
-func (ptc *ProductTagCreate) SetTagID(u uuid.UUID) *ProductTagCreate {
-	ptc.mutation.SetTagID(u)
 	return ptc
 }
 
@@ -124,25 +110,18 @@ func (ptc *ProductTagCreate) defaults() {
 		v := producttag.DefaultCreatedAt()
 		ptc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ptc.mutation.UpdatedAt(); !ok {
-		v := producttag.DefaultUpdatedAt()
-		ptc.mutation.SetUpdatedAt(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (ptc *ProductTagCreate) check() error {
-	if _, ok := ptc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProductTag.created_at"`)}
-	}
-	if _, ok := ptc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProductTag.updated_at"`)}
-	}
 	if _, ok := ptc.mutation.ProductID(); !ok {
 		return &ValidationError{Name: "product_id", err: errors.New(`ent: missing required field "ProductTag.product_id"`)}
 	}
 	if _, ok := ptc.mutation.TagID(); !ok {
 		return &ValidationError{Name: "tag_id", err: errors.New(`ent: missing required field "ProductTag.tag_id"`)}
+	}
+	if _, ok := ptc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProductTag.created_at"`)}
 	}
 	if _, ok := ptc.mutation.ProductsID(); !ok {
 		return &ValidationError{Name: "products", err: errors.New(`ent: missing required edge "ProductTag.products"`)}
@@ -175,10 +154,6 @@ func (ptc *ProductTagCreate) createSpec() (*ProductTag, *sqlgraph.CreateSpec) {
 	if value, ok := ptc.mutation.CreatedAt(); ok {
 		_spec.SetField(producttag.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
-	}
-	if value, ok := ptc.mutation.UpdatedAt(); ok {
-		_spec.SetField(producttag.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	if nodes := ptc.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

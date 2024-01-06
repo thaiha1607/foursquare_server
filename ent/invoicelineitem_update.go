@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,12 +27,6 @@ func (iliu *InvoiceLineItemUpdate) Where(ps ...predicate.InvoiceLineItem) *Invoi
 	return iliu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (iliu *InvoiceLineItemUpdate) SetUpdatedAt(t time.Time) *InvoiceLineItemUpdate {
-	iliu.mutation.SetUpdatedAt(t)
-	return iliu
-}
-
 // Mutation returns the InvoiceLineItemMutation object of the builder.
 func (iliu *InvoiceLineItemUpdate) Mutation() *InvoiceLineItemMutation {
 	return iliu.mutation
@@ -41,7 +34,6 @@ func (iliu *InvoiceLineItemUpdate) Mutation() *InvoiceLineItemMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (iliu *InvoiceLineItemUpdate) Save(ctx context.Context) (int, error) {
-	iliu.defaults()
 	return withHooks(ctx, iliu.sqlSave, iliu.mutation, iliu.hooks)
 }
 
@@ -64,14 +56,6 @@ func (iliu *InvoiceLineItemUpdate) Exec(ctx context.Context) error {
 func (iliu *InvoiceLineItemUpdate) ExecX(ctx context.Context) {
 	if err := iliu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (iliu *InvoiceLineItemUpdate) defaults() {
-	if _, ok := iliu.mutation.UpdatedAt(); !ok {
-		v := invoicelineitem.UpdateDefaultUpdatedAt()
-		iliu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -98,9 +82,6 @@ func (iliu *InvoiceLineItemUpdate) sqlSave(ctx context.Context) (n int, err erro
 			}
 		}
 	}
-	if value, ok := iliu.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicelineitem.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iliu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invoicelineitem.Label}
@@ -119,12 +100,6 @@ type InvoiceLineItemUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *InvoiceLineItemMutation
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (iliuo *InvoiceLineItemUpdateOne) SetUpdatedAt(t time.Time) *InvoiceLineItemUpdateOne {
-	iliuo.mutation.SetUpdatedAt(t)
-	return iliuo
 }
 
 // Mutation returns the InvoiceLineItemMutation object of the builder.
@@ -147,7 +122,6 @@ func (iliuo *InvoiceLineItemUpdateOne) Select(field string, fields ...string) *I
 
 // Save executes the query and returns the updated InvoiceLineItem entity.
 func (iliuo *InvoiceLineItemUpdateOne) Save(ctx context.Context) (*InvoiceLineItem, error) {
-	iliuo.defaults()
 	return withHooks(ctx, iliuo.sqlSave, iliuo.mutation, iliuo.hooks)
 }
 
@@ -170,14 +144,6 @@ func (iliuo *InvoiceLineItemUpdateOne) Exec(ctx context.Context) error {
 func (iliuo *InvoiceLineItemUpdateOne) ExecX(ctx context.Context) {
 	if err := iliuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (iliuo *InvoiceLineItemUpdateOne) defaults() {
-	if _, ok := iliuo.mutation.UpdatedAt(); !ok {
-		v := invoicelineitem.UpdateDefaultUpdatedAt()
-		iliuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -220,9 +186,6 @@ func (iliuo *InvoiceLineItemUpdateOne) sqlSave(ctx context.Context) (_node *Invo
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := iliuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicelineitem.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &InvoiceLineItem{config: iliuo.config}
 	_spec.Assign = _node.assignValues

@@ -261,12 +261,12 @@ func (ptq *ProductTagQuery) WithTags(opts ...func(*TagQuery)) *ProductTagQuery {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		ProductID uuid.UUID `json:"product_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProductTag.Query().
-//		GroupBy(producttag.FieldCreatedAt).
+//		GroupBy(producttag.FieldProductID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ptq *ProductTagQuery) GroupBy(field string, fields ...string) *ProductTagGroupBy {
@@ -284,11 +284,11 @@ func (ptq *ProductTagQuery) GroupBy(field string, fields ...string) *ProductTagG
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		ProductID uuid.UUID `json:"product_id,omitempty"`
 //	}
 //
 //	client.ProductTag.Query().
-//		Select(producttag.FieldCreatedAt).
+//		Select(producttag.FieldProductID).
 //		Scan(ctx, &v)
 func (ptq *ProductTagQuery) Select(fields ...string) *ProductTagSelect {
 	ptq.ctx.Fields = append(ptq.ctx.Fields, fields...)

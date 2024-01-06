@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -25,8 +27,13 @@ func (ProductTag) Annotations() []schema.Annotation {
 // Fields of the ProductTag.
 func (ProductTag) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("product_id", uuid.UUID{}),
-		field.UUID("tag_id", uuid.UUID{}),
+		field.UUID("product_id", uuid.UUID{}).
+			Immutable(),
+		field.UUID("tag_id", uuid.UUID{}).
+			Immutable(),
+		field.Time("created_at").
+			Immutable().
+			Default(time.Now),
 	}
 }
 
@@ -36,17 +43,12 @@ func (ProductTag) Edges() []ent.Edge {
 		edge.To("products", Product.Type).
 			Field("product_id").
 			Unique().
-			Required(),
+			Required().
+			Immutable(),
 		edge.To("tags", Tag.Type).
 			Field("tag_id").
 			Unique().
-			Required(),
-	}
-}
-
-// Mixin of the ProductTag.
-func (ProductTag) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		TimeMixin{},
+			Required().
+			Immutable(),
 	}
 }

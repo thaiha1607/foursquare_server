@@ -86,21 +86,12 @@ func init() {
 	invoiceDescID := invoiceFields[0].Descriptor()
 	// invoice.DefaultID holds the default value on creation for the id field.
 	invoice.DefaultID = invoiceDescID.Default.(func() uuid.UUID)
-	invoicelineitemMixin := schema.InvoiceLineItem{}.Mixin()
-	invoicelineitemMixinFields0 := invoicelineitemMixin[0].Fields()
-	_ = invoicelineitemMixinFields0
 	invoicelineitemFields := schema.InvoiceLineItem{}.Fields()
 	_ = invoicelineitemFields
 	// invoicelineitemDescCreatedAt is the schema descriptor for created_at field.
-	invoicelineitemDescCreatedAt := invoicelineitemMixinFields0[0].Descriptor()
+	invoicelineitemDescCreatedAt := invoicelineitemFields[5].Descriptor()
 	// invoicelineitem.DefaultCreatedAt holds the default value on creation for the created_at field.
 	invoicelineitem.DefaultCreatedAt = invoicelineitemDescCreatedAt.Default.(func() time.Time)
-	// invoicelineitemDescUpdatedAt is the schema descriptor for updated_at field.
-	invoicelineitemDescUpdatedAt := invoicelineitemMixinFields0[1].Descriptor()
-	// invoicelineitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	invoicelineitem.DefaultUpdatedAt = invoicelineitemDescUpdatedAt.Default.(func() time.Time)
-	// invoicelineitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	invoicelineitem.UpdateDefaultUpdatedAt = invoicelineitemDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// invoicelineitemDescID is the schema descriptor for id field.
 	invoicelineitemDescID := invoicelineitemFields[0].Descriptor()
 	// invoicelineitem.DefaultID holds the default value on creation for the id field.
@@ -222,21 +213,12 @@ func init() {
 	productDescID := productFields[2].Descriptor()
 	// product.DefaultID holds the default value on creation for the id field.
 	product.DefaultID = productDescID.Default.(func() uuid.UUID)
-	producttagMixin := schema.ProductTag{}.Mixin()
-	producttagMixinFields0 := producttagMixin[0].Fields()
-	_ = producttagMixinFields0
 	producttagFields := schema.ProductTag{}.Fields()
 	_ = producttagFields
 	// producttagDescCreatedAt is the schema descriptor for created_at field.
-	producttagDescCreatedAt := producttagMixinFields0[0].Descriptor()
+	producttagDescCreatedAt := producttagFields[2].Descriptor()
 	// producttag.DefaultCreatedAt holds the default value on creation for the created_at field.
 	producttag.DefaultCreatedAt = producttagDescCreatedAt.Default.(func() time.Time)
-	// producttagDescUpdatedAt is the schema descriptor for updated_at field.
-	producttagDescUpdatedAt := producttagMixinFields0[1].Descriptor()
-	// producttag.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	producttag.DefaultUpdatedAt = producttagDescUpdatedAt.Default.(func() time.Time)
-	// producttag.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	producttag.UpdateDefaultUpdatedAt = producttagDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tagMixin := schema.Tag{}.Mixin()
 	tagMixinFields0 := tagMixin[0].Fields()
 	_ = tagMixinFields0

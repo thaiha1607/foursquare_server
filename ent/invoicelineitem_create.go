@@ -24,34 +24,6 @@ type InvoiceLineItemCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (ilic *InvoiceLineItemCreate) SetCreatedAt(t time.Time) *InvoiceLineItemCreate {
-	ilic.mutation.SetCreatedAt(t)
-	return ilic
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ilic *InvoiceLineItemCreate) SetNillableCreatedAt(t *time.Time) *InvoiceLineItemCreate {
-	if t != nil {
-		ilic.SetCreatedAt(*t)
-	}
-	return ilic
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (ilic *InvoiceLineItemCreate) SetUpdatedAt(t time.Time) *InvoiceLineItemCreate {
-	ilic.mutation.SetUpdatedAt(t)
-	return ilic
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ilic *InvoiceLineItemCreate) SetNillableUpdatedAt(t *time.Time) *InvoiceLineItemCreate {
-	if t != nil {
-		ilic.SetUpdatedAt(*t)
-	}
-	return ilic
-}
-
 // SetInvoiceID sets the "invoice_id" field.
 func (ilic *InvoiceLineItemCreate) SetInvoiceID(u uuid.UUID) *InvoiceLineItemCreate {
 	ilic.mutation.SetInvoiceID(u)
@@ -73,6 +45,20 @@ func (ilic *InvoiceLineItemCreate) SetQty(d decimal.Decimal) *InvoiceLineItemCre
 // SetTotal sets the "total" field.
 func (ilic *InvoiceLineItemCreate) SetTotal(d decimal.Decimal) *InvoiceLineItemCreate {
 	ilic.mutation.SetTotal(d)
+	return ilic
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (ilic *InvoiceLineItemCreate) SetCreatedAt(t time.Time) *InvoiceLineItemCreate {
+	ilic.mutation.SetCreatedAt(t)
+	return ilic
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ilic *InvoiceLineItemCreate) SetNillableCreatedAt(t *time.Time) *InvoiceLineItemCreate {
+	if t != nil {
+		ilic.SetCreatedAt(*t)
+	}
 	return ilic
 }
 
@@ -139,10 +125,6 @@ func (ilic *InvoiceLineItemCreate) defaults() {
 		v := invoicelineitem.DefaultCreatedAt()
 		ilic.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ilic.mutation.UpdatedAt(); !ok {
-		v := invoicelineitem.DefaultUpdatedAt()
-		ilic.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := ilic.mutation.ID(); !ok {
 		v := invoicelineitem.DefaultID()
 		ilic.mutation.SetID(v)
@@ -151,12 +133,6 @@ func (ilic *InvoiceLineItemCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ilic *InvoiceLineItemCreate) check() error {
-	if _, ok := ilic.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "InvoiceLineItem.created_at"`)}
-	}
-	if _, ok := ilic.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "InvoiceLineItem.updated_at"`)}
-	}
 	if _, ok := ilic.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice_id", err: errors.New(`ent: missing required field "InvoiceLineItem.invoice_id"`)}
 	}
@@ -168,6 +144,9 @@ func (ilic *InvoiceLineItemCreate) check() error {
 	}
 	if _, ok := ilic.mutation.Total(); !ok {
 		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "InvoiceLineItem.total"`)}
+	}
+	if _, ok := ilic.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "InvoiceLineItem.created_at"`)}
 	}
 	if _, ok := ilic.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice", err: errors.New(`ent: missing required edge "InvoiceLineItem.invoice"`)}
@@ -210,14 +189,6 @@ func (ilic *InvoiceLineItemCreate) createSpec() (*InvoiceLineItem, *sqlgraph.Cre
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := ilic.mutation.CreatedAt(); ok {
-		_spec.SetField(invoicelineitem.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := ilic.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicelineitem.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
-	}
 	if value, ok := ilic.mutation.Qty(); ok {
 		_spec.SetField(invoicelineitem.FieldQty, field.TypeFloat64, value)
 		_node.Qty = value
@@ -225,6 +196,10 @@ func (ilic *InvoiceLineItemCreate) createSpec() (*InvoiceLineItem, *sqlgraph.Cre
 	if value, ok := ilic.mutation.Total(); ok {
 		_spec.SetField(invoicelineitem.FieldTotal, field.TypeFloat64, value)
 		_node.Total = value
+	}
+	if value, ok := ilic.mutation.CreatedAt(); ok {
+		_spec.SetField(invoicelineitem.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
 	}
 	if nodes := ilic.mutation.InvoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
