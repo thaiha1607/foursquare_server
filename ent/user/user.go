@@ -3,7 +3,6 @@
 package user
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -23,20 +22,10 @@ const (
 	FieldAvatarURL = "avatar_url"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
-	// FieldLastReset holds the string denoting the last_reset field in the database.
-	FieldLastReset = "last_reset"
-	// FieldLastVerification holds the string denoting the last_verification field in the database.
-	FieldLastVerification = "last_verification"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldPasswordHash holds the string denoting the password_hash field in the database.
-	FieldPasswordHash = "password_hash"
-	// FieldVerified holds the string denoting the verified field in the database.
-	FieldVerified = "verified"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
-	// FieldRole holds the string denoting the role field in the database.
-	FieldRole = "role"
 	// FieldAddress holds the string denoting the address field in the database.
 	FieldAddress = "address"
 	// FieldPostalCode holds the string denoting the postal_code field in the database.
@@ -54,13 +43,8 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldAvatarURL,
 	FieldEmail,
-	FieldLastReset,
-	FieldLastVerification,
 	FieldName,
-	FieldPasswordHash,
-	FieldVerified,
 	FieldPhone,
-	FieldRole,
 	FieldAddress,
 	FieldPostalCode,
 	FieldOtherAddressInfo,
@@ -87,44 +71,11 @@ var (
 	EmailValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
-	PasswordHashValidator func(string) error
-	// DefaultVerified holds the default value on creation for the "verified" field.
-	DefaultVerified bool
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	PhoneValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
-
-// Role defines the type for the "role" enum field.
-type Role string
-
-// RoleCustomer is the default value of the Role enum.
-const DefaultRole = RoleCustomer
-
-// Role values.
-const (
-	RoleAdmin      Role = "ADMIN"
-	RoleCustomer   Role = "CUSTOMER"
-	RoleWarehouse  Role = "WAREHOUSE"
-	RoleDelivery   Role = "DELIVERY"
-	RoleManagement Role = "MANAGEMENT"
-)
-
-func (r Role) String() string {
-	return string(r)
-}
-
-// RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
-func RoleValidator(r Role) error {
-	switch r {
-	case RoleAdmin, RoleCustomer, RoleWarehouse, RoleDelivery, RoleManagement:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for role field: %q", r)
-	}
-}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -149,39 +100,14 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
 }
 
-// ByLastReset orders the results by the last_reset field.
-func ByLastReset(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLastReset, opts...).ToFunc()
-}
-
-// ByLastVerification orders the results by the last_verification field.
-func ByLastVerification(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLastVerification, opts...).ToFunc()
-}
-
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByPasswordHash orders the results by the password_hash field.
-func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPasswordHash, opts...).ToFunc()
-}
-
-// ByVerified orders the results by the verified field.
-func ByVerified(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldVerified, opts...).ToFunc()
-}
-
 // ByPhone orders the results by the phone field.
 func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
-}
-
-// ByRole orders the results by the role field.
-func ByRole(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRole, opts...).ToFunc()
 }
 
 // ByAddress orders the results by the address field.

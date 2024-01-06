@@ -28,7 +28,8 @@ func (OrderLineItem) Annotations() []schema.Annotation {
 func (OrderLineItem) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.UUID("order_id", uuid.UUID{}).
 			Immutable(),
 		field.UUID("product_id", uuid.UUID{}).

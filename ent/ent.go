@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/thaiha1607/foursquare_server/ent/account"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
@@ -21,6 +22,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productimage"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/user"
@@ -84,6 +86,7 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			account.Table:              account.ValidColumn,
 			conversation.Table:         conversation.ValidColumn,
 			financialtransaction.Table: financialtransaction.ValidColumn,
 			invoice.Table:              invoice.ValidColumn,
@@ -93,6 +96,7 @@ func checkColumn(table, column string) error {
 			orderlineitem.Table:        orderlineitem.ValidColumn,
 			orderstatuscode.Table:      orderstatuscode.ValidColumn,
 			product.Table:              product.ValidColumn,
+			productimage.Table:         productimage.ValidColumn,
 			producttag.Table:           producttag.ValidColumn,
 			tag.Table:                  tag.ValidColumn,
 			user.Table:                 user.ValidColumn,

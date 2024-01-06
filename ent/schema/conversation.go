@@ -25,7 +25,8 @@ func (Conversation) Indexes() []ent.Index {
 func (Conversation) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.String("title").
 			Optional().
 			Nillable(),

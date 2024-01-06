@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 const (
@@ -146,6 +147,8 @@ var (
 	PriorityValidator func(int) error
 	// DefaultStatusCode holds the default value on creation for the "status_code" field.
 	DefaultStatusCode int
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // Type defines the type for the "type" enum field.

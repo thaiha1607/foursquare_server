@@ -62,6 +62,14 @@ func (tc *TagCreate) SetID(u uuid.UUID) *TagCreate {
 	return tc
 }
 
+// SetNillableID sets the "id" field if the given value is not nil.
+func (tc *TagCreate) SetNillableID(u *uuid.UUID) *TagCreate {
+	if u != nil {
+		tc.SetID(*u)
+	}
+	return tc
+}
+
 // AddProductIDs adds the "products" edge to the Product entity by IDs.
 func (tc *TagCreate) AddProductIDs(ids ...uuid.UUID) *TagCreate {
 	tc.mutation.AddProductIDs(ids...)
@@ -119,6 +127,10 @@ func (tc *TagCreate) defaults() {
 	if _, ok := tc.mutation.UpdatedAt(); !ok {
 		v := tag.DefaultUpdatedAt()
 		tc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := tc.mutation.ID(); !ok {
+		v := tag.DefaultID()
+		tc.mutation.SetID(v)
 	}
 }
 

@@ -28,20 +28,10 @@ type User struct {
 	AvatarURL *url.URL `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
 	Email *string `json:"email,omitempty"`
-	// LastReset holds the value of the "last_reset" field.
-	LastReset *time.Time `json:"last_reset,omitempty"`
-	// LastVerification holds the value of the "last_verification" field.
-	LastVerification *time.Time `json:"last_verification,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// PasswordHash holds the value of the "password_hash" field.
-	PasswordHash string `json:"-"`
-	// Verified holds the value of the "verified" field.
-	Verified bool `json:"verified,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
-	// Role holds the value of the "role" field.
-	Role user.Role `json:"role,omitempty"`
 	// Address holds the value of the "address" field.
 	Address *string `json:"address,omitempty"`
 	// PostalCode holds the value of the "postal_code" field.
@@ -58,11 +48,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldAvatarURL:
 			values[i] = new([]byte)
-		case user.FieldVerified:
-			values[i] = new(sql.NullBool)
-		case user.FieldEmail, user.FieldName, user.FieldPasswordHash, user.FieldPhone, user.FieldRole, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
+		case user.FieldEmail, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
 			values[i] = new(sql.NullString)
-		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldLastReset, user.FieldLastVerification:
+		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
@@ -114,49 +102,17 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.Email = new(string)
 				*u.Email = value.String
 			}
-		case user.FieldLastReset:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field last_reset", values[i])
-			} else if value.Valid {
-				u.LastReset = new(time.Time)
-				*u.LastReset = value.Time
-			}
-		case user.FieldLastVerification:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field last_verification", values[i])
-			} else if value.Valid {
-				u.LastVerification = new(time.Time)
-				*u.LastVerification = value.Time
-			}
 		case user.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				u.Name = value.String
 			}
-		case user.FieldPasswordHash:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password_hash", values[i])
-			} else if value.Valid {
-				u.PasswordHash = value.String
-			}
-		case user.FieldVerified:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field verified", values[i])
-			} else if value.Valid {
-				u.Verified = value.Bool
-			}
 		case user.FieldPhone:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
 			} else if value.Valid {
 				u.Phone = value.String
-			}
-		case user.FieldRole:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field role", values[i])
-			} else if value.Valid {
-				u.Role = user.Role(value.String)
 			}
 		case user.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -229,29 +185,11 @@ func (u *User) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := u.LastReset; v != nil {
-		builder.WriteString("last_reset=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
-	if v := u.LastVerification; v != nil {
-		builder.WriteString("last_verification=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(u.Name)
 	builder.WriteString(", ")
-	builder.WriteString("password_hash=<sensitive>")
-	builder.WriteString(", ")
-	builder.WriteString("verified=")
-	builder.WriteString(fmt.Sprintf("%v", u.Verified))
-	builder.WriteString(", ")
 	builder.WriteString("phone=")
 	builder.WriteString(u.Phone)
-	builder.WriteString(", ")
-	builder.WriteString("role=")
-	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteString(", ")
 	if v := u.Address; v != nil {
 		builder.WriteString("address=")

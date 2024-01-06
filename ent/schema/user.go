@@ -31,30 +31,11 @@ func (User) Fields() []ent.Field {
 			Unique(),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
-		field.Time("last_reset").
-			Optional().
-			Nillable(),
-		field.Time("last_verification").
-			Optional().
-			Nillable(),
 		field.String("name").
 			NotEmpty(),
-		field.Text("password_hash").
-			NotEmpty().
-			Sensitive(),
-		field.Bool("verified").
-			Default(false),
 		field.String("phone").
 			NotEmpty().
 			Unique(),
-		field.Enum("role").
-			NamedValues(
-				"Admin", "ADMIN",
-				"Customer", "CUSTOMER",
-				"Warehouse", "WAREHOUSE",
-				"Delivery", "DELIVERY",
-				"Management", "MANAGEMENT",
-			).Default("CUSTOMER"),
 		field.String("address").
 			Optional().
 			Nillable(),

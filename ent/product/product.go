@@ -29,8 +29,6 @@ const (
 	FieldPrice = "price"
 	// FieldQty holds the string denoting the qty field in the database.
 	FieldQty = "qty"
-	// FieldImageUrls holds the string denoting the image_urls field in the database.
-	FieldImageUrls = "image_urls"
 	// FieldUnitOfMeasurement holds the string denoting the unit_of_measurement field in the database.
 	FieldUnitOfMeasurement = "unit_of_measurement"
 	// FieldType holds the string denoting the type field in the database.
@@ -67,7 +65,6 @@ var Columns = []string{
 	FieldYear,
 	FieldPrice,
 	FieldQty,
-	FieldImageUrls,
 	FieldUnitOfMeasurement,
 	FieldType,
 	FieldProvider,

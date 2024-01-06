@@ -70,77 +70,15 @@ func (uc *UserCreate) SetNillableEmail(s *string) *UserCreate {
 	return uc
 }
 
-// SetLastReset sets the "last_reset" field.
-func (uc *UserCreate) SetLastReset(t time.Time) *UserCreate {
-	uc.mutation.SetLastReset(t)
-	return uc
-}
-
-// SetNillableLastReset sets the "last_reset" field if the given value is not nil.
-func (uc *UserCreate) SetNillableLastReset(t *time.Time) *UserCreate {
-	if t != nil {
-		uc.SetLastReset(*t)
-	}
-	return uc
-}
-
-// SetLastVerification sets the "last_verification" field.
-func (uc *UserCreate) SetLastVerification(t time.Time) *UserCreate {
-	uc.mutation.SetLastVerification(t)
-	return uc
-}
-
-// SetNillableLastVerification sets the "last_verification" field if the given value is not nil.
-func (uc *UserCreate) SetNillableLastVerification(t *time.Time) *UserCreate {
-	if t != nil {
-		uc.SetLastVerification(*t)
-	}
-	return uc
-}
-
 // SetName sets the "name" field.
 func (uc *UserCreate) SetName(s string) *UserCreate {
 	uc.mutation.SetName(s)
 	return uc
 }
 
-// SetPasswordHash sets the "password_hash" field.
-func (uc *UserCreate) SetPasswordHash(s string) *UserCreate {
-	uc.mutation.SetPasswordHash(s)
-	return uc
-}
-
-// SetVerified sets the "verified" field.
-func (uc *UserCreate) SetVerified(b bool) *UserCreate {
-	uc.mutation.SetVerified(b)
-	return uc
-}
-
-// SetNillableVerified sets the "verified" field if the given value is not nil.
-func (uc *UserCreate) SetNillableVerified(b *bool) *UserCreate {
-	if b != nil {
-		uc.SetVerified(*b)
-	}
-	return uc
-}
-
 // SetPhone sets the "phone" field.
 func (uc *UserCreate) SetPhone(s string) *UserCreate {
 	uc.mutation.SetPhone(s)
-	return uc
-}
-
-// SetRole sets the "role" field.
-func (uc *UserCreate) SetRole(u user.Role) *UserCreate {
-	uc.mutation.SetRole(u)
-	return uc
-}
-
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uc *UserCreate) SetNillableRole(u *user.Role) *UserCreate {
-	if u != nil {
-		uc.SetRole(*u)
-	}
 	return uc
 }
 
@@ -243,14 +181,6 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultUpdatedAt()
 		uc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := uc.mutation.Verified(); !ok {
-		v := user.DefaultVerified
-		uc.mutation.SetVerified(v)
-	}
-	if _, ok := uc.mutation.Role(); !ok {
-		v := user.DefaultRole
-		uc.mutation.SetRole(v)
-	}
 	if _, ok := uc.mutation.ID(); !ok {
 		v := user.DefaultID()
 		uc.mutation.SetID(v)
@@ -278,31 +208,12 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.PasswordHash(); !ok {
-		return &ValidationError{Name: "password_hash", err: errors.New(`ent: missing required field "User.password_hash"`)}
-	}
-	if v, ok := uc.mutation.PasswordHash(); ok {
-		if err := user.PasswordHashValidator(v); err != nil {
-			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.Verified(); !ok {
-		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "User.verified"`)}
-	}
 	if _, ok := uc.mutation.Phone(); !ok {
 		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "User.phone"`)}
 	}
 	if v, ok := uc.mutation.Phone(); ok {
 		if err := user.PhoneValidator(v); err != nil {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.Role(); !ok {
-		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
-	}
-	if v, ok := uc.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
 		}
 	}
 	return nil
@@ -356,33 +267,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 		_node.Email = &value
 	}
-	if value, ok := uc.mutation.LastReset(); ok {
-		_spec.SetField(user.FieldLastReset, field.TypeTime, value)
-		_node.LastReset = &value
-	}
-	if value, ok := uc.mutation.LastVerification(); ok {
-		_spec.SetField(user.FieldLastVerification, field.TypeTime, value)
-		_node.LastVerification = &value
-	}
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := uc.mutation.PasswordHash(); ok {
-		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
-		_node.PasswordHash = value
-	}
-	if value, ok := uc.mutation.Verified(); ok {
-		_spec.SetField(user.FieldVerified, field.TypeBool, value)
-		_node.Verified = value
-	}
 	if value, ok := uc.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 		_node.Phone = value
-	}
-	if value, ok := uc.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeEnum, value)
-		_node.Role = value
 	}
 	if value, ok := uc.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)

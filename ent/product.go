@@ -3,9 +3,7 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -35,8 +33,6 @@ type Product struct {
 	Price decimal.Decimal `json:"price,omitempty"`
 	// Qty holds the value of the "qty" field.
 	Qty decimal.Decimal `json:"qty,omitempty"`
-	// ImageUrls holds the value of the "image_urls" field.
-	ImageUrls []url.URL `json:"image_urls,omitempty"`
 	// UnitOfMeasurement holds the value of the "unit_of_measurement" field.
 	UnitOfMeasurement *string `json:"unit_of_measurement,omitempty"`
 	// Type holds the value of the "type" field.
@@ -83,8 +79,6 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case product.FieldImageUrls:
-			values[i] = new([]byte)
 		case product.FieldPrice, product.FieldQty:
 			values[i] = new(decimal.Decimal)
 		case product.FieldYear:
@@ -159,14 +153,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field qty", values[i])
 			} else if value != nil {
 				pr.Qty = *value
-			}
-		case product.FieldImageUrls:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field image_urls", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &pr.ImageUrls); err != nil {
-					return fmt.Errorf("unmarshal field image_urls: %w", err)
-				}
 			}
 		case product.FieldUnitOfMeasurement:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -259,9 +245,6 @@ func (pr *Product) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("qty=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Qty))
-	builder.WriteString(", ")
-	builder.WriteString("image_urls=")
-	builder.WriteString(fmt.Sprintf("%v", pr.ImageUrls))
 	builder.WriteString(", ")
 	if v := pr.UnitOfMeasurement; v != nil {
 		builder.WriteString("unit_of_measurement=")

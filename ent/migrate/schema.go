@@ -9,6 +9,35 @@ import (
 )
 
 var (
+	// AccountsColumns holds the columns for the "accounts" table.
+	AccountsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "username", Type: field.TypeString, Unique: true, Size: 10},
+		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
+		{Name: "last_email_verification", Type: field.TypeTime, Nullable: true},
+		{Name: "last_phone_verification", Type: field.TypeTime, Nullable: true},
+		{Name: "is_email_verified", Type: field.TypeBool, Default: false},
+		{Name: "is_phone_verified", Type: field.TypeBool, Default: false},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
+		{Name: "password_hash", Type: field.TypeString, Size: 2147483647},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// AccountsTable holds the schema information for the "accounts" table.
+	AccountsTable = &schema.Table{
+		Name:       "accounts",
+		Columns:    AccountsColumns,
+		PrimaryKey: []*schema.Column{AccountsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "accounts_users_user",
+				Columns:    []*schema.Column{AccountsColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ConversationsColumns holds the columns for the "conversations" table.
 	ConversationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -289,7 +318,6 @@ var (
 		{Name: "year", Type: field.TypeInt, Nullable: true},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "image_urls", Type: field.TypeJSON, Nullable: true},
 		{Name: "unit_of_measurement", Type: field.TypeString, Nullable: true},
 		{Name: "type", Type: field.TypeString, Nullable: true},
 		{Name: "provider", Type: field.TypeString, Nullable: true},
@@ -299,6 +327,28 @@ var (
 		Name:       "products",
 		Columns:    ProductsColumns,
 		PrimaryKey: []*schema.Column{ProductsColumns[0]},
+	}
+	// ProductImagesColumns holds the columns for the "product_images" table.
+	ProductImagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "image_url", Type: field.TypeJSON},
+		{Name: "product_id", Type: field.TypeUUID},
+	}
+	// ProductImagesTable holds the schema information for the "product_images" table.
+	ProductImagesTable = &schema.Table{
+		Name:       "product_images",
+		Columns:    ProductImagesColumns,
+		PrimaryKey: []*schema.Column{ProductImagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "product_images_products_product",
+				Columns:    []*schema.Column{ProductImagesColumns[4]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// ProductTagsColumns holds the columns for the "product_tags" table.
 	ProductTagsColumns = []*schema.Column{
@@ -346,13 +396,8 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "avatar_url", Type: field.TypeJSON, Nullable: true},
 		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
-		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
-		{Name: "last_verification", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "password_hash", Type: field.TypeString, Size: 2147483647},
-		{Name: "verified", Type: field.TypeBool, Default: false},
 		{Name: "phone", Type: field.TypeString, Unique: true},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
 		{Name: "address", Type: field.TypeString, Nullable: true},
 		{Name: "postal_code", Type: field.TypeString, Nullable: true},
 		{Name: "other_address_info", Type: field.TypeString, Nullable: true},
@@ -365,6 +410,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AccountsTable,
 		ConversationsTable,
 		FinancialTransactionsTable,
 		InvoicesTable,
@@ -374,6 +420,7 @@ var (
 		OrderLineItemsTable,
 		OrderStatusCodesTable,
 		ProductsTable,
+		ProductImagesTable,
 		ProductTagsTable,
 		TagsTable,
 		UsersTable,
@@ -381,6 +428,7 @@ var (
 )
 
 func init() {
+	AccountsTable.ForeignKeys[0].RefTable = UsersTable
 	ConversationsTable.ForeignKeys[0].RefTable = UsersTable
 	ConversationsTable.ForeignKeys[1].RefTable = UsersTable
 	FinancialTransactionsTable.ForeignKeys[0].RefTable = InvoicesTable
@@ -409,6 +457,10 @@ func init() {
 	}
 	OrderStatusCodesTable.Annotation = &entsql.Annotation{
 		Table: "order_status_codes",
+	}
+	ProductImagesTable.ForeignKeys[0].RefTable = ProductsTable
+	ProductImagesTable.Annotation = &entsql.Annotation{
+		Table: "product_images",
 	}
 	ProductTagsTable.ForeignKeys[0].RefTable = ProductsTable
 	ProductTagsTable.ForeignKeys[1].RefTable = TagsTable

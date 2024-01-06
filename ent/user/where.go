@@ -70,29 +70,9 @@ func Email(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldEmail, v))
 }
 
-// LastReset applies equality check predicate on the "last_reset" field. It's identical to LastResetEQ.
-func LastReset(v time.Time) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldLastReset, v))
-}
-
-// LastVerification applies equality check predicate on the "last_verification" field. It's identical to LastVerificationEQ.
-func LastVerification(v time.Time) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldLastVerification, v))
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldName, v))
-}
-
-// PasswordHash applies equality check predicate on the "password_hash" field. It's identical to PasswordHashEQ.
-func PasswordHash(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldPasswordHash, v))
-}
-
-// Verified applies equality check predicate on the "verified" field. It's identical to VerifiedEQ.
-func Verified(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldVerified, v))
 }
 
 // Phone applies equality check predicate on the "phone" field. It's identical to PhoneEQ.
@@ -280,106 +260,6 @@ func EmailContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldEmail, v))
 }
 
-// LastResetEQ applies the EQ predicate on the "last_reset" field.
-func LastResetEQ(v time.Time) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldLastReset, v))
-}
-
-// LastResetNEQ applies the NEQ predicate on the "last_reset" field.
-func LastResetNEQ(v time.Time) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldLastReset, v))
-}
-
-// LastResetIn applies the In predicate on the "last_reset" field.
-func LastResetIn(vs ...time.Time) predicate.User {
-	return predicate.User(sql.FieldIn(FieldLastReset, vs...))
-}
-
-// LastResetNotIn applies the NotIn predicate on the "last_reset" field.
-func LastResetNotIn(vs ...time.Time) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldLastReset, vs...))
-}
-
-// LastResetGT applies the GT predicate on the "last_reset" field.
-func LastResetGT(v time.Time) predicate.User {
-	return predicate.User(sql.FieldGT(FieldLastReset, v))
-}
-
-// LastResetGTE applies the GTE predicate on the "last_reset" field.
-func LastResetGTE(v time.Time) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldLastReset, v))
-}
-
-// LastResetLT applies the LT predicate on the "last_reset" field.
-func LastResetLT(v time.Time) predicate.User {
-	return predicate.User(sql.FieldLT(FieldLastReset, v))
-}
-
-// LastResetLTE applies the LTE predicate on the "last_reset" field.
-func LastResetLTE(v time.Time) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldLastReset, v))
-}
-
-// LastResetIsNil applies the IsNil predicate on the "last_reset" field.
-func LastResetIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldLastReset))
-}
-
-// LastResetNotNil applies the NotNil predicate on the "last_reset" field.
-func LastResetNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldLastReset))
-}
-
-// LastVerificationEQ applies the EQ predicate on the "last_verification" field.
-func LastVerificationEQ(v time.Time) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldLastVerification, v))
-}
-
-// LastVerificationNEQ applies the NEQ predicate on the "last_verification" field.
-func LastVerificationNEQ(v time.Time) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldLastVerification, v))
-}
-
-// LastVerificationIn applies the In predicate on the "last_verification" field.
-func LastVerificationIn(vs ...time.Time) predicate.User {
-	return predicate.User(sql.FieldIn(FieldLastVerification, vs...))
-}
-
-// LastVerificationNotIn applies the NotIn predicate on the "last_verification" field.
-func LastVerificationNotIn(vs ...time.Time) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldLastVerification, vs...))
-}
-
-// LastVerificationGT applies the GT predicate on the "last_verification" field.
-func LastVerificationGT(v time.Time) predicate.User {
-	return predicate.User(sql.FieldGT(FieldLastVerification, v))
-}
-
-// LastVerificationGTE applies the GTE predicate on the "last_verification" field.
-func LastVerificationGTE(v time.Time) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldLastVerification, v))
-}
-
-// LastVerificationLT applies the LT predicate on the "last_verification" field.
-func LastVerificationLT(v time.Time) predicate.User {
-	return predicate.User(sql.FieldLT(FieldLastVerification, v))
-}
-
-// LastVerificationLTE applies the LTE predicate on the "last_verification" field.
-func LastVerificationLTE(v time.Time) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldLastVerification, v))
-}
-
-// LastVerificationIsNil applies the IsNil predicate on the "last_verification" field.
-func LastVerificationIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldLastVerification))
-}
-
-// LastVerificationNotNil applies the NotNil predicate on the "last_verification" field.
-func LastVerificationNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldLastVerification))
-}
-
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldName, v))
@@ -445,81 +325,6 @@ func NameContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldName, v))
 }
 
-// PasswordHashEQ applies the EQ predicate on the "password_hash" field.
-func PasswordHashEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldPasswordHash, v))
-}
-
-// PasswordHashNEQ applies the NEQ predicate on the "password_hash" field.
-func PasswordHashNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldPasswordHash, v))
-}
-
-// PasswordHashIn applies the In predicate on the "password_hash" field.
-func PasswordHashIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldPasswordHash, vs...))
-}
-
-// PasswordHashNotIn applies the NotIn predicate on the "password_hash" field.
-func PasswordHashNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldPasswordHash, vs...))
-}
-
-// PasswordHashGT applies the GT predicate on the "password_hash" field.
-func PasswordHashGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldPasswordHash, v))
-}
-
-// PasswordHashGTE applies the GTE predicate on the "password_hash" field.
-func PasswordHashGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldPasswordHash, v))
-}
-
-// PasswordHashLT applies the LT predicate on the "password_hash" field.
-func PasswordHashLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldPasswordHash, v))
-}
-
-// PasswordHashLTE applies the LTE predicate on the "password_hash" field.
-func PasswordHashLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldPasswordHash, v))
-}
-
-// PasswordHashContains applies the Contains predicate on the "password_hash" field.
-func PasswordHashContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldPasswordHash, v))
-}
-
-// PasswordHashHasPrefix applies the HasPrefix predicate on the "password_hash" field.
-func PasswordHashHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldPasswordHash, v))
-}
-
-// PasswordHashHasSuffix applies the HasSuffix predicate on the "password_hash" field.
-func PasswordHashHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldPasswordHash, v))
-}
-
-// PasswordHashEqualFold applies the EqualFold predicate on the "password_hash" field.
-func PasswordHashEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldPasswordHash, v))
-}
-
-// PasswordHashContainsFold applies the ContainsFold predicate on the "password_hash" field.
-func PasswordHashContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldPasswordHash, v))
-}
-
-// VerifiedEQ applies the EQ predicate on the "verified" field.
-func VerifiedEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldVerified, v))
-}
-
-// VerifiedNEQ applies the NEQ predicate on the "verified" field.
-func VerifiedNEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldVerified, v))
-}
-
 // PhoneEQ applies the EQ predicate on the "phone" field.
 func PhoneEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPhone, v))
@@ -583,26 +388,6 @@ func PhoneEqualFold(v string) predicate.User {
 // PhoneContainsFold applies the ContainsFold predicate on the "phone" field.
 func PhoneContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPhone, v))
-}
-
-// RoleEQ applies the EQ predicate on the "role" field.
-func RoleEQ(v Role) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldRole, v))
-}
-
-// RoleNEQ applies the NEQ predicate on the "role" field.
-func RoleNEQ(v Role) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldRole, v))
-}
-
-// RoleIn applies the In predicate on the "role" field.
-func RoleIn(vs ...Role) predicate.User {
-	return predicate.User(sql.FieldIn(FieldRole, vs...))
-}
-
-// RoleNotIn applies the NotIn predicate on the "role" field.
-func RoleNotIn(vs ...Role) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldRole, vs...))
 }
 
 // AddressEQ applies the EQ predicate on the "address" field.

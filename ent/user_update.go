@@ -67,46 +67,6 @@ func (uu *UserUpdate) ClearEmail() *UserUpdate {
 	return uu
 }
 
-// SetLastReset sets the "last_reset" field.
-func (uu *UserUpdate) SetLastReset(t time.Time) *UserUpdate {
-	uu.mutation.SetLastReset(t)
-	return uu
-}
-
-// SetNillableLastReset sets the "last_reset" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableLastReset(t *time.Time) *UserUpdate {
-	if t != nil {
-		uu.SetLastReset(*t)
-	}
-	return uu
-}
-
-// ClearLastReset clears the value of the "last_reset" field.
-func (uu *UserUpdate) ClearLastReset() *UserUpdate {
-	uu.mutation.ClearLastReset()
-	return uu
-}
-
-// SetLastVerification sets the "last_verification" field.
-func (uu *UserUpdate) SetLastVerification(t time.Time) *UserUpdate {
-	uu.mutation.SetLastVerification(t)
-	return uu
-}
-
-// SetNillableLastVerification sets the "last_verification" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableLastVerification(t *time.Time) *UserUpdate {
-	if t != nil {
-		uu.SetLastVerification(*t)
-	}
-	return uu
-}
-
-// ClearLastVerification clears the value of the "last_verification" field.
-func (uu *UserUpdate) ClearLastVerification() *UserUpdate {
-	uu.mutation.ClearLastVerification()
-	return uu
-}
-
 // SetName sets the "name" field.
 func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	uu.mutation.SetName(s)
@@ -121,34 +81,6 @@ func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
 	return uu
 }
 
-// SetPasswordHash sets the "password_hash" field.
-func (uu *UserUpdate) SetPasswordHash(s string) *UserUpdate {
-	uu.mutation.SetPasswordHash(s)
-	return uu
-}
-
-// SetNillablePasswordHash sets the "password_hash" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePasswordHash(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetPasswordHash(*s)
-	}
-	return uu
-}
-
-// SetVerified sets the "verified" field.
-func (uu *UserUpdate) SetVerified(b bool) *UserUpdate {
-	uu.mutation.SetVerified(b)
-	return uu
-}
-
-// SetNillableVerified sets the "verified" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableVerified(b *bool) *UserUpdate {
-	if b != nil {
-		uu.SetVerified(*b)
-	}
-	return uu
-}
-
 // SetPhone sets the "phone" field.
 func (uu *UserUpdate) SetPhone(s string) *UserUpdate {
 	uu.mutation.SetPhone(s)
@@ -159,20 +91,6 @@ func (uu *UserUpdate) SetPhone(s string) *UserUpdate {
 func (uu *UserUpdate) SetNillablePhone(s *string) *UserUpdate {
 	if s != nil {
 		uu.SetPhone(*s)
-	}
-	return uu
-}
-
-// SetRole sets the "role" field.
-func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
-	uu.mutation.SetRole(u)
-	return uu
-}
-
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
-	if u != nil {
-		uu.SetRole(*u)
 	}
 	return uu
 }
@@ -290,19 +208,9 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.PasswordHash(); ok {
-		if err := user.PasswordHashValidator(v); err != nil {
-			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
-		}
-	}
 	if v, ok := uu.mutation.Phone(); ok {
 		if err := user.PhoneValidator(v); err != nil {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
 		}
 	}
 	return nil
@@ -335,32 +243,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if uu.mutation.EmailCleared() {
 		_spec.ClearField(user.FieldEmail, field.TypeString)
 	}
-	if value, ok := uu.mutation.LastReset(); ok {
-		_spec.SetField(user.FieldLastReset, field.TypeTime, value)
-	}
-	if uu.mutation.LastResetCleared() {
-		_spec.ClearField(user.FieldLastReset, field.TypeTime)
-	}
-	if value, ok := uu.mutation.LastVerification(); ok {
-		_spec.SetField(user.FieldLastVerification, field.TypeTime, value)
-	}
-	if uu.mutation.LastVerificationCleared() {
-		_spec.ClearField(user.FieldLastVerification, field.TypeTime)
-	}
 	if value, ok := uu.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.PasswordHash(); ok {
-		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Verified(); ok {
-		_spec.SetField(user.FieldVerified, field.TypeBool, value)
-	}
 	if value, ok := uu.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if value, ok := uu.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
@@ -438,46 +325,6 @@ func (uuo *UserUpdateOne) ClearEmail() *UserUpdateOne {
 	return uuo
 }
 
-// SetLastReset sets the "last_reset" field.
-func (uuo *UserUpdateOne) SetLastReset(t time.Time) *UserUpdateOne {
-	uuo.mutation.SetLastReset(t)
-	return uuo
-}
-
-// SetNillableLastReset sets the "last_reset" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableLastReset(t *time.Time) *UserUpdateOne {
-	if t != nil {
-		uuo.SetLastReset(*t)
-	}
-	return uuo
-}
-
-// ClearLastReset clears the value of the "last_reset" field.
-func (uuo *UserUpdateOne) ClearLastReset() *UserUpdateOne {
-	uuo.mutation.ClearLastReset()
-	return uuo
-}
-
-// SetLastVerification sets the "last_verification" field.
-func (uuo *UserUpdateOne) SetLastVerification(t time.Time) *UserUpdateOne {
-	uuo.mutation.SetLastVerification(t)
-	return uuo
-}
-
-// SetNillableLastVerification sets the "last_verification" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableLastVerification(t *time.Time) *UserUpdateOne {
-	if t != nil {
-		uuo.SetLastVerification(*t)
-	}
-	return uuo
-}
-
-// ClearLastVerification clears the value of the "last_verification" field.
-func (uuo *UserUpdateOne) ClearLastVerification() *UserUpdateOne {
-	uuo.mutation.ClearLastVerification()
-	return uuo
-}
-
 // SetName sets the "name" field.
 func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	uuo.mutation.SetName(s)
@@ -492,34 +339,6 @@ func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
 	return uuo
 }
 
-// SetPasswordHash sets the "password_hash" field.
-func (uuo *UserUpdateOne) SetPasswordHash(s string) *UserUpdateOne {
-	uuo.mutation.SetPasswordHash(s)
-	return uuo
-}
-
-// SetNillablePasswordHash sets the "password_hash" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePasswordHash(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetPasswordHash(*s)
-	}
-	return uuo
-}
-
-// SetVerified sets the "verified" field.
-func (uuo *UserUpdateOne) SetVerified(b bool) *UserUpdateOne {
-	uuo.mutation.SetVerified(b)
-	return uuo
-}
-
-// SetNillableVerified sets the "verified" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableVerified(b *bool) *UserUpdateOne {
-	if b != nil {
-		uuo.SetVerified(*b)
-	}
-	return uuo
-}
-
 // SetPhone sets the "phone" field.
 func (uuo *UserUpdateOne) SetPhone(s string) *UserUpdateOne {
 	uuo.mutation.SetPhone(s)
@@ -530,20 +349,6 @@ func (uuo *UserUpdateOne) SetPhone(s string) *UserUpdateOne {
 func (uuo *UserUpdateOne) SetNillablePhone(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetPhone(*s)
-	}
-	return uuo
-}
-
-// SetRole sets the "role" field.
-func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
-	uuo.mutation.SetRole(u)
-	return uuo
-}
-
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
-	if u != nil {
-		uuo.SetRole(*u)
 	}
 	return uuo
 }
@@ -674,19 +479,9 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.PasswordHash(); ok {
-		if err := user.PasswordHashValidator(v); err != nil {
-			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
-		}
-	}
 	if v, ok := uuo.mutation.Phone(); ok {
 		if err := user.PhoneValidator(v); err != nil {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
 		}
 	}
 	return nil
@@ -736,32 +531,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if uuo.mutation.EmailCleared() {
 		_spec.ClearField(user.FieldEmail, field.TypeString)
 	}
-	if value, ok := uuo.mutation.LastReset(); ok {
-		_spec.SetField(user.FieldLastReset, field.TypeTime, value)
-	}
-	if uuo.mutation.LastResetCleared() {
-		_spec.ClearField(user.FieldLastReset, field.TypeTime)
-	}
-	if value, ok := uuo.mutation.LastVerification(); ok {
-		_spec.SetField(user.FieldLastVerification, field.TypeTime, value)
-	}
-	if uuo.mutation.LastVerificationCleared() {
-		_spec.ClearField(user.FieldLastVerification, field.TypeTime)
-	}
 	if value, ok := uuo.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.PasswordHash(); ok {
-		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Verified(); ok {
-		_spec.SetField(user.FieldVerified, field.TypeBool, value)
-	}
 	if value, ok := uuo.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if value, ok := uuo.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)

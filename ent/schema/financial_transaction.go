@@ -27,7 +27,8 @@ func (FinancialTransaction) Annotations() []schema.Annotation {
 func (FinancialTransaction) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.UUID("invoice_id", uuid.UUID{}).
 			Immutable(),
 		field.Float("amount").GoType(decimal.Decimal{}).

@@ -16,7 +16,8 @@ type Message struct {
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.UUID("conversation_id", uuid.UUID{}).
 			Immutable(),
 		field.UUID("sender_id", uuid.UUID{}).

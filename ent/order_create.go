@@ -187,6 +187,14 @@ func (oc *OrderCreate) SetID(u uuid.UUID) *OrderCreate {
 	return oc
 }
 
+// SetNillableID sets the "id" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableID(u *uuid.UUID) *OrderCreate {
+	if u != nil {
+		oc.SetID(*u)
+	}
+	return oc
+}
+
 // SetCustomer sets the "customer" edge to the User entity.
 func (oc *OrderCreate) SetCustomer(u *User) *OrderCreate {
 	return oc.SetCustomerID(u.ID)
@@ -288,6 +296,10 @@ func (oc *OrderCreate) defaults() {
 	if _, ok := oc.mutation.StatusCode(); !ok {
 		v := order.DefaultStatusCode
 		oc.mutation.SetStatusCode(v)
+	}
+	if _, ok := oc.mutation.ID(); !ok {
+		v := order.DefaultID()
+		oc.mutation.SetID(v)
 	}
 }
 

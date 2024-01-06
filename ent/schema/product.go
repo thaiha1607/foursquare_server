@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"net/url"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
@@ -26,7 +24,8 @@ func (Product) Fields() []ent.Field {
 			Nillable().
 			Default(""),
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.Int("year").
 			Optional().
 			Nillable().
@@ -44,8 +43,6 @@ func (Product) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.JSON("image_urls", []url.URL{}).
-			Optional(),
 		field.String("unit_of_measurement").
 			Optional().
 			Nillable(),

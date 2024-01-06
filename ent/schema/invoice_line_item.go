@@ -30,7 +30,8 @@ func (InvoiceLineItem) Annotations() []schema.Annotation {
 func (InvoiceLineItem) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+			Default(uuid.New).
+			Immutable(),
 		field.UUID("invoice_id", uuid.UUID{}).
 			Immutable(),
 		field.UUID("order_line_item_id", uuid.UUID{}).

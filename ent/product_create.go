@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -95,12 +94,6 @@ func (pc *ProductCreate) SetPrice(d decimal.Decimal) *ProductCreate {
 // SetQty sets the "qty" field.
 func (pc *ProductCreate) SetQty(d decimal.Decimal) *ProductCreate {
 	pc.mutation.SetQty(d)
-	return pc
-}
-
-// SetImageUrls sets the "image_urls" field.
-func (pc *ProductCreate) SetImageUrls(u []url.URL) *ProductCreate {
-	pc.mutation.SetImageUrls(u)
 	return pc
 }
 
@@ -317,10 +310,6 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Qty(); ok {
 		_spec.SetField(product.FieldQty, field.TypeFloat64, value)
 		_node.Qty = value
-	}
-	if value, ok := pc.mutation.ImageUrls(); ok {
-		_spec.SetField(product.FieldImageUrls, field.TypeJSON, value)
-		_node.ImageUrls = value
 	}
 	if value, ok := pc.mutation.UnitOfMeasurement(); ok {
 		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)

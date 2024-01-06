@@ -457,16 +457,6 @@ func QtyLTE(v decimal.Decimal) predicate.Product {
 	return predicate.Product(sql.FieldLTE(FieldQty, v))
 }
 
-// ImageUrlsIsNil applies the IsNil predicate on the "image_urls" field.
-func ImageUrlsIsNil() predicate.Product {
-	return predicate.Product(sql.FieldIsNull(FieldImageUrls))
-}
-
-// ImageUrlsNotNil applies the NotNil predicate on the "image_urls" field.
-func ImageUrlsNotNil() predicate.Product {
-	return predicate.Product(sql.FieldNotNull(FieldImageUrls))
-}
-
 // UnitOfMeasurementEQ applies the EQ predicate on the "unit_of_measurement" field.
 func UnitOfMeasurementEQ(v string) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldUnitOfMeasurement, v))

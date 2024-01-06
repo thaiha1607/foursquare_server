@@ -15,7 +15,9 @@ type Order struct {
 // Fields of the Order.
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
+			Immutable(),
 		field.UUID("customer_id", uuid.UUID{}).
 			Immutable(),
 		field.String("note").

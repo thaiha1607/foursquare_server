@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Account is the client for interacting with the Account builders.
+	Account *AccountClient
 	// Conversation is the client for interacting with the Conversation builders.
 	Conversation *ConversationClient
 	// FinancialTransaction is the client for interacting with the FinancialTransaction builders.
@@ -30,6 +32,8 @@ type Tx struct {
 	OrderStatusCode *OrderStatusCodeClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
+	// ProductImage is the client for interacting with the ProductImage builders.
+	ProductImage *ProductImageClient
 	// ProductTag is the client for interacting with the ProductTag builders.
 	ProductTag *ProductTagClient
 	// Tag is the client for interacting with the Tag builders.
@@ -167,6 +171,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Account = NewAccountClient(tx.config)
 	tx.Conversation = NewConversationClient(tx.config)
 	tx.FinancialTransaction = NewFinancialTransactionClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
@@ -176,6 +181,7 @@ func (tx *Tx) init() {
 	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
+	tx.ProductImage = NewProductImageClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.User = NewUserClient(tx.config)
@@ -188,7 +194,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Conversation.QueryXXX(), the query will be executed
+// applies a query, for example: Account.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

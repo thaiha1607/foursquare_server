@@ -6,12 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -139,24 +137,6 @@ func (pu *ProductUpdate) SetNillableQty(d *decimal.Decimal) *ProductUpdate {
 // AddQty adds d to the "qty" field.
 func (pu *ProductUpdate) AddQty(d decimal.Decimal) *ProductUpdate {
 	pu.mutation.AddQty(d)
-	return pu
-}
-
-// SetImageUrls sets the "image_urls" field.
-func (pu *ProductUpdate) SetImageUrls(u []url.URL) *ProductUpdate {
-	pu.mutation.SetImageUrls(u)
-	return pu
-}
-
-// AppendImageUrls appends u to the "image_urls" field.
-func (pu *ProductUpdate) AppendImageUrls(u []url.URL) *ProductUpdate {
-	pu.mutation.AppendImageUrls(u)
-	return pu
-}
-
-// ClearImageUrls clears the value of the "image_urls" field.
-func (pu *ProductUpdate) ClearImageUrls() *ProductUpdate {
-	pu.mutation.ClearImageUrls()
 	return pu
 }
 
@@ -356,17 +336,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.AddedQty(); ok {
 		_spec.AddField(product.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := pu.mutation.ImageUrls(); ok {
-		_spec.SetField(product.FieldImageUrls, field.TypeJSON, value)
-	}
-	if value, ok := pu.mutation.AppendedImageUrls(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, product.FieldImageUrls, value)
-		})
-	}
-	if pu.mutation.ImageUrlsCleared() {
-		_spec.ClearField(product.FieldImageUrls, field.TypeJSON)
 	}
 	if value, ok := pu.mutation.UnitOfMeasurement(); ok {
 		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
@@ -569,24 +538,6 @@ func (puo *ProductUpdateOne) SetNillableQty(d *decimal.Decimal) *ProductUpdateOn
 // AddQty adds d to the "qty" field.
 func (puo *ProductUpdateOne) AddQty(d decimal.Decimal) *ProductUpdateOne {
 	puo.mutation.AddQty(d)
-	return puo
-}
-
-// SetImageUrls sets the "image_urls" field.
-func (puo *ProductUpdateOne) SetImageUrls(u []url.URL) *ProductUpdateOne {
-	puo.mutation.SetImageUrls(u)
-	return puo
-}
-
-// AppendImageUrls appends u to the "image_urls" field.
-func (puo *ProductUpdateOne) AppendImageUrls(u []url.URL) *ProductUpdateOne {
-	puo.mutation.AppendImageUrls(u)
-	return puo
-}
-
-// ClearImageUrls clears the value of the "image_urls" field.
-func (puo *ProductUpdateOne) ClearImageUrls() *ProductUpdateOne {
-	puo.mutation.ClearImageUrls()
 	return puo
 }
 
@@ -816,17 +767,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	}
 	if value, ok := puo.mutation.AddedQty(); ok {
 		_spec.AddField(product.FieldQty, field.TypeFloat64, value)
-	}
-	if value, ok := puo.mutation.ImageUrls(); ok {
-		_spec.SetField(product.FieldImageUrls, field.TypeJSON, value)
-	}
-	if value, ok := puo.mutation.AppendedImageUrls(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, product.FieldImageUrls, value)
-		})
-	}
-	if puo.mutation.ImageUrlsCleared() {
-		_spec.ClearField(product.FieldImageUrls, field.TypeJSON)
 	}
 	if value, ok := puo.mutation.UnitOfMeasurement(); ok {
 		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)

@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Account is the predicate function for account builders.
+type Account func(*sql.Selector)
+
 // Conversation is the predicate function for conversation builders.
 type Conversation func(*sql.Selector)
 
@@ -32,6 +35,9 @@ type OrderStatusCode func(*sql.Selector)
 
 // Product is the predicate function for product builders.
 type Product func(*sql.Selector)
+
+// ProductImage is the predicate function for productimage builders.
+type ProductImage func(*sql.Selector)
 
 // ProductTag is the predicate function for producttag builders.
 type ProductTag func(*sql.Selector)
