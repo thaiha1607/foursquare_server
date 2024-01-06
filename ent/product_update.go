@@ -94,6 +94,12 @@ func (pu *ProductUpdate) AddYear(i int) *ProductUpdate {
 	return pu
 }
 
+// ClearYear clears the value of the "year" field.
+func (pu *ProductUpdate) ClearYear() *ProductUpdate {
+	pu.mutation.ClearYear()
+	return pu
+}
+
 // SetPrice sets the "price" field.
 func (pu *ProductUpdate) SetPrice(d decimal.Decimal) *ProductUpdate {
 	pu.mutation.ResetPrice()
@@ -336,6 +342,9 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.AddedYear(); ok {
 		_spec.AddField(product.FieldYear, field.TypeInt, value)
 	}
+	if pu.mutation.YearCleared() {
+		_spec.ClearField(product.FieldYear, field.TypeInt)
+	}
 	if value, ok := pu.mutation.Price(); ok {
 		_spec.SetField(product.FieldPrice, field.TypeFloat64, value)
 	}
@@ -512,6 +521,12 @@ func (puo *ProductUpdateOne) SetNillableYear(i *int) *ProductUpdateOne {
 // AddYear adds i to the "year" field.
 func (puo *ProductUpdateOne) AddYear(i int) *ProductUpdateOne {
 	puo.mutation.AddYear(i)
+	return puo
+}
+
+// ClearYear clears the value of the "year" field.
+func (puo *ProductUpdateOne) ClearYear() *ProductUpdateOne {
+	puo.mutation.ClearYear()
 	return puo
 }
 
@@ -786,6 +801,9 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	}
 	if value, ok := puo.mutation.AddedYear(); ok {
 		_spec.AddField(product.FieldYear, field.TypeInt, value)
+	}
+	if puo.mutation.YearCleared() {
+		_spec.ClearField(product.FieldYear, field.TypeInt)
 	}
 	if value, ok := puo.mutation.Price(); ok {
 		_spec.SetField(product.FieldPrice, field.TypeFloat64, value)

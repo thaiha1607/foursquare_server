@@ -78,6 +78,14 @@ func (pc *ProductCreate) SetYear(i int) *ProductCreate {
 	return pc
 }
 
+// SetNillableYear sets the "year" field if the given value is not nil.
+func (pc *ProductCreate) SetNillableYear(i *int) *ProductCreate {
+	if i != nil {
+		pc.SetYear(*i)
+	}
+	return pc
+}
+
 // SetPrice sets the "price" field.
 func (pc *ProductCreate) SetPrice(d decimal.Decimal) *ProductCreate {
 	pc.mutation.SetPrice(d)
@@ -210,6 +218,10 @@ func (pc *ProductCreate) defaults() {
 		v := product.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := pc.mutation.Description(); !ok {
+		v := product.DefaultDescription
+		pc.mutation.SetDescription(v)
+	}
 	if _, ok := pc.mutation.ID(); !ok {
 		v := product.DefaultID()
 		pc.mutation.SetID(v)
@@ -231,9 +243,6 @@ func (pc *ProductCreate) check() error {
 		if err := product.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
-	}
-	if _, ok := pc.mutation.Year(); !ok {
-		return &ValidationError{Name: "year", err: errors.New(`ent: missing required field "Product.year"`)}
 	}
 	if v, ok := pc.mutation.Year(); ok {
 		if err := product.YearValidator(v); err != nil {
@@ -295,11 +304,11 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Description(); ok {
 		_spec.SetField(product.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := pc.mutation.Year(); ok {
 		_spec.SetField(product.FieldYear, field.TypeInt, value)
-		_node.Year = value
+		_node.Year = &value
 	}
 	if value, ok := pc.mutation.Price(); ok {
 		_spec.SetField(product.FieldPrice, field.TypeFloat64, value)
@@ -315,7 +324,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.UnitOfMeasurement(); ok {
 		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
-		_node.UnitOfMeasurement = value
+		_node.UnitOfMeasurement = &value
 	}
 	if value, ok := pc.mutation.GetType(); ok {
 		_spec.SetField(product.FieldType, field.TypeString, value)
@@ -323,7 +332,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
-		_node.Provider = value
+		_node.Provider = &value
 	}
 	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

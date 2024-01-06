@@ -367,6 +367,16 @@ func YearLTE(v int) predicate.Product {
 	return predicate.Product(sql.FieldLTE(FieldYear, v))
 }
 
+// YearIsNil applies the IsNil predicate on the "year" field.
+func YearIsNil() predicate.Product {
+	return predicate.Product(sql.FieldIsNull(FieldYear))
+}
+
+// YearNotNil applies the NotNil predicate on the "year" field.
+func YearNotNil() predicate.Product {
+	return predicate.Product(sql.FieldNotNull(FieldYear))
+}
+
 // PriceEQ applies the EQ predicate on the "price" field.
 func PriceEQ(v decimal.Decimal) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldPrice, v))

@@ -27,7 +27,7 @@ type User struct {
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL *url.URL `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	Email *string `json:"email,omitempty"`
 	// LastReset holds the value of the "last_reset" field.
 	LastReset *time.Time `json:"last_reset,omitempty"`
 	// LastVerification holds the value of the "last_verification" field.
@@ -111,7 +111,8 @@ func (u *User) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				u.Email = value.String
+				u.Email = new(string)
+				*u.Email = value.String
 			}
 		case user.FieldLastReset:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -223,8 +224,10 @@ func (u *User) String() string {
 	builder.WriteString("avatar_url=")
 	builder.WriteString(fmt.Sprintf("%v", u.AvatarURL))
 	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(u.Email)
+	if v := u.Email; v != nil {
+		builder.WriteString("email=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	if v := u.LastReset; v != nil {
 		builder.WriteString("last_reset=")

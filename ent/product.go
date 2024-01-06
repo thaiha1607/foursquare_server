@@ -28,9 +28,9 @@ type Product struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// Year holds the value of the "year" field.
-	Year int `json:"year,omitempty"`
+	Year *int `json:"year,omitempty"`
 	// Price holds the value of the "price" field.
 	Price decimal.Decimal `json:"price,omitempty"`
 	// Qty holds the value of the "qty" field.
@@ -38,11 +38,11 @@ type Product struct {
 	// ImageUrls holds the value of the "image_urls" field.
 	ImageUrls []url.URL `json:"image_urls,omitempty"`
 	// UnitOfMeasurement holds the value of the "unit_of_measurement" field.
-	UnitOfMeasurement string `json:"unit_of_measurement,omitempty"`
+	UnitOfMeasurement *string `json:"unit_of_measurement,omitempty"`
 	// Type holds the value of the "type" field.
 	Type *string `json:"type,omitempty"`
 	// Provider holds the value of the "provider" field.
-	Provider string `json:"provider,omitempty"`
+	Provider *string `json:"provider,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges        ProductEdges `json:"edges"`
@@ -138,13 +138,15 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				pr.Description = value.String
+				pr.Description = new(string)
+				*pr.Description = value.String
 			}
 		case product.FieldYear:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field year", values[i])
 			} else if value.Valid {
-				pr.Year = int(value.Int64)
+				pr.Year = new(int)
+				*pr.Year = int(value.Int64)
 			}
 		case product.FieldPrice:
 			if value, ok := values[i].(*decimal.Decimal); !ok {
@@ -170,7 +172,8 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field unit_of_measurement", values[i])
 			} else if value.Valid {
-				pr.UnitOfMeasurement = value.String
+				pr.UnitOfMeasurement = new(string)
+				*pr.UnitOfMeasurement = value.String
 			}
 		case product.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -183,7 +186,8 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field provider", values[i])
 			} else if value.Valid {
-				pr.Provider = value.String
+				pr.Provider = new(string)
+				*pr.Provider = value.String
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
@@ -240,11 +244,15 @@ func (pr *Product) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(pr.Name)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(pr.Description)
+	if v := pr.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
-	builder.WriteString("year=")
-	builder.WriteString(fmt.Sprintf("%v", pr.Year))
+	if v := pr.Year; v != nil {
+		builder.WriteString("year=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Price))
@@ -255,16 +263,20 @@ func (pr *Product) String() string {
 	builder.WriteString("image_urls=")
 	builder.WriteString(fmt.Sprintf("%v", pr.ImageUrls))
 	builder.WriteString(", ")
-	builder.WriteString("unit_of_measurement=")
-	builder.WriteString(pr.UnitOfMeasurement)
+	if v := pr.UnitOfMeasurement; v != nil {
+		builder.WriteString("unit_of_measurement=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	if v := pr.Type; v != nil {
 		builder.WriteString("type=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("provider=")
-	builder.WriteString(pr.Provider)
+	if v := pr.Provider; v != nil {
+		builder.WriteString("provider=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

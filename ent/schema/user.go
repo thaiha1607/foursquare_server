@@ -20,13 +20,14 @@ func (User) Fields() []ent.Field {
 		field.JSON("avatar_url", &url.URL{}).
 			Optional(),
 		field.String("email").
-			NotEmpty().
 			Validate(
 				func(s string) error {
 					_, err := mail.ParseAddress(s)
 					return err
 				},
 			).
+			Optional().
+			Nillable().
 			Unique(),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),

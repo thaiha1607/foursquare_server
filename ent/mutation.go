@@ -6651,7 +6651,7 @@ func (m *ProductMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Product entity.
 // If the Product object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *ProductMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -6701,7 +6701,7 @@ func (m *ProductMutation) Year() (r int, exists bool) {
 // OldYear returns the old "year" field's value of the Product entity.
 // If the Product object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductMutation) OldYear(ctx context.Context) (v int, err error) {
+func (m *ProductMutation) OldYear(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldYear is only allowed on UpdateOne operations")
 	}
@@ -6733,10 +6733,24 @@ func (m *ProductMutation) AddedYear() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearYear clears the value of the "year" field.
+func (m *ProductMutation) ClearYear() {
+	m.year = nil
+	m.addyear = nil
+	m.clearedFields[product.FieldYear] = struct{}{}
+}
+
+// YearCleared returns if the "year" field was cleared in this mutation.
+func (m *ProductMutation) YearCleared() bool {
+	_, ok := m.clearedFields[product.FieldYear]
+	return ok
+}
+
 // ResetYear resets all changes to the "year" field.
 func (m *ProductMutation) ResetYear() {
 	m.year = nil
 	m.addyear = nil
+	delete(m.clearedFields, product.FieldYear)
 }
 
 // SetPrice sets the "price" field.
@@ -6933,7 +6947,7 @@ func (m *ProductMutation) UnitOfMeasurement() (r string, exists bool) {
 // OldUnitOfMeasurement returns the old "unit_of_measurement" field's value of the Product entity.
 // If the Product object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductMutation) OldUnitOfMeasurement(ctx context.Context) (v string, err error) {
+func (m *ProductMutation) OldUnitOfMeasurement(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUnitOfMeasurement is only allowed on UpdateOne operations")
 	}
@@ -7031,7 +7045,7 @@ func (m *ProductMutation) Provider() (r string, exists bool) {
 // OldProvider returns the old "provider" field's value of the Product entity.
 // If the Product object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductMutation) OldProvider(ctx context.Context) (v string, err error) {
+func (m *ProductMutation) OldProvider(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldProvider is only allowed on UpdateOne operations")
 	}
@@ -7404,6 +7418,9 @@ func (m *ProductMutation) ClearedFields() []string {
 	if m.FieldCleared(product.FieldDescription) {
 		fields = append(fields, product.FieldDescription)
 	}
+	if m.FieldCleared(product.FieldYear) {
+		fields = append(fields, product.FieldYear)
+	}
 	if m.FieldCleared(product.FieldImageUrls) {
 		fields = append(fields, product.FieldImageUrls)
 	}
@@ -7432,6 +7449,9 @@ func (m *ProductMutation) ClearField(name string) error {
 	switch name {
 	case product.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case product.FieldYear:
+		m.ClearYear()
 		return nil
 	case product.FieldImageUrls:
 		m.ClearImageUrls()
@@ -8815,7 +8835,7 @@ func (m *UserMutation) Email() (r string, exists bool) {
 // OldEmail returns the old "email" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldEmail(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldEmail(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
 	}
@@ -8829,9 +8849,22 @@ func (m *UserMutation) OldEmail(ctx context.Context) (v string, err error) {
 	return oldValue.Email, nil
 }
 
+// ClearEmail clears the value of the "email" field.
+func (m *UserMutation) ClearEmail() {
+	m.email = nil
+	m.clearedFields[user.FieldEmail] = struct{}{}
+}
+
+// EmailCleared returns if the "email" field was cleared in this mutation.
+func (m *UserMutation) EmailCleared() bool {
+	_, ok := m.clearedFields[user.FieldEmail]
+	return ok
+}
+
 // ResetEmail resets all changes to the "email" field.
 func (m *UserMutation) ResetEmail() {
 	m.email = nil
+	delete(m.clearedFields, user.FieldEmail)
 }
 
 // SetLastReset sets the "last_reset" field.
@@ -9549,6 +9582,9 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldAvatarURL) {
 		fields = append(fields, user.FieldAvatarURL)
 	}
+	if m.FieldCleared(user.FieldEmail) {
+		fields = append(fields, user.FieldEmail)
+	}
 	if m.FieldCleared(user.FieldLastReset) {
 		fields = append(fields, user.FieldLastReset)
 	}
@@ -9580,6 +9616,9 @@ func (m *UserMutation) ClearField(name string) error {
 	switch name {
 	case user.FieldAvatarURL:
 		m.ClearAvatarURL()
+		return nil
+	case user.FieldEmail:
+		m.ClearEmail()
 		return nil
 	case user.FieldLastReset:
 		m.ClearLastReset()

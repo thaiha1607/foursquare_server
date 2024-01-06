@@ -22,11 +22,16 @@ func (Product) Fields() []ent.Field {
 		field.String("name").
 			NotEmpty(),
 		field.String("description").
-			Optional(),
+			Optional().
+			Nillable().
+			Default(""),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.Int("year").
-			Positive(),
+			Optional().
+			Nillable().
+			Positive().
+			Min(1900),
 		field.Float("price").
 			GoType(decimal.Decimal{}).
 			SchemaType(map[string]string{
@@ -42,12 +47,14 @@ func (Product) Fields() []ent.Field {
 		field.JSON("image_urls", []url.URL{}).
 			Optional(),
 		field.String("unit_of_measurement").
-			Optional(),
+			Optional().
+			Nillable(),
 		field.String("type").
 			Optional().
 			Nillable(),
 		field.String("provider").
-			Optional(),
+			Optional().
+			Nillable(),
 	}
 }
 
