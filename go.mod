@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.4
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/shopspring/decimal v1.3.1
 )
 
