@@ -41,7 +41,7 @@ func (Order) Fields() []ent.Field {
 			Immutable(),
 		field.Int("status_code").
 			Default(1),
-		field.UUID("manaagment_staff_id", uuid.UUID{}),
+		field.UUID("management_staff_id", uuid.UUID{}),
 		field.UUID("warehouse_staff_id", uuid.UUID{}).
 			Optional().
 			Nillable(),
@@ -75,7 +75,7 @@ func (Order) Edges() []ent.Edge {
 			Unique().
 			Required(),
 		edge.To("management_staff", User.Type).
-			Field("manaagment_staff_id").
+			Field("management_staff_id").
 			Unique().
 			Required(),
 		edge.To("warehouse_staff", User.Type).

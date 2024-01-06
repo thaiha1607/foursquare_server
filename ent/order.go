@@ -38,8 +38,8 @@ type Order struct {
 	Type order.Type `json:"type,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
 	StatusCode int `json:"status_code,omitempty"`
-	// ManaagmentStaffID holds the value of the "manaagment_staff_id" field.
-	ManaagmentStaffID uuid.UUID `json:"manaagment_staff_id,omitempty"`
+	// ManagementStaffID holds the value of the "management_staff_id" field.
+	ManagementStaffID uuid.UUID `json:"management_staff_id,omitempty"`
 	// WarehouseStaffID holds the value of the "warehouse_staff_id" field.
 	WarehouseStaffID *uuid.UUID `json:"warehouse_staff_id,omitempty"`
 	// DeliveryStaffID holds the value of the "delivery_staff_id" field.
@@ -177,7 +177,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldParentOrderID, order.FieldManaagmentStaffID:
+		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldParentOrderID, order.FieldManagementStaffID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -255,11 +255,11 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				o.StatusCode = int(value.Int64)
 			}
-		case order.FieldManaagmentStaffID:
+		case order.FieldManagementStaffID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field manaagment_staff_id", values[i])
+				return fmt.Errorf("unexpected type %T for field management_staff_id", values[i])
 			} else if value != nil {
-				o.ManaagmentStaffID = *value
+				o.ManagementStaffID = *value
 			}
 		case order.FieldWarehouseStaffID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -382,8 +382,8 @@ func (o *Order) String() string {
 	builder.WriteString("status_code=")
 	builder.WriteString(fmt.Sprintf("%v", o.StatusCode))
 	builder.WriteString(", ")
-	builder.WriteString("manaagment_staff_id=")
-	builder.WriteString(fmt.Sprintf("%v", o.ManaagmentStaffID))
+	builder.WriteString("management_staff_id=")
+	builder.WriteString(fmt.Sprintf("%v", o.ManagementStaffID))
 	builder.WriteString(", ")
 	if v := o.WarehouseStaffID; v != nil {
 		builder.WriteString("warehouse_staff_id=")

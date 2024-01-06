@@ -133,9 +133,9 @@ func (oc *OrderCreate) SetNillableStatusCode(i *int) *OrderCreate {
 	return oc
 }
 
-// SetManaagmentStaffID sets the "manaagment_staff_id" field.
-func (oc *OrderCreate) SetManaagmentStaffID(u uuid.UUID) *OrderCreate {
-	oc.mutation.SetManaagmentStaffID(u)
+// SetManagementStaffID sets the "management_staff_id" field.
+func (oc *OrderCreate) SetManagementStaffID(u uuid.UUID) *OrderCreate {
+	oc.mutation.SetManagementStaffID(u)
 	return oc
 }
 
@@ -217,12 +217,6 @@ func (oc *OrderCreate) SetOrderStatusID(id int) *OrderCreate {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (oc *OrderCreate) SetOrderStatus(o *OrderStatusCode) *OrderCreate {
 	return oc.SetOrderStatusID(o.ID)
-}
-
-// SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
-func (oc *OrderCreate) SetManagementStaffID(id uuid.UUID) *OrderCreate {
-	oc.mutation.SetManagementStaffID(id)
-	return oc
 }
 
 // SetManagementStaff sets the "management_staff" edge to the User entity.
@@ -330,8 +324,8 @@ func (oc *OrderCreate) check() error {
 	if _, ok := oc.mutation.StatusCode(); !ok {
 		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Order.status_code"`)}
 	}
-	if _, ok := oc.mutation.ManaagmentStaffID(); !ok {
-		return &ValidationError{Name: "manaagment_staff_id", err: errors.New(`ent: missing required field "Order.manaagment_staff_id"`)}
+	if _, ok := oc.mutation.ManagementStaffID(); !ok {
+		return &ValidationError{Name: "management_staff_id", err: errors.New(`ent: missing required field "Order.management_staff_id"`)}
 	}
 	if _, ok := oc.mutation.CustomerID(); !ok {
 		return &ValidationError{Name: "customer", err: errors.New(`ent: missing required edge "Order.customer"`)}
@@ -486,7 +480,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ManaagmentStaffID = nodes[0]
+		_node.ManagementStaffID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := oc.mutation.WarehouseStaffIDs(); len(nodes) > 0 {

@@ -96,9 +96,9 @@ func StatusCode(v int) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldStatusCode, v))
 }
 
-// ManaagmentStaffID applies equality check predicate on the "manaagment_staff_id" field. It's identical to ManaagmentStaffIDEQ.
-func ManaagmentStaffID(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldManaagmentStaffID, v))
+// ManagementStaffID applies equality check predicate on the "management_staff_id" field. It's identical to ManagementStaffIDEQ.
+func ManagementStaffID(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldManagementStaffID, v))
 }
 
 // WarehouseStaffID applies equality check predicate on the "warehouse_staff_id" field. It's identical to WarehouseStaffIDEQ.
@@ -421,24 +421,24 @@ func StatusCodeNotIn(vs ...int) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldStatusCode, vs...))
 }
 
-// ManaagmentStaffIDEQ applies the EQ predicate on the "manaagment_staff_id" field.
-func ManaagmentStaffIDEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldManaagmentStaffID, v))
+// ManagementStaffIDEQ applies the EQ predicate on the "management_staff_id" field.
+func ManagementStaffIDEQ(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldManagementStaffID, v))
 }
 
-// ManaagmentStaffIDNEQ applies the NEQ predicate on the "manaagment_staff_id" field.
-func ManaagmentStaffIDNEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNEQ(FieldManaagmentStaffID, v))
+// ManagementStaffIDNEQ applies the NEQ predicate on the "management_staff_id" field.
+func ManagementStaffIDNEQ(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldManagementStaffID, v))
 }
 
-// ManaagmentStaffIDIn applies the In predicate on the "manaagment_staff_id" field.
-func ManaagmentStaffIDIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldIn(FieldManaagmentStaffID, vs...))
+// ManagementStaffIDIn applies the In predicate on the "management_staff_id" field.
+func ManagementStaffIDIn(vs ...uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldManagementStaffID, vs...))
 }
 
-// ManaagmentStaffIDNotIn applies the NotIn predicate on the "manaagment_staff_id" field.
-func ManaagmentStaffIDNotIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNotIn(FieldManaagmentStaffID, vs...))
+// ManagementStaffIDNotIn applies the NotIn predicate on the "management_staff_id" field.
+func ManagementStaffIDNotIn(vs ...uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldManagementStaffID, vs...))
 }
 
 // WarehouseStaffIDEQ applies the EQ predicate on the "warehouse_staff_id" field.

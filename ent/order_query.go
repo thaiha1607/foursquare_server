@@ -774,7 +774,7 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *UserQuery,
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
-		fk := nodes[i].ManaagmentStaffID
+		fk := nodes[i].ManagementStaffID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -791,7 +791,7 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *UserQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "manaagment_staff_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "management_staff_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -902,7 +902,7 @@ func (oq *OrderQuery) querySpec() *sqlgraph.QuerySpec {
 			_spec.Node.AddColumnOnce(order.FieldStatusCode)
 		}
 		if oq.withManagementStaff != nil {
-			_spec.Node.AddColumnOnce(order.FieldManaagmentStaffID)
+			_spec.Node.AddColumnOnce(order.FieldManagementStaffID)
 		}
 		if oq.withWarehouseStaff != nil {
 			_spec.Node.AddColumnOnce(order.FieldWarehouseStaffID)

@@ -33,8 +33,8 @@ const (
 	FieldType = "type"
 	// FieldStatusCode holds the string denoting the status_code field in the database.
 	FieldStatusCode = "status_code"
-	// FieldManaagmentStaffID holds the string denoting the manaagment_staff_id field in the database.
-	FieldManaagmentStaffID = "manaagment_staff_id"
+	// FieldManagementStaffID holds the string denoting the management_staff_id field in the database.
+	FieldManagementStaffID = "management_staff_id"
 	// FieldWarehouseStaffID holds the string denoting the warehouse_staff_id field in the database.
 	FieldWarehouseStaffID = "warehouse_staff_id"
 	// FieldDeliveryStaffID holds the string denoting the delivery_staff_id field in the database.
@@ -88,7 +88,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	ManagementStaffInverseTable = "users"
 	// ManagementStaffColumn is the table column denoting the management_staff relation/edge.
-	ManagementStaffColumn = "manaagment_staff_id"
+	ManagementStaffColumn = "management_staff_id"
 	// WarehouseStaffTable is the table that holds the warehouse_staff relation/edge.
 	WarehouseStaffTable = "orders"
 	// WarehouseStaffInverseTable is the table name for the User entity.
@@ -117,7 +117,7 @@ var Columns = []string{
 	FieldPriority,
 	FieldType,
 	FieldStatusCode,
-	FieldManaagmentStaffID,
+	FieldManagementStaffID,
 	FieldWarehouseStaffID,
 	FieldDeliveryStaffID,
 	FieldInternalNote,
@@ -231,9 +231,9 @@ func ByStatusCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatusCode, opts...).ToFunc()
 }
 
-// ByManaagmentStaffID orders the results by the manaagment_staff_id field.
-func ByManaagmentStaffID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldManaagmentStaffID, opts...).ToFunc()
+// ByManagementStaffID orders the results by the management_staff_id field.
+func ByManagementStaffID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldManagementStaffID, opts...).ToFunc()
 }
 
 // ByWarehouseStaffID orders the results by the warehouse_staff_id field.

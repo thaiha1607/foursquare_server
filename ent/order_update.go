@@ -112,16 +112,16 @@ func (ou *OrderUpdate) SetNillableStatusCode(i *int) *OrderUpdate {
 	return ou
 }
 
-// SetManaagmentStaffID sets the "manaagment_staff_id" field.
-func (ou *OrderUpdate) SetManaagmentStaffID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetManaagmentStaffID(u)
+// SetManagementStaffID sets the "management_staff_id" field.
+func (ou *OrderUpdate) SetManagementStaffID(u uuid.UUID) *OrderUpdate {
+	ou.mutation.SetManagementStaffID(u)
 	return ou
 }
 
-// SetNillableManaagmentStaffID sets the "manaagment_staff_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableManaagmentStaffID(u *uuid.UUID) *OrderUpdate {
+// SetNillableManagementStaffID sets the "management_staff_id" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableManagementStaffID(u *uuid.UUID) *OrderUpdate {
 	if u != nil {
-		ou.SetManaagmentStaffID(*u)
+		ou.SetManagementStaffID(*u)
 	}
 	return ou
 }
@@ -200,12 +200,6 @@ func (ou *OrderUpdate) SetOrderStatusID(id int) *OrderUpdate {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (ou *OrderUpdate) SetOrderStatus(o *OrderStatusCode) *OrderUpdate {
 	return ou.SetOrderStatusID(o.ID)
-}
-
-// SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
-func (ou *OrderUpdate) SetManagementStaffID(id uuid.UUID) *OrderUpdate {
-	ou.mutation.SetManagementStaffID(id)
-	return ou
 }
 
 // SetManagementStaff sets the "management_staff" edge to the User entity.
@@ -595,16 +589,16 @@ func (ouo *OrderUpdateOne) SetNillableStatusCode(i *int) *OrderUpdateOne {
 	return ouo
 }
 
-// SetManaagmentStaffID sets the "manaagment_staff_id" field.
-func (ouo *OrderUpdateOne) SetManaagmentStaffID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetManaagmentStaffID(u)
+// SetManagementStaffID sets the "management_staff_id" field.
+func (ouo *OrderUpdateOne) SetManagementStaffID(u uuid.UUID) *OrderUpdateOne {
+	ouo.mutation.SetManagementStaffID(u)
 	return ouo
 }
 
-// SetNillableManaagmentStaffID sets the "manaagment_staff_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableManaagmentStaffID(u *uuid.UUID) *OrderUpdateOne {
+// SetNillableManagementStaffID sets the "management_staff_id" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableManagementStaffID(u *uuid.UUID) *OrderUpdateOne {
 	if u != nil {
-		ouo.SetManaagmentStaffID(*u)
+		ouo.SetManagementStaffID(*u)
 	}
 	return ouo
 }
@@ -683,12 +677,6 @@ func (ouo *OrderUpdateOne) SetOrderStatusID(id int) *OrderUpdateOne {
 // SetOrderStatus sets the "order_status" edge to the OrderStatusCode entity.
 func (ouo *OrderUpdateOne) SetOrderStatus(o *OrderStatusCode) *OrderUpdateOne {
 	return ouo.SetOrderStatusID(o.ID)
-}
-
-// SetManagementStaffID sets the "management_staff" edge to the User entity by ID.
-func (ouo *OrderUpdateOne) SetManagementStaffID(id uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetManagementStaffID(id)
-	return ouo
 }
 
 // SetManagementStaff sets the "management_staff" edge to the User entity.

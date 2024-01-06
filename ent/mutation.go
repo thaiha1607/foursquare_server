@@ -4365,13 +4365,13 @@ func (m *OrderMutation) ResetStatusCode() {
 	m.order_status = nil
 }
 
-// SetManaagmentStaffID sets the "manaagment_staff_id" field.
-func (m *OrderMutation) SetManaagmentStaffID(u uuid.UUID) {
+// SetManagementStaffID sets the "management_staff_id" field.
+func (m *OrderMutation) SetManagementStaffID(u uuid.UUID) {
 	m.management_staff = &u
 }
 
-// ManaagmentStaffID returns the value of the "manaagment_staff_id" field in the mutation.
-func (m *OrderMutation) ManaagmentStaffID() (r uuid.UUID, exists bool) {
+// ManagementStaffID returns the value of the "management_staff_id" field in the mutation.
+func (m *OrderMutation) ManagementStaffID() (r uuid.UUID, exists bool) {
 	v := m.management_staff
 	if v == nil {
 		return
@@ -4379,25 +4379,25 @@ func (m *OrderMutation) ManaagmentStaffID() (r uuid.UUID, exists bool) {
 	return *v, true
 }
 
-// OldManaagmentStaffID returns the old "manaagment_staff_id" field's value of the Order entity.
+// OldManagementStaffID returns the old "management_staff_id" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldManaagmentStaffID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *OrderMutation) OldManagementStaffID(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldManaagmentStaffID is only allowed on UpdateOne operations")
+		return v, errors.New("OldManagementStaffID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldManaagmentStaffID requires an ID field in the mutation")
+		return v, errors.New("OldManagementStaffID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldManaagmentStaffID: %w", err)
+		return v, fmt.Errorf("querying old value for OldManagementStaffID: %w", err)
 	}
-	return oldValue.ManaagmentStaffID, nil
+	return oldValue.ManagementStaffID, nil
 }
 
-// ResetManaagmentStaffID resets all changes to the "manaagment_staff_id" field.
-func (m *OrderMutation) ResetManaagmentStaffID() {
+// ResetManagementStaffID resets all changes to the "management_staff_id" field.
+func (m *OrderMutation) ResetManagementStaffID() {
 	m.management_staff = nil
 }
 
@@ -4682,28 +4682,15 @@ func (m *OrderMutation) ResetOrderStatus() {
 	m.clearedorder_status = false
 }
 
-// SetManagementStaffID sets the "management_staff" edge to the User entity by id.
-func (m *OrderMutation) SetManagementStaffID(id uuid.UUID) {
-	m.management_staff = &id
-}
-
 // ClearManagementStaff clears the "management_staff" edge to the User entity.
 func (m *OrderMutation) ClearManagementStaff() {
 	m.clearedmanagement_staff = true
-	m.clearedFields[order.FieldManaagmentStaffID] = struct{}{}
+	m.clearedFields[order.FieldManagementStaffID] = struct{}{}
 }
 
 // ManagementStaffCleared reports if the "management_staff" edge to the User entity was cleared.
 func (m *OrderMutation) ManagementStaffCleared() bool {
 	return m.clearedmanagement_staff
-}
-
-// ManagementStaffID returns the "management_staff" edge ID in the mutation.
-func (m *OrderMutation) ManagementStaffID() (id uuid.UUID, exists bool) {
-	if m.management_staff != nil {
-		return *m.management_staff, true
-	}
-	return
 }
 
 // ManagementStaffIDs returns the "management_staff" edge IDs in the mutation.
@@ -4839,7 +4826,7 @@ func (m *OrderMutation) Fields() []string {
 		fields = append(fields, order.FieldStatusCode)
 	}
 	if m.management_staff != nil {
-		fields = append(fields, order.FieldManaagmentStaffID)
+		fields = append(fields, order.FieldManagementStaffID)
 	}
 	if m.warehouse_staff != nil {
 		fields = append(fields, order.FieldWarehouseStaffID)
@@ -4876,8 +4863,8 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 		return m.GetType()
 	case order.FieldStatusCode:
 		return m.StatusCode()
-	case order.FieldManaagmentStaffID:
-		return m.ManaagmentStaffID()
+	case order.FieldManagementStaffID:
+		return m.ManagementStaffID()
 	case order.FieldWarehouseStaffID:
 		return m.WarehouseStaffID()
 	case order.FieldDeliveryStaffID:
@@ -4911,8 +4898,8 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldType(ctx)
 	case order.FieldStatusCode:
 		return m.OldStatusCode(ctx)
-	case order.FieldManaagmentStaffID:
-		return m.OldManaagmentStaffID(ctx)
+	case order.FieldManagementStaffID:
+		return m.OldManagementStaffID(ctx)
 	case order.FieldWarehouseStaffID:
 		return m.OldWarehouseStaffID(ctx)
 	case order.FieldDeliveryStaffID:
@@ -4991,12 +4978,12 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatusCode(v)
 		return nil
-	case order.FieldManaagmentStaffID:
+	case order.FieldManagementStaffID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetManaagmentStaffID(v)
+		m.SetManagementStaffID(v)
 		return nil
 	case order.FieldWarehouseStaffID:
 		v, ok := value.(uuid.UUID)
@@ -5143,8 +5130,8 @@ func (m *OrderMutation) ResetField(name string) error {
 	case order.FieldStatusCode:
 		m.ResetStatusCode()
 		return nil
-	case order.FieldManaagmentStaffID:
-		m.ResetManaagmentStaffID()
+	case order.FieldManagementStaffID:
+		m.ResetManagementStaffID()
 		return nil
 	case order.FieldWarehouseStaffID:
 		m.ResetWarehouseStaffID()

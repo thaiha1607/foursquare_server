@@ -177,7 +177,7 @@ var (
 		{Name: "created_by", Type: field.TypeUUID},
 		{Name: "parent_order_id", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "status_code", Type: field.TypeInt, Default: 1},
-		{Name: "manaagment_staff_id", Type: field.TypeUUID},
+		{Name: "management_staff_id", Type: field.TypeUUID},
 		{Name: "warehouse_staff_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "delivery_staff_id", Type: field.TypeUUID, Nullable: true},
 	}
