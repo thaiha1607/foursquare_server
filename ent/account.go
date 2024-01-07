@@ -18,15 +18,13 @@ import (
 type Account struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uuid.UUID `json:"user_id,omitempty"`
-	// Username holds the value of the "username" field.
-	Username string `json:"username,omitempty"`
 	// LastReset holds the value of the "last_reset" field.
 	LastReset *time.Time `json:"last_reset,omitempty"`
 	// LastEmailVerification holds the value of the "last_email_verification" field.
@@ -76,11 +74,11 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case account.FieldIsEmailVerified, account.FieldIsPhoneVerified:
 			values[i] = new(sql.NullBool)
-		case account.FieldUsername, account.FieldRole, account.FieldPasswordHash:
+		case account.FieldID, account.FieldRole, account.FieldPasswordHash:
 			values[i] = new(sql.NullString)
 		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldLastReset, account.FieldLastEmailVerification, account.FieldLastPhoneVerification:
 			values[i] = new(sql.NullTime)
-		case account.FieldID, account.FieldUserID:
+		case account.FieldUserID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -98,10 +96,10 @@ func (a *Account) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case account.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				a.ID = *value
+			} else if value.Valid {
+				a.ID = value.String
 			}
 		case account.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -120,12 +118,6 @@ func (a *Account) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value != nil {
 				a.UserID = *value
-			}
-		case account.FieldUsername:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field username", values[i])
-			} else if value.Valid {
-				a.Username = value.String
 			}
 		case account.FieldLastReset:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -222,9 +214,6 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.UserID))
-	builder.WriteString(", ")
-	builder.WriteString("username=")
-	builder.WriteString(a.Username)
 	builder.WriteString(", ")
 	if v := a.LastReset; v != nil {
 		builder.WriteString("last_reset=")

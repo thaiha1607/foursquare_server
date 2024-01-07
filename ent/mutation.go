@@ -61,10 +61,9 @@ type AccountMutation struct {
 	config
 	op                      Op
 	typ                     string
-	id                      *uuid.UUID
+	id                      *string
 	created_at              *time.Time
 	updated_at              *time.Time
-	username                *string
 	last_reset              *time.Time
 	last_email_verification *time.Time
 	last_phone_verification *time.Time
@@ -100,7 +99,7 @@ func newAccountMutation(c config, op Op, opts ...accountOption) *AccountMutation
 }
 
 // withAccountID sets the ID field of the mutation.
-func withAccountID(id uuid.UUID) accountOption {
+func withAccountID(id string) accountOption {
 	return func(m *AccountMutation) {
 		var (
 			err   error
@@ -152,13 +151,13 @@ func (m AccountMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Account entities.
-func (m *AccountMutation) SetID(id uuid.UUID) {
+func (m *AccountMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *AccountMutation) ID() (id uuid.UUID, exists bool) {
+func (m *AccountMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -169,12 +168,12 @@ func (m *AccountMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *AccountMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *AccountMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -290,42 +289,6 @@ func (m *AccountMutation) OldUserID(ctx context.Context) (v uuid.UUID, err error
 // ResetUserID resets all changes to the "user_id" field.
 func (m *AccountMutation) ResetUserID() {
 	m.user = nil
-}
-
-// SetUsername sets the "username" field.
-func (m *AccountMutation) SetUsername(s string) {
-	m.username = &s
-}
-
-// Username returns the value of the "username" field in the mutation.
-func (m *AccountMutation) Username() (r string, exists bool) {
-	v := m.username
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUsername returns the old "username" field's value of the Account entity.
-// If the Account object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldUsername(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUsername requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUsername: %w", err)
-	}
-	return oldValue.Username, nil
-}
-
-// ResetUsername resets all changes to the "username" field.
-func (m *AccountMutation) ResetUsername() {
-	m.username = nil
 }
 
 // SetLastReset sets the "last_reset" field.
@@ -693,7 +656,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -702,9 +665,6 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.user != nil {
 		fields = append(fields, account.FieldUserID)
-	}
-	if m.username != nil {
-		fields = append(fields, account.FieldUsername)
 	}
 	if m.last_reset != nil {
 		fields = append(fields, account.FieldLastReset)
@@ -741,8 +701,6 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case account.FieldUserID:
 		return m.UserID()
-	case account.FieldUsername:
-		return m.Username()
 	case account.FieldLastReset:
 		return m.LastReset()
 	case account.FieldLastEmailVerification:
@@ -772,8 +730,6 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedAt(ctx)
 	case account.FieldUserID:
 		return m.OldUserID(ctx)
-	case account.FieldUsername:
-		return m.OldUsername(ctx)
 	case account.FieldLastReset:
 		return m.OldLastReset(ctx)
 	case account.FieldLastEmailVerification:
@@ -817,13 +773,6 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUserID(v)
-		return nil
-	case account.FieldUsername:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUsername(v)
 		return nil
 	case account.FieldLastReset:
 		v, ok := value.(time.Time)
@@ -958,9 +907,6 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldUserID:
 		m.ResetUserID()
-		return nil
-	case account.FieldUsername:
-		m.ResetUsername()
 		return nil
 	case account.FieldLastReset:
 		m.ResetLastReset()

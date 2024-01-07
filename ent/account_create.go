@@ -56,12 +56,6 @@ func (ac *AccountCreate) SetUserID(u uuid.UUID) *AccountCreate {
 	return ac
 }
 
-// SetUsername sets the "username" field.
-func (ac *AccountCreate) SetUsername(s string) *AccountCreate {
-	ac.mutation.SetUsername(s)
-	return ac
-}
-
 // SetLastReset sets the "last_reset" field.
 func (ac *AccountCreate) SetLastReset(t time.Time) *AccountCreate {
 	ac.mutation.SetLastReset(t)
@@ -161,16 +155,8 @@ func (ac *AccountCreate) SetNillablePasswordHash(s *string) *AccountCreate {
 }
 
 // SetID sets the "id" field.
-func (ac *AccountCreate) SetID(u uuid.UUID) *AccountCreate {
-	ac.mutation.SetID(u)
-	return ac
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableID(u *uuid.UUID) *AccountCreate {
-	if u != nil {
-		ac.SetID(*u)
-	}
+func (ac *AccountCreate) SetID(s string) *AccountCreate {
+	ac.mutation.SetID(s)
 	return ac
 }
 
@@ -242,13 +228,6 @@ func (ac *AccountCreate) defaults() error {
 		v := account.DefaultRole
 		ac.mutation.SetRole(v)
 	}
-	if _, ok := ac.mutation.ID(); !ok {
-		if account.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized account.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := account.DefaultID()
-		ac.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -262,14 +241,6 @@ func (ac *AccountCreate) check() error {
 	}
 	if _, ok := ac.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Account.user_id"`)}
-	}
-	if _, ok := ac.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "Account.username"`)}
-	}
-	if v, ok := ac.mutation.Username(); ok {
-		if err := account.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Account.username": %w`, err)}
-		}
 	}
 	if _, ok := ac.mutation.IsEmailVerified(); !ok {
 		return &ValidationError{Name: "is_email_verified", err: errors.New(`ent: missing required field "Account.is_email_verified"`)}
@@ -290,6 +261,11 @@ func (ac *AccountCreate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "Account.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := ac.mutation.ID(); ok {
+		if err := account.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Account.id": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Account.user"`)}
 	}
@@ -308,10 +284,10 @@ func (ac *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Account.ID type: %T", _spec.ID.Value)
 		}
 	}
 	ac.mutation.id = &_node.ID
@@ -322,11 +298,11 @@ func (ac *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
 func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Account{config: ac.config}
-		_spec = sqlgraph.NewCreateSpec(account.Table, sqlgraph.NewFieldSpec(account.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(account.Table, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
 	)
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(account.FieldCreatedAt, field.TypeTime, value)
@@ -335,10 +311,6 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := ac.mutation.Username(); ok {
-		_spec.SetField(account.FieldUsername, field.TypeString, value)
-		_node.Username = value
 	}
 	if value, ok := ac.mutation.LastReset(); ok {
 		_spec.SetField(account.FieldLastReset, field.TypeTime, value)

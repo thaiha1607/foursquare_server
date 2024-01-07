@@ -11,10 +11,9 @@ import (
 var (
 	// AccountsColumns holds the columns for the "accounts" table.
 	AccountsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 10},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "username", Type: field.TypeString, Unique: true, Size: 10},
 		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
 		{Name: "last_email_verification", Type: field.TypeTime, Nullable: true},
 		{Name: "last_phone_verification", Type: field.TypeTime, Nullable: true},
@@ -32,7 +31,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "accounts_users_user",
-				Columns:    []*schema.Column{AccountsColumns[11]},
+				Columns:    []*schema.Column{AccountsColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

@@ -34,20 +34,6 @@ func (au *AccountUpdate) SetUpdatedAt(t time.Time) *AccountUpdate {
 	return au
 }
 
-// SetUsername sets the "username" field.
-func (au *AccountUpdate) SetUsername(s string) *AccountUpdate {
-	au.mutation.SetUsername(s)
-	return au
-}
-
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableUsername(s *string) *AccountUpdate {
-	if s != nil {
-		au.SetUsername(*s)
-	}
-	return au
-}
-
 // SetLastReset sets the "last_reset" field.
 func (au *AccountUpdate) SetLastReset(t time.Time) *AccountUpdate {
 	au.mutation.SetLastReset(t)
@@ -219,11 +205,6 @@ func (au *AccountUpdate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (au *AccountUpdate) check() error {
-	if v, ok := au.mutation.Username(); ok {
-		if err := account.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Account.username": %w`, err)}
-		}
-	}
 	if v, ok := au.mutation.Role(); ok {
 		if err := account.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Account.role": %w`, err)}
@@ -244,7 +225,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := au.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -254,9 +235,6 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := au.mutation.Username(); ok {
-		_spec.SetField(account.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := au.mutation.LastReset(); ok {
 		_spec.SetField(account.FieldLastReset, field.TypeTime, value)
@@ -314,20 +292,6 @@ type AccountUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (auo *AccountUpdateOne) SetUpdatedAt(t time.Time) *AccountUpdateOne {
 	auo.mutation.SetUpdatedAt(t)
-	return auo
-}
-
-// SetUsername sets the "username" field.
-func (auo *AccountUpdateOne) SetUsername(s string) *AccountUpdateOne {
-	auo.mutation.SetUsername(s)
-	return auo
-}
-
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableUsername(s *string) *AccountUpdateOne {
-	if s != nil {
-		auo.SetUsername(*s)
-	}
 	return auo
 }
 
@@ -515,11 +479,6 @@ func (auo *AccountUpdateOne) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *AccountUpdateOne) check() error {
-	if v, ok := auo.mutation.Username(); ok {
-		if err := account.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Account.username": %w`, err)}
-		}
-	}
 	if v, ok := auo.mutation.Role(); ok {
 		if err := account.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Account.role": %w`, err)}
@@ -540,7 +499,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	if err := auo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
 	id, ok := auo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Account.id" for update`)}
@@ -567,9 +526,6 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := auo.mutation.Username(); ok {
-		_spec.SetField(account.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.LastReset(); ok {
 		_spec.SetField(account.FieldLastReset, field.TypeTime, value)

@@ -12,48 +12,58 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Account {
+func ID(id string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Account {
+func IDEQ(id string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Account {
+func IDNEQ(id string) predicate.Account {
 	return predicate.Account(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Account {
+func IDIn(ids ...string) predicate.Account {
 	return predicate.Account(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Account {
+func IDNotIn(ids ...string) predicate.Account {
 	return predicate.Account(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Account {
+func IDGT(id string) predicate.Account {
 	return predicate.Account(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Account {
+func IDGTE(id string) predicate.Account {
 	return predicate.Account(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Account {
+func IDLT(id string) predicate.Account {
 	return predicate.Account(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Account {
+func IDLTE(id string) predicate.Account {
 	return predicate.Account(sql.FieldLTE(FieldID, id))
+}
+
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Account {
+	return predicate.Account(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Account {
+	return predicate.Account(sql.FieldContainsFold(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -69,11 +79,6 @@ func UpdatedAt(v time.Time) predicate.Account {
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v uuid.UUID) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldUserID, v))
-}
-
-// Username applies equality check predicate on the "username" field. It's identical to UsernameEQ.
-func Username(v string) predicate.Account {
-	return predicate.Account(sql.FieldEQ(FieldUsername, v))
 }
 
 // LastReset applies equality check predicate on the "last_reset" field. It's identical to LastResetEQ.
@@ -204,71 +209,6 @@ func UserIDIn(vs ...uuid.UUID) predicate.Account {
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
 func UserIDNotIn(vs ...uuid.UUID) predicate.Account {
 	return predicate.Account(sql.FieldNotIn(FieldUserID, vs...))
-}
-
-// UsernameEQ applies the EQ predicate on the "username" field.
-func UsernameEQ(v string) predicate.Account {
-	return predicate.Account(sql.FieldEQ(FieldUsername, v))
-}
-
-// UsernameNEQ applies the NEQ predicate on the "username" field.
-func UsernameNEQ(v string) predicate.Account {
-	return predicate.Account(sql.FieldNEQ(FieldUsername, v))
-}
-
-// UsernameIn applies the In predicate on the "username" field.
-func UsernameIn(vs ...string) predicate.Account {
-	return predicate.Account(sql.FieldIn(FieldUsername, vs...))
-}
-
-// UsernameNotIn applies the NotIn predicate on the "username" field.
-func UsernameNotIn(vs ...string) predicate.Account {
-	return predicate.Account(sql.FieldNotIn(FieldUsername, vs...))
-}
-
-// UsernameGT applies the GT predicate on the "username" field.
-func UsernameGT(v string) predicate.Account {
-	return predicate.Account(sql.FieldGT(FieldUsername, v))
-}
-
-// UsernameGTE applies the GTE predicate on the "username" field.
-func UsernameGTE(v string) predicate.Account {
-	return predicate.Account(sql.FieldGTE(FieldUsername, v))
-}
-
-// UsernameLT applies the LT predicate on the "username" field.
-func UsernameLT(v string) predicate.Account {
-	return predicate.Account(sql.FieldLT(FieldUsername, v))
-}
-
-// UsernameLTE applies the LTE predicate on the "username" field.
-func UsernameLTE(v string) predicate.Account {
-	return predicate.Account(sql.FieldLTE(FieldUsername, v))
-}
-
-// UsernameContains applies the Contains predicate on the "username" field.
-func UsernameContains(v string) predicate.Account {
-	return predicate.Account(sql.FieldContains(FieldUsername, v))
-}
-
-// UsernameHasPrefix applies the HasPrefix predicate on the "username" field.
-func UsernameHasPrefix(v string) predicate.Account {
-	return predicate.Account(sql.FieldHasPrefix(FieldUsername, v))
-}
-
-// UsernameHasSuffix applies the HasSuffix predicate on the "username" field.
-func UsernameHasSuffix(v string) predicate.Account {
-	return predicate.Account(sql.FieldHasSuffix(FieldUsername, v))
-}
-
-// UsernameEqualFold applies the EqualFold predicate on the "username" field.
-func UsernameEqualFold(v string) predicate.Account {
-	return predicate.Account(sql.FieldEqualFold(FieldUsername, v))
-}
-
-// UsernameContainsFold applies the ContainsFold predicate on the "username" field.
-func UsernameContainsFold(v string) predicate.Account {
-	return predicate.Account(sql.FieldContainsFold(FieldUsername, v))
 }
 
 // LastResetEQ applies the EQ predicate on the "last_reset" field.

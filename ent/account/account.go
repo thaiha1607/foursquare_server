@@ -9,7 +9,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
 )
 
 const (
@@ -23,8 +22,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
 	// FieldLastReset holds the string denoting the last_reset field in the database.
 	FieldLastReset = "last_reset"
 	// FieldLastEmailVerification holds the string denoting the last_email_verification field in the database.
@@ -58,7 +55,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldUserID,
-	FieldUsername,
 	FieldLastReset,
 	FieldLastEmailVerification,
 	FieldLastPhoneVerification,
@@ -91,16 +87,14 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	UsernameValidator func(string) error
 	// DefaultIsEmailVerified holds the default value on creation for the "is_email_verified" field.
 	DefaultIsEmailVerified bool
 	// DefaultIsPhoneVerified holds the default value on creation for the "is_phone_verified" field.
 	DefaultIsPhoneVerified bool
 	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	PasswordHashValidator func(string) error
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(string) error
 )
 
 // Role defines the type for the "role" enum field.
@@ -153,11 +147,6 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUserID orders the results by the user_id field.
 func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
-}
-
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
 }
 
 // ByLastReset orders the results by the last_reset field.

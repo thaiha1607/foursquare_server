@@ -106,8 +106,8 @@ func (aq *AccountQuery) FirstX(ctx context.Context) *Account {
 
 // FirstID returns the first Account ID from the query.
 // Returns a *NotFoundError when no Account ID was found.
-func (aq *AccountQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AccountQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -119,7 +119,7 @@ func (aq *AccountQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AccountQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (aq *AccountQuery) FirstIDX(ctx context.Context) string {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -157,8 +157,8 @@ func (aq *AccountQuery) OnlyX(ctx context.Context) *Account {
 // OnlyID is like Only, but returns the only Account ID in the query.
 // Returns a *NotSingularError when more than one Account ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AccountQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AccountQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -174,7 +174,7 @@ func (aq *AccountQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AccountQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (aq *AccountQuery) OnlyIDX(ctx context.Context) string {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -202,7 +202,7 @@ func (aq *AccountQuery) AllX(ctx context.Context) []*Account {
 }
 
 // IDs executes the query and returns a list of Account IDs.
-func (aq *AccountQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (aq *AccountQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
@@ -214,7 +214,7 @@ func (aq *AccountQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AccountQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (aq *AccountQuery) IDsX(ctx context.Context) []string {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -441,7 +441,7 @@ func (aq *AccountQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
 	_spec.From = aq.sql
 	if unique := aq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

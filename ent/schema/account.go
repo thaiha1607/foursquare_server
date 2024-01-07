@@ -1,14 +1,10 @@
 package schema
 
 import (
-	"context"
-	"fmt"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/thaiha1607/foursquare_server/ent/hook"
 )
 
@@ -20,15 +16,12 @@ type Account struct {
 // Fields of the Account.
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Immutable(),
-		field.UUID("user_id", uuid.UUID{}).
-			Immutable(),
-		field.String("username").
+		field.String("id").
 			NotEmpty().
 			Unique().
 			MaxLen(10),
+		field.UUID("user_id", uuid.UUID{}).
+			Immutable(),
 		field.Time("last_reset").
 			Optional().
 			Nillable(),
@@ -79,26 +72,6 @@ func (Account) Mixin() []ent.Mixin {
 // Hooks of the Account.
 func (Account) Hooks() []ent.Hook {
 	return []ent.Hook{
-		hook.On(CreateUsernameHook(), ent.OpCreate),
-	}
-}
-
-func CreateUsernameHook() ent.Hook {
-	type UsernameSetter interface {
-		SetUsername(string)
-	}
-	return func(next ent.Mutator) ent.Mutator {
-		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-			is, ok := m.(UsernameSetter)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation %T", m)
-			}
-			id, err := gonanoid.New(10)
-			if err != nil {
-				return nil, err
-			}
-			is.SetUsername(id)
-			return next.Mutate(ctx, m)
-		})
+		hook.On(IDHook(10), ent.OpCreate),
 	}
 }

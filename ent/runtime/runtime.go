@@ -44,40 +44,36 @@ func init() {
 	account.DefaultUpdatedAt = accountDescUpdatedAt.Default.(func() time.Time)
 	// account.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	account.UpdateDefaultUpdatedAt = accountDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// accountDescUsername is the schema descriptor for username field.
-	accountDescUsername := accountFields[2].Descriptor()
-	// account.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	account.UsernameValidator = func() func(string) error {
-		validators := accountDescUsername.Validators
+	// accountDescIsEmailVerified is the schema descriptor for is_email_verified field.
+	accountDescIsEmailVerified := accountFields[5].Descriptor()
+	// account.DefaultIsEmailVerified holds the default value on creation for the is_email_verified field.
+	account.DefaultIsEmailVerified = accountDescIsEmailVerified.Default.(bool)
+	// accountDescIsPhoneVerified is the schema descriptor for is_phone_verified field.
+	accountDescIsPhoneVerified := accountFields[6].Descriptor()
+	// account.DefaultIsPhoneVerified holds the default value on creation for the is_phone_verified field.
+	account.DefaultIsPhoneVerified = accountDescIsPhoneVerified.Default.(bool)
+	// accountDescPasswordHash is the schema descriptor for password_hash field.
+	accountDescPasswordHash := accountFields[8].Descriptor()
+	// account.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
+	account.PasswordHashValidator = accountDescPasswordHash.Validators[0].(func(string) error)
+	// accountDescID is the schema descriptor for id field.
+	accountDescID := accountFields[0].Descriptor()
+	// account.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	account.IDValidator = func() func(string) error {
+		validators := accountDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(username string) error {
+		return func(id string) error {
 			for _, fn := range fns {
-				if err := fn(username); err != nil {
+				if err := fn(id); err != nil {
 					return err
 				}
 			}
 			return nil
 		}
 	}()
-	// accountDescIsEmailVerified is the schema descriptor for is_email_verified field.
-	accountDescIsEmailVerified := accountFields[6].Descriptor()
-	// account.DefaultIsEmailVerified holds the default value on creation for the is_email_verified field.
-	account.DefaultIsEmailVerified = accountDescIsEmailVerified.Default.(bool)
-	// accountDescIsPhoneVerified is the schema descriptor for is_phone_verified field.
-	accountDescIsPhoneVerified := accountFields[7].Descriptor()
-	// account.DefaultIsPhoneVerified holds the default value on creation for the is_phone_verified field.
-	account.DefaultIsPhoneVerified = accountDescIsPhoneVerified.Default.(bool)
-	// accountDescPasswordHash is the schema descriptor for password_hash field.
-	accountDescPasswordHash := accountFields[9].Descriptor()
-	// account.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
-	account.PasswordHashValidator = accountDescPasswordHash.Validators[0].(func(string) error)
-	// accountDescID is the schema descriptor for id field.
-	accountDescID := accountFields[0].Descriptor()
-	// account.DefaultID holds the default value on creation for the id field.
-	account.DefaultID = accountDescID.Default.(func() uuid.UUID)
 	conversationMixin := schema.Conversation{}.Mixin()
 	conversationMixinFields0 := conversationMixin[0].Fields()
 	_ = conversationMixinFields0
