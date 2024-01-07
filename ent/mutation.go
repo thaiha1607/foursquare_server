@@ -600,7 +600,7 @@ func (m *AccountMutation) PasswordHash() (r string, exists bool) {
 // OldPasswordHash returns the old "password_hash" field's value of the Account entity.
 // If the Account object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldPasswordHash(ctx context.Context) (v string, err error) {
+func (m *AccountMutation) OldPasswordHash(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPasswordHash is only allowed on UpdateOne operations")
 	}
@@ -614,9 +614,22 @@ func (m *AccountMutation) OldPasswordHash(ctx context.Context) (v string, err er
 	return oldValue.PasswordHash, nil
 }
 
+// ClearPasswordHash clears the value of the "password_hash" field.
+func (m *AccountMutation) ClearPasswordHash() {
+	m.password_hash = nil
+	m.clearedFields[account.FieldPasswordHash] = struct{}{}
+}
+
+// PasswordHashCleared returns if the "password_hash" field was cleared in this mutation.
+func (m *AccountMutation) PasswordHashCleared() bool {
+	_, ok := m.clearedFields[account.FieldPasswordHash]
+	return ok
+}
+
 // ResetPasswordHash resets all changes to the "password_hash" field.
 func (m *AccountMutation) ResetPasswordHash() {
 	m.password_hash = nil
+	delete(m.clearedFields, account.FieldPasswordHash)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -900,6 +913,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldLastPhoneVerification) {
 		fields = append(fields, account.FieldLastPhoneVerification)
 	}
+	if m.FieldCleared(account.FieldPasswordHash) {
+		fields = append(fields, account.FieldPasswordHash)
+	}
 	return fields
 }
 
@@ -922,6 +938,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldLastPhoneVerification:
 		m.ClearLastPhoneVerification()
+		return nil
+	case account.FieldPasswordHash:
+		m.ClearPasswordHash()
 		return nil
 	}
 	return fmt.Errorf("unknown Account nullable field %s", name)

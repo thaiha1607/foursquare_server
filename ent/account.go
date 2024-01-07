@@ -40,7 +40,7 @@ type Account struct {
 	// Role holds the value of the "role" field.
 	Role account.Role `json:"role,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
-	PasswordHash string `json:"-"`
+	PasswordHash *string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
 	Edges        AccountEdges `json:"edges"`
@@ -170,7 +170,8 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password_hash", values[i])
 			} else if value.Valid {
-				a.PasswordHash = value.String
+				a.PasswordHash = new(string)
+				*a.PasswordHash = value.String
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])

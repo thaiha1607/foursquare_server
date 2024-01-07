@@ -152,6 +152,14 @@ func (ac *AccountCreate) SetPasswordHash(s string) *AccountCreate {
 	return ac
 }
 
+// SetNillablePasswordHash sets the "password_hash" field if the given value is not nil.
+func (ac *AccountCreate) SetNillablePasswordHash(s *string) *AccountCreate {
+	if s != nil {
+		ac.SetPasswordHash(*s)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AccountCreate) SetID(u uuid.UUID) *AccountCreate {
 	ac.mutation.SetID(u)
@@ -277,9 +285,6 @@ func (ac *AccountCreate) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Account.role": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.PasswordHash(); !ok {
-		return &ValidationError{Name: "password_hash", err: errors.New(`ent: missing required field "Account.password_hash"`)}
-	}
 	if v, ok := ac.mutation.PasswordHash(); ok {
 		if err := account.PasswordHashValidator(v); err != nil {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "Account.password_hash": %w`, err)}
@@ -361,7 +366,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.PasswordHash(); ok {
 		_spec.SetField(account.FieldPasswordHash, field.TypeString, value)
-		_node.PasswordHash = value
+		_node.PasswordHash = &value
 	}
 	if nodes := ac.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

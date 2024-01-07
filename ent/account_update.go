@@ -164,6 +164,12 @@ func (au *AccountUpdate) SetNillablePasswordHash(s *string) *AccountUpdate {
 	return au
 }
 
+// ClearPasswordHash clears the value of the "password_hash" field.
+func (au *AccountUpdate) ClearPasswordHash() *AccountUpdate {
+	au.mutation.ClearPasswordHash()
+	return au
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -281,6 +287,9 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.PasswordHash(); ok {
 		_spec.SetField(account.FieldPasswordHash, field.TypeString, value)
+	}
+	if au.mutation.PasswordHashCleared() {
+		_spec.ClearField(account.FieldPasswordHash, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -438,6 +447,12 @@ func (auo *AccountUpdateOne) SetNillablePasswordHash(s *string) *AccountUpdateOn
 	return auo
 }
 
+// ClearPasswordHash clears the value of the "password_hash" field.
+func (auo *AccountUpdateOne) ClearPasswordHash() *AccountUpdateOne {
+	auo.mutation.ClearPasswordHash()
+	return auo
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -585,6 +600,9 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.PasswordHash(); ok {
 		_spec.SetField(account.FieldPasswordHash, field.TypeString, value)
+	}
+	if auo.mutation.PasswordHashCleared() {
+		_spec.ClearField(account.FieldPasswordHash, field.TypeString)
 	}
 	_node = &Account{config: auo.config}
 	_spec.Assign = _node.assignValues

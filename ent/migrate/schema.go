@@ -21,7 +21,7 @@ var (
 		{Name: "is_email_verified", Type: field.TypeBool, Default: false},
 		{Name: "is_phone_verified", Type: field.TypeBool, Default: false},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
-		{Name: "password_hash", Type: field.TypeString, Size: 2147483647},
+		{Name: "password_hash", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "user_id", Type: field.TypeUUID},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.

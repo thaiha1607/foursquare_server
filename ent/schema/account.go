@@ -52,6 +52,8 @@ func (Account) Fields() []ent.Field {
 			).Default("CUSTOMER"),
 		field.Text("password_hash").
 			NotEmpty().
+			Optional().
+			Nillable().
 			Sensitive(),
 	}
 }
