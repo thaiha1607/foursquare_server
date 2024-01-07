@@ -11,12 +11,12 @@ import (
 type ProductTagService interface {
 	Fetch(ctx context.Context) ([]*ent.ProductTag, error)
 	Store(ctx context.Context, obj *ent.ProductTag) error
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, product_id uuid.UUID, tag_id uuid.UUID) error
 }
 
 // ProductTagRepository describes the repository.
 type ProductTagRepository interface {
 	Fetch(ctx context.Context) ([]*ent.ProductTag, error)
 	Store(ctx context.Context, obj *ent.ProductTag) error
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, product_id uuid.UUID, tag_id uuid.UUID) error
 }
