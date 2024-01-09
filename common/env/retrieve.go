@@ -15,6 +15,14 @@ func GetEnv(key string) (envVar string, err error) {
 	return envVar, nil
 }
 
+func MustGetEnv(key string) (envVar string) {
+	envVar, err := GetEnv(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return envVar
+}
+
 func GetEnvOrDefault(key string, defaultValue string) (envVar string) {
 	envVar = os.Getenv(key)
 	if envVar == "" {
