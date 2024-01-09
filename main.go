@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/thaiha1607/foursquare_server/common/env"
+	"github.com/thaiha1607/foursquare_server/db"
 	"github.com/thaiha1607/foursquare_server/handlers"
 	"github.com/thaiha1607/foursquare_server/handlers/sysmon"
 	"github.com/thaiha1607/foursquare_server/middlewares"
@@ -22,6 +23,14 @@ import (
 func main() {
 	// Check whether we are running in production environment
 	isProdEnv := env.IsProdEnv()
+	// Setup DB connection
+	db := db.SetupDbConnection(
+		db.NewPostgresDatabaseConnector(
+			env.MustGetEnv("POSTGRES_URI"),
+		),
+	)
+	defer db.Close()
+	// Initialize Echo
 	e := echo.New()
 	// Add/remove trailing slash to improve SEO
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -74,7 +83,7 @@ func main() {
 	// Decompress HTTP request if Content-Encoding header is set to gzip
 	e.Use(middleware.Decompress())
 	// Routes
-	handlers.RegisterRoutes(e)
+	handlers.RegisterRoutes(e, db)
 	go func() {
 		if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
