@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thaiha1607/foursquare_server/ent"
+	_ "github.com/thaiha1607/foursquare_server/ent/runtime"
 	"github.com/thaiha1607/foursquare_server/interfaces"
 )
 

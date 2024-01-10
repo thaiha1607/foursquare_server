@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
+	_ "github.com/thaiha1607/foursquare_server/ent/runtime"
 	"github.com/thaiha1607/foursquare_server/interfaces"
 )
 
