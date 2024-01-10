@@ -15,3 +15,8 @@ func (p *DataPaging) Process() {
 		p.Limit = 10
 	}
 }
+
+type FailureResponse struct {
+	HttpStatusCode int    `json:"-"`
+	Message        string `json:"message"`
+}

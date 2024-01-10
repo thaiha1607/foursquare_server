@@ -30,7 +30,8 @@ func (h *ConversationHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	conversations, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, conversations)
 }
@@ -43,7 +44,8 @@ func (h *ConversationHandler) GetByID(c echo.Context) error {
 	}
 	conversation, err := h.Service.GetByID(ctx, id)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, conversation)
 }
@@ -55,7 +57,8 @@ func (h *ConversationHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &conversation); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, conversation)
 }
@@ -71,7 +74,8 @@ func (h *ConversationHandler) Update(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Update(ctx, id, &conversation); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, conversation)
 }
@@ -83,7 +87,8 @@ func (h *ConversationHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }

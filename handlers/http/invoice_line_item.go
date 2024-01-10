@@ -29,7 +29,8 @@ func (h *InvoiceLineItemHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	invoiceLineItems, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, invoiceLineItems)
 }
@@ -42,7 +43,8 @@ func (h *InvoiceLineItemHandler) GetByID(c echo.Context) error {
 	}
 	invoiceLineItem, err := h.Service.GetByID(ctx, id)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, invoiceLineItem)
 }
@@ -54,7 +56,8 @@ func (h *InvoiceLineItemHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &invoice_line_item); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, invoice_line_item)
 }
@@ -66,7 +69,8 @@ func (h *InvoiceLineItemHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }
