@@ -35,6 +35,7 @@ func (e *entOrderStatusCodeRepository) Store(ctx context.Context, obj *ent.Order
 	//lint:ignore SA4006 we want to return the result of creating operation
 	obj, err = e.Client.OrderStatusCode.
 		Create().
+		SetID(obj.ID).
 		SetOrderStatus(obj.OrderStatus).
 		Save(ctx)
 	return

@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/thaiha1607/foursquare_server/ent"
 	"github.com/thaiha1607/foursquare_server/interfaces"
@@ -38,11 +37,7 @@ func (h *ProductHandler) Fetch(c echo.Context) error {
 
 func (h *ProductHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
-	}
-	product, err := h.Service.GetByID(ctx, id)
+	product, err := h.Service.GetByID(ctx, c.Param("id"))
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
@@ -66,14 +61,10 @@ func (h *ProductHandler) Store(c echo.Context) error {
 func (h *ProductHandler) Update(c echo.Context) error {
 	ctx := context.Background()
 	var product ent.Product
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
-	}
 	if err := c.Bind(&product); err != nil {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
-	if err := h.Service.Update(ctx, id, &product); err != nil {
+	if err := h.Service.Update(ctx, c.Param("id"), &product); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
@@ -82,11 +73,7 @@ func (h *ProductHandler) Update(c echo.Context) error {
 
 func (h *ProductHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
-	}
-	if err := h.Service.Delete(ctx, id); err != nil {
+	if err := h.Service.Delete(ctx, c.Param("id")); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}

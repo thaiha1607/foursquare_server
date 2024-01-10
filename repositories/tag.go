@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent"
 	_ "github.com/thaiha1607/foursquare_server/ent/runtime"
 	"github.com/thaiha1607/foursquare_server/interfaces"
@@ -23,7 +22,7 @@ func (e *entTagRepository) Fetch(ctx context.Context) ([]*ent.Tag, error) {
 	return tags, nil
 }
 
-func (e *entTagRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.Tag, error) {
+func (e *entTagRepository) GetByID(ctx context.Context, id string) (*ent.Tag, error) {
 	tag, err := e.Client.Tag.
 		Get(ctx, id)
 	if err != nil {
@@ -41,7 +40,7 @@ func (e *entTagRepository) Store(ctx context.Context, obj *ent.Tag) (err error) 
 	return
 }
 
-func (e *entTagRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Tag) (err error) {
+func (e *entTagRepository) Update(ctx context.Context, id string, obj *ent.Tag) (err error) {
 	//lint:ignore SA4006 we want to return the result of updating operation
 	obj, err = e.Client.Tag.
 		UpdateOneID(id).
@@ -50,7 +49,7 @@ func (e *entTagRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Ta
 	return
 }
 
-func (e *entTagRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (e *entTagRepository) Delete(ctx context.Context, id string) error {
 	return e.Client.Tag.
 		DeleteOneID(id).
 		Exec(ctx)

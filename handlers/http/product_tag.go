@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/thaiha1607/foursquare_server/ent"
 	"github.com/thaiha1607/foursquare_server/interfaces"
@@ -49,15 +48,11 @@ func (h *ProductTagHandler) Store(c echo.Context) error {
 
 func (h *ProductTagHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
-	product_id, err := uuid.Parse(c.QueryParam("product_id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
-	}
-	tag_id, err := uuid.Parse(c.QueryParam("tag_id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
-	}
-	if err := h.Service.Delete(ctx, product_id, tag_id); err != nil {
+	if err := h.Service.Delete(
+		ctx,
+		c.QueryParam("product_id"),
+		c.QueryParam("tag_id"),
+	); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}

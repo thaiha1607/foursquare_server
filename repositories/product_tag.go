@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	_ "github.com/thaiha1607/foursquare_server/ent/runtime"
@@ -34,7 +33,7 @@ func (e *entProductTagRepository) Store(ctx context.Context, obj *ent.ProductTag
 	return
 }
 
-func (e *entProductTagRepository) Delete(ctx context.Context, product_id uuid.UUID, tag_id uuid.UUID) (err error) {
+func (e *entProductTagRepository) Delete(ctx context.Context, product_id string, tag_id string) (err error) {
 	_, err = e.Client.ProductTag.
 		Delete().
 		Where(

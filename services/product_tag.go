@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent"
 	"github.com/thaiha1607/foursquare_server/interfaces"
 )
@@ -26,6 +25,6 @@ func (p *productTagService) Store(ctx context.Context, obj *ent.ProductTag) erro
 	return p.productTagRepo.Store(ctx, obj)
 }
 
-func (p *productTagService) Delete(ctx context.Context, product_id uuid.UUID, tag_id uuid.UUID) error {
+func (p *productTagService) Delete(ctx context.Context, product_id string, tag_id string) error {
 	return p.productTagRepo.Delete(ctx, product_id, tag_id)
 }

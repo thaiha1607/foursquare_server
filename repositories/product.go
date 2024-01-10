@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent"
 	_ "github.com/thaiha1607/foursquare_server/ent/runtime"
 	"github.com/thaiha1607/foursquare_server/interfaces"
@@ -23,7 +22,7 @@ func (e *entProductRepository) Fetch(ctx context.Context) ([]*ent.Product, error
 	return products, nil
 }
 
-func (e *entProductRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.Product, error) {
+func (e *entProductRepository) GetByID(ctx context.Context, id string) (*ent.Product, error) {
 	product, err := e.Client.Product.
 		Get(ctx, id)
 	if err != nil {
@@ -48,7 +47,7 @@ func (e *entProductRepository) Store(ctx context.Context, obj *ent.Product) (err
 	return err
 }
 
-func (e *entProductRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Product) error {
+func (e *entProductRepository) Update(ctx context.Context, id string, obj *ent.Product) error {
 	//lint:ignore SA4006 we want to return the result of updating operation
 	obj, err := e.Client.Product.
 		UpdateOneID(id).
@@ -64,7 +63,7 @@ func (e *entProductRepository) Update(ctx context.Context, id uuid.UUID, obj *en
 	return err
 }
 
-func (e *entProductRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (e *entProductRepository) Delete(ctx context.Context, id string) error {
 	return e.Client.Product.
 		DeleteOneID(id).
 		Exec(ctx)
