@@ -30,7 +30,8 @@ func (h *OrderLineItemHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	orderLineItems, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, orderLineItems)
 }
@@ -43,7 +44,8 @@ func (h *OrderLineItemHandler) GetByID(c echo.Context) error {
 	}
 	orderLineItem, err := h.Service.GetByID(ctx, id)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, orderLineItem)
 }
@@ -55,7 +57,8 @@ func (h *OrderLineItemHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &order_line_item); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, order_line_item)
 }
@@ -71,7 +74,8 @@ func (h *OrderLineItemHandler) Update(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Update(ctx, id, &order_line_item); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, order_line_item)
 }
@@ -83,7 +87,8 @@ func (h *OrderLineItemHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }

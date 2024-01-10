@@ -28,7 +28,8 @@ func (h *ProductTagHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	productTags, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, productTags)
 }
@@ -40,7 +41,8 @@ func (h *ProductTagHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &product_tag); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, product_tag)
 }
@@ -56,7 +58,8 @@ func (h *ProductTagHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, product_id, tag_id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }

@@ -30,7 +30,8 @@ func (h *OrderStatusCodeHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	orderStatusCodes, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, orderStatusCodes)
 }
@@ -43,7 +44,8 @@ func (h *OrderStatusCodeHandler) GetByID(c echo.Context) error {
 	}
 	orderStatusCode, err := h.Service.GetByID(ctx, id)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, orderStatusCode)
 }
@@ -55,7 +57,8 @@ func (h *OrderStatusCodeHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &order_status_code); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, order_status_code)
 }
@@ -71,7 +74,8 @@ func (h *OrderStatusCodeHandler) Update(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Update(ctx, id, &order_status_code); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, order_status_code)
 }
@@ -83,7 +87,8 @@ func (h *OrderStatusCodeHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }

@@ -29,7 +29,8 @@ func (h *ProductImageHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
 	productImages, err := h.Service.Fetch(ctx)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, productImages)
 }
@@ -42,7 +43,8 @@ func (h *ProductImageHandler) GetByID(c echo.Context) error {
 	}
 	productImage, err := h.Service.GetByID(ctx, id)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, productImage)
 }
@@ -54,7 +56,8 @@ func (h *ProductImageHandler) Store(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Store(ctx, &product_image); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.JSON(http.StatusOK, product_image)
 }
@@ -66,7 +69,8 @@ func (h *ProductImageHandler) Delete(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
-		return c.String(http.StatusInternalServerError, "Internal Server Error")
+		err_rsp := handleError(err)
+		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
 	return c.String(http.StatusOK, "OK")
 }
