@@ -20,7 +20,8 @@ func (Tag) Fields() []ent.Field {
 			Unique().
 			MinLen(6),
 		field.String("title").
-			NotEmpty(),
+			NotEmpty().
+			Unique(),
 	}
 }
 
