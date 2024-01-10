@@ -28,7 +28,7 @@ type OrderLineItem struct {
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
-	ProductID uuid.UUID `json:"product_id,omitempty"`
+	ProductID string `json:"product_id,omitempty"`
 	// Qty holds the value of the "qty" field.
 	Qty decimal.Decimal `json:"qty,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -81,9 +81,11 @@ func (*OrderLineItem) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case orderlineitem.FieldQty:
 			values[i] = new(decimal.Decimal)
+		case orderlineitem.FieldProductID:
+			values[i] = new(sql.NullString)
 		case orderlineitem.FieldCreatedAt, orderlineitem.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case orderlineitem.FieldID, orderlineitem.FieldOrderID, orderlineitem.FieldProductID:
+		case orderlineitem.FieldID, orderlineitem.FieldOrderID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -125,10 +127,10 @@ func (oli *OrderLineItem) assignValues(columns []string, values []any) error {
 				oli.OrderID = *value
 			}
 		case orderlineitem.FieldProductID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
-			} else if value != nil {
-				oli.ProductID = *value
+			} else if value.Valid {
+				oli.ProductID = value.String
 			}
 		case orderlineitem.FieldQty:
 			if value, ok := values[i].(*decimal.Decimal); !ok {
@@ -192,7 +194,7 @@ func (oli *OrderLineItem) String() string {
 	builder.WriteString(fmt.Sprintf("%v", oli.OrderID))
 	builder.WriteString(", ")
 	builder.WriteString("product_id=")
-	builder.WriteString(fmt.Sprintf("%v", oli.ProductID))
+	builder.WriteString(oli.ProductID)
 	builder.WriteString(", ")
 	builder.WriteString("qty=")
 	builder.WriteString(fmt.Sprintf("%v", oli.Qty))

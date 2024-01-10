@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
@@ -131,8 +130,8 @@ func (tq *TagQuery) FirstX(ctx context.Context) *Tag {
 
 // FirstID returns the first Tag ID from the query.
 // Returns a *NotFoundError when no Tag ID was found.
-func (tq *TagQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (tq *TagQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -144,7 +143,7 @@ func (tq *TagQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tq *TagQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (tq *TagQuery) FirstIDX(ctx context.Context) string {
 	id, err := tq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +181,8 @@ func (tq *TagQuery) OnlyX(ctx context.Context) *Tag {
 // OnlyID is like Only, but returns the only Tag ID in the query.
 // Returns a *NotSingularError when more than one Tag ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (tq *TagQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (tq *TagQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -199,7 +198,7 @@ func (tq *TagQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tq *TagQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (tq *TagQuery) OnlyIDX(ctx context.Context) string {
 	id, err := tq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +226,7 @@ func (tq *TagQuery) AllX(ctx context.Context) []*Tag {
 }
 
 // IDs executes the query and returns a list of Tag IDs.
-func (tq *TagQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (tq *TagQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if tq.ctx.Unique == nil && tq.path != nil {
 		tq.Unique(true)
 	}
@@ -239,7 +238,7 @@ func (tq *TagQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tq *TagQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (tq *TagQuery) IDsX(ctx context.Context) []string {
 	ids, err := tq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -449,8 +448,8 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 
 func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Product)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Tag)
-	nids := make(map[uuid.UUID]map[*Tag]struct{})
+	byID := make(map[string]*Tag)
+	nids := make(map[string]map[*Tag]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -479,11 +478,11 @@ func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(uuid.UUID)}, values...), nil
+				return append([]any{new(sql.NullString)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
@@ -510,7 +509,7 @@ func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes
 }
 func (tq *TagQuery) loadProductTags(ctx context.Context, query *ProductTagQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *ProductTag)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Tag)
+	nodeids := make(map[string]*Tag)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -549,7 +548,7 @@ func (tq *TagQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (tq *TagQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
 	_spec.From = tq.sql
 	if unique := tq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

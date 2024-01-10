@@ -54,6 +54,12 @@ func (oscc *OrderStatusCodeCreate) SetOrderStatus(s string) *OrderStatusCodeCrea
 	return oscc
 }
 
+// SetID sets the "id" field.
+func (oscc *OrderStatusCodeCreate) SetID(i int) *OrderStatusCodeCreate {
+	oscc.mutation.SetID(i)
+	return oscc
+}
+
 // Mutation returns the OrderStatusCodeMutation object of the builder.
 func (oscc *OrderStatusCodeCreate) Mutation() *OrderStatusCodeMutation {
 	return oscc.mutation
@@ -115,6 +121,11 @@ func (oscc *OrderStatusCodeCreate) check() error {
 			return &ValidationError{Name: "order_status", err: fmt.Errorf(`ent: validator failed for field "OrderStatusCode.order_status": %w`, err)}
 		}
 	}
+	if v, ok := oscc.mutation.ID(); ok {
+		if err := orderstatuscode.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "OrderStatusCode.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -129,8 +140,10 @@ func (oscc *OrderStatusCodeCreate) sqlSave(ctx context.Context) (*OrderStatusCod
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	oscc.mutation.id = &_node.ID
 	oscc.mutation.done = true
 	return _node, nil
@@ -141,6 +154,10 @@ func (oscc *OrderStatusCodeCreate) createSpec() (*OrderStatusCode, *sqlgraph.Cre
 		_node = &OrderStatusCode{config: oscc.config}
 		_spec = sqlgraph.NewCreateSpec(orderstatuscode.Table, sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt))
 	)
+	if id, ok := oscc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := oscc.mutation.CreatedAt(); ok {
 		_spec.SetField(orderstatuscode.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -201,7 +218,7 @@ func (osccb *OrderStatusCodeCreateBulk) Save(ctx context.Context) ([]*OrderStatu
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

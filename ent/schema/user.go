@@ -17,7 +17,13 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.JSON("avatar_url", &url.URL{}).
+		field.String("avatar_url").
+			Validate(
+				func(s string) error {
+					_, err := url.Parse(s)
+					return err
+				},
+			).
 			Optional(),
 		field.String("email").
 			Validate(

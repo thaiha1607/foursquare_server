@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -36,8 +35,16 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 }
 
 // SetAvatarURL sets the "avatar_url" field.
-func (uu *UserUpdate) SetAvatarURL(u *url.URL) *UserUpdate {
-	uu.mutation.SetAvatarURL(u)
+func (uu *UserUpdate) SetAvatarURL(s string) *UserUpdate {
+	uu.mutation.SetAvatarURL(s)
+	return uu
+}
+
+// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableAvatarURL(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetAvatarURL(*s)
+	}
 	return uu
 }
 
@@ -198,6 +205,11 @@ func (uu *UserUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
+	if v, ok := uu.mutation.AvatarURL(); ok {
+		if err := user.AvatarURLValidator(v); err != nil {
+			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "User.avatar_url": %w`, err)}
+		}
+	}
 	if v, ok := uu.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -232,10 +244,10 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := uu.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeJSON, value)
+		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
 	}
 	if uu.mutation.AvatarURLCleared() {
-		_spec.ClearField(user.FieldAvatarURL, field.TypeJSON)
+		_spec.ClearField(user.FieldAvatarURL, field.TypeString)
 	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -294,8 +306,16 @@ func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 }
 
 // SetAvatarURL sets the "avatar_url" field.
-func (uuo *UserUpdateOne) SetAvatarURL(u *url.URL) *UserUpdateOne {
-	uuo.mutation.SetAvatarURL(u)
+func (uuo *UserUpdateOne) SetAvatarURL(s string) *UserUpdateOne {
+	uuo.mutation.SetAvatarURL(s)
+	return uuo
+}
+
+// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableAvatarURL(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetAvatarURL(*s)
+	}
 	return uuo
 }
 
@@ -469,6 +489,11 @@ func (uuo *UserUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
+	if v, ok := uuo.mutation.AvatarURL(); ok {
+		if err := user.AvatarURLValidator(v); err != nil {
+			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "User.avatar_url": %w`, err)}
+		}
+	}
 	if v, ok := uuo.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -520,10 +545,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := uuo.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeJSON, value)
+		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
 	}
 	if uuo.mutation.AvatarURLCleared() {
-		_spec.ClearField(user.FieldAvatarURL, field.TypeJSON)
+		_spec.ClearField(user.FieldAvatarURL, field.TypeString)
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)

@@ -32,7 +32,7 @@ func (OrderLineItem) Fields() []ent.Field {
 			Immutable(),
 		field.UUID("order_id", uuid.UUID{}).
 			Immutable(),
-		field.UUID("product_id", uuid.UUID{}).
+		field.String("product_id").
 			Immutable(),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).

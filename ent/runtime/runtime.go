@@ -236,10 +236,30 @@ func init() {
 	// orderstatuscode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	orderstatuscode.UpdateDefaultUpdatedAt = orderstatuscodeDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// orderstatuscodeDescOrderStatus is the schema descriptor for order_status field.
-	orderstatuscodeDescOrderStatus := orderstatuscodeFields[0].Descriptor()
+	orderstatuscodeDescOrderStatus := orderstatuscodeFields[1].Descriptor()
 	// orderstatuscode.OrderStatusValidator is a validator for the "order_status" field. It is called by the builders before save.
 	orderstatuscode.OrderStatusValidator = orderstatuscodeDescOrderStatus.Validators[0].(func(string) error)
+	// orderstatuscodeDescID is the schema descriptor for id field.
+	orderstatuscodeDescID := orderstatuscodeFields[0].Descriptor()
+	// orderstatuscode.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	orderstatuscode.IDValidator = func() func(int) error {
+		validators := orderstatuscodeDescID.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(id int) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	productMixin := schema.Product{}.Mixin()
+	productHooks := schema.Product{}.Hooks()
+	product.Hooks[0] = productHooks[0]
 	productMixinFields0 := productMixin[0].Fields()
 	_ = productMixinFields0
 	productFields := schema.Product{}.Fields()
@@ -282,8 +302,22 @@ func init() {
 	}()
 	// productDescID is the schema descriptor for id field.
 	productDescID := productFields[2].Descriptor()
-	// product.DefaultID holds the default value on creation for the id field.
-	product.DefaultID = productDescID.Default.(func() uuid.UUID)
+	// product.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	product.IDValidator = func() func(string) error {
+		validators := productDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	productimageMixin := schema.ProductImage{}.Mixin()
 	productimageMixinFields0 := productimageMixin[0].Fields()
 	_ = productimageMixinFields0
@@ -299,6 +333,10 @@ func init() {
 	productimage.DefaultUpdatedAt = productimageDescUpdatedAt.Default.(func() time.Time)
 	// productimage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	productimage.UpdateDefaultUpdatedAt = productimageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// productimageDescImageURL is the schema descriptor for image_url field.
+	productimageDescImageURL := productimageFields[2].Descriptor()
+	// productimage.ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	productimage.ImageURLValidator = productimageDescImageURL.Validators[0].(func(string) error)
 	// productimageDescID is the schema descriptor for id field.
 	productimageDescID := productimageFields[0].Descriptor()
 	// productimage.DefaultID holds the default value on creation for the id field.
@@ -310,6 +348,8 @@ func init() {
 	// producttag.DefaultCreatedAt holds the default value on creation for the created_at field.
 	producttag.DefaultCreatedAt = producttagDescCreatedAt.Default.(func() time.Time)
 	tagMixin := schema.Tag{}.Mixin()
+	tagHooks := schema.Tag{}.Hooks()
+	tag.Hooks[0] = tagHooks[0]
 	tagMixinFields0 := tagMixin[0].Fields()
 	_ = tagMixinFields0
 	tagFields := schema.Tag{}.Fields()
@@ -330,8 +370,22 @@ func init() {
 	tag.TitleValidator = tagDescTitle.Validators[0].(func(string) error)
 	// tagDescID is the schema descriptor for id field.
 	tagDescID := tagFields[0].Descriptor()
-	// tag.DefaultID holds the default value on creation for the id field.
-	tag.DefaultID = tagDescID.Default.(func() uuid.UUID)
+	// tag.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	tag.IDValidator = func() func(string) error {
+		validators := tagDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
@@ -347,6 +401,10 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescAvatarURL is the schema descriptor for avatar_url field.
+	userDescAvatarURL := userFields[0].Descriptor()
+	// user.AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
+	user.AvatarURLValidator = userDescAvatarURL.Validators[0].(func(string) error)
 	// userDescEmail is the schema descriptor for email field.
 	userDescEmail := userFields[1].Descriptor()
 	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.

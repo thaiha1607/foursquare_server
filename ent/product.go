@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 )
@@ -18,7 +17,7 @@ import (
 type Product struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -83,12 +82,10 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 			values[i] = new(decimal.Decimal)
 		case product.FieldYear:
 			values[i] = new(sql.NullInt64)
-		case product.FieldName, product.FieldDescription, product.FieldUnitOfMeasurement, product.FieldType, product.FieldProvider:
+		case product.FieldID, product.FieldName, product.FieldDescription, product.FieldUnitOfMeasurement, product.FieldType, product.FieldProvider:
 			values[i] = new(sql.NullString)
 		case product.FieldCreatedAt, product.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case product.FieldID:
-			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,10 +102,10 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case product.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				pr.ID = *value
+			} else if value.Valid {
+				pr.ID = value.String
 			}
 		case product.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

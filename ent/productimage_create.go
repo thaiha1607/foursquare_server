@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -52,14 +51,14 @@ func (pic *ProductImageCreate) SetNillableUpdatedAt(t *time.Time) *ProductImageC
 }
 
 // SetProductID sets the "product_id" field.
-func (pic *ProductImageCreate) SetProductID(u uuid.UUID) *ProductImageCreate {
-	pic.mutation.SetProductID(u)
+func (pic *ProductImageCreate) SetProductID(s string) *ProductImageCreate {
+	pic.mutation.SetProductID(s)
 	return pic
 }
 
 // SetImageURL sets the "image_url" field.
-func (pic *ProductImageCreate) SetImageURL(u *url.URL) *ProductImageCreate {
-	pic.mutation.SetImageURL(u)
+func (pic *ProductImageCreate) SetImageURL(s string) *ProductImageCreate {
+	pic.mutation.SetImageURL(s)
 	return pic
 }
 
@@ -145,6 +144,11 @@ func (pic *ProductImageCreate) check() error {
 	if _, ok := pic.mutation.ImageURL(); !ok {
 		return &ValidationError{Name: "image_url", err: errors.New(`ent: missing required field "ProductImage.image_url"`)}
 	}
+	if v, ok := pic.mutation.ImageURL(); ok {
+		if err := productimage.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "ProductImage.image_url": %w`, err)}
+		}
+	}
 	if _, ok := pic.mutation.ProductID(); !ok {
 		return &ValidationError{Name: "product", err: errors.New(`ent: missing required edge "ProductImage.product"`)}
 	}
@@ -192,7 +196,7 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 		_node.UpdatedAt = value
 	}
 	if value, ok := pic.mutation.ImageURL(); ok {
-		_spec.SetField(productimage.FieldImageURL, field.TypeJSON, value)
+		_spec.SetField(productimage.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = value
 	}
 	if nodes := pic.mutation.ProductIDs(); len(nodes) > 0 {
@@ -203,7 +207,7 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 			Columns: []string{productimage.ProductColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -11,7 +11,7 @@ import (
 var (
 	// AccountsColumns holds the columns for the "accounts" table.
 	AccountsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true, Size: 10},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
@@ -265,7 +265,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "order_id", Type: field.TypeUUID},
-		{Name: "product_id", Type: field.TypeUUID},
+		{Name: "product_id", Type: field.TypeString},
 	}
 	// OrderLineItemsTable holds the schema information for the "order_line_items" table.
 	OrderLineItemsTable = &schema.Table{
@@ -309,7 +309,7 @@ var (
 	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
@@ -332,8 +332,8 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "image_url", Type: field.TypeJSON},
-		{Name: "product_id", Type: field.TypeUUID},
+		{Name: "image_url", Type: field.TypeString},
+		{Name: "product_id", Type: field.TypeString},
 	}
 	// ProductImagesTable holds the schema information for the "product_images" table.
 	ProductImagesTable = &schema.Table{
@@ -352,8 +352,8 @@ var (
 	// ProductTagsColumns holds the columns for the "product_tags" table.
 	ProductTagsColumns = []*schema.Column{
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "product_id", Type: field.TypeUUID},
-		{Name: "tag_id", Type: field.TypeUUID},
+		{Name: "product_id", Type: field.TypeString},
+		{Name: "tag_id", Type: field.TypeString},
 	}
 	// ProductTagsTable holds the schema information for the "product_tags" table.
 	ProductTagsTable = &schema.Table{
@@ -377,7 +377,7 @@ var (
 	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString},
@@ -393,7 +393,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "avatar_url", Type: field.TypeJSON, Nullable: true},
+		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "phone", Type: field.TypeString, Unique: true},

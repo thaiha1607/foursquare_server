@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
@@ -57,28 +56,20 @@ func (tc *TagCreate) SetTitle(s string) *TagCreate {
 }
 
 // SetID sets the "id" field.
-func (tc *TagCreate) SetID(u uuid.UUID) *TagCreate {
-	tc.mutation.SetID(u)
-	return tc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (tc *TagCreate) SetNillableID(u *uuid.UUID) *TagCreate {
-	if u != nil {
-		tc.SetID(*u)
-	}
+func (tc *TagCreate) SetID(s string) *TagCreate {
+	tc.mutation.SetID(s)
 	return tc
 }
 
 // AddProductIDs adds the "products" edge to the Product entity by IDs.
-func (tc *TagCreate) AddProductIDs(ids ...uuid.UUID) *TagCreate {
+func (tc *TagCreate) AddProductIDs(ids ...string) *TagCreate {
 	tc.mutation.AddProductIDs(ids...)
 	return tc
 }
 
 // AddProducts adds the "products" edges to the Product entity.
 func (tc *TagCreate) AddProducts(p ...*Product) *TagCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -92,7 +83,9 @@ func (tc *TagCreate) Mutation() *TagMutation {
 
 // Save creates the Tag in the database.
 func (tc *TagCreate) Save(ctx context.Context) (*Tag, error) {
-	tc.defaults()
+	if err := tc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
@@ -119,19 +112,22 @@ func (tc *TagCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (tc *TagCreate) defaults() {
+func (tc *TagCreate) defaults() error {
 	if _, ok := tc.mutation.CreatedAt(); !ok {
+		if tag.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized tag.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := tag.DefaultCreatedAt()
 		tc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := tc.mutation.UpdatedAt(); !ok {
+		if tag.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized tag.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := tag.DefaultUpdatedAt()
 		tc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := tc.mutation.ID(); !ok {
-		v := tag.DefaultID()
-		tc.mutation.SetID(v)
-	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -150,6 +146,11 @@ func (tc *TagCreate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Tag.title": %w`, err)}
 		}
 	}
+	if v, ok := tc.mutation.ID(); ok {
+		if err := tag.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Tag.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -165,10 +166,10 @@ func (tc *TagCreate) sqlSave(ctx context.Context) (*Tag, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Tag.ID type: %T", _spec.ID.Value)
 		}
 	}
 	tc.mutation.id = &_node.ID
@@ -179,11 +180,11 @@ func (tc *TagCreate) sqlSave(ctx context.Context) (*Tag, error) {
 func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Tag{config: tc.config}
-		_spec = sqlgraph.NewCreateSpec(tag.Table, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(tag.Table, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
 	)
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.SetField(tag.FieldCreatedAt, field.TypeTime, value)
@@ -205,7 +206,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -7,17 +7,16 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
 
 // ProductID applies equality check predicate on the "product_id" field. It's identical to ProductIDEQ.
-func ProductID(v uuid.UUID) predicate.ProductTag {
+func ProductID(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldEQ(FieldProductID, v))
 }
 
 // TagID applies equality check predicate on the "tag_id" field. It's identical to TagIDEQ.
-func TagID(v uuid.UUID) predicate.ProductTag {
+func TagID(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldEQ(FieldTagID, v))
 }
 
@@ -27,43 +26,133 @@ func CreatedAt(v time.Time) predicate.ProductTag {
 }
 
 // ProductIDEQ applies the EQ predicate on the "product_id" field.
-func ProductIDEQ(v uuid.UUID) predicate.ProductTag {
+func ProductIDEQ(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldEQ(FieldProductID, v))
 }
 
 // ProductIDNEQ applies the NEQ predicate on the "product_id" field.
-func ProductIDNEQ(v uuid.UUID) predicate.ProductTag {
+func ProductIDNEQ(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldNEQ(FieldProductID, v))
 }
 
 // ProductIDIn applies the In predicate on the "product_id" field.
-func ProductIDIn(vs ...uuid.UUID) predicate.ProductTag {
+func ProductIDIn(vs ...string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldIn(FieldProductID, vs...))
 }
 
 // ProductIDNotIn applies the NotIn predicate on the "product_id" field.
-func ProductIDNotIn(vs ...uuid.UUID) predicate.ProductTag {
+func ProductIDNotIn(vs ...string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldNotIn(FieldProductID, vs...))
 }
 
+// ProductIDGT applies the GT predicate on the "product_id" field.
+func ProductIDGT(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldGT(FieldProductID, v))
+}
+
+// ProductIDGTE applies the GTE predicate on the "product_id" field.
+func ProductIDGTE(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldGTE(FieldProductID, v))
+}
+
+// ProductIDLT applies the LT predicate on the "product_id" field.
+func ProductIDLT(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldLT(FieldProductID, v))
+}
+
+// ProductIDLTE applies the LTE predicate on the "product_id" field.
+func ProductIDLTE(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldLTE(FieldProductID, v))
+}
+
+// ProductIDContains applies the Contains predicate on the "product_id" field.
+func ProductIDContains(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldContains(FieldProductID, v))
+}
+
+// ProductIDHasPrefix applies the HasPrefix predicate on the "product_id" field.
+func ProductIDHasPrefix(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldHasPrefix(FieldProductID, v))
+}
+
+// ProductIDHasSuffix applies the HasSuffix predicate on the "product_id" field.
+func ProductIDHasSuffix(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldHasSuffix(FieldProductID, v))
+}
+
+// ProductIDEqualFold applies the EqualFold predicate on the "product_id" field.
+func ProductIDEqualFold(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldEqualFold(FieldProductID, v))
+}
+
+// ProductIDContainsFold applies the ContainsFold predicate on the "product_id" field.
+func ProductIDContainsFold(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldContainsFold(FieldProductID, v))
+}
+
 // TagIDEQ applies the EQ predicate on the "tag_id" field.
-func TagIDEQ(v uuid.UUID) predicate.ProductTag {
+func TagIDEQ(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldEQ(FieldTagID, v))
 }
 
 // TagIDNEQ applies the NEQ predicate on the "tag_id" field.
-func TagIDNEQ(v uuid.UUID) predicate.ProductTag {
+func TagIDNEQ(v string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldNEQ(FieldTagID, v))
 }
 
 // TagIDIn applies the In predicate on the "tag_id" field.
-func TagIDIn(vs ...uuid.UUID) predicate.ProductTag {
+func TagIDIn(vs ...string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldIn(FieldTagID, vs...))
 }
 
 // TagIDNotIn applies the NotIn predicate on the "tag_id" field.
-func TagIDNotIn(vs ...uuid.UUID) predicate.ProductTag {
+func TagIDNotIn(vs ...string) predicate.ProductTag {
 	return predicate.ProductTag(sql.FieldNotIn(FieldTagID, vs...))
+}
+
+// TagIDGT applies the GT predicate on the "tag_id" field.
+func TagIDGT(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldGT(FieldTagID, v))
+}
+
+// TagIDGTE applies the GTE predicate on the "tag_id" field.
+func TagIDGTE(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldGTE(FieldTagID, v))
+}
+
+// TagIDLT applies the LT predicate on the "tag_id" field.
+func TagIDLT(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldLT(FieldTagID, v))
+}
+
+// TagIDLTE applies the LTE predicate on the "tag_id" field.
+func TagIDLTE(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldLTE(FieldTagID, v))
+}
+
+// TagIDContains applies the Contains predicate on the "tag_id" field.
+func TagIDContains(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldContains(FieldTagID, v))
+}
+
+// TagIDHasPrefix applies the HasPrefix predicate on the "tag_id" field.
+func TagIDHasPrefix(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldHasPrefix(FieldTagID, v))
+}
+
+// TagIDHasSuffix applies the HasSuffix predicate on the "tag_id" field.
+func TagIDHasSuffix(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldHasSuffix(FieldTagID, v))
+}
+
+// TagIDEqualFold applies the EqualFold predicate on the "tag_id" field.
+func TagIDEqualFold(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldEqualFold(FieldTagID, v))
+}
+
+// TagIDContainsFold applies the ContainsFold predicate on the "tag_id" field.
+func TagIDContainsFold(v string) predicate.ProductTag {
+	return predicate.ProductTag(sql.FieldContainsFold(FieldTagID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

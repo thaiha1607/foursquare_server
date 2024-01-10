@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -17,7 +16,7 @@ import (
 type Tag struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -64,12 +63,10 @@ func (*Tag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tag.FieldTitle:
+		case tag.FieldID, tag.FieldTitle:
 			values[i] = new(sql.NullString)
 		case tag.FieldCreatedAt, tag.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case tag.FieldID:
-			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,10 +83,10 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case tag.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				t.ID = *value
+			} else if value.Valid {
+				t.ID = value.String
 			}
 		case tag.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

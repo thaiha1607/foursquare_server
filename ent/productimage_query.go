@@ -402,8 +402,8 @@ func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 }
 
 func (piq *ProductImageQuery) loadProduct(ctx context.Context, query *ProductQuery, nodes []*ProductImage, init func(*ProductImage), assign func(*ProductImage, *Product)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*ProductImage)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*ProductImage)
 	for i := range nodes {
 		fk := nodes[i].ProductID
 		if _, ok := nodeids[fk]; !ok {

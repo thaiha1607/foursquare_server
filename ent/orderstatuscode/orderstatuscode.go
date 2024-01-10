@@ -50,6 +50,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// OrderStatusValidator is a validator for the "order_status" field. It is called by the builders before save.
 	OrderStatusValidator func(string) error
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the OrderStatusCode queries.

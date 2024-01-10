@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -51,8 +50,16 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 }
 
 // SetAvatarURL sets the "avatar_url" field.
-func (uc *UserCreate) SetAvatarURL(u *url.URL) *UserCreate {
-	uc.mutation.SetAvatarURL(u)
+func (uc *UserCreate) SetAvatarURL(s string) *UserCreate {
+	uc.mutation.SetAvatarURL(s)
+	return uc
+}
+
+// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
+func (uc *UserCreate) SetNillableAvatarURL(s *string) *UserCreate {
+	if s != nil {
+		uc.SetAvatarURL(*s)
+	}
 	return uc
 }
 
@@ -195,6 +202,11 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
+	if v, ok := uc.mutation.AvatarURL(); ok {
+		if err := user.AvatarURLValidator(v); err != nil {
+			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "User.avatar_url": %w`, err)}
+		}
+	}
 	if v, ok := uc.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -260,7 +272,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.UpdatedAt = value
 	}
 	if value, ok := uc.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeJSON, value)
+		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
 		_node.AvatarURL = value
 	}
 	if value, ok := uc.mutation.Email(); ok {

@@ -59,8 +59,8 @@ func (olic *OrderLineItemCreate) SetOrderID(u uuid.UUID) *OrderLineItemCreate {
 }
 
 // SetProductID sets the "product_id" field.
-func (olic *OrderLineItemCreate) SetProductID(u uuid.UUID) *OrderLineItemCreate {
-	olic.mutation.SetProductID(u)
+func (olic *OrderLineItemCreate) SetProductID(s string) *OrderLineItemCreate {
+	olic.mutation.SetProductID(s)
 	return olic
 }
 
@@ -238,7 +238,7 @@ func (olic *OrderLineItemCreate) createSpec() (*OrderLineItem, *sqlgraph.CreateS
 			Columns: []string{orderlineitem.ProductColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

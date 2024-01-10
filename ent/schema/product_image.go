@@ -29,9 +29,15 @@ func (ProductImage) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Immutable(),
-		field.UUID("product_id", uuid.UUID{}).
+		field.String("product_id").
 			Immutable(),
-		field.JSON("image_url", &url.URL{}).
+		field.String("image_url").
+			Validate(
+				func(s string) error {
+					_, err := url.Parse(s)
+					return err
+				},
+			).
 			Immutable(),
 	}
 }

@@ -1861,7 +1861,7 @@ func (c *ProductClient) UpdateOne(pr *Product) *ProductUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProductClient) UpdateOneID(id uuid.UUID) *ProductUpdateOne {
+func (c *ProductClient) UpdateOneID(id string) *ProductUpdateOne {
 	mutation := newProductMutation(c.config, OpUpdateOne, withProductID(id))
 	return &ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1878,7 +1878,7 @@ func (c *ProductClient) DeleteOne(pr *Product) *ProductDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProductClient) DeleteOneID(id uuid.UUID) *ProductDeleteOne {
+func (c *ProductClient) DeleteOneID(id string) *ProductDeleteOne {
 	builder := c.Delete().Where(product.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1895,12 +1895,12 @@ func (c *ProductClient) Query() *ProductQuery {
 }
 
 // Get returns a Product entity by its id.
-func (c *ProductClient) Get(ctx context.Context, id uuid.UUID) (*Product, error) {
+func (c *ProductClient) Get(ctx context.Context, id string) (*Product, error) {
 	return c.Query().Where(product.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProductClient) GetX(ctx context.Context, id uuid.UUID) *Product {
+func (c *ProductClient) GetX(ctx context.Context, id string) *Product {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1942,7 +1942,8 @@ func (c *ProductClient) QueryProductTags(pr *Product) *ProductTagQuery {
 
 // Hooks returns the client hooks.
 func (c *ProductClient) Hooks() []Hook {
-	return c.hooks.Product
+	hooks := c.hooks.Product
+	return append(hooks[:len(hooks):len(hooks)], product.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -2291,7 +2292,7 @@ func (c *TagClient) UpdateOne(t *Tag) *TagUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TagClient) UpdateOneID(id uuid.UUID) *TagUpdateOne {
+func (c *TagClient) UpdateOneID(id string) *TagUpdateOne {
 	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
 	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -2308,7 +2309,7 @@ func (c *TagClient) DeleteOne(t *Tag) *TagDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TagClient) DeleteOneID(id uuid.UUID) *TagDeleteOne {
+func (c *TagClient) DeleteOneID(id string) *TagDeleteOne {
 	builder := c.Delete().Where(tag.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -2325,12 +2326,12 @@ func (c *TagClient) Query() *TagQuery {
 }
 
 // Get returns a Tag entity by its id.
-func (c *TagClient) Get(ctx context.Context, id uuid.UUID) (*Tag, error) {
+func (c *TagClient) Get(ctx context.Context, id string) (*Tag, error) {
 	return c.Query().Where(tag.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TagClient) GetX(ctx context.Context, id uuid.UUID) *Tag {
+func (c *TagClient) GetX(ctx context.Context, id string) *Tag {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2372,7 +2373,8 @@ func (c *TagClient) QueryProductTags(t *Tag) *ProductTagQuery {
 
 // Hooks returns the client hooks.
 func (c *TagClient) Hooks() []Hook {
-	return c.hooks.Tag
+	hooks := c.hooks.Tag
+	return append(hooks[:len(hooks):len(hooks)], tag.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.

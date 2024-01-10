@@ -474,8 +474,8 @@ func (oliq *OrderLineItemQuery) loadOrder(ctx context.Context, query *OrderQuery
 	return nil
 }
 func (oliq *OrderLineItemQuery) loadProduct(ctx context.Context, query *ProductQuery, nodes []*OrderLineItem, init func(*OrderLineItem), assign func(*OrderLineItem, *Product)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*OrderLineItem)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*OrderLineItem)
 	for i := range nodes {
 		fk := nodes[i].ProductID
 		if _, ok := nodeids[fk]; !ok {

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
@@ -201,14 +200,14 @@ func (pu *ProductUpdate) ClearProvider() *ProductUpdate {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pu *ProductUpdate) AddTagIDs(ids ...uuid.UUID) *ProductUpdate {
+func (pu *ProductUpdate) AddTagIDs(ids ...string) *ProductUpdate {
 	pu.mutation.AddTagIDs(ids...)
 	return pu
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
 func (pu *ProductUpdate) AddTags(t ...*Tag) *ProductUpdate {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]string, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -227,14 +226,14 @@ func (pu *ProductUpdate) ClearTags() *ProductUpdate {
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (pu *ProductUpdate) RemoveTagIDs(ids ...uuid.UUID) *ProductUpdate {
+func (pu *ProductUpdate) RemoveTagIDs(ids ...string) *ProductUpdate {
 	pu.mutation.RemoveTagIDs(ids...)
 	return pu
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
 func (pu *ProductUpdate) RemoveTags(t ...*Tag) *ProductUpdate {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]string, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -243,7 +242,9 @@ func (pu *ProductUpdate) RemoveTags(t ...*Tag) *ProductUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *ProductUpdate) Save(ctx context.Context) (int, error) {
-	pu.defaults()
+	if err := pu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
@@ -270,11 +271,15 @@ func (pu *ProductUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pu *ProductUpdate) defaults() {
+func (pu *ProductUpdate) defaults() error {
 	if _, ok := pu.mutation.UpdatedAt(); !ok {
+		if product.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized product.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := product.UpdateDefaultUpdatedAt()
 		pu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -296,7 +301,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := pu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeString))
 	if ps := pu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -363,7 +368,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		createE := &ProductTagCreate{config: pu.config, mutation: newProductTagMutation(pu.config, OpCreate)}
@@ -380,7 +385,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -400,7 +405,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -602,14 +607,14 @@ func (puo *ProductUpdateOne) ClearProvider() *ProductUpdateOne {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (puo *ProductUpdateOne) AddTagIDs(ids ...uuid.UUID) *ProductUpdateOne {
+func (puo *ProductUpdateOne) AddTagIDs(ids ...string) *ProductUpdateOne {
 	puo.mutation.AddTagIDs(ids...)
 	return puo
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
 func (puo *ProductUpdateOne) AddTags(t ...*Tag) *ProductUpdateOne {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]string, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -628,14 +633,14 @@ func (puo *ProductUpdateOne) ClearTags() *ProductUpdateOne {
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (puo *ProductUpdateOne) RemoveTagIDs(ids ...uuid.UUID) *ProductUpdateOne {
+func (puo *ProductUpdateOne) RemoveTagIDs(ids ...string) *ProductUpdateOne {
 	puo.mutation.RemoveTagIDs(ids...)
 	return puo
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
 func (puo *ProductUpdateOne) RemoveTags(t ...*Tag) *ProductUpdateOne {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]string, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -657,7 +662,9 @@ func (puo *ProductUpdateOne) Select(field string, fields ...string) *ProductUpda
 
 // Save executes the query and returns the updated Product entity.
 func (puo *ProductUpdateOne) Save(ctx context.Context) (*Product, error) {
-	puo.defaults()
+	if err := puo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
@@ -684,11 +691,15 @@ func (puo *ProductUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (puo *ProductUpdateOne) defaults() {
+func (puo *ProductUpdateOne) defaults() error {
 	if _, ok := puo.mutation.UpdatedAt(); !ok {
+		if product.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized product.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := product.UpdateDefaultUpdatedAt()
 		puo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -710,7 +721,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	if err := puo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeString))
 	id, ok := puo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Product.id" for update`)}
@@ -794,7 +805,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		createE := &ProductTagCreate{config: puo.config, mutation: newProductTagMutation(puo.config, OpCreate)}
@@ -811,7 +822,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -831,7 +842,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

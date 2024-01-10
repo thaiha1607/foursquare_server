@@ -19,7 +19,7 @@ func (Account) Fields() []ent.Field {
 		field.String("id").
 			NotEmpty().
 			Unique().
-			MaxLen(10),
+			MinLen(10),
 		field.UUID("user_id", uuid.UUID{}).
 			Immutable(),
 		field.Time("last_reset").

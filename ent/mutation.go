@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"sync"
 	"time"
 
@@ -6242,7 +6241,7 @@ type OrderLineItemMutation struct {
 	clearedFields  map[string]struct{}
 	_order         *uuid.UUID
 	cleared_order  bool
-	product        *uuid.UUID
+	product        *string
 	clearedproduct bool
 	done           bool
 	oldValue       func(context.Context) (*OrderLineItem, error)
@@ -6462,12 +6461,12 @@ func (m *OrderLineItemMutation) ResetOrderID() {
 }
 
 // SetProductID sets the "product_id" field.
-func (m *OrderLineItemMutation) SetProductID(u uuid.UUID) {
-	m.product = &u
+func (m *OrderLineItemMutation) SetProductID(s string) {
+	m.product = &s
 }
 
 // ProductID returns the value of the "product_id" field in the mutation.
-func (m *OrderLineItemMutation) ProductID() (r uuid.UUID, exists bool) {
+func (m *OrderLineItemMutation) ProductID() (r string, exists bool) {
 	v := m.product
 	if v == nil {
 		return
@@ -6478,7 +6477,7 @@ func (m *OrderLineItemMutation) ProductID() (r uuid.UUID, exists bool) {
 // OldProductID returns the old "product_id" field's value of the OrderLineItem entity.
 // If the OrderLineItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderLineItemMutation) OldProductID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *OrderLineItemMutation) OldProductID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldProductID is only allowed on UpdateOne operations")
 	}
@@ -6594,7 +6593,7 @@ func (m *OrderLineItemMutation) ProductCleared() bool {
 // ProductIDs returns the "product" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ProductID instead. It exists only for internal usage by the builders.
-func (m *OrderLineItemMutation) ProductIDs() (ids []uuid.UUID) {
+func (m *OrderLineItemMutation) ProductIDs() (ids []string) {
 	if id := m.product; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6725,7 +6724,7 @@ func (m *OrderLineItemMutation) SetField(name string, value ent.Value) error {
 		m.SetOrderID(v)
 		return nil
 	case orderlineitem.FieldProductID:
-		v, ok := value.(uuid.UUID)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6996,6 +6995,12 @@ func (m OrderStatusCodeMutation) Tx() (*Tx, error) {
 	tx := &Tx{config: m.config}
 	tx.init()
 	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of OrderStatusCode entities.
+func (m *OrderStatusCodeMutation) SetID(id int) {
+	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
@@ -7352,7 +7357,7 @@ type ProductMutation struct {
 	config
 	op                  Op
 	typ                 string
-	id                  *uuid.UUID
+	id                  *string
 	created_at          *time.Time
 	updated_at          *time.Time
 	name                *string
@@ -7367,8 +7372,8 @@ type ProductMutation struct {
 	_type               *string
 	provider            *string
 	clearedFields       map[string]struct{}
-	tags                map[uuid.UUID]struct{}
-	removedtags         map[uuid.UUID]struct{}
+	tags                map[string]struct{}
+	removedtags         map[string]struct{}
 	clearedtags         bool
 	done                bool
 	oldValue            func(context.Context) (*Product, error)
@@ -7395,7 +7400,7 @@ func newProductMutation(c config, op Op, opts ...productOption) *ProductMutation
 }
 
 // withProductID sets the ID field of the mutation.
-func withProductID(id uuid.UUID) productOption {
+func withProductID(id string) productOption {
 	return func(m *ProductMutation) {
 		var (
 			err   error
@@ -7447,13 +7452,13 @@ func (m ProductMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Product entities.
-func (m *ProductMutation) SetID(id uuid.UUID) {
+func (m *ProductMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ProductMutation) ID() (id uuid.UUID, exists bool) {
+func (m *ProductMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -7464,12 +7469,12 @@ func (m *ProductMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ProductMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *ProductMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -7966,9 +7971,9 @@ func (m *ProductMutation) ResetProvider() {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
-func (m *ProductMutation) AddTagIDs(ids ...uuid.UUID) {
+func (m *ProductMutation) AddTagIDs(ids ...string) {
 	if m.tags == nil {
-		m.tags = make(map[uuid.UUID]struct{})
+		m.tags = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.tags[ids[i]] = struct{}{}
@@ -7986,9 +7991,9 @@ func (m *ProductMutation) TagsCleared() bool {
 }
 
 // RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
-func (m *ProductMutation) RemoveTagIDs(ids ...uuid.UUID) {
+func (m *ProductMutation) RemoveTagIDs(ids ...string) {
 	if m.removedtags == nil {
-		m.removedtags = make(map[uuid.UUID]struct{})
+		m.removedtags = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.tags, ids[i])
@@ -7997,7 +8002,7 @@ func (m *ProductMutation) RemoveTagIDs(ids ...uuid.UUID) {
 }
 
 // RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
-func (m *ProductMutation) RemovedTagsIDs() (ids []uuid.UUID) {
+func (m *ProductMutation) RemovedTagsIDs() (ids []string) {
 	for id := range m.removedtags {
 		ids = append(ids, id)
 	}
@@ -8005,7 +8010,7 @@ func (m *ProductMutation) RemovedTagsIDs() (ids []uuid.UUID) {
 }
 
 // TagsIDs returns the "tags" edge IDs in the mutation.
-func (m *ProductMutation) TagsIDs() (ids []uuid.UUID) {
+func (m *ProductMutation) TagsIDs() (ids []string) {
 	for id := range m.tags {
 		ids = append(ids, id)
 	}
@@ -8467,9 +8472,9 @@ type ProductImageMutation struct {
 	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
-	image_url      **url.URL
+	image_url      *string
 	clearedFields  map[string]struct{}
-	product        *uuid.UUID
+	product        *string
 	clearedproduct bool
 	done           bool
 	oldValue       func(context.Context) (*ProductImage, error)
@@ -8653,12 +8658,12 @@ func (m *ProductImageMutation) ResetUpdatedAt() {
 }
 
 // SetProductID sets the "product_id" field.
-func (m *ProductImageMutation) SetProductID(u uuid.UUID) {
-	m.product = &u
+func (m *ProductImageMutation) SetProductID(s string) {
+	m.product = &s
 }
 
 // ProductID returns the value of the "product_id" field in the mutation.
-func (m *ProductImageMutation) ProductID() (r uuid.UUID, exists bool) {
+func (m *ProductImageMutation) ProductID() (r string, exists bool) {
 	v := m.product
 	if v == nil {
 		return
@@ -8669,7 +8674,7 @@ func (m *ProductImageMutation) ProductID() (r uuid.UUID, exists bool) {
 // OldProductID returns the old "product_id" field's value of the ProductImage entity.
 // If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductImageMutation) OldProductID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *ProductImageMutation) OldProductID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldProductID is only allowed on UpdateOne operations")
 	}
@@ -8689,12 +8694,12 @@ func (m *ProductImageMutation) ResetProductID() {
 }
 
 // SetImageURL sets the "image_url" field.
-func (m *ProductImageMutation) SetImageURL(u *url.URL) {
-	m.image_url = &u
+func (m *ProductImageMutation) SetImageURL(s string) {
+	m.image_url = &s
 }
 
 // ImageURL returns the value of the "image_url" field in the mutation.
-func (m *ProductImageMutation) ImageURL() (r *url.URL, exists bool) {
+func (m *ProductImageMutation) ImageURL() (r string, exists bool) {
 	v := m.image_url
 	if v == nil {
 		return
@@ -8705,7 +8710,7 @@ func (m *ProductImageMutation) ImageURL() (r *url.URL, exists bool) {
 // OldImageURL returns the old "image_url" field's value of the ProductImage entity.
 // If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductImageMutation) OldImageURL(ctx context.Context) (v *url.URL, err error) {
+func (m *ProductImageMutation) OldImageURL(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
 	}
@@ -8738,7 +8743,7 @@ func (m *ProductImageMutation) ProductCleared() bool {
 // ProductIDs returns the "product" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ProductID instead. It exists only for internal usage by the builders.
-func (m *ProductImageMutation) ProductIDs() (ids []uuid.UUID) {
+func (m *ProductImageMutation) ProductIDs() (ids []string) {
 	if id := m.product; id != nil {
 		ids = append(ids, *id)
 	}
@@ -8855,14 +8860,14 @@ func (m *ProductImageMutation) SetField(name string, value ent.Value) error {
 		m.SetUpdatedAt(v)
 		return nil
 	case productimage.FieldProductID:
-		v, ok := value.(uuid.UUID)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetProductID(v)
 		return nil
 	case productimage.FieldImageURL:
-		v, ok := value.(*url.URL)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9014,9 +9019,9 @@ type ProductTagMutation struct {
 	typ             string
 	created_at      *time.Time
 	clearedFields   map[string]struct{}
-	products        *uuid.UUID
+	products        *string
 	clearedproducts bool
-	tags            *uuid.UUID
+	tags            *string
 	clearedtags     bool
 	done            bool
 	oldValue        func(context.Context) (*ProductTag, error)
@@ -9062,12 +9067,12 @@ func (m ProductTagMutation) Tx() (*Tx, error) {
 }
 
 // SetProductID sets the "product_id" field.
-func (m *ProductTagMutation) SetProductID(u uuid.UUID) {
-	m.products = &u
+func (m *ProductTagMutation) SetProductID(s string) {
+	m.products = &s
 }
 
 // ProductID returns the value of the "product_id" field in the mutation.
-func (m *ProductTagMutation) ProductID() (r uuid.UUID, exists bool) {
+func (m *ProductTagMutation) ProductID() (r string, exists bool) {
 	v := m.products
 	if v == nil {
 		return
@@ -9081,12 +9086,12 @@ func (m *ProductTagMutation) ResetProductID() {
 }
 
 // SetTagID sets the "tag_id" field.
-func (m *ProductTagMutation) SetTagID(u uuid.UUID) {
-	m.tags = &u
+func (m *ProductTagMutation) SetTagID(s string) {
+	m.tags = &s
 }
 
 // TagID returns the value of the "tag_id" field in the mutation.
-func (m *ProductTagMutation) TagID() (r uuid.UUID, exists bool) {
+func (m *ProductTagMutation) TagID() (r string, exists bool) {
 	v := m.tags
 	if v == nil {
 		return
@@ -9119,7 +9124,7 @@ func (m *ProductTagMutation) ResetCreatedAt() {
 }
 
 // SetProductsID sets the "products" edge to the Product entity by id.
-func (m *ProductTagMutation) SetProductsID(id uuid.UUID) {
+func (m *ProductTagMutation) SetProductsID(id string) {
 	m.products = &id
 }
 
@@ -9135,7 +9140,7 @@ func (m *ProductTagMutation) ProductsCleared() bool {
 }
 
 // ProductsID returns the "products" edge ID in the mutation.
-func (m *ProductTagMutation) ProductsID() (id uuid.UUID, exists bool) {
+func (m *ProductTagMutation) ProductsID() (id string, exists bool) {
 	if m.products != nil {
 		return *m.products, true
 	}
@@ -9145,7 +9150,7 @@ func (m *ProductTagMutation) ProductsID() (id uuid.UUID, exists bool) {
 // ProductsIDs returns the "products" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ProductsID instead. It exists only for internal usage by the builders.
-func (m *ProductTagMutation) ProductsIDs() (ids []uuid.UUID) {
+func (m *ProductTagMutation) ProductsIDs() (ids []string) {
 	if id := m.products; id != nil {
 		ids = append(ids, *id)
 	}
@@ -9159,7 +9164,7 @@ func (m *ProductTagMutation) ResetProducts() {
 }
 
 // SetTagsID sets the "tags" edge to the Tag entity by id.
-func (m *ProductTagMutation) SetTagsID(id uuid.UUID) {
+func (m *ProductTagMutation) SetTagsID(id string) {
 	m.tags = &id
 }
 
@@ -9175,7 +9180,7 @@ func (m *ProductTagMutation) TagsCleared() bool {
 }
 
 // TagsID returns the "tags" edge ID in the mutation.
-func (m *ProductTagMutation) TagsID() (id uuid.UUID, exists bool) {
+func (m *ProductTagMutation) TagsID() (id string, exists bool) {
 	if m.tags != nil {
 		return *m.tags, true
 	}
@@ -9185,7 +9190,7 @@ func (m *ProductTagMutation) TagsID() (id uuid.UUID, exists bool) {
 // TagsIDs returns the "tags" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // TagsID instead. It exists only for internal usage by the builders.
-func (m *ProductTagMutation) TagsIDs() (ids []uuid.UUID) {
+func (m *ProductTagMutation) TagsIDs() (ids []string) {
 	if id := m.tags; id != nil {
 		ids = append(ids, *id)
 	}
@@ -9273,14 +9278,14 @@ func (m *ProductTagMutation) OldField(ctx context.Context, name string) (ent.Val
 func (m *ProductTagMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case producttag.FieldProductID:
-		v, ok := value.(uuid.UUID)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetProductID(v)
 		return nil
 	case producttag.FieldTagID:
-		v, ok := value.(uuid.UUID)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9452,13 +9457,13 @@ type TagMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *uuid.UUID
+	id              *string
 	created_at      *time.Time
 	updated_at      *time.Time
 	title           *string
 	clearedFields   map[string]struct{}
-	products        map[uuid.UUID]struct{}
-	removedproducts map[uuid.UUID]struct{}
+	products        map[string]struct{}
+	removedproducts map[string]struct{}
 	clearedproducts bool
 	done            bool
 	oldValue        func(context.Context) (*Tag, error)
@@ -9485,7 +9490,7 @@ func newTagMutation(c config, op Op, opts ...tagOption) *TagMutation {
 }
 
 // withTagID sets the ID field of the mutation.
-func withTagID(id uuid.UUID) tagOption {
+func withTagID(id string) tagOption {
 	return func(m *TagMutation) {
 		var (
 			err   error
@@ -9537,13 +9542,13 @@ func (m TagMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Tag entities.
-func (m *TagMutation) SetID(id uuid.UUID) {
+func (m *TagMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TagMutation) ID() (id uuid.UUID, exists bool) {
+func (m *TagMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -9554,12 +9559,12 @@ func (m *TagMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *TagMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *TagMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -9678,9 +9683,9 @@ func (m *TagMutation) ResetTitle() {
 }
 
 // AddProductIDs adds the "products" edge to the Product entity by ids.
-func (m *TagMutation) AddProductIDs(ids ...uuid.UUID) {
+func (m *TagMutation) AddProductIDs(ids ...string) {
 	if m.products == nil {
-		m.products = make(map[uuid.UUID]struct{})
+		m.products = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.products[ids[i]] = struct{}{}
@@ -9698,9 +9703,9 @@ func (m *TagMutation) ProductsCleared() bool {
 }
 
 // RemoveProductIDs removes the "products" edge to the Product entity by IDs.
-func (m *TagMutation) RemoveProductIDs(ids ...uuid.UUID) {
+func (m *TagMutation) RemoveProductIDs(ids ...string) {
 	if m.removedproducts == nil {
-		m.removedproducts = make(map[uuid.UUID]struct{})
+		m.removedproducts = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.products, ids[i])
@@ -9709,7 +9714,7 @@ func (m *TagMutation) RemoveProductIDs(ids ...uuid.UUID) {
 }
 
 // RemovedProducts returns the removed IDs of the "products" edge to the Product entity.
-func (m *TagMutation) RemovedProductsIDs() (ids []uuid.UUID) {
+func (m *TagMutation) RemovedProductsIDs() (ids []string) {
 	for id := range m.removedproducts {
 		ids = append(ids, id)
 	}
@@ -9717,7 +9722,7 @@ func (m *TagMutation) RemovedProductsIDs() (ids []uuid.UUID) {
 }
 
 // ProductsIDs returns the "products" edge IDs in the mutation.
-func (m *TagMutation) ProductsIDs() (ids []uuid.UUID) {
+func (m *TagMutation) ProductsIDs() (ids []string) {
 	for id := range m.products {
 		ids = append(ids, id)
 	}
@@ -9988,7 +9993,7 @@ type UserMutation struct {
 	id                 *uuid.UUID
 	created_at         *time.Time
 	updated_at         *time.Time
-	avatar_url         **url.URL
+	avatar_url         *string
 	email              *string
 	name               *string
 	phone              *string
@@ -10178,12 +10183,12 @@ func (m *UserMutation) ResetUpdatedAt() {
 }
 
 // SetAvatarURL sets the "avatar_url" field.
-func (m *UserMutation) SetAvatarURL(u *url.URL) {
-	m.avatar_url = &u
+func (m *UserMutation) SetAvatarURL(s string) {
+	m.avatar_url = &s
 }
 
 // AvatarURL returns the value of the "avatar_url" field in the mutation.
-func (m *UserMutation) AvatarURL() (r *url.URL, exists bool) {
+func (m *UserMutation) AvatarURL() (r string, exists bool) {
 	v := m.avatar_url
 	if v == nil {
 		return
@@ -10194,7 +10199,7 @@ func (m *UserMutation) AvatarURL() (r *url.URL, exists bool) {
 // OldAvatarURL returns the old "avatar_url" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldAvatarURL(ctx context.Context) (v *url.URL, err error) {
+func (m *UserMutation) OldAvatarURL(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAvatarURL is only allowed on UpdateOne operations")
 	}
@@ -10633,7 +10638,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetUpdatedAt(v)
 		return nil
 	case user.FieldAvatarURL:
-		v, ok := value.(*url.URL)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

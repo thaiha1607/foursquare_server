@@ -67,8 +67,13 @@ func UpdatedAt(v time.Time) predicate.ProductImage {
 }
 
 // ProductID applies equality check predicate on the "product_id" field. It's identical to ProductIDEQ.
-func ProductID(v uuid.UUID) predicate.ProductImage {
+func ProductID(v string) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldEQ(FieldProductID, v))
+}
+
+// ImageURL applies equality check predicate on the "image_url" field. It's identical to ImageURLEQ.
+func ImageURL(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldImageURL, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -152,23 +157,133 @@ func UpdatedAtLTE(v time.Time) predicate.ProductImage {
 }
 
 // ProductIDEQ applies the EQ predicate on the "product_id" field.
-func ProductIDEQ(v uuid.UUID) predicate.ProductImage {
+func ProductIDEQ(v string) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldEQ(FieldProductID, v))
 }
 
 // ProductIDNEQ applies the NEQ predicate on the "product_id" field.
-func ProductIDNEQ(v uuid.UUID) predicate.ProductImage {
+func ProductIDNEQ(v string) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldNEQ(FieldProductID, v))
 }
 
 // ProductIDIn applies the In predicate on the "product_id" field.
-func ProductIDIn(vs ...uuid.UUID) predicate.ProductImage {
+func ProductIDIn(vs ...string) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldIn(FieldProductID, vs...))
 }
 
 // ProductIDNotIn applies the NotIn predicate on the "product_id" field.
-func ProductIDNotIn(vs ...uuid.UUID) predicate.ProductImage {
+func ProductIDNotIn(vs ...string) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldNotIn(FieldProductID, vs...))
+}
+
+// ProductIDGT applies the GT predicate on the "product_id" field.
+func ProductIDGT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGT(FieldProductID, v))
+}
+
+// ProductIDGTE applies the GTE predicate on the "product_id" field.
+func ProductIDGTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGTE(FieldProductID, v))
+}
+
+// ProductIDLT applies the LT predicate on the "product_id" field.
+func ProductIDLT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLT(FieldProductID, v))
+}
+
+// ProductIDLTE applies the LTE predicate on the "product_id" field.
+func ProductIDLTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLTE(FieldProductID, v))
+}
+
+// ProductIDContains applies the Contains predicate on the "product_id" field.
+func ProductIDContains(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContains(FieldProductID, v))
+}
+
+// ProductIDHasPrefix applies the HasPrefix predicate on the "product_id" field.
+func ProductIDHasPrefix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasPrefix(FieldProductID, v))
+}
+
+// ProductIDHasSuffix applies the HasSuffix predicate on the "product_id" field.
+func ProductIDHasSuffix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasSuffix(FieldProductID, v))
+}
+
+// ProductIDEqualFold applies the EqualFold predicate on the "product_id" field.
+func ProductIDEqualFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEqualFold(FieldProductID, v))
+}
+
+// ProductIDContainsFold applies the ContainsFold predicate on the "product_id" field.
+func ProductIDContainsFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContainsFold(FieldProductID, v))
+}
+
+// ImageURLEQ applies the EQ predicate on the "image_url" field.
+func ImageURLEQ(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldImageURL, v))
+}
+
+// ImageURLNEQ applies the NEQ predicate on the "image_url" field.
+func ImageURLNEQ(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNEQ(FieldImageURL, v))
+}
+
+// ImageURLIn applies the In predicate on the "image_url" field.
+func ImageURLIn(vs ...string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldIn(FieldImageURL, vs...))
+}
+
+// ImageURLNotIn applies the NotIn predicate on the "image_url" field.
+func ImageURLNotIn(vs ...string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNotIn(FieldImageURL, vs...))
+}
+
+// ImageURLGT applies the GT predicate on the "image_url" field.
+func ImageURLGT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGT(FieldImageURL, v))
+}
+
+// ImageURLGTE applies the GTE predicate on the "image_url" field.
+func ImageURLGTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGTE(FieldImageURL, v))
+}
+
+// ImageURLLT applies the LT predicate on the "image_url" field.
+func ImageURLLT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLT(FieldImageURL, v))
+}
+
+// ImageURLLTE applies the LTE predicate on the "image_url" field.
+func ImageURLLTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLTE(FieldImageURL, v))
+}
+
+// ImageURLContains applies the Contains predicate on the "image_url" field.
+func ImageURLContains(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContains(FieldImageURL, v))
+}
+
+// ImageURLHasPrefix applies the HasPrefix predicate on the "image_url" field.
+func ImageURLHasPrefix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasPrefix(FieldImageURL, v))
+}
+
+// ImageURLHasSuffix applies the HasSuffix predicate on the "image_url" field.
+func ImageURLHasSuffix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasSuffix(FieldImageURL, v))
+}
+
+// ImageURLEqualFold applies the EqualFold predicate on the "image_url" field.
+func ImageURLEqualFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEqualFold(FieldImageURL, v))
+}
+
+// ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
+func ImageURLContainsFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContainsFold(FieldImageURL, v))
 }
 
 // HasProduct applies the HasEdge predicate on the "product" edge.

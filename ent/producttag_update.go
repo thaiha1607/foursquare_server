@@ -74,7 +74,7 @@ func (ptu *ProductTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ptu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(producttag.Table, producttag.Columns, sqlgraph.NewFieldSpec(producttag.FieldProductID, field.TypeUUID), sqlgraph.NewFieldSpec(producttag.FieldTagID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(producttag.Table, producttag.Columns, sqlgraph.NewFieldSpec(producttag.FieldProductID, field.TypeString), sqlgraph.NewFieldSpec(producttag.FieldTagID, field.TypeString))
 	if ps := ptu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -162,7 +162,7 @@ func (ptuo *ProductTagUpdateOne) sqlSave(ctx context.Context) (_node *ProductTag
 	if err := ptuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(producttag.Table, producttag.Columns, sqlgraph.NewFieldSpec(producttag.FieldProductID, field.TypeUUID), sqlgraph.NewFieldSpec(producttag.FieldTagID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(producttag.Table, producttag.Columns, sqlgraph.NewFieldSpec(producttag.FieldProductID, field.TypeString), sqlgraph.NewFieldSpec(producttag.FieldTagID, field.TypeString))
 	if id, ok := ptuo.mutation.ProductID(); !ok {
 		return nil, &ValidationError{Name: "product_id", err: errors.New(`ent: missing "ProductTag.product_id" for update`)}
 	} else {

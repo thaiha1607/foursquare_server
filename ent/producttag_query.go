@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
@@ -261,7 +260,7 @@ func (ptq *ProductTagQuery) WithTags(opts ...func(*TagQuery)) *ProductTagQuery {
 // Example:
 //
 //	var v []struct {
-//		ProductID uuid.UUID `json:"product_id,omitempty"`
+//		ProductID string `json:"product_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +283,7 @@ func (ptq *ProductTagQuery) GroupBy(field string, fields ...string) *ProductTagG
 // Example:
 //
 //	var v []struct {
-//		ProductID uuid.UUID `json:"product_id,omitempty"`
+//		ProductID string `json:"product_id,omitempty"`
 //	}
 //
 //	client.ProductTag.Query().
@@ -372,8 +371,8 @@ func (ptq *ProductTagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 }
 
 func (ptq *ProductTagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes []*ProductTag, init func(*ProductTag), assign func(*ProductTag, *Product)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*ProductTag)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*ProductTag)
 	for i := range nodes {
 		fk := nodes[i].ProductID
 		if _, ok := nodeids[fk]; !ok {
@@ -401,8 +400,8 @@ func (ptq *ProductTagQuery) loadProducts(ctx context.Context, query *ProductQuer
 	return nil
 }
 func (ptq *ProductTagQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*ProductTag, init func(*ProductTag), assign func(*ProductTag, *Tag)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*ProductTag)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*ProductTag)
 	for i := range nodes {
 		fk := nodes[i].TagID
 		if _, ok := nodeids[fk]; !ok {

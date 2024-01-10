@@ -22,6 +22,11 @@ func (OrderStatusCode) Annotations() []schema.Annotation {
 // Fields of the OrderStatusCode.
 func (OrderStatusCode) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int("id").
+			Unique().
+			Immutable().
+			Positive().
+			Min(1),
 		field.String("order_status").
 			NotEmpty().
 			Unique(),

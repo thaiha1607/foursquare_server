@@ -8,7 +8,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // ProductTag holds the schema definition for the ProductTag entity.
@@ -27,9 +26,9 @@ func (ProductTag) Annotations() []schema.Annotation {
 // Fields of the ProductTag.
 func (ProductTag) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("product_id", uuid.UUID{}).
+		field.String("product_id").
 			Immutable(),
-		field.UUID("tag_id", uuid.UUID{}).
+		field.String("tag_id").
 			Immutable(),
 		field.Time("created_at").
 			Immutable().

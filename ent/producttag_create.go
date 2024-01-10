@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
@@ -24,14 +23,14 @@ type ProductTagCreate struct {
 }
 
 // SetProductID sets the "product_id" field.
-func (ptc *ProductTagCreate) SetProductID(u uuid.UUID) *ProductTagCreate {
-	ptc.mutation.SetProductID(u)
+func (ptc *ProductTagCreate) SetProductID(s string) *ProductTagCreate {
+	ptc.mutation.SetProductID(s)
 	return ptc
 }
 
 // SetTagID sets the "tag_id" field.
-func (ptc *ProductTagCreate) SetTagID(u uuid.UUID) *ProductTagCreate {
-	ptc.mutation.SetTagID(u)
+func (ptc *ProductTagCreate) SetTagID(s string) *ProductTagCreate {
+	ptc.mutation.SetTagID(s)
 	return ptc
 }
 
@@ -50,7 +49,7 @@ func (ptc *ProductTagCreate) SetNillableCreatedAt(t *time.Time) *ProductTagCreat
 }
 
 // SetProductsID sets the "products" edge to the Product entity by ID.
-func (ptc *ProductTagCreate) SetProductsID(id uuid.UUID) *ProductTagCreate {
+func (ptc *ProductTagCreate) SetProductsID(id string) *ProductTagCreate {
 	ptc.mutation.SetProductsID(id)
 	return ptc
 }
@@ -61,7 +60,7 @@ func (ptc *ProductTagCreate) SetProducts(p *Product) *ProductTagCreate {
 }
 
 // SetTagsID sets the "tags" edge to the Tag entity by ID.
-func (ptc *ProductTagCreate) SetTagsID(id uuid.UUID) *ProductTagCreate {
+func (ptc *ProductTagCreate) SetTagsID(id string) *ProductTagCreate {
 	ptc.mutation.SetTagsID(id)
 	return ptc
 }
@@ -163,7 +162,7 @@ func (ptc *ProductTagCreate) createSpec() (*ProductTag, *sqlgraph.CreateSpec) {
 			Columns: []string{producttag.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -180,7 +179,7 @@ func (ptc *ProductTagCreate) createSpec() (*ProductTag, *sqlgraph.CreateSpec) {
 			Columns: []string{producttag.TagsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

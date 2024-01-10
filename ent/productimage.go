@@ -3,9 +3,7 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -26,9 +24,9 @@ type ProductImage struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ProductID holds the value of the "product_id" field.
-	ProductID uuid.UUID `json:"product_id,omitempty"`
+	ProductID string `json:"product_id,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
-	ImageURL *url.URL `json:"image_url,omitempty"`
+	ImageURL string `json:"image_url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductImageQuery when eager-loading is set.
 	Edges        ProductImageEdges `json:"edges"`
@@ -62,11 +60,11 @@ func (*ProductImage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case productimage.FieldImageURL:
-			values[i] = new([]byte)
+		case productimage.FieldProductID, productimage.FieldImageURL:
+			values[i] = new(sql.NullString)
 		case productimage.FieldCreatedAt, productimage.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case productimage.FieldID, productimage.FieldProductID:
+		case productimage.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -102,18 +100,16 @@ func (pi *ProductImage) assignValues(columns []string, values []any) error {
 				pi.UpdatedAt = value.Time
 			}
 		case productimage.FieldProductID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
-			} else if value != nil {
-				pi.ProductID = *value
+			} else if value.Valid {
+				pi.ProductID = value.String
 			}
 		case productimage.FieldImageURL:
-			if value, ok := values[i].(*[]byte); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field image_url", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &pi.ImageURL); err != nil {
-					return fmt.Errorf("unmarshal field image_url: %w", err)
-				}
+			} else if value.Valid {
+				pi.ImageURL = value.String
 			}
 		default:
 			pi.selectValues.Set(columns[i], values[i])
@@ -163,10 +159,10 @@ func (pi *ProductImage) String() string {
 	builder.WriteString(pi.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("product_id=")
-	builder.WriteString(fmt.Sprintf("%v", pi.ProductID))
+	builder.WriteString(pi.ProductID)
 	builder.WriteString(", ")
 	builder.WriteString("image_url=")
-	builder.WriteString(fmt.Sprintf("%v", pi.ImageURL))
+	builder.WriteString(pi.ImageURL)
 	builder.WriteByte(')')
 	return builder.String()
 }

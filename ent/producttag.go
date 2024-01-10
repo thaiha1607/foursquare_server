@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
@@ -19,9 +18,9 @@ import (
 type ProductTag struct {
 	config `json:"-"`
 	// ProductID holds the value of the "product_id" field.
-	ProductID uuid.UUID `json:"product_id,omitempty"`
+	ProductID string `json:"product_id,omitempty"`
 	// TagID holds the value of the "tag_id" field.
-	TagID uuid.UUID `json:"tag_id,omitempty"`
+	TagID string `json:"tag_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -72,10 +71,10 @@ func (*ProductTag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case producttag.FieldProductID, producttag.FieldTagID:
+			values[i] = new(sql.NullString)
 		case producttag.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case producttag.FieldProductID, producttag.FieldTagID:
-			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -92,16 +91,16 @@ func (pt *ProductTag) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case producttag.FieldProductID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
-			} else if value != nil {
-				pt.ProductID = *value
+			} else if value.Valid {
+				pt.ProductID = value.String
 			}
 		case producttag.FieldTagID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field tag_id", values[i])
-			} else if value != nil {
-				pt.TagID = *value
+			} else if value.Valid {
+				pt.TagID = value.String
 			}
 		case producttag.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -155,10 +154,10 @@ func (pt *ProductTag) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductTag(")
 	builder.WriteString("product_id=")
-	builder.WriteString(fmt.Sprintf("%v", pt.ProductID))
+	builder.WriteString(pt.ProductID)
 	builder.WriteString(", ")
 	builder.WriteString("tag_id=")
-	builder.WriteString(fmt.Sprintf("%v", pt.TagID))
+	builder.WriteString(pt.TagID)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(pt.CreatedAt.Format(time.ANSIC))

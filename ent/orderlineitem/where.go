@@ -73,7 +73,7 @@ func OrderID(v uuid.UUID) predicate.OrderLineItem {
 }
 
 // ProductID applies equality check predicate on the "product_id" field. It's identical to ProductIDEQ.
-func ProductID(v uuid.UUID) predicate.OrderLineItem {
+func ProductID(v string) predicate.OrderLineItem {
 	return predicate.OrderLineItem(sql.FieldEQ(FieldProductID, v))
 }
 
@@ -183,23 +183,68 @@ func OrderIDNotIn(vs ...uuid.UUID) predicate.OrderLineItem {
 }
 
 // ProductIDEQ applies the EQ predicate on the "product_id" field.
-func ProductIDEQ(v uuid.UUID) predicate.OrderLineItem {
+func ProductIDEQ(v string) predicate.OrderLineItem {
 	return predicate.OrderLineItem(sql.FieldEQ(FieldProductID, v))
 }
 
 // ProductIDNEQ applies the NEQ predicate on the "product_id" field.
-func ProductIDNEQ(v uuid.UUID) predicate.OrderLineItem {
+func ProductIDNEQ(v string) predicate.OrderLineItem {
 	return predicate.OrderLineItem(sql.FieldNEQ(FieldProductID, v))
 }
 
 // ProductIDIn applies the In predicate on the "product_id" field.
-func ProductIDIn(vs ...uuid.UUID) predicate.OrderLineItem {
+func ProductIDIn(vs ...string) predicate.OrderLineItem {
 	return predicate.OrderLineItem(sql.FieldIn(FieldProductID, vs...))
 }
 
 // ProductIDNotIn applies the NotIn predicate on the "product_id" field.
-func ProductIDNotIn(vs ...uuid.UUID) predicate.OrderLineItem {
+func ProductIDNotIn(vs ...string) predicate.OrderLineItem {
 	return predicate.OrderLineItem(sql.FieldNotIn(FieldProductID, vs...))
+}
+
+// ProductIDGT applies the GT predicate on the "product_id" field.
+func ProductIDGT(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldGT(FieldProductID, v))
+}
+
+// ProductIDGTE applies the GTE predicate on the "product_id" field.
+func ProductIDGTE(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldGTE(FieldProductID, v))
+}
+
+// ProductIDLT applies the LT predicate on the "product_id" field.
+func ProductIDLT(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldLT(FieldProductID, v))
+}
+
+// ProductIDLTE applies the LTE predicate on the "product_id" field.
+func ProductIDLTE(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldLTE(FieldProductID, v))
+}
+
+// ProductIDContains applies the Contains predicate on the "product_id" field.
+func ProductIDContains(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldContains(FieldProductID, v))
+}
+
+// ProductIDHasPrefix applies the HasPrefix predicate on the "product_id" field.
+func ProductIDHasPrefix(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldHasPrefix(FieldProductID, v))
+}
+
+// ProductIDHasSuffix applies the HasSuffix predicate on the "product_id" field.
+func ProductIDHasSuffix(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldHasSuffix(FieldProductID, v))
+}
+
+// ProductIDEqualFold applies the EqualFold predicate on the "product_id" field.
+func ProductIDEqualFold(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldEqualFold(FieldProductID, v))
+}
+
+// ProductIDContainsFold applies the ContainsFold predicate on the "product_id" field.
+func ProductIDContainsFold(v string) predicate.OrderLineItem {
+	return predicate.OrderLineItem(sql.FieldContainsFold(FieldProductID, v))
 }
 
 // QtyEQ applies the EQ predicate on the "qty" field.

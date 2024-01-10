@@ -62,6 +62,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	ImageURLValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -87,6 +89,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByProductID orders the results by the product_id field.
 func ByProductID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProductID, opts...).ToFunc()
+}
+
+// ByImageURL orders the results by the image_url field.
+func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }
 
 // ByProductField orders the results by product field.

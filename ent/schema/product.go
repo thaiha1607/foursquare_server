@@ -5,8 +5,8 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+	"github.com/thaiha1607/foursquare_server/ent/hook"
 )
 
 // Product holds the schema definition for the Product entity.
@@ -23,9 +23,10 @@ func (Product) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Default(""),
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Immutable(),
+		field.String("id").
+			NotEmpty().
+			Unique().
+			MinLen(6),
 		field.Int("year").
 			Optional().
 			Nillable().
@@ -60,6 +61,13 @@ func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tags", Tag.Type).
 			Through("product_tags", ProductTag.Type),
+	}
+}
+
+// Hooks of the Product.
+func (Product) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.On(IDHook(6), ent.OpCreate),
 	}
 }
 

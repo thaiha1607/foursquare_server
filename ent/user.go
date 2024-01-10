@@ -3,9 +3,7 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -25,7 +23,7 @@ type User struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
-	AvatarURL *url.URL `json:"avatar_url,omitempty"`
+	AvatarURL string `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
 	Email *string `json:"email,omitempty"`
 	// Name holds the value of the "name" field.
@@ -46,9 +44,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldAvatarURL:
-			values[i] = new([]byte)
-		case user.FieldEmail, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
+		case user.FieldAvatarURL, user.FieldEmail, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldPostalCode, user.FieldOtherAddressInfo:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -88,12 +84,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.UpdatedAt = value.Time
 			}
 		case user.FieldAvatarURL:
-			if value, ok := values[i].(*[]byte); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field avatar_url", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &u.AvatarURL); err != nil {
-					return fmt.Errorf("unmarshal field avatar_url: %w", err)
-				}
+			} else if value.Valid {
+				u.AvatarURL = value.String
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -178,7 +172,7 @@ func (u *User) String() string {
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("avatar_url=")
-	builder.WriteString(fmt.Sprintf("%v", u.AvatarURL))
+	builder.WriteString(u.AvatarURL)
 	builder.WriteString(", ")
 	if v := u.Email; v != nil {
 		builder.WriteString("email=")

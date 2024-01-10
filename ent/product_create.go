@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
@@ -140,28 +139,20 @@ func (pc *ProductCreate) SetNillableProvider(s *string) *ProductCreate {
 }
 
 // SetID sets the "id" field.
-func (pc *ProductCreate) SetID(u uuid.UUID) *ProductCreate {
-	pc.mutation.SetID(u)
-	return pc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (pc *ProductCreate) SetNillableID(u *uuid.UUID) *ProductCreate {
-	if u != nil {
-		pc.SetID(*u)
-	}
+func (pc *ProductCreate) SetID(s string) *ProductCreate {
+	pc.mutation.SetID(s)
 	return pc
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pc *ProductCreate) AddTagIDs(ids ...uuid.UUID) *ProductCreate {
+func (pc *ProductCreate) AddTagIDs(ids ...string) *ProductCreate {
 	pc.mutation.AddTagIDs(ids...)
 	return pc
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
 func (pc *ProductCreate) AddTags(t ...*Tag) *ProductCreate {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]string, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -175,7 +166,9 @@ func (pc *ProductCreate) Mutation() *ProductMutation {
 
 // Save creates the Product in the database.
 func (pc *ProductCreate) Save(ctx context.Context) (*Product, error) {
-	pc.defaults()
+	if err := pc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -202,12 +195,18 @@ func (pc *ProductCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *ProductCreate) defaults() {
+func (pc *ProductCreate) defaults() error {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
+		if product.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized product.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := product.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		if product.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized product.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := product.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
@@ -215,10 +214,7 @@ func (pc *ProductCreate) defaults() {
 		v := product.DefaultDescription
 		pc.mutation.SetDescription(v)
 	}
-	if _, ok := pc.mutation.ID(); !ok {
-		v := product.DefaultID()
-		pc.mutation.SetID(v)
-	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -248,6 +244,11 @@ func (pc *ProductCreate) check() error {
 	if _, ok := pc.mutation.Qty(); !ok {
 		return &ValidationError{Name: "qty", err: errors.New(`ent: missing required field "Product.qty"`)}
 	}
+	if v, ok := pc.mutation.ID(); ok {
+		if err := product.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Product.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -263,10 +264,10 @@ func (pc *ProductCreate) sqlSave(ctx context.Context) (*Product, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Product.ID type: %T", _spec.ID.Value)
 		}
 	}
 	pc.mutation.id = &_node.ID
@@ -277,11 +278,11 @@ func (pc *ProductCreate) sqlSave(ctx context.Context) (*Product, error) {
 func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Product{config: pc.config}
-		_spec = sqlgraph.NewCreateSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeString))
 	)
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(product.FieldCreatedAt, field.TypeTime, value)
@@ -331,7 +332,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Columns: product.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

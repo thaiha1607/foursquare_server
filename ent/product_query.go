@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
@@ -131,8 +130,8 @@ func (pq *ProductQuery) FirstX(ctx context.Context) *Product {
 
 // FirstID returns the first Product ID from the query.
 // Returns a *NotFoundError when no Product ID was found.
-func (pq *ProductQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (pq *ProductQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -144,7 +143,7 @@ func (pq *ProductQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *ProductQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (pq *ProductQuery) FirstIDX(ctx context.Context) string {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +181,8 @@ func (pq *ProductQuery) OnlyX(ctx context.Context) *Product {
 // OnlyID is like Only, but returns the only Product ID in the query.
 // Returns a *NotSingularError when more than one Product ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *ProductQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (pq *ProductQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -199,7 +198,7 @@ func (pq *ProductQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *ProductQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (pq *ProductQuery) OnlyIDX(ctx context.Context) string {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +226,7 @@ func (pq *ProductQuery) AllX(ctx context.Context) []*Product {
 }
 
 // IDs executes the query and returns a list of Product IDs.
-func (pq *ProductQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (pq *ProductQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if pq.ctx.Unique == nil && pq.path != nil {
 		pq.Unique(true)
 	}
@@ -239,7 +238,7 @@ func (pq *ProductQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *ProductQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (pq *ProductQuery) IDsX(ctx context.Context) []string {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -449,8 +448,8 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 
 func (pq *ProductQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Product, init func(*Product), assign func(*Product, *Tag)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Product)
-	nids := make(map[uuid.UUID]map[*Product]struct{})
+	byID := make(map[string]*Product)
+	nids := make(map[string]map[*Product]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -479,11 +478,11 @@ func (pq *ProductQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(uuid.UUID)}, values...), nil
+				return append([]any{new(sql.NullString)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Product]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
@@ -510,7 +509,7 @@ func (pq *ProductQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*
 }
 func (pq *ProductQuery) loadProductTags(ctx context.Context, query *ProductTagQuery, nodes []*Product, init func(*Product), assign func(*Product, *ProductTag)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Product)
+	nodeids := make(map[string]*Product)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -549,7 +548,7 @@ func (pq *ProductQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeString))
 	_spec.From = pq.sql
 	if unique := pq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
