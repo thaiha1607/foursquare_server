@@ -32,9 +32,8 @@ func (e *entConversationRepository) GetByID(ctx context.Context, id uuid.UUID) (
 	return conversation, nil
 }
 
-func (e *entConversationRepository) Store(ctx context.Context, obj *ent.Conversation) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Conversation.
+func (e *entConversationRepository) Store(ctx context.Context, obj *ent.Conversation) (res *ent.Conversation, err error) {
+	res, err = e.Client.Conversation.
 		Create().
 		SetNillableTitle(obj.Title).
 		SetUserOneID(obj.UserOneID).
@@ -43,9 +42,8 @@ func (e *entConversationRepository) Store(ctx context.Context, obj *ent.Conversa
 	return
 }
 
-func (e *entConversationRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.Conversation.
+func (e *entConversationRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (res *ent.Conversation, err error) {
+	res, err = e.Client.Conversation.
 		UpdateOneID(id).
 		SetNillableTitle(obj.Title).
 		Save(ctx)

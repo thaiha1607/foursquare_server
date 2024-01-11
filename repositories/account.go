@@ -31,9 +31,8 @@ func (e *entAccountRepository) GetByID(ctx context.Context, id string) (*ent.Acc
 	return conversation, nil
 }
 
-func (e *entAccountRepository) Store(ctx context.Context, obj *ent.Account) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Account.
+func (e *entAccountRepository) Store(ctx context.Context, obj *ent.Account) (res *ent.Account, err error) {
+	res, err = e.Client.Account.
 		Create().
 		SetUserID(obj.UserID).
 		SetNillablePasswordHash(obj.PasswordHash).
@@ -41,9 +40,8 @@ func (e *entAccountRepository) Store(ctx context.Context, obj *ent.Account) (err
 	return
 }
 
-func (e *entAccountRepository) Update(ctx context.Context, id string, obj *ent.Account) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.Account.
+func (e *entAccountRepository) Update(ctx context.Context, id string, obj *ent.Account) (res *ent.Account, err error) {
+	res, err = e.Client.Account.
 		UpdateOneID(id).
 		SetNillableLastReset(obj.LastReset).
 		SetNillableLastEmailVerification(obj.LastEmailVerification).

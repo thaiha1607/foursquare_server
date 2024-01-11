@@ -26,11 +26,11 @@ func (c *conversationService) GetByID(ctx context.Context, id uuid.UUID) (*ent.C
 	return c.conversationRepo.GetByID(ctx, id)
 }
 
-func (c *conversationService) Store(ctx context.Context, obj *ent.Conversation) error {
+func (c *conversationService) Store(ctx context.Context, obj *ent.Conversation) (*ent.Conversation, error) {
 	return c.conversationRepo.Store(ctx, obj)
 }
 
-func (c *conversationService) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) error {
+func (c *conversationService) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (*ent.Conversation, error) {
 	return c.conversationRepo.Update(ctx, id, obj)
 }
 

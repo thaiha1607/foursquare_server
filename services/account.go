@@ -25,11 +25,11 @@ func (a *accountService) GetByID(ctx context.Context, id string) (*ent.Account, 
 	return a.accountRepo.GetByID(ctx, id)
 }
 
-func (a *accountService) Store(ctx context.Context, obj *ent.Account) error {
+func (a *accountService) Store(ctx context.Context, obj *ent.Account) (*ent.Account, error) {
 	return a.accountRepo.Store(ctx, obj)
 }
 
-func (a *accountService) Update(ctx context.Context, id string, obj *ent.Account) error {
+func (a *accountService) Update(ctx context.Context, id string, obj *ent.Account) (*ent.Account, error) {
 	return a.accountRepo.Update(ctx, id, obj)
 }
 

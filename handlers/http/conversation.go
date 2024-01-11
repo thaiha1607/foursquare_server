@@ -40,7 +40,7 @@ func (h *ConversationHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	conversation, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *ConversationHandler) GetByID(c echo.Context) error {
 
 func (h *ConversationHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var conversation ent.Conversation
+	var conversation *ent.Conversation
 	if err := c.Bind(&conversation); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &conversation); err != nil {
+	resp_obj, err := h.Service.Store(ctx, conversation)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, conversation)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *ConversationHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var conversation ent.Conversation
+	var conversation *ent.Conversation
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&conversation); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &conversation); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, conversation)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, conversation)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *ConversationHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

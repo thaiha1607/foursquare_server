@@ -11,8 +11,8 @@ import (
 type ConversationService interface {
 	Fetch(ctx context.Context) ([]*ent.Conversation, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) error
-	Store(ctx context.Context, obj *ent.Conversation) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (*ent.Conversation, error)
+	Store(ctx context.Context, obj *ent.Conversation) (*ent.Conversation, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -20,7 +20,7 @@ type ConversationService interface {
 type ConversationRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Conversation, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) error
-	Store(ctx context.Context, obj *ent.Conversation) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (*ent.Conversation, error)
+	Store(ctx context.Context, obj *ent.Conversation) (*ent.Conversation, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }

@@ -32,9 +32,8 @@ func (e *entFinancialTransactionRepository) GetByID(ctx context.Context, id uuid
 	return conversation, nil
 }
 
-func (e *entFinancialTransactionRepository) Store(ctx context.Context, obj *ent.FinancialTransaction) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.FinancialTransaction.
+func (e *entFinancialTransactionRepository) Store(ctx context.Context, obj *ent.FinancialTransaction) (r *ent.FinancialTransaction, err error) {
+	r, err = e.Client.FinancialTransaction.
 		Create().
 		SetInvoiceID(obj.InvoiceID).
 		SetAmount(obj.Amount).
@@ -45,9 +44,8 @@ func (e *entFinancialTransactionRepository) Store(ctx context.Context, obj *ent.
 	return
 }
 
-func (e *entFinancialTransactionRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.FinancialTransaction) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.FinancialTransaction.
+func (e *entFinancialTransactionRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.FinancialTransaction) (r *ent.FinancialTransaction, err error) {
+	r, err = e.Client.FinancialTransaction.
 		UpdateOneID(id).
 		SetNillableComment(obj.Comment).
 		Save(ctx)

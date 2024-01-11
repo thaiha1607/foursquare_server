@@ -10,8 +10,8 @@ import (
 type AccountService interface {
 	Fetch(ctx context.Context) ([]*ent.Account, error)
 	GetByID(ctx context.Context, id string) (*ent.Account, error)
-	Update(ctx context.Context, id string, obj *ent.Account) error
-	Store(ctx context.Context, obj *ent.Account) error
+	Update(ctx context.Context, id string, obj *ent.Account) (*ent.Account, error)
+	Store(ctx context.Context, obj *ent.Account) (*ent.Account, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -19,7 +19,7 @@ type AccountService interface {
 type AccountRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Account, error)
 	GetByID(ctx context.Context, id string) (*ent.Account, error)
-	Update(ctx context.Context, id string, obj *ent.Account) error
-	Store(ctx context.Context, obj *ent.Account) error
+	Update(ctx context.Context, id string, obj *ent.Account) (*ent.Account, error)
+	Store(ctx context.Context, obj *ent.Account) (*ent.Account, error)
 	Delete(ctx context.Context, id string) error
 }

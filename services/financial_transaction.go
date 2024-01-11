@@ -26,11 +26,11 @@ func (f *financialTransactionService) GetByID(ctx context.Context, id uuid.UUID)
 	return f.financialTransactionRepo.GetByID(ctx, id)
 }
 
-func (f *financialTransactionService) Store(ctx context.Context, obj *ent.FinancialTransaction) error {
+func (f *financialTransactionService) Store(ctx context.Context, obj *ent.FinancialTransaction) (*ent.FinancialTransaction, error) {
 	return f.financialTransactionRepo.Store(ctx, obj)
 }
 
-func (f *financialTransactionService) Update(ctx context.Context, id uuid.UUID, obj *ent.FinancialTransaction) error {
+func (f *financialTransactionService) Update(ctx context.Context, id uuid.UUID, obj *ent.FinancialTransaction) (*ent.FinancialTransaction, error) {
 	return f.financialTransactionRepo.Update(ctx, id, obj)
 }
 
