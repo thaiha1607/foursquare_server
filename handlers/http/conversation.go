@@ -14,7 +14,7 @@ type ConversationHandler struct {
 	Service interfaces.ConversationService
 }
 
-func NewConversationHandler(e *echo.Echo, srvc interfaces.ConversationService) any {
+func NewConversationHandler(e *echo.Echo, srvc interfaces.ConversationService) error {
 	handler := &ConversationHandler{
 		Service: srvc,
 	}

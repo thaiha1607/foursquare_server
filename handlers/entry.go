@@ -6,9 +6,6 @@ import (
 )
 
 func RegisterRoutes(e *echo.Echo, db *ent.Client) {
-	e.GET("/", func(c echo.Context) error {
-		return c.String(200, "Hello world")
-	})
 	initializeApi(e, db)
 }
 

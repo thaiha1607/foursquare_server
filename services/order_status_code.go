@@ -25,11 +25,11 @@ func (o *orderStatusCodeService) GetByID(ctx context.Context, id int) (*ent.Orde
 	return o.orderStatusCodeRepo.GetByID(ctx, id)
 }
 
-func (o *orderStatusCodeService) Store(ctx context.Context, obj *ent.OrderStatusCode) error {
+func (o *orderStatusCodeService) Store(ctx context.Context, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
 	return o.orderStatusCodeRepo.Store(ctx, obj)
 }
 
-func (o *orderStatusCodeService) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) error {
+func (o *orderStatusCodeService) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
 	return o.orderStatusCodeRepo.Update(ctx, id, obj)
 }
 

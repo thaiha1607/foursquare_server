@@ -14,7 +14,7 @@ type InvoiceLineItemHandler struct {
 	Service interfaces.InvoiceLineItemService
 }
 
-func NewInvoiceLineItemHandler(e *echo.Echo, srvc interfaces.InvoiceLineItemService) any {
+func NewInvoiceLineItemHandler(e *echo.Echo, srvc interfaces.InvoiceLineItemService) error {
 	handler := &InvoiceLineItemHandler{
 		Service: srvc,
 	}
@@ -39,7 +39,7 @@ func (h *InvoiceLineItemHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	invoiceLineItem, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -51,26 +51,27 @@ func (h *InvoiceLineItemHandler) GetByID(c echo.Context) error {
 
 func (h *InvoiceLineItemHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var invoice_line_item ent.InvoiceLineItem
+	var invoice_line_item *ent.InvoiceLineItem
 	if err := c.Bind(&invoice_line_item); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &invoice_line_item); err != nil {
+	resp_obj, err := h.Service.Store(ctx, invoice_line_item)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, invoice_line_item)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *InvoiceLineItemHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

@@ -11,8 +11,8 @@ import (
 type OrderLineItemService interface {
 	Fetch(ctx context.Context) ([]*ent.OrderLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.OrderLineItem, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) error
-	Store(ctx context.Context, obj *ent.OrderLineItem) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) (*ent.OrderLineItem, error)
+	Store(ctx context.Context, obj *ent.OrderLineItem) (*ent.OrderLineItem, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -20,7 +20,7 @@ type OrderLineItemService interface {
 type OrderLineItemRepository interface {
 	Fetch(ctx context.Context) ([]*ent.OrderLineItem, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.OrderLineItem, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) error
-	Store(ctx context.Context, obj *ent.OrderLineItem) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) (*ent.OrderLineItem, error)
+	Store(ctx context.Context, obj *ent.OrderLineItem) (*ent.OrderLineItem, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }

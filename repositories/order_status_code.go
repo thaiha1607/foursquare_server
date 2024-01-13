@@ -31,9 +31,8 @@ func (e *entOrderStatusCodeRepository) GetByID(ctx context.Context, id int) (*en
 	return order_status_code, nil
 }
 
-func (e *entOrderStatusCodeRepository) Store(ctx context.Context, obj *ent.OrderStatusCode) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.OrderStatusCode.
+func (e *entOrderStatusCodeRepository) Store(ctx context.Context, obj *ent.OrderStatusCode) (res *ent.OrderStatusCode, err error) {
+	res, err = e.Client.OrderStatusCode.
 		Create().
 		SetID(obj.ID).
 		SetOrderStatus(obj.OrderStatus).
@@ -41,9 +40,8 @@ func (e *entOrderStatusCodeRepository) Store(ctx context.Context, obj *ent.Order
 	return
 }
 
-func (e *entOrderStatusCodeRepository) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.OrderStatusCode.
+func (e *entOrderStatusCodeRepository) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) (res *ent.OrderStatusCode, err error) {
+	res, err = e.Client.OrderStatusCode.
 		UpdateOneID(id).
 		SetNillableOrderStatus(&obj.OrderStatus).
 		Save(ctx)

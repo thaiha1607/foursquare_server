@@ -11,8 +11,8 @@ import (
 type InvoiceService interface {
 	Fetch(ctx context.Context) ([]*ent.Invoice, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Invoice, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) error
-	Store(ctx context.Context, obj *ent.Invoice) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) (*ent.Invoice, error)
+	Store(ctx context.Context, obj *ent.Invoice) (*ent.Invoice, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -20,7 +20,7 @@ type InvoiceService interface {
 type InvoiceRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Invoice, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*ent.Invoice, error)
-	Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) error
-	Store(ctx context.Context, obj *ent.Invoice) error
+	Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) (*ent.Invoice, error)
+	Store(ctx context.Context, obj *ent.Invoice) (*ent.Invoice, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }

@@ -14,7 +14,7 @@ type OrderHandler struct {
 	Service interfaces.OrderService
 }
 
-func NewOrderHandler(e *echo.Echo, srvc interfaces.OrderService) any {
+func NewOrderHandler(e *echo.Echo, srvc interfaces.OrderService) error {
 	handler := &OrderHandler{
 		Service: srvc,
 	}

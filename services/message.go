@@ -26,11 +26,11 @@ func (m *messageService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Messag
 	return m.messageRepo.GetByID(ctx, id)
 }
 
-func (m *messageService) Store(ctx context.Context, obj *ent.Message) error {
+func (m *messageService) Store(ctx context.Context, obj *ent.Message) (*ent.Message, error) {
 	return m.messageRepo.Store(ctx, obj)
 }
 
-func (m *messageService) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) error {
+func (m *messageService) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) (*ent.Message, error) {
 	return m.messageRepo.Update(ctx, id, obj)
 }
 

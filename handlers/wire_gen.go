@@ -16,100 +16,100 @@ import (
 
 // Injectors from wire.go:
 
-func initializeOrderHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderHandler(e *echo.Echo, db *ent.Client) error {
 	orderRepository := repositories.NewEntOrderRepository(db)
 	orderService := services.NewOrderService(orderRepository)
-	v := http.NewOrderHandler(e, orderService)
-	return v
+	error2 := http.NewOrderHandler(e, orderService)
+	return error2
 }
 
-func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
 	orderStatusCodeRepository := repositories.NewEntOrderStatusCodeRepository(db)
 	orderStatusCodeService := services.NewOrderStatusCodeService(orderStatusCodeRepository)
-	v := http.NewOrderStatusCodeHandler(e, orderStatusCodeService)
-	return v
+	error2 := http.NewOrderStatusCodeHandler(e, orderStatusCodeService)
+	return error2
 }
 
-func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) any {
+func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	invoiceLineItemRepository := repositories.NewEntInvoiceLineItemRepository(db)
 	invoiceLineItemService := services.NewInvoiceLineItemService(invoiceLineItemRepository)
-	v := http.NewInvoiceLineItemHandler(e, invoiceLineItemService)
-	return v
+	error2 := http.NewInvoiceLineItemHandler(e, invoiceLineItemService)
+	return error2
 }
 
-func initializeProductImageHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	productImageRepository := repositories.NewEntProductImageRepository(db)
 	productImageService := services.NewProductImageService(productImageRepository)
-	v := http.NewProductImageHandler(e, productImageService)
-	return v
+	error2 := http.NewProductImageHandler(e, productImageService)
+	return error2
 }
 
-func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	orderLineItemRepository := repositories.NewEntOrderLineItemRepository(db)
 	orderLineItemService := services.NewOrderLineItemService(orderLineItemRepository)
-	v := http.NewOrderLineItemHandler(e, orderLineItemService)
-	return v
+	error2 := http.NewOrderLineItemHandler(e, orderLineItemService)
+	return error2
 }
 
-func initializeUserHandler(e *echo.Echo, db *ent.Client) any {
+func initializeUserHandler(e *echo.Echo, db *ent.Client) error {
 	userRepository := repositories.NewEntUserRepository(db)
 	userService := services.NewUserService(userRepository)
-	v := http.NewUserHandler(e, userService)
-	return v
+	error2 := http.NewUserHandler(e, userService)
+	return error2
 }
 
-func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) any {
+func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) error {
 	financialTransactionRepository := repositories.NewEntFinancialTransactionRepository(db)
 	financialTransactionService := services.NewFinancialTransactionService(financialTransactionRepository)
-	v := http.NewFinancialTransactionHandler(e, financialTransactionService)
-	return v
+	error2 := http.NewFinancialTransactionHandler(e, financialTransactionService)
+	return error2
 }
 
-func initializeProductTagHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductTagHandler(e *echo.Echo, db *ent.Client) error {
 	productTagRepository := repositories.NewEntProductTagRepository(db)
 	productTagService := services.NewProductTagService(productTagRepository)
-	v := http.NewProductTagHandler(e, productTagService)
-	return v
+	error2 := http.NewProductTagHandler(e, productTagService)
+	return error2
 }
 
-func initializeMessageHandler(e *echo.Echo, db *ent.Client) any {
+func initializeMessageHandler(e *echo.Echo, db *ent.Client) error {
 	messageRepository := repositories.NewEntMessageRepository(db)
 	messageService := services.NewMessageService(messageRepository)
-	v := http.NewMessageHandler(e, messageService)
-	return v
+	error2 := http.NewMessageHandler(e, messageService)
+	return error2
 }
 
-func initializeTagHandler(e *echo.Echo, db *ent.Client) any {
+func initializeTagHandler(e *echo.Echo, db *ent.Client) error {
 	tagRepository := repositories.NewEntTagRepository(db)
 	tagService := services.NewTagService(tagRepository)
-	v := http.NewTagHandler(e, tagService)
-	return v
+	error2 := http.NewTagHandler(e, tagService)
+	return error2
 }
 
-func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) any {
+func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) error {
 	invoiceRepository := repositories.NewEntInvoiceRepository(db)
 	invoiceService := services.NewInvoiceService(invoiceRepository)
-	v := http.NewInvoiceHandler(e, invoiceService)
-	return v
+	error2 := http.NewInvoiceHandler(e, invoiceService)
+	return error2
 }
 
-func initializeConversationHandler(e *echo.Echo, db *ent.Client) any {
+func initializeConversationHandler(e *echo.Echo, db *ent.Client) error {
 	conversationRepository := repositories.NewEntConversationRepository(db)
 	conversationService := services.NewConversationService(conversationRepository)
-	v := http.NewConversationHandler(e, conversationService)
-	return v
+	error2 := http.NewConversationHandler(e, conversationService)
+	return error2
 }
 
-func initializeProductHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
 	productRepository := repositories.NewEntProductRepository(db)
 	productService := services.NewProductService(productRepository)
-	v := http.NewProductHandler(e, productService)
-	return v
+	error2 := http.NewProductHandler(e, productService)
+	return error2
 }
 
-func initializeAccountHandler(e *echo.Echo, db *ent.Client) any {
+func initializeAccountHandler(e *echo.Echo, db *ent.Client) error {
 	accountRepository := repositories.NewEntAccountRepository(db)
 	accountService := services.NewAccountService(accountRepository)
-	v := http.NewAccountHandler(e, accountService)
-	return v
+	error2 := http.NewAccountHandler(e, accountService)
+	return error2
 }

@@ -26,11 +26,11 @@ func (i *invoiceService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Invoic
 	return i.invoiceRepo.GetByID(ctx, id)
 }
 
-func (i *invoiceService) Store(ctx context.Context, obj *ent.Invoice) error {
+func (i *invoiceService) Store(ctx context.Context, obj *ent.Invoice) (*ent.Invoice, error) {
 	return i.invoiceRepo.Store(ctx, obj)
 }
 
-func (i *invoiceService) Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) error {
+func (i *invoiceService) Update(ctx context.Context, id uuid.UUID, obj *ent.Invoice) (*ent.Invoice, error) {
 	return i.invoiceRepo.Update(ctx, id, obj)
 }
 

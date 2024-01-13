@@ -14,7 +14,7 @@ type FinancialTransactionHandler struct {
 	Service interfaces.FinancialTransactionService
 }
 
-func NewFinancialTransactionHandler(e *echo.Echo, srvc interfaces.FinancialTransactionService) any {
+func NewFinancialTransactionHandler(e *echo.Echo, srvc interfaces.FinancialTransactionService) error {
 	handler := &FinancialTransactionHandler{
 		Service: srvc,
 	}

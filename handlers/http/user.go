@@ -14,7 +14,7 @@ type UserHandler struct {
 	Service interfaces.UserService
 }
 
-func NewUserHandler(e *echo.Echo, srvc interfaces.UserService) any {
+func NewUserHandler(e *echo.Echo, srvc interfaces.UserService) error {
 	handler := &UserHandler{
 		Service: srvc,
 	}

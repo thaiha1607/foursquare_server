@@ -32,9 +32,8 @@ func (e *entInvoiceLineItemRepository) GetByID(ctx context.Context, id uuid.UUID
 	return invoice_line_item, nil
 }
 
-func (e *entInvoiceLineItemRepository) Store(ctx context.Context, obj *ent.InvoiceLineItem) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.InvoiceLineItem.
+func (e *entInvoiceLineItemRepository) Store(ctx context.Context, obj *ent.InvoiceLineItem) (res *ent.InvoiceLineItem, err error) {
+	res, err = e.Client.InvoiceLineItem.
 		Create().
 		SetInvoiceID(obj.InvoiceID).
 		SetOrderLineItemID(obj.OrderLineItemID).

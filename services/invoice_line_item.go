@@ -26,7 +26,7 @@ func (i *invoiceLineItemService) GetByID(ctx context.Context, id uuid.UUID) (*en
 	return i.invoiceLineItemRepo.GetByID(ctx, id)
 }
 
-func (i *invoiceLineItemService) Store(ctx context.Context, obj *ent.InvoiceLineItem) error {
+func (i *invoiceLineItemService) Store(ctx context.Context, obj *ent.InvoiceLineItem) (*ent.InvoiceLineItem, error) {
 	return i.invoiceLineItemRepo.Store(ctx, obj)
 }
 

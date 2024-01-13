@@ -13,7 +13,7 @@ type TagHandler struct {
 	Service interfaces.TagService
 }
 
-func NewTagHandler(e *echo.Echo, srvc interfaces.TagService) any {
+func NewTagHandler(e *echo.Echo, srvc interfaces.TagService) error {
 	handler := &TagHandler{
 		Service: srvc,
 	}

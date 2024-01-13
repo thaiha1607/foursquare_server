@@ -14,7 +14,7 @@ type ProductImageHandler struct {
 	Service interfaces.ProductImageService
 }
 
-func NewProductImageHandler(e *echo.Echo, srvc interfaces.ProductImageService) any {
+func NewProductImageHandler(e *echo.Echo, srvc interfaces.ProductImageService) error {
 	handler := &ProductImageHandler{
 		Service: srvc,
 	}

@@ -14,7 +14,7 @@ type MessageHandler struct {
 	Service interfaces.MessageService
 }
 
-func NewMessageHandler(e *echo.Echo, srvc interfaces.MessageService) any {
+func NewMessageHandler(e *echo.Echo, srvc interfaces.MessageService) error {
 	handler := &MessageHandler{
 		Service: srvc,
 	}
@@ -40,7 +40,7 @@ func (h *MessageHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	message, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *MessageHandler) GetByID(c echo.Context) error {
 
 func (h *MessageHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var message ent.Message
+	var message *ent.Message
 	if err := c.Bind(&message); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &message); err != nil {
+	resp_obj, err := h.Service.Store(ctx, message)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, message)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *MessageHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var message ent.Message
+	var message *ent.Message
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&message); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &message); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, message)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, message)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *MessageHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

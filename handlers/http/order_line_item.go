@@ -14,7 +14,7 @@ type OrderLineItemHandler struct {
 	Service interfaces.OrderLineItemService
 }
 
-func NewOrderLineItemHandler(e *echo.Echo, srvc interfaces.OrderLineItemService) any {
+func NewOrderLineItemHandler(e *echo.Echo, srvc interfaces.OrderLineItemService) error {
 	handler := &OrderLineItemHandler{
 		Service: srvc,
 	}
@@ -40,7 +40,7 @@ func (h *OrderLineItemHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	orderLineItem, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *OrderLineItemHandler) GetByID(c echo.Context) error {
 
 func (h *OrderLineItemHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var order_line_item ent.OrderLineItem
+	var order_line_item *ent.OrderLineItem
 	if err := c.Bind(&order_line_item); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &order_line_item); err != nil {
+	resp_obj, err := h.Service.Store(ctx, order_line_item)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order_line_item)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *OrderLineItemHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var order_line_item ent.OrderLineItem
+	var order_line_item *ent.OrderLineItem
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&order_line_item); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &order_line_item); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, order_line_item)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order_line_item)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *OrderLineItemHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

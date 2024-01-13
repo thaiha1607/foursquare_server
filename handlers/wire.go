@@ -12,7 +12,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/services"
 )
 
-func initializeOrderHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewOrderHandler,
 		services.NewOrderService,
@@ -21,7 +21,7 @@ func initializeOrderHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewOrderStatusCodeHandler,
 		services.NewOrderStatusCodeService,
@@ -30,7 +30,7 @@ func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) any {
+func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewInvoiceLineItemHandler,
 		services.NewInvoiceLineItemService,
@@ -39,7 +39,7 @@ func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeProductImageHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewProductImageHandler,
 		services.NewProductImageService,
@@ -48,7 +48,7 @@ func initializeProductImageHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) any {
+func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewOrderLineItemHandler,
 		services.NewOrderLineItemService,
@@ -57,7 +57,7 @@ func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeUserHandler(e *echo.Echo, db *ent.Client) any {
+func initializeUserHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewUserHandler,
 		services.NewUserService,
@@ -66,7 +66,7 @@ func initializeUserHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) any {
+func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewFinancialTransactionHandler,
 		services.NewFinancialTransactionService,
@@ -75,7 +75,7 @@ func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeProductTagHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductTagHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewProductTagHandler,
 		services.NewProductTagService,
@@ -84,7 +84,7 @@ func initializeProductTagHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeMessageHandler(e *echo.Echo, db *ent.Client) any {
+func initializeMessageHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewMessageHandler,
 		services.NewMessageService,
@@ -93,7 +93,7 @@ func initializeMessageHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeTagHandler(e *echo.Echo, db *ent.Client) any {
+func initializeTagHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewTagHandler,
 		services.NewTagService,
@@ -102,7 +102,7 @@ func initializeTagHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) any {
+func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewInvoiceHandler,
 		services.NewInvoiceService,
@@ -111,7 +111,7 @@ func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeConversationHandler(e *echo.Echo, db *ent.Client) any {
+func initializeConversationHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewConversationHandler,
 		services.NewConversationService,
@@ -120,7 +120,7 @@ func initializeConversationHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeProductHandler(e *echo.Echo, db *ent.Client) any {
+func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewProductHandler,
 		services.NewProductService,
@@ -129,7 +129,7 @@ func initializeProductHandler(e *echo.Echo, db *ent.Client) any {
 	return nil
 }
 
-func initializeAccountHandler(e *echo.Echo, db *ent.Client) any {
+func initializeAccountHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewAccountHandler,
 		services.NewAccountService,

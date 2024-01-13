@@ -13,7 +13,7 @@ type AccountHandler struct {
 	Service interfaces.AccountService
 }
 
-func NewAccountHandler(e *echo.Echo, srvc interfaces.AccountService) any {
+func NewAccountHandler(e *echo.Echo, srvc interfaces.AccountService) error {
 	handler := &AccountHandler{
 		Service: srvc,
 	}

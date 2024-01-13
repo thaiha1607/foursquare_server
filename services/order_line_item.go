@@ -26,11 +26,11 @@ func (o *orderLineItemService) GetByID(ctx context.Context, id uuid.UUID) (*ent.
 	return o.orderLineItemRepo.GetByID(ctx, id)
 }
 
-func (o *orderLineItemService) Store(ctx context.Context, obj *ent.OrderLineItem) error {
+func (o *orderLineItemService) Store(ctx context.Context, obj *ent.OrderLineItem) (*ent.OrderLineItem, error) {
 	return o.orderLineItemRepo.Store(ctx, obj)
 }
 
-func (o *orderLineItemService) Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) error {
+func (o *orderLineItemService) Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) (*ent.OrderLineItem, error) {
 	return o.orderLineItemRepo.Update(ctx, id, obj)
 }
 

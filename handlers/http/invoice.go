@@ -14,7 +14,7 @@ type InvoiceHandler struct {
 	Service interfaces.InvoiceService
 }
 
-func NewInvoiceHandler(e *echo.Echo, srvc interfaces.InvoiceService) any {
+func NewInvoiceHandler(e *echo.Echo, srvc interfaces.InvoiceService) error {
 	handler := &InvoiceHandler{
 		Service: srvc,
 	}
@@ -40,7 +40,7 @@ func (h *InvoiceHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	invoice, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *InvoiceHandler) GetByID(c echo.Context) error {
 
 func (h *InvoiceHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var invoice ent.Invoice
+	var invoice *ent.Invoice
 	if err := c.Bind(&invoice); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &invoice); err != nil {
+	resp_obj, err := h.Service.Store(ctx, invoice)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, invoice)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *InvoiceHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var invoice ent.Invoice
+	var invoice *ent.Invoice
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&invoice); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &invoice); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, invoice)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, invoice)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *InvoiceHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

@@ -14,7 +14,7 @@ type OrderStatusCodeHandler struct {
 	Service interfaces.OrderStatusCodeService
 }
 
-func NewOrderStatusCodeHandler(e *echo.Echo, srvc interfaces.OrderStatusCodeService) any {
+func NewOrderStatusCodeHandler(e *echo.Echo, srvc interfaces.OrderStatusCodeService) error {
 	handler := &OrderStatusCodeHandler{
 		Service: srvc,
 	}
@@ -40,7 +40,7 @@ func (h *OrderStatusCodeHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	orderStatusCode, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *OrderStatusCodeHandler) GetByID(c echo.Context) error {
 
 func (h *OrderStatusCodeHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var order_status_code ent.OrderStatusCode
+	var order_status_code *ent.OrderStatusCode
 	if err := c.Bind(&order_status_code); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &order_status_code); err != nil {
+	resp_obj, err := h.Service.Store(ctx, order_status_code)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order_status_code)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *OrderStatusCodeHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var order_status_code ent.OrderStatusCode
+	var order_status_code *ent.OrderStatusCode
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&order_status_code); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &order_status_code); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, order_status_code)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order_status_code)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *OrderStatusCodeHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

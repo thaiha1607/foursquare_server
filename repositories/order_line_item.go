@@ -32,9 +32,8 @@ func (e *entOrderLineItemRepository) GetByID(ctx context.Context, id uuid.UUID) 
 	return order_line_item, nil
 }
 
-func (e *entOrderLineItemRepository) Store(ctx context.Context, obj *ent.OrderLineItem) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.OrderLineItem.
+func (e *entOrderLineItemRepository) Store(ctx context.Context, obj *ent.OrderLineItem) (res *ent.OrderLineItem, err error) {
+	res, err = e.Client.OrderLineItem.
 		Create().
 		SetOrderID(obj.OrderID).
 		SetProductID(obj.ProductID).
@@ -43,9 +42,8 @@ func (e *entOrderLineItemRepository) Store(ctx context.Context, obj *ent.OrderLi
 	return
 }
 
-func (e *entOrderLineItemRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.OrderLineItem.
+func (e *entOrderLineItemRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.OrderLineItem) (res *ent.OrderLineItem, err error) {
+	res, err = e.Client.OrderLineItem.
 		UpdateOneID(id).
 		SetNillableQty(&obj.Qty).
 		Save(ctx)

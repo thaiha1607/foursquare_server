@@ -32,9 +32,8 @@ func (e *entMessageRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.
 	return message, nil
 }
 
-func (e *entMessageRepository) Store(ctx context.Context, obj *ent.Message) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Message.
+func (e *entMessageRepository) Store(ctx context.Context, obj *ent.Message) (res *ent.Message, err error) {
+	res, err = e.Client.Message.
 		Create().
 		SetConversationID(obj.ConversationID).
 		SetSenderID(obj.SenderID).
@@ -45,9 +44,8 @@ func (e *entMessageRepository) Store(ctx context.Context, obj *ent.Message) (err
 	return
 }
 
-func (e *entMessageRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.Message.
+func (e *entMessageRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) (res *ent.Message, err error) {
+	res, err = e.Client.Message.
 		UpdateOneID(id).
 		SetNillableContent(&obj.Content).
 		SetNillableIsRead(&obj.IsRead).
