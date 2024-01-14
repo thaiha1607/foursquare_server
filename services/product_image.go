@@ -26,7 +26,7 @@ func (p *productImageService) GetByID(ctx context.Context, id uuid.UUID) (*ent.P
 	return p.productImageRepo.GetByID(ctx, id)
 }
 
-func (p *productImageService) Store(ctx context.Context, obj *ent.ProductImage) error {
+func (p *productImageService) Store(ctx context.Context, obj *ent.ProductImage) (*ent.ProductImage, error) {
 	return p.productImageRepo.Store(ctx, obj)
 }
 

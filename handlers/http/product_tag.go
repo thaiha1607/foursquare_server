@@ -35,15 +35,16 @@ func (h *ProductTagHandler) Fetch(c echo.Context) error {
 
 func (h *ProductTagHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var product_tag ent.ProductTag
+	var product_tag *ent.ProductTag
 	if err := c.Bind(&product_tag); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &product_tag); err != nil {
+	resp_obj, err := h.Service.Store(ctx, product_tag)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, product_tag)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *ProductTagHandler) Delete(c echo.Context) error {
@@ -56,5 +57,5 @@ func (h *ProductTagHandler) Delete(c echo.Context) error {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

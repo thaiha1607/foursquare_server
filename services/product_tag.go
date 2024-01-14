@@ -21,7 +21,7 @@ func (p *productTagService) Fetch(ctx context.Context) ([]*ent.ProductTag, error
 	return p.productTagRepo.Fetch(ctx)
 }
 
-func (p *productTagService) Store(ctx context.Context, obj *ent.ProductTag) error {
+func (p *productTagService) Store(ctx context.Context, obj *ent.ProductTag) (*ent.ProductTag, error) {
 	return p.productTagRepo.Store(ctx, obj)
 }
 

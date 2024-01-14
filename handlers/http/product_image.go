@@ -39,7 +39,7 @@ func (h *ProductImageHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	productImage, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -51,26 +51,27 @@ func (h *ProductImageHandler) GetByID(c echo.Context) error {
 
 func (h *ProductImageHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var product_image ent.ProductImage
+	var product_image *ent.ProductImage
 	if err := c.Bind(&product_image); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &product_image); err != nil {
+	resp_obj, err := h.Service.Store(ctx, product_image)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, product_image)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *ProductImageHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

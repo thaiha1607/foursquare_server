@@ -25,11 +25,11 @@ func (p *productService) GetByID(ctx context.Context, id string) (*ent.Product, 
 	return p.productRepo.GetByID(ctx, id)
 }
 
-func (p *productService) Store(ctx context.Context, obj *ent.Product) error {
+func (p *productService) Store(ctx context.Context, obj *ent.Product) (*ent.Product, error) {
 	return p.productRepo.Store(ctx, obj)
 }
 
-func (p *productService) Update(ctx context.Context, id string, obj *ent.Product) error {
+func (p *productService) Update(ctx context.Context, id string, obj *ent.Product) (*ent.Product, error) {
 	return p.productRepo.Update(ctx, id, obj)
 }
 

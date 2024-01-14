@@ -32,9 +32,8 @@ func (e *entProductImageRepository) GetByID(ctx context.Context, id uuid.UUID) (
 	return order, nil
 }
 
-func (e *entProductImageRepository) Store(ctx context.Context, obj *ent.ProductImage) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.ProductImage.
+func (e *entProductImageRepository) Store(ctx context.Context, obj *ent.ProductImage) (res *ent.ProductImage, err error) {
+	res, err = e.Client.ProductImage.
 		Create().
 		SetProductID(obj.ProductID).
 		SetImageURL(obj.ImageURL).

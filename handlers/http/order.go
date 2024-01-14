@@ -40,7 +40,7 @@ func (h *OrderHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	order, err := h.Service.GetByID(ctx, id)
 	if err != nil {
@@ -52,43 +52,45 @@ func (h *OrderHandler) GetByID(c echo.Context) error {
 
 func (h *OrderHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var order ent.Order
+	var order *ent.Order
 	if err := c.Bind(&order); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &order); err != nil {
+	resp_obj, err := h.Service.Store(ctx, order)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *OrderHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var order ent.Order
+	var order *ent.Order
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := c.Bind(&order); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, id, &order); err != nil {
+	resp_obj, err := h.Service.Update(ctx, id, order)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, order)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *OrderHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
 	if err := h.Service.Delete(ctx, id); err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

@@ -32,9 +32,8 @@ func (e *entOrderRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.Or
 	return order, nil
 }
 
-func (e *entOrderRepository) Store(ctx context.Context, obj *ent.Order) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Order.
+func (e *entOrderRepository) Store(ctx context.Context, obj *ent.Order) (res *ent.Order, err error) {
+	res, err = e.Client.Order.
 		Create().
 		SetCustomerID(obj.CustomerID).
 		SetNillableNote(obj.Note).
@@ -51,9 +50,8 @@ func (e *entOrderRepository) Store(ctx context.Context, obj *ent.Order) (err err
 	return
 }
 
-func (e *entOrderRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Order) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.Order.
+func (e *entOrderRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Order) (res *ent.Order, err error) {
+	res, err = e.Client.Order.
 		UpdateOneID(id).
 		SetNillableNote(obj.Note).
 		SetNillableParentOrderID(&obj.ParentOrderID).

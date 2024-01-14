@@ -31,18 +31,16 @@ func (e *entTagRepository) GetByID(ctx context.Context, id string) (*ent.Tag, er
 	return tag, nil
 }
 
-func (e *entTagRepository) Store(ctx context.Context, obj *ent.Tag) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Tag.
+func (e *entTagRepository) Store(ctx context.Context, obj *ent.Tag) (res *ent.Tag, err error) {
+	res, err = e.Client.Tag.
 		Create().
 		SetTitle(obj.Title).
 		Save(ctx)
 	return
 }
 
-func (e *entTagRepository) Update(ctx context.Context, id string, obj *ent.Tag) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.Tag.
+func (e *entTagRepository) Update(ctx context.Context, id string, obj *ent.Tag) (res *ent.Tag, err error) {
+	res, err = e.Client.Tag.
 		UpdateOneID(id).
 		SetTitle(obj.Title).
 		Save(ctx)

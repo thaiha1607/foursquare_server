@@ -47,28 +47,30 @@ func (h *TagHandler) GetByID(c echo.Context) error {
 
 func (h *TagHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var tag ent.Tag
+	var tag *ent.Tag
 	if err := c.Bind(&tag); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Store(ctx, &tag); err != nil {
+	resp_obj, err := h.Service.Store(ctx, tag)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, tag)
+	return c.JSON(http.StatusCreated, resp_obj)
 }
 
 func (h *TagHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var tag ent.Tag
+	var tag *ent.Tag
 	if err := c.Bind(&tag); err != nil {
-		return c.String(http.StatusBadRequest, "Bad Request")
+		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := h.Service.Update(ctx, c.Param("id"), &tag); err != nil {
+	resp_obj, err := h.Service.Store(ctx, tag)
+	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, tag)
+	return c.JSON(http.StatusOK, resp_obj)
 }
 
 func (h *TagHandler) Delete(c echo.Context) error {
@@ -77,5 +79,5 @@ func (h *TagHandler) Delete(c echo.Context) error {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.String(http.StatusOK, "OK")
+	return c.NoContent(http.StatusNoContent)
 }

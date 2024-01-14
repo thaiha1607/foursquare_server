@@ -32,9 +32,8 @@ func (e *entUserRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.Use
 	return user, nil
 }
 
-func (e *entUserRepository) Store(ctx context.Context, obj *ent.User) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.User.
+func (e *entUserRepository) Store(ctx context.Context, obj *ent.User) (res *ent.User, err error) {
+	res, err = e.Client.User.
 		Create().
 		SetAvatarURL(obj.AvatarURL).
 		SetNillableEmail(obj.Email).
@@ -48,9 +47,8 @@ func (e *entUserRepository) Store(ctx context.Context, obj *ent.User) (err error
 
 }
 
-func (e *entUserRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.User) (err error) {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err = e.Client.User.
+func (e *entUserRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.User) (res *ent.User, err error) {
+	res, err = e.Client.User.
 		UpdateOneID(id).
 		SetAvatarURL(obj.AvatarURL).
 		SetNillableEmail(obj.Email).

@@ -10,8 +10,8 @@ import (
 type TagService interface {
 	Fetch(ctx context.Context) ([]*ent.Tag, error)
 	GetByID(ctx context.Context, id string) (*ent.Tag, error)
-	Update(ctx context.Context, id string, obj *ent.Tag) error
-	Store(ctx context.Context, obj *ent.Tag) error
+	Update(ctx context.Context, id string, obj *ent.Tag) (*ent.Tag, error)
+	Store(ctx context.Context, obj *ent.Tag) (*ent.Tag, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -19,7 +19,7 @@ type TagService interface {
 type TagRepository interface {
 	Fetch(ctx context.Context) ([]*ent.Tag, error)
 	GetByID(ctx context.Context, id string) (*ent.Tag, error)
-	Update(ctx context.Context, id string, obj *ent.Tag) error
-	Store(ctx context.Context, obj *ent.Tag) error
+	Update(ctx context.Context, id string, obj *ent.Tag) (*ent.Tag, error)
+	Store(ctx context.Context, obj *ent.Tag) (*ent.Tag, error)
 	Delete(ctx context.Context, id string) error
 }

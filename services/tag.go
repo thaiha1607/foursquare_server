@@ -25,11 +25,11 @@ func (t *tagService) GetByID(ctx context.Context, id string) (*ent.Tag, error) {
 	return t.tagRepo.GetByID(ctx, id)
 }
 
-func (t *tagService) Store(ctx context.Context, obj *ent.Tag) error {
+func (t *tagService) Store(ctx context.Context, obj *ent.Tag) (*ent.Tag, error) {
 	return t.tagRepo.Store(ctx, obj)
 }
 
-func (t *tagService) Update(ctx context.Context, id string, obj *ent.Tag) error {
+func (t *tagService) Update(ctx context.Context, id string, obj *ent.Tag) (*ent.Tag, error) {
 	return t.tagRepo.Update(ctx, id, obj)
 }
 

@@ -31,9 +31,8 @@ func (e *entProductRepository) GetByID(ctx context.Context, id string) (*ent.Pro
 	return product, nil
 }
 
-func (e *entProductRepository) Store(ctx context.Context, obj *ent.Product) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.Product.
+func (e *entProductRepository) Store(ctx context.Context, obj *ent.Product) (res *ent.Product, err error) {
+	res, err = e.Client.Product.
 		Create().
 		SetName(obj.Name).
 		SetNillableDescription(obj.Description).
@@ -44,12 +43,11 @@ func (e *entProductRepository) Store(ctx context.Context, obj *ent.Product) (err
 		SetNillableType(obj.Type).
 		SetNillableProvider(obj.Provider).
 		Save(ctx)
-	return err
+	return
 }
 
-func (e *entProductRepository) Update(ctx context.Context, id string, obj *ent.Product) error {
-	//lint:ignore SA4006 we want to return the result of updating operation
-	obj, err := e.Client.Product.
+func (e *entProductRepository) Update(ctx context.Context, id string, obj *ent.Product) (res *ent.Product, err error) {
+	res, err = e.Client.Product.
 		UpdateOneID(id).
 		SetNillableName(&obj.Name).
 		SetNillableDescription(obj.Description).
@@ -60,7 +58,7 @@ func (e *entProductRepository) Update(ctx context.Context, id string, obj *ent.P
 		SetNillableType(obj.Type).
 		SetNillableProvider(obj.Provider).
 		Save(ctx)
-	return err
+	return
 }
 
 func (e *entProductRepository) Delete(ctx context.Context, id string) error {

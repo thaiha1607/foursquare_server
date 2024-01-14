@@ -26,11 +26,11 @@ func (u *userService) GetByID(ctx context.Context, id uuid.UUID) (*ent.User, err
 	return u.userRepo.GetByID(ctx, id)
 }
 
-func (u *userService) Store(ctx context.Context, obj *ent.User) error {
+func (u *userService) Store(ctx context.Context, obj *ent.User) (*ent.User, error) {
 	return u.userRepo.Store(ctx, obj)
 }
 
-func (u *userService) Update(ctx context.Context, id uuid.UUID, obj *ent.User) error {
+func (u *userService) Update(ctx context.Context, id uuid.UUID, obj *ent.User) (*ent.User, error) {
 	return u.userRepo.Update(ctx, id, obj)
 }
 

@@ -23,9 +23,8 @@ func (e *entProductTagRepository) Fetch(ctx context.Context) ([]*ent.ProductTag,
 	return product_tags, nil
 }
 
-func (e *entProductTagRepository) Store(ctx context.Context, obj *ent.ProductTag) (err error) {
-	//lint:ignore SA4006 we want to return the result of creating operation
-	obj, err = e.Client.ProductTag.
+func (e *entProductTagRepository) Store(ctx context.Context, obj *ent.ProductTag) (res *ent.ProductTag, err error) {
+	res, err = e.Client.ProductTag.
 		Create().
 		SetProductID(obj.ProductID).
 		SetTagID(obj.TagID).
