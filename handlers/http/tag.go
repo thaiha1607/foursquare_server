@@ -65,7 +65,7 @@ func (h *TagHandler) Update(c echo.Context) error {
 	if err := c.Bind(&tag); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	resp_obj, err := h.Service.Store(ctx, tag)
+	resp_obj, err := h.Service.Update(ctx, c.Param("id"), tag)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
