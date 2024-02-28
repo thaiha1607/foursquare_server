@@ -52,12 +52,10 @@ type FinancialTransactionEdges struct {
 // InvoiceOrErr returns the Invoice value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e FinancialTransactionEdges) InvoiceOrErr() (*Invoice, error) {
-	if e.loadedTypes[0] {
-		if e.Invoice == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: invoice.Label}
-		}
+	if e.Invoice != nil {
 		return e.Invoice, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: invoice.Label}
 	}
 	return nil, &NotLoadedError{edge: "invoice"}
 }

@@ -54,12 +54,10 @@ type MessageEdges struct {
 // ConversationOrErr returns the Conversation value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MessageEdges) ConversationOrErr() (*Conversation, error) {
-	if e.loadedTypes[0] {
-		if e.Conversation == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: conversation.Label}
-		}
+	if e.Conversation != nil {
 		return e.Conversation, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: conversation.Label}
 	}
 	return nil, &NotLoadedError{edge: "conversation"}
 }
@@ -67,12 +65,10 @@ func (e MessageEdges) ConversationOrErr() (*Conversation, error) {
 // SenderOrErr returns the Sender value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MessageEdges) SenderOrErr() (*User, error) {
-	if e.loadedTypes[1] {
-		if e.Sender == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.Sender != nil {
 		return e.Sender, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "sender"}
 }

@@ -51,12 +51,10 @@ type OrderLineItemEdges struct {
 // OrderOrErr returns the Order value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderLineItemEdges) OrderOrErr() (*Order, error) {
-	if e.loadedTypes[0] {
-		if e.Order == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: order.Label}
-		}
+	if e.Order != nil {
 		return e.Order, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: order.Label}
 	}
 	return nil, &NotLoadedError{edge: "order"}
 }
@@ -64,12 +62,10 @@ func (e OrderLineItemEdges) OrderOrErr() (*Order, error) {
 // ProductOrErr returns the Product value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderLineItemEdges) ProductOrErr() (*Product, error) {
-	if e.loadedTypes[1] {
-		if e.Product == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
+	if e.Product != nil {
 		return e.Product, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: product.Label}
 	}
 	return nil, &NotLoadedError{edge: "product"}
 }

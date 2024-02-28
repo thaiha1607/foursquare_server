@@ -51,12 +51,10 @@ type InvoiceLineItemEdges struct {
 // InvoiceOrErr returns the Invoice value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e InvoiceLineItemEdges) InvoiceOrErr() (*Invoice, error) {
-	if e.loadedTypes[0] {
-		if e.Invoice == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: invoice.Label}
-		}
+	if e.Invoice != nil {
 		return e.Invoice, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: invoice.Label}
 	}
 	return nil, &NotLoadedError{edge: "invoice"}
 }
@@ -64,12 +62,10 @@ func (e InvoiceLineItemEdges) InvoiceOrErr() (*Invoice, error) {
 // OrderLineItemOrErr returns the OrderLineItem value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e InvoiceLineItemEdges) OrderLineItemOrErr() (*OrderLineItem, error) {
-	if e.loadedTypes[1] {
-		if e.OrderLineItem == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: orderlineitem.Label}
-		}
+	if e.OrderLineItem != nil {
 		return e.OrderLineItem, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: orderlineitem.Label}
 	}
 	return nil, &NotLoadedError{edge: "order_line_item"}
 }

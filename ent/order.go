@@ -76,12 +76,10 @@ type OrderEdges struct {
 // CustomerOrErr returns the Customer value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) CustomerOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.Customer == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.Customer != nil {
 		return e.Customer, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "customer"}
 }
@@ -89,12 +87,10 @@ func (e OrderEdges) CustomerOrErr() (*User, error) {
 // CreatorOrErr returns the Creator value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) CreatorOrErr() (*User, error) {
-	if e.loadedTypes[1] {
-		if e.Creator == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.Creator != nil {
 		return e.Creator, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "creator"}
 }
@@ -102,12 +98,10 @@ func (e OrderEdges) CreatorOrErr() (*User, error) {
 // ParentOrderOrErr returns the ParentOrder value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) ParentOrderOrErr() (*Order, error) {
-	if e.loadedTypes[2] {
-		if e.ParentOrder == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: order.Label}
-		}
+	if e.ParentOrder != nil {
 		return e.ParentOrder, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: order.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent_order"}
 }
@@ -115,12 +109,10 @@ func (e OrderEdges) ParentOrderOrErr() (*Order, error) {
 // OrderStatusOrErr returns the OrderStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) OrderStatusOrErr() (*OrderStatusCode, error) {
-	if e.loadedTypes[3] {
-		if e.OrderStatus == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: orderstatuscode.Label}
-		}
+	if e.OrderStatus != nil {
 		return e.OrderStatus, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: orderstatuscode.Label}
 	}
 	return nil, &NotLoadedError{edge: "order_status"}
 }
@@ -128,12 +120,10 @@ func (e OrderEdges) OrderStatusOrErr() (*OrderStatusCode, error) {
 // ManagementStaffOrErr returns the ManagementStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) ManagementStaffOrErr() (*User, error) {
-	if e.loadedTypes[4] {
-		if e.ManagementStaff == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.ManagementStaff != nil {
 		return e.ManagementStaff, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "management_staff"}
 }
@@ -141,12 +131,10 @@ func (e OrderEdges) ManagementStaffOrErr() (*User, error) {
 // WarehouseStaffOrErr returns the WarehouseStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) WarehouseStaffOrErr() (*User, error) {
-	if e.loadedTypes[5] {
-		if e.WarehouseStaff == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.WarehouseStaff != nil {
 		return e.WarehouseStaff, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "warehouse_staff"}
 }
@@ -154,12 +142,10 @@ func (e OrderEdges) WarehouseStaffOrErr() (*User, error) {
 // DeliveryStaffOrErr returns the DeliveryStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) DeliveryStaffOrErr() (*User, error) {
-	if e.loadedTypes[6] {
-		if e.DeliveryStaff == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.DeliveryStaff != nil {
 		return e.DeliveryStaff, nil
+	} else if e.loadedTypes[6] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "delivery_staff"}
 }

@@ -43,12 +43,10 @@ type ProductTagEdges struct {
 // ProductsOrErr returns the Products value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductTagEdges) ProductsOrErr() (*Product, error) {
-	if e.loadedTypes[0] {
-		if e.Products == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
+	if e.Products != nil {
 		return e.Products, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: product.Label}
 	}
 	return nil, &NotLoadedError{edge: "products"}
 }
@@ -56,12 +54,10 @@ func (e ProductTagEdges) ProductsOrErr() (*Product, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductTagEdges) TagsOrErr() (*Tag, error) {
-	if e.loadedTypes[1] {
-		if e.Tags == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tag.Label}
-		}
+	if e.Tags != nil {
 		return e.Tags, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: tag.Label}
 	}
 	return nil, &NotLoadedError{edge: "tags"}
 }
