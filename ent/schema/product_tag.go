@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -30,9 +28,6 @@ func (ProductTag) Fields() []ent.Field {
 			Immutable(),
 		field.String("tag_id").
 			Immutable(),
-		field.Time("created_at").
-			Immutable().
-			Default(time.Now),
 	}
 }
 

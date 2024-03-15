@@ -21,30 +21,30 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
-	// FieldUserOneID holds the string denoting the user_one_id field in the database.
-	FieldUserOneID = "user_one_id"
-	// FieldUserTwoID holds the string denoting the user_two_id field in the database.
-	FieldUserTwoID = "user_two_id"
-	// EdgeUserOne holds the string denoting the user_one edge name in mutations.
-	EdgeUserOne = "user_one"
-	// EdgeUserTwo holds the string denoting the user_two edge name in mutations.
-	EdgeUserTwo = "user_two"
+	// FieldPersonOneID holds the string denoting the person_one_id field in the database.
+	FieldPersonOneID = "person_one_id"
+	// FieldPersonTwoID holds the string denoting the person_two_id field in the database.
+	FieldPersonTwoID = "person_two_id"
+	// EdgePersonOne holds the string denoting the person_one edge name in mutations.
+	EdgePersonOne = "person_one"
+	// EdgePersonTwo holds the string denoting the person_two edge name in mutations.
+	EdgePersonTwo = "person_two"
 	// Table holds the table name of the conversation in the database.
 	Table = "conversations"
-	// UserOneTable is the table that holds the user_one relation/edge.
-	UserOneTable = "conversations"
-	// UserOneInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserOneInverseTable = "users"
-	// UserOneColumn is the table column denoting the user_one relation/edge.
-	UserOneColumn = "user_one_id"
-	// UserTwoTable is the table that holds the user_two relation/edge.
-	UserTwoTable = "conversations"
-	// UserTwoInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserTwoInverseTable = "users"
-	// UserTwoColumn is the table column denoting the user_two relation/edge.
-	UserTwoColumn = "user_two_id"
+	// PersonOneTable is the table that holds the person_one relation/edge.
+	PersonOneTable = "conversations"
+	// PersonOneInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	PersonOneInverseTable = "persons"
+	// PersonOneColumn is the table column denoting the person_one relation/edge.
+	PersonOneColumn = "person_one_id"
+	// PersonTwoTable is the table that holds the person_two relation/edge.
+	PersonTwoTable = "conversations"
+	// PersonTwoInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	PersonTwoInverseTable = "persons"
+	// PersonTwoColumn is the table column denoting the person_two relation/edge.
+	PersonTwoColumn = "person_two_id"
 )
 
 // Columns holds all SQL columns for conversation fields.
@@ -53,8 +53,8 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldTitle,
-	FieldUserOneID,
-	FieldUserTwoID,
+	FieldPersonOneID,
+	FieldPersonTwoID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -101,40 +101,40 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
 }
 
-// ByUserOneID orders the results by the user_one_id field.
-func ByUserOneID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserOneID, opts...).ToFunc()
+// ByPersonOneID orders the results by the person_one_id field.
+func ByPersonOneID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPersonOneID, opts...).ToFunc()
 }
 
-// ByUserTwoID orders the results by the user_two_id field.
-func ByUserTwoID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserTwoID, opts...).ToFunc()
+// ByPersonTwoID orders the results by the person_two_id field.
+func ByPersonTwoID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPersonTwoID, opts...).ToFunc()
 }
 
-// ByUserOneField orders the results by user_one field.
-func ByUserOneField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByPersonOneField orders the results by person_one field.
+func ByPersonOneField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserOneStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newPersonOneStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByUserTwoField orders the results by user_two field.
-func ByUserTwoField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByPersonTwoField orders the results by person_two field.
+func ByPersonTwoField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserTwoStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newPersonTwoStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newUserOneStep() *sqlgraph.Step {
+func newPersonOneStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserOneInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, UserOneTable, UserOneColumn),
+		sqlgraph.To(PersonOneInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, PersonOneTable, PersonOneColumn),
 	)
 }
-func newUserTwoStep() *sqlgraph.Step {
+func newPersonTwoStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserTwoInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, UserTwoTable, UserTwoColumn),
+		sqlgraph.To(PersonTwoInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, PersonTwoTable, PersonTwoColumn),
 	)
 }

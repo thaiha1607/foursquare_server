@@ -10,53 +10,53 @@ import (
 	"github.com/thaiha1607/foursquare_server/interfaces"
 )
 
-type UserHandler struct {
-	Service interfaces.UserService
+type PersonHandler struct {
+	Service interfaces.PersonService
 }
 
-func NewUserHandler(e *echo.Echo, srvc interfaces.UserService) error {
-	handler := &UserHandler{
+func NewPersonHandler(e *echo.Echo, srvc interfaces.PersonService) error {
+	handler := &PersonHandler{
 		Service: srvc,
 	}
-	e.GET("/users", handler.Fetch)
-	e.GET("/users/:id", handler.GetByID)
-	e.POST("/users", handler.Store)
-	e.PUT("/users/:id", handler.Update)
-	e.DELETE("/users/:id", handler.Delete)
+	e.GET("/persons", handler.Fetch)
+	e.GET("/persons/:id", handler.GetByID)
+	e.POST("/persons", handler.Store)
+	e.PUT("/persons/:id", handler.Update)
+	e.DELETE("/persons/:id", handler.Delete)
 	return nil
 }
 
-func (h *UserHandler) Fetch(c echo.Context) error {
+func (h *PersonHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
-	users, err := h.Service.Fetch(ctx)
+	persons, err := h.Service.Fetch(ctx)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, persons)
 }
 
-func (h *UserHandler) GetByID(c echo.Context) error {
+func (h *PersonHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	user, err := h.Service.GetByID(ctx, id)
+	person, err := h.Service.GetByID(ctx, id)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, person)
 }
 
-func (h *UserHandler) Store(c echo.Context) error {
+func (h *PersonHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var user *ent.User
-	if err := c.Bind(&user); err != nil {
+	var person *ent.Person
+	if err := c.Bind(&person); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	resp_obj, err := h.Service.Store(ctx, user)
+	resp_obj, err := h.Service.Store(ctx, person)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
@@ -64,17 +64,17 @@ func (h *UserHandler) Store(c echo.Context) error {
 	return c.JSON(http.StatusCreated, resp_obj)
 }
 
-func (h *UserHandler) Update(c echo.Context) error {
+func (h *PersonHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var user *ent.User
+	var person *ent.Person
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := c.Bind(&user); err != nil {
+	if err := c.Bind(&person); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	resp_obj, err := h.Service.Update(ctx, id, user)
+	resp_obj, err := h.Service.Update(ctx, id, person)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
@@ -82,7 +82,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp_obj)
 }
 
-func (h *UserHandler) Delete(c echo.Context) error {
+func (h *PersonHandler) Delete(c echo.Context) error {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {

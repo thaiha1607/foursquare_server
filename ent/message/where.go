@@ -336,7 +336,7 @@ func HasSender() predicate.Message {
 }
 
 // HasSenderWith applies the HasEdge predicate on the "sender" edge with a given conditions (other predicates).
-func HasSenderWith(preds ...predicate.User) predicate.Message {
+func HasSenderWith(preds ...predicate.Person) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
 		step := newSenderStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

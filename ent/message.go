@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // Message is the model entity for the Message schema.
@@ -45,7 +45,7 @@ type MessageEdges struct {
 	// Conversation holds the value of the conversation edge.
 	Conversation *Conversation `json:"conversation,omitempty"`
 	// Sender holds the value of the sender edge.
-	Sender *User `json:"sender,omitempty"`
+	Sender *Person `json:"sender,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -64,11 +64,11 @@ func (e MessageEdges) ConversationOrErr() (*Conversation, error) {
 
 // SenderOrErr returns the Sender value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e MessageEdges) SenderOrErr() (*User, error) {
+func (e MessageEdges) SenderOrErr() (*Person, error) {
 	if e.Sender != nil {
 		return e.Sender, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "sender"}
 }
@@ -168,7 +168,7 @@ func (m *Message) QueryConversation() *ConversationQuery {
 }
 
 // QuerySender queries the "sender" edge of the Message entity.
-func (m *Message) QuerySender() *UserQuery {
+func (m *Message) QuerySender() *PersonQuery {
 	return NewMessageClient(m.config).QuerySender(m)
 }
 

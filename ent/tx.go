@@ -12,8 +12,6 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Account is the client for interacting with the Account builders.
-	Account *AccountClient
 	// Conversation is the client for interacting with the Conversation builders.
 	Conversation *ConversationClient
 	// FinancialTransaction is the client for interacting with the FinancialTransaction builders.
@@ -30,6 +28,8 @@ type Tx struct {
 	OrderLineItem *OrderLineItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
 	OrderStatusCode *OrderStatusCodeClient
+	// Person is the client for interacting with the Person builders.
+	Person *PersonClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// ProductImage is the client for interacting with the ProductImage builders.
@@ -38,8 +38,6 @@ type Tx struct {
 	ProductTag *ProductTagClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
-	// User is the client for interacting with the User builders.
-	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -171,7 +169,6 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Account = NewAccountClient(tx.config)
 	tx.Conversation = NewConversationClient(tx.config)
 	tx.FinancialTransaction = NewFinancialTransactionClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
@@ -180,11 +177,11 @@ func (tx *Tx) init() {
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
+	tx.Person = NewPersonClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
 	tx.ProductImage = NewProductImageClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
-	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -194,7 +191,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Account.QueryXXX(), the query will be executed
+// applies a query, for example: Conversation.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

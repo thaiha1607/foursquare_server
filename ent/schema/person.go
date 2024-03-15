@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-// User holds the schema definition for the User entity.
-type User struct {
+// Person holds the schema definition for the Person entity.
+type Person struct {
 	ent.Schema
 }
 
-// Fields of the User.
-func (User) Fields() []ent.Field {
+// Fields of the Person.
+func (Person) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("avatar_url").
 			Validate(
@@ -42,25 +42,33 @@ func (User) Fields() []ent.Field {
 		field.String("phone").
 			NotEmpty().
 			Unique(),
-		field.String("address").
+		field.Enum("role").
+			NamedValues(
+				"Admin", "ADMIN",
+				"Customer", "CUSTOMER",
+				"Warehouse", "WAREHOUSE",
+				"Delivery", "DELIVERY",
+				"Management", "MANAGEMENT",
+			).Default("CUSTOMER"),
+		field.Bytes("password_hash").
+			NotEmpty().
 			Optional().
-			Nillable(),
-		field.String("postal_code").
-			Optional().
-			Nillable(),
-		field.String("other_address_info").
-			Optional().
-			Nillable(),
+			Nillable().
+			Sensitive(),
+		field.Bool("is_email_verified").
+			Default(false),
+		field.Bool("is_phone_verified").
+			Default(false),
 	}
 }
 
-// Edges of the User.
-func (User) Edges() []ent.Edge {
+// Edges of the Person.
+func (Person) Edges() []ent.Edge {
 	return nil
 }
 
-// Mixin of the User.
-func (User) Mixin() []ent.Mixin {
+// Mixin of the Person.
+func (Person) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		TimeMixin{},
 	}

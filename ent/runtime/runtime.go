@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/account"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
@@ -15,65 +14,17 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
-	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/schema"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	accountMixin := schema.Account{}.Mixin()
-	accountHooks := schema.Account{}.Hooks()
-	account.Hooks[0] = accountHooks[0]
-	accountMixinFields0 := accountMixin[0].Fields()
-	_ = accountMixinFields0
-	accountFields := schema.Account{}.Fields()
-	_ = accountFields
-	// accountDescCreatedAt is the schema descriptor for created_at field.
-	accountDescCreatedAt := accountMixinFields0[0].Descriptor()
-	// account.DefaultCreatedAt holds the default value on creation for the created_at field.
-	account.DefaultCreatedAt = accountDescCreatedAt.Default.(func() time.Time)
-	// accountDescUpdatedAt is the schema descriptor for updated_at field.
-	accountDescUpdatedAt := accountMixinFields0[1].Descriptor()
-	// account.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	account.DefaultUpdatedAt = accountDescUpdatedAt.Default.(func() time.Time)
-	// account.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	account.UpdateDefaultUpdatedAt = accountDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// accountDescIsEmailVerified is the schema descriptor for is_email_verified field.
-	accountDescIsEmailVerified := accountFields[5].Descriptor()
-	// account.DefaultIsEmailVerified holds the default value on creation for the is_email_verified field.
-	account.DefaultIsEmailVerified = accountDescIsEmailVerified.Default.(bool)
-	// accountDescIsPhoneVerified is the schema descriptor for is_phone_verified field.
-	accountDescIsPhoneVerified := accountFields[6].Descriptor()
-	// account.DefaultIsPhoneVerified holds the default value on creation for the is_phone_verified field.
-	account.DefaultIsPhoneVerified = accountDescIsPhoneVerified.Default.(bool)
-	// accountDescPasswordHash is the schema descriptor for password_hash field.
-	accountDescPasswordHash := accountFields[8].Descriptor()
-	// account.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
-	account.PasswordHashValidator = accountDescPasswordHash.Validators[0].(func(string) error)
-	// accountDescID is the schema descriptor for id field.
-	accountDescID := accountFields[0].Descriptor()
-	// account.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	account.IDValidator = func() func(string) error {
-		validators := accountDescID.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(id string) error {
-			for _, fn := range fns {
-				if err := fn(id); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
 	conversationMixin := schema.Conversation{}.Mixin()
 	conversationMixinFields0 := conversationMixin[0].Fields()
 	_ = conversationMixinFields0
@@ -257,6 +208,53 @@ func init() {
 			return nil
 		}
 	}()
+	personMixin := schema.Person{}.Mixin()
+	personMixinFields0 := personMixin[0].Fields()
+	_ = personMixinFields0
+	personFields := schema.Person{}.Fields()
+	_ = personFields
+	// personDescCreatedAt is the schema descriptor for created_at field.
+	personDescCreatedAt := personMixinFields0[0].Descriptor()
+	// person.DefaultCreatedAt holds the default value on creation for the created_at field.
+	person.DefaultCreatedAt = personDescCreatedAt.Default.(func() time.Time)
+	// personDescUpdatedAt is the schema descriptor for updated_at field.
+	personDescUpdatedAt := personMixinFields0[1].Descriptor()
+	// person.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	person.DefaultUpdatedAt = personDescUpdatedAt.Default.(func() time.Time)
+	// person.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	person.UpdateDefaultUpdatedAt = personDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// personDescAvatarURL is the schema descriptor for avatar_url field.
+	personDescAvatarURL := personFields[0].Descriptor()
+	// person.AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
+	person.AvatarURLValidator = personDescAvatarURL.Validators[0].(func(string) error)
+	// personDescEmail is the schema descriptor for email field.
+	personDescEmail := personFields[1].Descriptor()
+	// person.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	person.EmailValidator = personDescEmail.Validators[0].(func(string) error)
+	// personDescName is the schema descriptor for name field.
+	personDescName := personFields[3].Descriptor()
+	// person.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	person.NameValidator = personDescName.Validators[0].(func(string) error)
+	// personDescPhone is the schema descriptor for phone field.
+	personDescPhone := personFields[4].Descriptor()
+	// person.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	person.PhoneValidator = personDescPhone.Validators[0].(func(string) error)
+	// personDescPasswordHash is the schema descriptor for password_hash field.
+	personDescPasswordHash := personFields[6].Descriptor()
+	// person.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
+	person.PasswordHashValidator = personDescPasswordHash.Validators[0].(func([]byte) error)
+	// personDescIsEmailVerified is the schema descriptor for is_email_verified field.
+	personDescIsEmailVerified := personFields[7].Descriptor()
+	// person.DefaultIsEmailVerified holds the default value on creation for the is_email_verified field.
+	person.DefaultIsEmailVerified = personDescIsEmailVerified.Default.(bool)
+	// personDescIsPhoneVerified is the schema descriptor for is_phone_verified field.
+	personDescIsPhoneVerified := personFields[8].Descriptor()
+	// person.DefaultIsPhoneVerified holds the default value on creation for the is_phone_verified field.
+	person.DefaultIsPhoneVerified = personDescIsPhoneVerified.Default.(bool)
+	// personDescID is the schema descriptor for id field.
+	personDescID := personFields[2].Descriptor()
+	// person.DefaultID holds the default value on creation for the id field.
+	person.DefaultID = personDescID.Default.(func() uuid.UUID)
 	productMixin := schema.Product{}.Mixin()
 	productHooks := schema.Product{}.Hooks()
 	product.Hooks[0] = productHooks[0]
@@ -341,12 +339,6 @@ func init() {
 	productimageDescID := productimageFields[0].Descriptor()
 	// productimage.DefaultID holds the default value on creation for the id field.
 	productimage.DefaultID = productimageDescID.Default.(func() uuid.UUID)
-	producttagFields := schema.ProductTag{}.Fields()
-	_ = producttagFields
-	// producttagDescCreatedAt is the schema descriptor for created_at field.
-	producttagDescCreatedAt := producttagFields[2].Descriptor()
-	// producttag.DefaultCreatedAt holds the default value on creation for the created_at field.
-	producttag.DefaultCreatedAt = producttagDescCreatedAt.Default.(func() time.Time)
 	tagMixin := schema.Tag{}.Mixin()
 	tagHooks := schema.Tag{}.Hooks()
 	tag.Hooks[0] = tagHooks[0]
@@ -386,41 +378,6 @@ func init() {
 			return nil
 		}
 	}()
-	userMixin := schema.User{}.Mixin()
-	userMixinFields0 := userMixin[0].Fields()
-	_ = userMixinFields0
-	userFields := schema.User{}.Fields()
-	_ = userFields
-	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userMixinFields0[0].Descriptor()
-	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
-	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
-	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userMixinFields0[1].Descriptor()
-	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
-	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// userDescAvatarURL is the schema descriptor for avatar_url field.
-	userDescAvatarURL := userFields[0].Descriptor()
-	// user.AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
-	user.AvatarURLValidator = userDescAvatarURL.Validators[0].(func(string) error)
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[1].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
-	// userDescName is the schema descriptor for name field.
-	userDescName := userFields[3].Descriptor()
-	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	user.NameValidator = userDescName.Validators[0].(func(string) error)
-	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userFields[4].Descriptor()
-	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
-	// userDescID is the schema descriptor for id field.
-	userDescID := userFields[2].Descriptor()
-	// user.DefaultID holds the default value on creation for the id field.
-	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }
 
 const (

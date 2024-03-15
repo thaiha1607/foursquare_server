@@ -9,42 +9,14 @@ import (
 )
 
 var (
-	// AccountsColumns holds the columns for the "accounts" table.
-	AccountsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "last_reset", Type: field.TypeTime, Nullable: true},
-		{Name: "last_email_verification", Type: field.TypeTime, Nullable: true},
-		{Name: "last_phone_verification", Type: field.TypeTime, Nullable: true},
-		{Name: "is_email_verified", Type: field.TypeBool, Default: false},
-		{Name: "is_phone_verified", Type: field.TypeBool, Default: false},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
-		{Name: "password_hash", Type: field.TypeString, Nullable: true, Size: 2147483647},
-		{Name: "user_id", Type: field.TypeUUID},
-	}
-	// AccountsTable holds the schema information for the "accounts" table.
-	AccountsTable = &schema.Table{
-		Name:       "accounts",
-		Columns:    AccountsColumns,
-		PrimaryKey: []*schema.Column{AccountsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "accounts_users_user",
-				Columns:    []*schema.Column{AccountsColumns[10]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// ConversationsColumns holds the columns for the "conversations" table.
 	ConversationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Nullable: true},
-		{Name: "user_one_id", Type: field.TypeUUID},
-		{Name: "user_two_id", Type: field.TypeUUID},
+		{Name: "person_one_id", Type: field.TypeUUID},
+		{Name: "person_two_id", Type: field.TypeUUID},
 	}
 	// ConversationsTable holds the schema information for the "conversations" table.
 	ConversationsTable = &schema.Table{
@@ -53,21 +25,21 @@ var (
 		PrimaryKey: []*schema.Column{ConversationsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "conversations_users_user_one",
+				Symbol:     "conversations_persons_person_one",
 				Columns:    []*schema.Column{ConversationsColumns[4]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "conversations_users_user_two",
+				Symbol:     "conversations_persons_person_two",
 				Columns:    []*schema.Column{ConversationsColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "conversation_user_one_id_user_two_id",
+				Name:    "conversation_person_one_id_person_two_id",
 				Unique:  true,
 				Columns: []*schema.Column{ConversationsColumns[4], ConversationsColumns[5]},
 			},
@@ -184,9 +156,9 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "messages_users_sender",
+				Symbol:     "messages_persons_sender",
 				Columns:    []*schema.Column{MessagesColumns[7]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -215,15 +187,15 @@ var (
 		PrimaryKey: []*schema.Column{OrdersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "orders_users_customer",
+				Symbol:     "orders_persons_customer",
 				Columns:    []*schema.Column{OrdersColumns[7]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_users_creator",
+				Symbol:     "orders_persons_creator",
 				Columns:    []*schema.Column{OrdersColumns[8]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
@@ -239,21 +211,21 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_users_management_staff",
+				Symbol:     "orders_persons_management_staff",
 				Columns:    []*schema.Column{OrdersColumns[11]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_users_warehouse_staff",
+				Symbol:     "orders_persons_warehouse_staff",
 				Columns:    []*schema.Column{OrdersColumns[12]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "orders_users_delivery_staff",
+				Symbol:     "orders_persons_delivery_staff",
 				Columns:    []*schema.Column{OrdersColumns[13]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -307,6 +279,26 @@ var (
 		Columns:    OrderStatusCodesColumns,
 		PrimaryKey: []*schema.Column{OrderStatusCodesColumns[0]},
 	}
+	// PersonsColumns holds the columns for the "persons" table.
+	PersonsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
+		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "phone", Type: field.TypeString, Unique: true},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
+		{Name: "password_hash", Type: field.TypeBytes, Nullable: true},
+		{Name: "is_email_verified", Type: field.TypeBool, Default: false},
+		{Name: "is_phone_verified", Type: field.TypeBool, Default: false},
+	}
+	// PersonsTable holds the schema information for the "persons" table.
+	PersonsTable = &schema.Table{
+		Name:       "persons",
+		Columns:    PersonsColumns,
+		PrimaryKey: []*schema.Column{PersonsColumns[0]},
+	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -317,8 +309,7 @@ var (
 		{Name: "year", Type: field.TypeInt, Nullable: true},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "unit_of_measurement", Type: field.TypeString, Nullable: true},
-		{Name: "type", Type: field.TypeString, Nullable: true},
+		{Name: "colors", Type: field.TypeJSON, Nullable: true},
 		{Name: "provider", Type: field.TypeString, Nullable: true},
 	}
 	// ProductsTable holds the schema information for the "products" table.
@@ -351,7 +342,6 @@ var (
 	}
 	// ProductTagsColumns holds the columns for the "product_tags" table.
 	ProductTagsColumns = []*schema.Column{
-		{Name: "created_at", Type: field.TypeTime},
 		{Name: "product_id", Type: field.TypeString},
 		{Name: "tag_id", Type: field.TypeString},
 	}
@@ -359,17 +349,17 @@ var (
 	ProductTagsTable = &schema.Table{
 		Name:       "product_tags",
 		Columns:    ProductTagsColumns,
-		PrimaryKey: []*schema.Column{ProductTagsColumns[1], ProductTagsColumns[2]},
+		PrimaryKey: []*schema.Column{ProductTagsColumns[0], ProductTagsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "product_tags_products_products",
-				Columns:    []*schema.Column{ProductTagsColumns[1]},
+				Columns:    []*schema.Column{ProductTagsColumns[0]},
 				RefColumns: []*schema.Column{ProductsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "product_tags_tags_tags",
-				Columns:    []*schema.Column{ProductTagsColumns[2]},
+				Columns:    []*schema.Column{ProductTagsColumns[1]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -388,28 +378,8 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
-	// UsersColumns holds the columns for the "users" table.
-	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
-		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeString, Unique: true},
-		{Name: "address", Type: field.TypeString, Nullable: true},
-		{Name: "postal_code", Type: field.TypeString, Nullable: true},
-		{Name: "other_address_info", Type: field.TypeString, Nullable: true},
-	}
-	// UsersTable holds the schema information for the "users" table.
-	UsersTable = &schema.Table{
-		Name:       "users",
-		Columns:    UsersColumns,
-		PrimaryKey: []*schema.Column{UsersColumns[0]},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		AccountsTable,
 		ConversationsTable,
 		FinancialTransactionsTable,
 		InvoicesTable,
@@ -418,18 +388,17 @@ var (
 		OrdersTable,
 		OrderLineItemsTable,
 		OrderStatusCodesTable,
+		PersonsTable,
 		ProductsTable,
 		ProductImagesTable,
 		ProductTagsTable,
 		TagsTable,
-		UsersTable,
 	}
 )
 
 func init() {
-	AccountsTable.ForeignKeys[0].RefTable = UsersTable
-	ConversationsTable.ForeignKeys[0].RefTable = UsersTable
-	ConversationsTable.ForeignKeys[1].RefTable = UsersTable
+	ConversationsTable.ForeignKeys[0].RefTable = PersonsTable
+	ConversationsTable.ForeignKeys[1].RefTable = PersonsTable
 	FinancialTransactionsTable.ForeignKeys[0].RefTable = InvoicesTable
 	FinancialTransactionsTable.Annotation = &entsql.Annotation{
 		Table: "financial_transactions",
@@ -441,14 +410,14 @@ func init() {
 		Table: "invoice_line_items",
 	}
 	MessagesTable.ForeignKeys[0].RefTable = ConversationsTable
-	MessagesTable.ForeignKeys[1].RefTable = UsersTable
-	OrdersTable.ForeignKeys[0].RefTable = UsersTable
-	OrdersTable.ForeignKeys[1].RefTable = UsersTable
+	MessagesTable.ForeignKeys[1].RefTable = PersonsTable
+	OrdersTable.ForeignKeys[0].RefTable = PersonsTable
+	OrdersTable.ForeignKeys[1].RefTable = PersonsTable
 	OrdersTable.ForeignKeys[2].RefTable = OrdersTable
 	OrdersTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
-	OrdersTable.ForeignKeys[4].RefTable = UsersTable
-	OrdersTable.ForeignKeys[5].RefTable = UsersTable
-	OrdersTable.ForeignKeys[6].RefTable = UsersTable
+	OrdersTable.ForeignKeys[4].RefTable = PersonsTable
+	OrdersTable.ForeignKeys[5].RefTable = PersonsTable
+	OrdersTable.ForeignKeys[6].RefTable = PersonsTable
 	OrderLineItemsTable.ForeignKeys[0].RefTable = OrdersTable
 	OrderLineItemsTable.ForeignKeys[1].RefTable = ProductsTable
 	OrderLineItemsTable.Annotation = &entsql.Annotation{

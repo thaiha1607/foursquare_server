@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // OrderCreate is the builder for creating a Order entity.
@@ -195,20 +195,20 @@ func (oc *OrderCreate) SetNillableID(u *uuid.UUID) *OrderCreate {
 	return oc
 }
 
-// SetCustomer sets the "customer" edge to the User entity.
-func (oc *OrderCreate) SetCustomer(u *User) *OrderCreate {
-	return oc.SetCustomerID(u.ID)
+// SetCustomer sets the "customer" edge to the Person entity.
+func (oc *OrderCreate) SetCustomer(p *Person) *OrderCreate {
+	return oc.SetCustomerID(p.ID)
 }
 
-// SetCreatorID sets the "creator" edge to the User entity by ID.
+// SetCreatorID sets the "creator" edge to the Person entity by ID.
 func (oc *OrderCreate) SetCreatorID(id uuid.UUID) *OrderCreate {
 	oc.mutation.SetCreatorID(id)
 	return oc
 }
 
-// SetCreator sets the "creator" edge to the User entity.
-func (oc *OrderCreate) SetCreator(u *User) *OrderCreate {
-	return oc.SetCreatorID(u.ID)
+// SetCreator sets the "creator" edge to the Person entity.
+func (oc *OrderCreate) SetCreator(p *Person) *OrderCreate {
+	return oc.SetCreatorID(p.ID)
 }
 
 // SetParentOrder sets the "parent_order" edge to the Order entity.
@@ -227,19 +227,19 @@ func (oc *OrderCreate) SetOrderStatus(o *OrderStatusCode) *OrderCreate {
 	return oc.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the User entity.
-func (oc *OrderCreate) SetManagementStaff(u *User) *OrderCreate {
-	return oc.SetManagementStaffID(u.ID)
+// SetManagementStaff sets the "management_staff" edge to the Person entity.
+func (oc *OrderCreate) SetManagementStaff(p *Person) *OrderCreate {
+	return oc.SetManagementStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the User entity.
-func (oc *OrderCreate) SetWarehouseStaff(u *User) *OrderCreate {
-	return oc.SetWarehouseStaffID(u.ID)
+// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
+func (oc *OrderCreate) SetWarehouseStaff(p *Person) *OrderCreate {
+	return oc.SetWarehouseStaffID(p.ID)
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the User entity.
-func (oc *OrderCreate) SetDeliveryStaff(u *User) *OrderCreate {
-	return oc.SetDeliveryStaffID(u.ID)
+// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
+func (oc *OrderCreate) SetDeliveryStaff(p *Person) *OrderCreate {
+	return oc.SetDeliveryStaffID(p.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -418,7 +418,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.CustomerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -435,7 +435,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.CreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -486,7 +486,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.ManagementStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -503,7 +503,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.WarehouseStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -520,7 +520,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.DeliveryStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

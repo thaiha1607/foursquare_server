@@ -37,7 +37,7 @@ func (Tag) Edges() []ent.Edge {
 // Hooks of the Tag.
 func (Tag) Hooks() []ent.Hook {
 	return []ent.Hook{
-		hook.On(IDHook(6), ent.OpCreate),
+		hook.On(NanoIDHook(6), ent.OpCreate),
 	}
 }
 

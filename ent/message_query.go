@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // MessageQuery is the builder for querying Message entities.
@@ -25,7 +25,7 @@ type MessageQuery struct {
 	inters           []Interceptor
 	predicates       []predicate.Message
 	withConversation *ConversationQuery
-	withSender       *UserQuery
+	withSender       *PersonQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,8 +85,8 @@ func (mq *MessageQuery) QueryConversation() *ConversationQuery {
 }
 
 // QuerySender chains the current query on the "sender" edge.
-func (mq *MessageQuery) QuerySender() *UserQuery {
-	query := (&UserClient{config: mq.config}).Query()
+func (mq *MessageQuery) QuerySender() *PersonQuery {
+	query := (&PersonClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -97,7 +97,7 @@ func (mq *MessageQuery) QuerySender() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(message.Table, message.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, message.SenderTable, message.SenderColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
@@ -319,8 +319,8 @@ func (mq *MessageQuery) WithConversation(opts ...func(*ConversationQuery)) *Mess
 
 // WithSender tells the query-builder to eager-load the nodes that are connected to
 // the "sender" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MessageQuery) WithSender(opts ...func(*UserQuery)) *MessageQuery {
-	query := (&UserClient{config: mq.config}).Query()
+func (mq *MessageQuery) WithSender(opts ...func(*PersonQuery)) *MessageQuery {
+	query := (&PersonClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -437,7 +437,7 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	}
 	if query := mq.withSender; query != nil {
 		if err := mq.loadSender(ctx, query, nodes, nil,
-			func(n *Message, e *User) { n.Edges.Sender = e }); err != nil {
+			func(n *Message, e *Person) { n.Edges.Sender = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -473,7 +473,7 @@ func (mq *MessageQuery) loadConversation(ctx context.Context, query *Conversatio
 	}
 	return nil
 }
-func (mq *MessageQuery) loadSender(ctx context.Context, query *UserQuery, nodes []*Message, init func(*Message), assign func(*Message, *User)) error {
+func (mq *MessageQuery) loadSender(ctx context.Context, query *PersonQuery, nodes []*Message, init func(*Message), assign func(*Message, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Message)
 	for i := range nodes {
@@ -486,7 +486,7 @@ func (mq *MessageQuery) loadSender(ctx context.Context, query *UserQuery, nodes 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

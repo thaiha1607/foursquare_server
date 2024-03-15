@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // Conversation is the model entity for the Conversation schema.
@@ -25,10 +25,10 @@ type Conversation struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Title holds the value of the "title" field.
 	Title *string `json:"title,omitempty"`
-	// UserOneID holds the value of the "user_one_id" field.
-	UserOneID uuid.UUID `json:"user_one_id,omitempty"`
-	// UserTwoID holds the value of the "user_two_id" field.
-	UserTwoID uuid.UUID `json:"user_two_id,omitempty"`
+	// PersonOneID holds the value of the "person_one_id" field.
+	PersonOneID uuid.UUID `json:"person_one_id,omitempty"`
+	// PersonTwoID holds the value of the "person_two_id" field.
+	PersonTwoID uuid.UUID `json:"person_two_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConversationQuery when eager-loading is set.
 	Edges        ConversationEdges `json:"edges"`
@@ -37,35 +37,35 @@ type Conversation struct {
 
 // ConversationEdges holds the relations/edges for other nodes in the graph.
 type ConversationEdges struct {
-	// UserOne holds the value of the user_one edge.
-	UserOne *User `json:"user_one,omitempty"`
-	// UserTwo holds the value of the user_two edge.
-	UserTwo *User `json:"user_two,omitempty"`
+	// PersonOne holds the value of the person_one edge.
+	PersonOne *Person `json:"person_one,omitempty"`
+	// PersonTwo holds the value of the person_two edge.
+	PersonTwo *Person `json:"person_two,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// UserOneOrErr returns the UserOne value or an error if the edge
+// PersonOneOrErr returns the PersonOne value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ConversationEdges) UserOneOrErr() (*User, error) {
-	if e.UserOne != nil {
-		return e.UserOne, nil
+func (e ConversationEdges) PersonOneOrErr() (*Person, error) {
+	if e.PersonOne != nil {
+		return e.PersonOne, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
-	return nil, &NotLoadedError{edge: "user_one"}
+	return nil, &NotLoadedError{edge: "person_one"}
 }
 
-// UserTwoOrErr returns the UserTwo value or an error if the edge
+// PersonTwoOrErr returns the PersonTwo value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ConversationEdges) UserTwoOrErr() (*User, error) {
-	if e.UserTwo != nil {
-		return e.UserTwo, nil
+func (e ConversationEdges) PersonTwoOrErr() (*Person, error) {
+	if e.PersonTwo != nil {
+		return e.PersonTwo, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
-	return nil, &NotLoadedError{edge: "user_two"}
+	return nil, &NotLoadedError{edge: "person_two"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -77,7 +77,7 @@ func (*Conversation) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case conversation.FieldCreatedAt, conversation.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case conversation.FieldID, conversation.FieldUserOneID, conversation.FieldUserTwoID:
+		case conversation.FieldID, conversation.FieldPersonOneID, conversation.FieldPersonTwoID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,17 +119,17 @@ func (c *Conversation) assignValues(columns []string, values []any) error {
 				c.Title = new(string)
 				*c.Title = value.String
 			}
-		case conversation.FieldUserOneID:
+		case conversation.FieldPersonOneID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field user_one_id", values[i])
+				return fmt.Errorf("unexpected type %T for field person_one_id", values[i])
 			} else if value != nil {
-				c.UserOneID = *value
+				c.PersonOneID = *value
 			}
-		case conversation.FieldUserTwoID:
+		case conversation.FieldPersonTwoID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field user_two_id", values[i])
+				return fmt.Errorf("unexpected type %T for field person_two_id", values[i])
 			} else if value != nil {
-				c.UserTwoID = *value
+				c.PersonTwoID = *value
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -144,14 +144,14 @@ func (c *Conversation) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryUserOne queries the "user_one" edge of the Conversation entity.
-func (c *Conversation) QueryUserOne() *UserQuery {
-	return NewConversationClient(c.config).QueryUserOne(c)
+// QueryPersonOne queries the "person_one" edge of the Conversation entity.
+func (c *Conversation) QueryPersonOne() *PersonQuery {
+	return NewConversationClient(c.config).QueryPersonOne(c)
 }
 
-// QueryUserTwo queries the "user_two" edge of the Conversation entity.
-func (c *Conversation) QueryUserTwo() *UserQuery {
-	return NewConversationClient(c.config).QueryUserTwo(c)
+// QueryPersonTwo queries the "person_two" edge of the Conversation entity.
+func (c *Conversation) QueryPersonTwo() *PersonQuery {
+	return NewConversationClient(c.config).QueryPersonTwo(c)
 }
 
 // Update returns a builder for updating this Conversation.
@@ -188,11 +188,11 @@ func (c *Conversation) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("user_one_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserOneID))
+	builder.WriteString("person_one_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.PersonOneID))
 	builder.WriteString(", ")
-	builder.WriteString("user_two_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserTwoID))
+	builder.WriteString("person_two_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.PersonTwoID))
 	builder.WriteByte(')')
 	return builder.String()
 }

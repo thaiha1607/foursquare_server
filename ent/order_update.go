@@ -14,8 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // OrderUpdate is the builder for updating Order entities.
@@ -202,19 +202,19 @@ func (ou *OrderUpdate) SetOrderStatus(o *OrderStatusCode) *OrderUpdate {
 	return ou.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the User entity.
-func (ou *OrderUpdate) SetManagementStaff(u *User) *OrderUpdate {
-	return ou.SetManagementStaffID(u.ID)
+// SetManagementStaff sets the "management_staff" edge to the Person entity.
+func (ou *OrderUpdate) SetManagementStaff(p *Person) *OrderUpdate {
+	return ou.SetManagementStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the User entity.
-func (ou *OrderUpdate) SetWarehouseStaff(u *User) *OrderUpdate {
-	return ou.SetWarehouseStaffID(u.ID)
+// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
+func (ou *OrderUpdate) SetWarehouseStaff(p *Person) *OrderUpdate {
+	return ou.SetWarehouseStaffID(p.ID)
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the User entity.
-func (ou *OrderUpdate) SetDeliveryStaff(u *User) *OrderUpdate {
-	return ou.SetDeliveryStaffID(u.ID)
+// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
+func (ou *OrderUpdate) SetDeliveryStaff(p *Person) *OrderUpdate {
+	return ou.SetDeliveryStaffID(p.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -234,19 +234,19 @@ func (ou *OrderUpdate) ClearOrderStatus() *OrderUpdate {
 	return ou
 }
 
-// ClearManagementStaff clears the "management_staff" edge to the User entity.
+// ClearManagementStaff clears the "management_staff" edge to the Person entity.
 func (ou *OrderUpdate) ClearManagementStaff() *OrderUpdate {
 	ou.mutation.ClearManagementStaff()
 	return ou
 }
 
-// ClearWarehouseStaff clears the "warehouse_staff" edge to the User entity.
+// ClearWarehouseStaff clears the "warehouse_staff" edge to the Person entity.
 func (ou *OrderUpdate) ClearWarehouseStaff() *OrderUpdate {
 	ou.mutation.ClearWarehouseStaff()
 	return ou
 }
 
-// ClearDeliveryStaff clears the "delivery_staff" edge to the User entity.
+// ClearDeliveryStaff clears the "delivery_staff" edge to the Person entity.
 func (ou *OrderUpdate) ClearDeliveryStaff() *OrderUpdate {
 	ou.mutation.ClearDeliveryStaff()
 	return ou
@@ -409,7 +409,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.ManagementStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -422,7 +422,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.ManagementStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -438,7 +438,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.WarehouseStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -451,7 +451,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.WarehouseStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -467,7 +467,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.DeliveryStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -480,7 +480,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.DeliveryStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -679,19 +679,19 @@ func (ouo *OrderUpdateOne) SetOrderStatus(o *OrderStatusCode) *OrderUpdateOne {
 	return ouo.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the User entity.
-func (ouo *OrderUpdateOne) SetManagementStaff(u *User) *OrderUpdateOne {
-	return ouo.SetManagementStaffID(u.ID)
+// SetManagementStaff sets the "management_staff" edge to the Person entity.
+func (ouo *OrderUpdateOne) SetManagementStaff(p *Person) *OrderUpdateOne {
+	return ouo.SetManagementStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the User entity.
-func (ouo *OrderUpdateOne) SetWarehouseStaff(u *User) *OrderUpdateOne {
-	return ouo.SetWarehouseStaffID(u.ID)
+// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
+func (ouo *OrderUpdateOne) SetWarehouseStaff(p *Person) *OrderUpdateOne {
+	return ouo.SetWarehouseStaffID(p.ID)
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the User entity.
-func (ouo *OrderUpdateOne) SetDeliveryStaff(u *User) *OrderUpdateOne {
-	return ouo.SetDeliveryStaffID(u.ID)
+// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
+func (ouo *OrderUpdateOne) SetDeliveryStaff(p *Person) *OrderUpdateOne {
+	return ouo.SetDeliveryStaffID(p.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -711,19 +711,19 @@ func (ouo *OrderUpdateOne) ClearOrderStatus() *OrderUpdateOne {
 	return ouo
 }
 
-// ClearManagementStaff clears the "management_staff" edge to the User entity.
+// ClearManagementStaff clears the "management_staff" edge to the Person entity.
 func (ouo *OrderUpdateOne) ClearManagementStaff() *OrderUpdateOne {
 	ouo.mutation.ClearManagementStaff()
 	return ouo
 }
 
-// ClearWarehouseStaff clears the "warehouse_staff" edge to the User entity.
+// ClearWarehouseStaff clears the "warehouse_staff" edge to the Person entity.
 func (ouo *OrderUpdateOne) ClearWarehouseStaff() *OrderUpdateOne {
 	ouo.mutation.ClearWarehouseStaff()
 	return ouo
 }
 
-// ClearDeliveryStaff clears the "delivery_staff" edge to the User entity.
+// ClearDeliveryStaff clears the "delivery_staff" edge to the Person entity.
 func (ouo *OrderUpdateOne) ClearDeliveryStaff() *OrderUpdateOne {
 	ouo.mutation.ClearDeliveryStaff()
 	return ouo
@@ -916,7 +916,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.ManagementStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -929,7 +929,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.ManagementStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -945,7 +945,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.WarehouseStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -958,7 +958,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.WarehouseStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -974,7 +974,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.DeliveryStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -987,7 +987,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.DeliveryStaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

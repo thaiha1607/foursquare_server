@@ -60,16 +60,16 @@ const (
 	Table = "orders"
 	// CustomerTable is the table that holds the customer relation/edge.
 	CustomerTable = "orders"
-	// CustomerInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	CustomerInverseTable = "users"
+	// CustomerInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	CustomerInverseTable = "persons"
 	// CustomerColumn is the table column denoting the customer relation/edge.
 	CustomerColumn = "customer_id"
 	// CreatorTable is the table that holds the creator relation/edge.
 	CreatorTable = "orders"
-	// CreatorInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	CreatorInverseTable = "users"
+	// CreatorInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	CreatorInverseTable = "persons"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
 	// ParentOrderTable is the table that holds the parent_order relation/edge.
@@ -85,23 +85,23 @@ const (
 	OrderStatusColumn = "status_code"
 	// ManagementStaffTable is the table that holds the management_staff relation/edge.
 	ManagementStaffTable = "orders"
-	// ManagementStaffInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	ManagementStaffInverseTable = "users"
+	// ManagementStaffInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	ManagementStaffInverseTable = "persons"
 	// ManagementStaffColumn is the table column denoting the management_staff relation/edge.
 	ManagementStaffColumn = "management_staff_id"
 	// WarehouseStaffTable is the table that holds the warehouse_staff relation/edge.
 	WarehouseStaffTable = "orders"
-	// WarehouseStaffInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	WarehouseStaffInverseTable = "users"
+	// WarehouseStaffInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	WarehouseStaffInverseTable = "persons"
 	// WarehouseStaffColumn is the table column denoting the warehouse_staff relation/edge.
 	WarehouseStaffColumn = "warehouse_staff_id"
 	// DeliveryStaffTable is the table that holds the delivery_staff relation/edge.
 	DeliveryStaffTable = "orders"
-	// DeliveryStaffInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	DeliveryStaffInverseTable = "users"
+	// DeliveryStaffInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	DeliveryStaffInverseTable = "persons"
 	// DeliveryStaffColumn is the table column denoting the delivery_staff relation/edge.
 	DeliveryStaffColumn = "delivery_staff_id"
 )

@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -21,8 +20,6 @@ type ProductTag struct {
 	ProductID string `json:"product_id,omitempty"`
 	// TagID holds the value of the "tag_id" field.
 	TagID string `json:"tag_id,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductTagQuery when eager-loading is set.
 	Edges        ProductTagEdges `json:"edges"`
@@ -69,8 +66,6 @@ func (*ProductTag) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case producttag.FieldProductID, producttag.FieldTagID:
 			values[i] = new(sql.NullString)
-		case producttag.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -97,12 +92,6 @@ func (pt *ProductTag) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tag_id", values[i])
 			} else if value.Valid {
 				pt.TagID = value.String
-			}
-		case producttag.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				pt.CreatedAt = value.Time
 			}
 		default:
 			pt.selectValues.Set(columns[i], values[i])
@@ -154,9 +143,6 @@ func (pt *ProductTag) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tag_id=")
 	builder.WriteString(pt.TagID)
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(pt.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

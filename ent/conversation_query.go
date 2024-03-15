@@ -12,19 +12,19 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // ConversationQuery is the builder for querying Conversation entities.
 type ConversationQuery struct {
 	config
-	ctx         *QueryContext
-	order       []conversation.OrderOption
-	inters      []Interceptor
-	predicates  []predicate.Conversation
-	withUserOne *UserQuery
-	withUserTwo *UserQuery
+	ctx           *QueryContext
+	order         []conversation.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Conversation
+	withPersonOne *PersonQuery
+	withPersonTwo *PersonQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,9 +61,9 @@ func (cq *ConversationQuery) Order(o ...conversation.OrderOption) *ConversationQ
 	return cq
 }
 
-// QueryUserOne chains the current query on the "user_one" edge.
-func (cq *ConversationQuery) QueryUserOne() *UserQuery {
-	query := (&UserClient{config: cq.config}).Query()
+// QueryPersonOne chains the current query on the "person_one" edge.
+func (cq *ConversationQuery) QueryPersonOne() *PersonQuery {
+	query := (&PersonClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,8 +74,8 @@ func (cq *ConversationQuery) QueryUserOne() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(conversation.Table, conversation.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, conversation.UserOneTable, conversation.UserOneColumn),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, conversation.PersonOneTable, conversation.PersonOneColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -83,9 +83,9 @@ func (cq *ConversationQuery) QueryUserOne() *UserQuery {
 	return query
 }
 
-// QueryUserTwo chains the current query on the "user_two" edge.
-func (cq *ConversationQuery) QueryUserTwo() *UserQuery {
-	query := (&UserClient{config: cq.config}).Query()
+// QueryPersonTwo chains the current query on the "person_two" edge.
+func (cq *ConversationQuery) QueryPersonTwo() *PersonQuery {
+	query := (&PersonClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -96,8 +96,8 @@ func (cq *ConversationQuery) QueryUserTwo() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(conversation.Table, conversation.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, conversation.UserTwoTable, conversation.UserTwoColumn),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, conversation.PersonTwoTable, conversation.PersonTwoColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -292,38 +292,38 @@ func (cq *ConversationQuery) Clone() *ConversationQuery {
 		return nil
 	}
 	return &ConversationQuery{
-		config:      cq.config,
-		ctx:         cq.ctx.Clone(),
-		order:       append([]conversation.OrderOption{}, cq.order...),
-		inters:      append([]Interceptor{}, cq.inters...),
-		predicates:  append([]predicate.Conversation{}, cq.predicates...),
-		withUserOne: cq.withUserOne.Clone(),
-		withUserTwo: cq.withUserTwo.Clone(),
+		config:        cq.config,
+		ctx:           cq.ctx.Clone(),
+		order:         append([]conversation.OrderOption{}, cq.order...),
+		inters:        append([]Interceptor{}, cq.inters...),
+		predicates:    append([]predicate.Conversation{}, cq.predicates...),
+		withPersonOne: cq.withPersonOne.Clone(),
+		withPersonTwo: cq.withPersonTwo.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
 }
 
-// WithUserOne tells the query-builder to eager-load the nodes that are connected to
-// the "user_one" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ConversationQuery) WithUserOne(opts ...func(*UserQuery)) *ConversationQuery {
-	query := (&UserClient{config: cq.config}).Query()
+// WithPersonOne tells the query-builder to eager-load the nodes that are connected to
+// the "person_one" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ConversationQuery) WithPersonOne(opts ...func(*PersonQuery)) *ConversationQuery {
+	query := (&PersonClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withUserOne = query
+	cq.withPersonOne = query
 	return cq
 }
 
-// WithUserTwo tells the query-builder to eager-load the nodes that are connected to
-// the "user_two" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ConversationQuery) WithUserTwo(opts ...func(*UserQuery)) *ConversationQuery {
-	query := (&UserClient{config: cq.config}).Query()
+// WithPersonTwo tells the query-builder to eager-load the nodes that are connected to
+// the "person_two" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ConversationQuery) WithPersonTwo(opts ...func(*PersonQuery)) *ConversationQuery {
+	query := (&PersonClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withUserTwo = query
+	cq.withPersonTwo = query
 	return cq
 }
 
@@ -406,8 +406,8 @@ func (cq *ConversationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes       = []*Conversation{}
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
-			cq.withUserOne != nil,
-			cq.withUserTwo != nil,
+			cq.withPersonOne != nil,
+			cq.withPersonTwo != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -428,26 +428,26 @@ func (cq *ConversationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withUserOne; query != nil {
-		if err := cq.loadUserOne(ctx, query, nodes, nil,
-			func(n *Conversation, e *User) { n.Edges.UserOne = e }); err != nil {
+	if query := cq.withPersonOne; query != nil {
+		if err := cq.loadPersonOne(ctx, query, nodes, nil,
+			func(n *Conversation, e *Person) { n.Edges.PersonOne = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withUserTwo; query != nil {
-		if err := cq.loadUserTwo(ctx, query, nodes, nil,
-			func(n *Conversation, e *User) { n.Edges.UserTwo = e }); err != nil {
+	if query := cq.withPersonTwo; query != nil {
+		if err := cq.loadPersonTwo(ctx, query, nodes, nil,
+			func(n *Conversation, e *Person) { n.Edges.PersonTwo = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *ConversationQuery) loadUserOne(ctx context.Context, query *UserQuery, nodes []*Conversation, init func(*Conversation), assign func(*Conversation, *User)) error {
+func (cq *ConversationQuery) loadPersonOne(ctx context.Context, query *PersonQuery, nodes []*Conversation, init func(*Conversation), assign func(*Conversation, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Conversation)
 	for i := range nodes {
-		fk := nodes[i].UserOneID
+		fk := nodes[i].PersonOneID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -456,7 +456,7 @@ func (cq *ConversationQuery) loadUserOne(ctx context.Context, query *UserQuery, 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -464,7 +464,7 @@ func (cq *ConversationQuery) loadUserOne(ctx context.Context, query *UserQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_one_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "person_one_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -472,11 +472,11 @@ func (cq *ConversationQuery) loadUserOne(ctx context.Context, query *UserQuery, 
 	}
 	return nil
 }
-func (cq *ConversationQuery) loadUserTwo(ctx context.Context, query *UserQuery, nodes []*Conversation, init func(*Conversation), assign func(*Conversation, *User)) error {
+func (cq *ConversationQuery) loadPersonTwo(ctx context.Context, query *PersonQuery, nodes []*Conversation, init func(*Conversation), assign func(*Conversation, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Conversation)
 	for i := range nodes {
-		fk := nodes[i].UserTwoID
+		fk := nodes[i].PersonTwoID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -485,7 +485,7 @@ func (cq *ConversationQuery) loadUserTwo(ctx context.Context, query *UserQuery, 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -493,7 +493,7 @@ func (cq *ConversationQuery) loadUserTwo(ctx context.Context, query *UserQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_two_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "person_two_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -527,11 +527,11 @@ func (cq *ConversationQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if cq.withUserOne != nil {
-			_spec.Node.AddColumnOnce(conversation.FieldUserOneID)
+		if cq.withPersonOne != nil {
+			_spec.Node.AddColumnOnce(conversation.FieldPersonOneID)
 		}
-		if cq.withUserTwo != nil {
-			_spec.Node.AddColumnOnce(conversation.FieldUserTwoID)
+		if cq.withPersonTwo != nil {
+			_spec.Node.AddColumnOnce(conversation.FieldPersonTwoID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

@@ -39,8 +39,6 @@ func (e *entProductRepository) Store(ctx context.Context, obj *ent.Product) (res
 		SetNillableYear(obj.Year).
 		SetPrice(obj.Price).
 		SetQty(obj.Qty).
-		SetNillableUnitOfMeasurement(obj.UnitOfMeasurement).
-		SetNillableType(obj.Type).
 		SetNillableProvider(obj.Provider).
 		Save(ctx)
 	return
@@ -54,8 +52,6 @@ func (e *entProductRepository) Update(ctx context.Context, id string, obj *ent.P
 		SetNillableYear(obj.Year).
 		SetNillablePrice(&obj.Price).
 		SetNillableQty(&obj.Qty).
-		SetNillableUnitOfMeasurement(obj.UnitOfMeasurement).
-		SetNillableType(obj.Type).
 		SetNillableProvider(obj.Provider).
 		Save(ctx)
 	return

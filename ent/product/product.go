@@ -29,10 +29,8 @@ const (
 	FieldPrice = "price"
 	// FieldQty holds the string denoting the qty field in the database.
 	FieldQty = "qty"
-	// FieldUnitOfMeasurement holds the string denoting the unit_of_measurement field in the database.
-	FieldUnitOfMeasurement = "unit_of_measurement"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
+	// FieldColors holds the string denoting the colors field in the database.
+	FieldColors = "colors"
 	// FieldProvider holds the string denoting the provider field in the database.
 	FieldProvider = "provider"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
@@ -65,8 +63,7 @@ var Columns = []string{
 	FieldYear,
 	FieldPrice,
 	FieldQty,
-	FieldUnitOfMeasurement,
-	FieldType,
+	FieldColors,
 	FieldProvider,
 }
 
@@ -150,16 +147,6 @@ func ByPrice(opts ...sql.OrderTermOption) OrderOption {
 // ByQty orders the results by the qty field.
 func ByQty(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQty, opts...).ToFunc()
-}
-
-// ByUnitOfMeasurement orders the results by the unit_of_measurement field.
-func ByUnitOfMeasurement(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUnitOfMeasurement, opts...).ToFunc()
-}
-
-// ByType orders the results by the type field.
-func ByType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
 // ByProvider orders the results by the provider field.

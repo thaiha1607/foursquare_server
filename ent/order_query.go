@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/user"
 )
 
 // OrderQuery is the builder for querying Order entities.
@@ -24,13 +24,13 @@ type OrderQuery struct {
 	order               []order.OrderOption
 	inters              []Interceptor
 	predicates          []predicate.Order
-	withCustomer        *UserQuery
-	withCreator         *UserQuery
+	withCustomer        *PersonQuery
+	withCreator         *PersonQuery
 	withParentOrder     *OrderQuery
 	withOrderStatus     *OrderStatusCodeQuery
-	withManagementStaff *UserQuery
-	withWarehouseStaff  *UserQuery
-	withDeliveryStaff   *UserQuery
+	withManagementStaff *PersonQuery
+	withWarehouseStaff  *PersonQuery
+	withDeliveryStaff   *PersonQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -68,8 +68,8 @@ func (oq *OrderQuery) Order(o ...order.OrderOption) *OrderQuery {
 }
 
 // QueryCustomer chains the current query on the "customer" edge.
-func (oq *OrderQuery) QueryCustomer() *UserQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) QueryCustomer() *PersonQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -80,7 +80,7 @@ func (oq *OrderQuery) QueryCustomer() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, order.CustomerTable, order.CustomerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
@@ -90,8 +90,8 @@ func (oq *OrderQuery) QueryCustomer() *UserQuery {
 }
 
 // QueryCreator chains the current query on the "creator" edge.
-func (oq *OrderQuery) QueryCreator() *UserQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) QueryCreator() *PersonQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -102,7 +102,7 @@ func (oq *OrderQuery) QueryCreator() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, order.CreatorTable, order.CreatorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
@@ -156,8 +156,8 @@ func (oq *OrderQuery) QueryOrderStatus() *OrderStatusCodeQuery {
 }
 
 // QueryManagementStaff chains the current query on the "management_staff" edge.
-func (oq *OrderQuery) QueryManagementStaff() *UserQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) QueryManagementStaff() *PersonQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -168,7 +168,7 @@ func (oq *OrderQuery) QueryManagementStaff() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, order.ManagementStaffTable, order.ManagementStaffColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
@@ -178,8 +178,8 @@ func (oq *OrderQuery) QueryManagementStaff() *UserQuery {
 }
 
 // QueryWarehouseStaff chains the current query on the "warehouse_staff" edge.
-func (oq *OrderQuery) QueryWarehouseStaff() *UserQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) QueryWarehouseStaff() *PersonQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -190,7 +190,7 @@ func (oq *OrderQuery) QueryWarehouseStaff() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, order.WarehouseStaffTable, order.WarehouseStaffColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
@@ -200,8 +200,8 @@ func (oq *OrderQuery) QueryWarehouseStaff() *UserQuery {
 }
 
 // QueryDeliveryStaff chains the current query on the "delivery_staff" edge.
-func (oq *OrderQuery) QueryDeliveryStaff() *UserQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) QueryDeliveryStaff() *PersonQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -212,7 +212,7 @@ func (oq *OrderQuery) QueryDeliveryStaff() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, order.DeliveryStaffTable, order.DeliveryStaffColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
@@ -428,8 +428,8 @@ func (oq *OrderQuery) Clone() *OrderQuery {
 
 // WithCustomer tells the query-builder to eager-load the nodes that are connected to
 // the "customer" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithCustomer(opts ...func(*UserQuery)) *OrderQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) WithCustomer(opts ...func(*PersonQuery)) *OrderQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -439,8 +439,8 @@ func (oq *OrderQuery) WithCustomer(opts ...func(*UserQuery)) *OrderQuery {
 
 // WithCreator tells the query-builder to eager-load the nodes that are connected to
 // the "creator" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithCreator(opts ...func(*UserQuery)) *OrderQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) WithCreator(opts ...func(*PersonQuery)) *OrderQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -472,8 +472,8 @@ func (oq *OrderQuery) WithOrderStatus(opts ...func(*OrderStatusCodeQuery)) *Orde
 
 // WithManagementStaff tells the query-builder to eager-load the nodes that are connected to
 // the "management_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithManagementStaff(opts ...func(*UserQuery)) *OrderQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) WithManagementStaff(opts ...func(*PersonQuery)) *OrderQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -483,8 +483,8 @@ func (oq *OrderQuery) WithManagementStaff(opts ...func(*UserQuery)) *OrderQuery 
 
 // WithWarehouseStaff tells the query-builder to eager-load the nodes that are connected to
 // the "warehouse_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithWarehouseStaff(opts ...func(*UserQuery)) *OrderQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) WithWarehouseStaff(opts ...func(*PersonQuery)) *OrderQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -494,8 +494,8 @@ func (oq *OrderQuery) WithWarehouseStaff(opts ...func(*UserQuery)) *OrderQuery {
 
 // WithDeliveryStaff tells the query-builder to eager-load the nodes that are connected to
 // the "delivery_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithDeliveryStaff(opts ...func(*UserQuery)) *OrderQuery {
-	query := (&UserClient{config: oq.config}).Query()
+func (oq *OrderQuery) WithDeliveryStaff(opts ...func(*PersonQuery)) *OrderQuery {
+	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -611,13 +611,13 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	}
 	if query := oq.withCustomer; query != nil {
 		if err := oq.loadCustomer(ctx, query, nodes, nil,
-			func(n *Order, e *User) { n.Edges.Customer = e }); err != nil {
+			func(n *Order, e *Person) { n.Edges.Customer = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := oq.withCreator; query != nil {
 		if err := oq.loadCreator(ctx, query, nodes, nil,
-			func(n *Order, e *User) { n.Edges.Creator = e }); err != nil {
+			func(n *Order, e *Person) { n.Edges.Creator = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -635,26 +635,26 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	}
 	if query := oq.withManagementStaff; query != nil {
 		if err := oq.loadManagementStaff(ctx, query, nodes, nil,
-			func(n *Order, e *User) { n.Edges.ManagementStaff = e }); err != nil {
+			func(n *Order, e *Person) { n.Edges.ManagementStaff = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := oq.withWarehouseStaff; query != nil {
 		if err := oq.loadWarehouseStaff(ctx, query, nodes, nil,
-			func(n *Order, e *User) { n.Edges.WarehouseStaff = e }); err != nil {
+			func(n *Order, e *Person) { n.Edges.WarehouseStaff = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := oq.withDeliveryStaff; query != nil {
 		if err := oq.loadDeliveryStaff(ctx, query, nodes, nil,
-			func(n *Order, e *User) { n.Edges.DeliveryStaff = e }); err != nil {
+			func(n *Order, e *Person) { n.Edges.DeliveryStaff = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (oq *OrderQuery) loadCustomer(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
+func (oq *OrderQuery) loadCustomer(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
@@ -667,7 +667,7 @@ func (oq *OrderQuery) loadCustomer(ctx context.Context, query *UserQuery, nodes 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -683,7 +683,7 @@ func (oq *OrderQuery) loadCustomer(ctx context.Context, query *UserQuery, nodes 
 	}
 	return nil
 }
-func (oq *OrderQuery) loadCreator(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
+func (oq *OrderQuery) loadCreator(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
@@ -696,7 +696,7 @@ func (oq *OrderQuery) loadCreator(ctx context.Context, query *UserQuery, nodes [
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -770,7 +770,7 @@ func (oq *OrderQuery) loadOrderStatus(ctx context.Context, query *OrderStatusCod
 	}
 	return nil
 }
-func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
+func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
@@ -783,7 +783,7 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *UserQuery,
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -799,7 +799,7 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *UserQuery,
 	}
 	return nil
 }
-func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
+func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
@@ -815,7 +815,7 @@ func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *UserQuery, 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -831,7 +831,7 @@ func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *UserQuery, 
 	}
 	return nil
 }
-func (oq *OrderQuery) loadDeliveryStaff(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
+func (oq *OrderQuery) loadDeliveryStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
@@ -847,7 +847,7 @@ func (oq *OrderQuery) loadDeliveryStaff(ctx context.Context, query *UserQuery, n
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(person.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

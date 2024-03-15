@@ -96,31 +96,9 @@ func (pc *ProductCreate) SetQty(d decimal.Decimal) *ProductCreate {
 	return pc
 }
 
-// SetUnitOfMeasurement sets the "unit_of_measurement" field.
-func (pc *ProductCreate) SetUnitOfMeasurement(s string) *ProductCreate {
-	pc.mutation.SetUnitOfMeasurement(s)
-	return pc
-}
-
-// SetNillableUnitOfMeasurement sets the "unit_of_measurement" field if the given value is not nil.
-func (pc *ProductCreate) SetNillableUnitOfMeasurement(s *string) *ProductCreate {
-	if s != nil {
-		pc.SetUnitOfMeasurement(*s)
-	}
-	return pc
-}
-
-// SetType sets the "type" field.
-func (pc *ProductCreate) SetType(s string) *ProductCreate {
-	pc.mutation.SetType(s)
-	return pc
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (pc *ProductCreate) SetNillableType(s *string) *ProductCreate {
-	if s != nil {
-		pc.SetType(*s)
-	}
+// SetColors sets the "colors" field.
+func (pc *ProductCreate) SetColors(s []string) *ProductCreate {
+	pc.mutation.SetColors(s)
 	return pc
 }
 
@@ -312,13 +290,9 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_spec.SetField(product.FieldQty, field.TypeFloat64, value)
 		_node.Qty = value
 	}
-	if value, ok := pc.mutation.UnitOfMeasurement(); ok {
-		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
-		_node.UnitOfMeasurement = &value
-	}
-	if value, ok := pc.mutation.GetType(); ok {
-		_spec.SetField(product.FieldType, field.TypeString, value)
-		_node.Type = &value
+	if value, ok := pc.mutation.Colors(); ok {
+		_spec.SetField(product.FieldColors, field.TypeJSON, value)
+		_node.Colors = value
 	}
 	if value, ok := pc.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
@@ -338,10 +312,6 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &ProductTagCreate{config: pc.config, mutation: newProductTagMutation(pc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

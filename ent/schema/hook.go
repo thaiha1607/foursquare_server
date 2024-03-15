@@ -8,10 +8,10 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent"
 )
 
-// IDHook is a hook that generates a random ID for the entity.
+// NanoIDHook is a hook that generates a random ID for the entity.
 // Only applies to ID fields that are strings.
 // l is the length of the generated ID (optional, default is 21).
-func IDHook(l ...int) ent.Hook {
+func NanoIDHook(l ...int) ent.Hook {
 	type IDSetter interface {
 		SetID(string)
 	}

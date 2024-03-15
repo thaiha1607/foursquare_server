@@ -47,7 +47,7 @@ func (Message) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
-		edge.To("sender", User.Type).
+		edge.To("sender", Person.Type).
 			Field("sender_id").
 			Unique().
 			Required().

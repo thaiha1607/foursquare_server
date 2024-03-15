@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -31,20 +30,6 @@ func (ptc *ProductTagCreate) SetProductID(s string) *ProductTagCreate {
 // SetTagID sets the "tag_id" field.
 func (ptc *ProductTagCreate) SetTagID(s string) *ProductTagCreate {
 	ptc.mutation.SetTagID(s)
-	return ptc
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (ptc *ProductTagCreate) SetCreatedAt(t time.Time) *ProductTagCreate {
-	ptc.mutation.SetCreatedAt(t)
-	return ptc
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ptc *ProductTagCreate) SetNillableCreatedAt(t *time.Time) *ProductTagCreate {
-	if t != nil {
-		ptc.SetCreatedAt(*t)
-	}
 	return ptc
 }
 
@@ -77,7 +62,6 @@ func (ptc *ProductTagCreate) Mutation() *ProductTagMutation {
 
 // Save creates the ProductTag in the database.
 func (ptc *ProductTagCreate) Save(ctx context.Context) (*ProductTag, error) {
-	ptc.defaults()
 	return withHooks(ctx, ptc.sqlSave, ptc.mutation, ptc.hooks)
 }
 
@@ -103,14 +87,6 @@ func (ptc *ProductTagCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (ptc *ProductTagCreate) defaults() {
-	if _, ok := ptc.mutation.CreatedAt(); !ok {
-		v := producttag.DefaultCreatedAt()
-		ptc.mutation.SetCreatedAt(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (ptc *ProductTagCreate) check() error {
 	if _, ok := ptc.mutation.ProductID(); !ok {
@@ -118,9 +94,6 @@ func (ptc *ProductTagCreate) check() error {
 	}
 	if _, ok := ptc.mutation.TagID(); !ok {
 		return &ValidationError{Name: "tag_id", err: errors.New(`ent: missing required field "ProductTag.tag_id"`)}
-	}
-	if _, ok := ptc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProductTag.created_at"`)}
 	}
 	if _, ok := ptc.mutation.ProductsID(); !ok {
 		return &ValidationError{Name: "products", err: errors.New(`ent: missing required edge "ProductTag.products"`)}
@@ -150,10 +123,6 @@ func (ptc *ProductTagCreate) createSpec() (*ProductTag, *sqlgraph.CreateSpec) {
 		_node = &ProductTag{config: ptc.config}
 		_spec = sqlgraph.NewCreateSpec(producttag.Table, nil)
 	)
-	if value, ok := ptc.mutation.CreatedAt(); ok {
-		_spec.SetField(producttag.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
 	if nodes := ptc.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -209,7 +178,6 @@ func (ptcb *ProductTagCreateBulk) Save(ctx context.Context) ([]*ProductTag, erro
 	for i := range ptcb.builders {
 		func(i int, root context.Context) {
 			builder := ptcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ProductTagMutation)
 				if !ok {

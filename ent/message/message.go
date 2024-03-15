@@ -45,9 +45,9 @@ const (
 	ConversationColumn = "conversation_id"
 	// SenderTable is the table that holds the sender relation/edge.
 	SenderTable = "messages"
-	// SenderInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	SenderInverseTable = "users"
+	// SenderInverseTable is the table name for the Person entity.
+	// It exists in this package in order to avoid circular dependency with the "person" package.
+	SenderInverseTable = "persons"
 	// SenderColumn is the table column denoting the sender relation/edge.
 	SenderColumn = "sender_id"
 )

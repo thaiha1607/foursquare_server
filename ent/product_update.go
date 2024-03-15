@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
@@ -139,43 +140,21 @@ func (pu *ProductUpdate) AddQty(d decimal.Decimal) *ProductUpdate {
 	return pu
 }
 
-// SetUnitOfMeasurement sets the "unit_of_measurement" field.
-func (pu *ProductUpdate) SetUnitOfMeasurement(s string) *ProductUpdate {
-	pu.mutation.SetUnitOfMeasurement(s)
+// SetColors sets the "colors" field.
+func (pu *ProductUpdate) SetColors(s []string) *ProductUpdate {
+	pu.mutation.SetColors(s)
 	return pu
 }
 
-// SetNillableUnitOfMeasurement sets the "unit_of_measurement" field if the given value is not nil.
-func (pu *ProductUpdate) SetNillableUnitOfMeasurement(s *string) *ProductUpdate {
-	if s != nil {
-		pu.SetUnitOfMeasurement(*s)
-	}
+// AppendColors appends s to the "colors" field.
+func (pu *ProductUpdate) AppendColors(s []string) *ProductUpdate {
+	pu.mutation.AppendColors(s)
 	return pu
 }
 
-// ClearUnitOfMeasurement clears the value of the "unit_of_measurement" field.
-func (pu *ProductUpdate) ClearUnitOfMeasurement() *ProductUpdate {
-	pu.mutation.ClearUnitOfMeasurement()
-	return pu
-}
-
-// SetType sets the "type" field.
-func (pu *ProductUpdate) SetType(s string) *ProductUpdate {
-	pu.mutation.SetType(s)
-	return pu
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (pu *ProductUpdate) SetNillableType(s *string) *ProductUpdate {
-	if s != nil {
-		pu.SetType(*s)
-	}
-	return pu
-}
-
-// ClearType clears the value of the "type" field.
-func (pu *ProductUpdate) ClearType() *ProductUpdate {
-	pu.mutation.ClearType()
+// ClearColors clears the value of the "colors" field.
+func (pu *ProductUpdate) ClearColors() *ProductUpdate {
+	pu.mutation.ClearColors()
 	return pu
 }
 
@@ -342,17 +321,16 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.AddedQty(); ok {
 		_spec.AddField(product.FieldQty, field.TypeFloat64, value)
 	}
-	if value, ok := pu.mutation.UnitOfMeasurement(); ok {
-		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
+	if value, ok := pu.mutation.Colors(); ok {
+		_spec.SetField(product.FieldColors, field.TypeJSON, value)
 	}
-	if pu.mutation.UnitOfMeasurementCleared() {
-		_spec.ClearField(product.FieldUnitOfMeasurement, field.TypeString)
+	if value, ok := pu.mutation.AppendedColors(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, product.FieldColors, value)
+		})
 	}
-	if value, ok := pu.mutation.GetType(); ok {
-		_spec.SetField(product.FieldType, field.TypeString, value)
-	}
-	if pu.mutation.TypeCleared() {
-		_spec.ClearField(product.FieldType, field.TypeString)
+	if pu.mutation.ColorsCleared() {
+		_spec.ClearField(product.FieldColors, field.TypeJSON)
 	}
 	if value, ok := pu.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
@@ -371,10 +349,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
-		createE := &ProductTagCreate{config: pu.config, mutation: newProductTagMutation(pu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := pu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !pu.mutation.TagsCleared() {
@@ -391,10 +365,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &ProductTagCreate{config: pu.config, mutation: newProductTagMutation(pu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := pu.mutation.TagsIDs(); len(nodes) > 0 {
@@ -411,10 +381,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &ProductTagCreate{config: pu.config, mutation: newProductTagMutation(pu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
@@ -546,43 +512,21 @@ func (puo *ProductUpdateOne) AddQty(d decimal.Decimal) *ProductUpdateOne {
 	return puo
 }
 
-// SetUnitOfMeasurement sets the "unit_of_measurement" field.
-func (puo *ProductUpdateOne) SetUnitOfMeasurement(s string) *ProductUpdateOne {
-	puo.mutation.SetUnitOfMeasurement(s)
+// SetColors sets the "colors" field.
+func (puo *ProductUpdateOne) SetColors(s []string) *ProductUpdateOne {
+	puo.mutation.SetColors(s)
 	return puo
 }
 
-// SetNillableUnitOfMeasurement sets the "unit_of_measurement" field if the given value is not nil.
-func (puo *ProductUpdateOne) SetNillableUnitOfMeasurement(s *string) *ProductUpdateOne {
-	if s != nil {
-		puo.SetUnitOfMeasurement(*s)
-	}
+// AppendColors appends s to the "colors" field.
+func (puo *ProductUpdateOne) AppendColors(s []string) *ProductUpdateOne {
+	puo.mutation.AppendColors(s)
 	return puo
 }
 
-// ClearUnitOfMeasurement clears the value of the "unit_of_measurement" field.
-func (puo *ProductUpdateOne) ClearUnitOfMeasurement() *ProductUpdateOne {
-	puo.mutation.ClearUnitOfMeasurement()
-	return puo
-}
-
-// SetType sets the "type" field.
-func (puo *ProductUpdateOne) SetType(s string) *ProductUpdateOne {
-	puo.mutation.SetType(s)
-	return puo
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (puo *ProductUpdateOne) SetNillableType(s *string) *ProductUpdateOne {
-	if s != nil {
-		puo.SetType(*s)
-	}
-	return puo
-}
-
-// ClearType clears the value of the "type" field.
-func (puo *ProductUpdateOne) ClearType() *ProductUpdateOne {
-	puo.mutation.ClearType()
+// ClearColors clears the value of the "colors" field.
+func (puo *ProductUpdateOne) ClearColors() *ProductUpdateOne {
+	puo.mutation.ClearColors()
 	return puo
 }
 
@@ -779,17 +723,16 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	if value, ok := puo.mutation.AddedQty(); ok {
 		_spec.AddField(product.FieldQty, field.TypeFloat64, value)
 	}
-	if value, ok := puo.mutation.UnitOfMeasurement(); ok {
-		_spec.SetField(product.FieldUnitOfMeasurement, field.TypeString, value)
+	if value, ok := puo.mutation.Colors(); ok {
+		_spec.SetField(product.FieldColors, field.TypeJSON, value)
 	}
-	if puo.mutation.UnitOfMeasurementCleared() {
-		_spec.ClearField(product.FieldUnitOfMeasurement, field.TypeString)
+	if value, ok := puo.mutation.AppendedColors(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, product.FieldColors, value)
+		})
 	}
-	if value, ok := puo.mutation.GetType(); ok {
-		_spec.SetField(product.FieldType, field.TypeString, value)
-	}
-	if puo.mutation.TypeCleared() {
-		_spec.ClearField(product.FieldType, field.TypeString)
+	if puo.mutation.ColorsCleared() {
+		_spec.ClearField(product.FieldColors, field.TypeJSON)
 	}
 	if value, ok := puo.mutation.Provider(); ok {
 		_spec.SetField(product.FieldProvider, field.TypeString, value)
@@ -808,10 +751,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
-		createE := &ProductTagCreate{config: puo.config, mutation: newProductTagMutation(puo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := puo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !puo.mutation.TagsCleared() {
@@ -828,10 +767,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &ProductTagCreate{config: puo.config, mutation: newProductTagMutation(puo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := puo.mutation.TagsIDs(); len(nodes) > 0 {
@@ -848,10 +783,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &ProductTagCreate{config: puo.config, mutation: newProductTagMutation(puo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Product{config: puo.config}

@@ -44,12 +44,8 @@ func (Product) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
-		field.String("unit_of_measurement").
-			Optional().
-			Nillable(),
-		field.String("type").
-			Optional().
-			Nillable(),
+		field.Strings("colors").
+			Optional(),
 		field.String("provider").
 			Optional().
 			Nillable(),
@@ -67,7 +63,7 @@ func (Product) Edges() []ent.Edge {
 // Hooks of the Product.
 func (Product) Hooks() []ent.Hook {
 	return []ent.Hook{
-		hook.On(IDHook(6), ent.OpCreate),
+		hook.On(NanoIDHook(6), ent.OpCreate),
 	}
 }
 

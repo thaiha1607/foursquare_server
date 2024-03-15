@@ -59,12 +59,12 @@ func (Order) Fields() []ent.Field {
 // Edges of the Order.
 func (Order) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("customer", User.Type).
+		edge.To("customer", Person.Type).
 			Field("customer_id").
 			Unique().
 			Required().
 			Immutable(),
-		edge.To("creator", User.Type).
+		edge.To("creator", Person.Type).
 			Field("created_by").
 			Unique().
 			Required().
@@ -76,14 +76,14 @@ func (Order) Edges() []ent.Edge {
 			Field("status_code").
 			Unique().
 			Required(),
-		edge.To("management_staff", User.Type).
+		edge.To("management_staff", Person.Type).
 			Field("management_staff_id").
 			Unique().
 			Required(),
-		edge.To("warehouse_staff", User.Type).
+		edge.To("warehouse_staff", Person.Type).
 			Field("warehouse_staff_id").
 			Unique(),
-		edge.To("delivery_staff", User.Type).
+		edge.To("delivery_staff", Person.Type).
 			Field("delivery_staff_id").
 			Unique(),
 	}

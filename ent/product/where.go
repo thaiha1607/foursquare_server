@@ -101,16 +101,6 @@ func Qty(v decimal.Decimal) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldQty, v))
 }
 
-// UnitOfMeasurement applies equality check predicate on the "unit_of_measurement" field. It's identical to UnitOfMeasurementEQ.
-func UnitOfMeasurement(v string) predicate.Product {
-	return predicate.Product(sql.FieldEQ(FieldUnitOfMeasurement, v))
-}
-
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v string) predicate.Product {
-	return predicate.Product(sql.FieldEQ(FieldType, v))
-}
-
 // Provider applies equality check predicate on the "provider" field. It's identical to ProviderEQ.
 func Provider(v string) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldProvider, v))
@@ -466,154 +456,14 @@ func QtyLTE(v decimal.Decimal) predicate.Product {
 	return predicate.Product(sql.FieldLTE(FieldQty, v))
 }
 
-// UnitOfMeasurementEQ applies the EQ predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementEQ(v string) predicate.Product {
-	return predicate.Product(sql.FieldEQ(FieldUnitOfMeasurement, v))
+// ColorsIsNil applies the IsNil predicate on the "colors" field.
+func ColorsIsNil() predicate.Product {
+	return predicate.Product(sql.FieldIsNull(FieldColors))
 }
 
-// UnitOfMeasurementNEQ applies the NEQ predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementNEQ(v string) predicate.Product {
-	return predicate.Product(sql.FieldNEQ(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementIn applies the In predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementIn(vs ...string) predicate.Product {
-	return predicate.Product(sql.FieldIn(FieldUnitOfMeasurement, vs...))
-}
-
-// UnitOfMeasurementNotIn applies the NotIn predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementNotIn(vs ...string) predicate.Product {
-	return predicate.Product(sql.FieldNotIn(FieldUnitOfMeasurement, vs...))
-}
-
-// UnitOfMeasurementGT applies the GT predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementGT(v string) predicate.Product {
-	return predicate.Product(sql.FieldGT(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementGTE applies the GTE predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementGTE(v string) predicate.Product {
-	return predicate.Product(sql.FieldGTE(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementLT applies the LT predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementLT(v string) predicate.Product {
-	return predicate.Product(sql.FieldLT(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementLTE applies the LTE predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementLTE(v string) predicate.Product {
-	return predicate.Product(sql.FieldLTE(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementContains applies the Contains predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementContains(v string) predicate.Product {
-	return predicate.Product(sql.FieldContains(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementHasPrefix applies the HasPrefix predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementHasPrefix(v string) predicate.Product {
-	return predicate.Product(sql.FieldHasPrefix(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementHasSuffix applies the HasSuffix predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementHasSuffix(v string) predicate.Product {
-	return predicate.Product(sql.FieldHasSuffix(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementIsNil applies the IsNil predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementIsNil() predicate.Product {
-	return predicate.Product(sql.FieldIsNull(FieldUnitOfMeasurement))
-}
-
-// UnitOfMeasurementNotNil applies the NotNil predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementNotNil() predicate.Product {
-	return predicate.Product(sql.FieldNotNull(FieldUnitOfMeasurement))
-}
-
-// UnitOfMeasurementEqualFold applies the EqualFold predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementEqualFold(v string) predicate.Product {
-	return predicate.Product(sql.FieldEqualFold(FieldUnitOfMeasurement, v))
-}
-
-// UnitOfMeasurementContainsFold applies the ContainsFold predicate on the "unit_of_measurement" field.
-func UnitOfMeasurementContainsFold(v string) predicate.Product {
-	return predicate.Product(sql.FieldContainsFold(FieldUnitOfMeasurement, v))
-}
-
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v string) predicate.Product {
-	return predicate.Product(sql.FieldEQ(FieldType, v))
-}
-
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v string) predicate.Product {
-	return predicate.Product(sql.FieldNEQ(FieldType, v))
-}
-
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...string) predicate.Product {
-	return predicate.Product(sql.FieldIn(FieldType, vs...))
-}
-
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...string) predicate.Product {
-	return predicate.Product(sql.FieldNotIn(FieldType, vs...))
-}
-
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v string) predicate.Product {
-	return predicate.Product(sql.FieldGT(FieldType, v))
-}
-
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v string) predicate.Product {
-	return predicate.Product(sql.FieldGTE(FieldType, v))
-}
-
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v string) predicate.Product {
-	return predicate.Product(sql.FieldLT(FieldType, v))
-}
-
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v string) predicate.Product {
-	return predicate.Product(sql.FieldLTE(FieldType, v))
-}
-
-// TypeContains applies the Contains predicate on the "type" field.
-func TypeContains(v string) predicate.Product {
-	return predicate.Product(sql.FieldContains(FieldType, v))
-}
-
-// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
-func TypeHasPrefix(v string) predicate.Product {
-	return predicate.Product(sql.FieldHasPrefix(FieldType, v))
-}
-
-// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
-func TypeHasSuffix(v string) predicate.Product {
-	return predicate.Product(sql.FieldHasSuffix(FieldType, v))
-}
-
-// TypeIsNil applies the IsNil predicate on the "type" field.
-func TypeIsNil() predicate.Product {
-	return predicate.Product(sql.FieldIsNull(FieldType))
-}
-
-// TypeNotNil applies the NotNil predicate on the "type" field.
-func TypeNotNil() predicate.Product {
-	return predicate.Product(sql.FieldNotNull(FieldType))
-}
-
-// TypeEqualFold applies the EqualFold predicate on the "type" field.
-func TypeEqualFold(v string) predicate.Product {
-	return predicate.Product(sql.FieldEqualFold(FieldType, v))
-}
-
-// TypeContainsFold applies the ContainsFold predicate on the "type" field.
-func TypeContainsFold(v string) predicate.Product {
-	return predicate.Product(sql.FieldContainsFold(FieldType, v))
+// ColorsNotNil applies the NotNil predicate on the "colors" field.
+func ColorsNotNil() predicate.Product {
+	return predicate.Product(sql.FieldNotNull(FieldColors))
 }
 
 // ProviderEQ applies the EQ predicate on the "provider" field.

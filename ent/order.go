@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // Order is the model entity for the Order schema.
@@ -55,19 +55,19 @@ type Order struct {
 // OrderEdges holds the relations/edges for other nodes in the graph.
 type OrderEdges struct {
 	// Customer holds the value of the customer edge.
-	Customer *User `json:"customer,omitempty"`
+	Customer *Person `json:"customer,omitempty"`
 	// Creator holds the value of the creator edge.
-	Creator *User `json:"creator,omitempty"`
+	Creator *Person `json:"creator,omitempty"`
 	// ParentOrder holds the value of the parent_order edge.
 	ParentOrder *Order `json:"parent_order,omitempty"`
 	// OrderStatus holds the value of the order_status edge.
 	OrderStatus *OrderStatusCode `json:"order_status,omitempty"`
 	// ManagementStaff holds the value of the management_staff edge.
-	ManagementStaff *User `json:"management_staff,omitempty"`
+	ManagementStaff *Person `json:"management_staff,omitempty"`
 	// WarehouseStaff holds the value of the warehouse_staff edge.
-	WarehouseStaff *User `json:"warehouse_staff,omitempty"`
+	WarehouseStaff *Person `json:"warehouse_staff,omitempty"`
 	// DeliveryStaff holds the value of the delivery_staff edge.
-	DeliveryStaff *User `json:"delivery_staff,omitempty"`
+	DeliveryStaff *Person `json:"delivery_staff,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [7]bool
@@ -75,22 +75,22 @@ type OrderEdges struct {
 
 // CustomerOrErr returns the Customer value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) CustomerOrErr() (*User, error) {
+func (e OrderEdges) CustomerOrErr() (*Person, error) {
 	if e.Customer != nil {
 		return e.Customer, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "customer"}
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) CreatorOrErr() (*User, error) {
+func (e OrderEdges) CreatorOrErr() (*Person, error) {
 	if e.Creator != nil {
 		return e.Creator, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "creator"}
 }
@@ -119,33 +119,33 @@ func (e OrderEdges) OrderStatusOrErr() (*OrderStatusCode, error) {
 
 // ManagementStaffOrErr returns the ManagementStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) ManagementStaffOrErr() (*User, error) {
+func (e OrderEdges) ManagementStaffOrErr() (*Person, error) {
 	if e.ManagementStaff != nil {
 		return e.ManagementStaff, nil
 	} else if e.loadedTypes[4] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "management_staff"}
 }
 
 // WarehouseStaffOrErr returns the WarehouseStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) WarehouseStaffOrErr() (*User, error) {
+func (e OrderEdges) WarehouseStaffOrErr() (*Person, error) {
 	if e.WarehouseStaff != nil {
 		return e.WarehouseStaff, nil
 	} else if e.loadedTypes[5] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "warehouse_staff"}
 }
 
 // DeliveryStaffOrErr returns the DeliveryStaff value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) DeliveryStaffOrErr() (*User, error) {
+func (e OrderEdges) DeliveryStaffOrErr() (*Person, error) {
 	if e.DeliveryStaff != nil {
 		return e.DeliveryStaff, nil
 	} else if e.loadedTypes[6] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: person.Label}
 	}
 	return nil, &NotLoadedError{edge: "delivery_staff"}
 }
@@ -282,12 +282,12 @@ func (o *Order) Value(name string) (ent.Value, error) {
 }
 
 // QueryCustomer queries the "customer" edge of the Order entity.
-func (o *Order) QueryCustomer() *UserQuery {
+func (o *Order) QueryCustomer() *PersonQuery {
 	return NewOrderClient(o.config).QueryCustomer(o)
 }
 
 // QueryCreator queries the "creator" edge of the Order entity.
-func (o *Order) QueryCreator() *UserQuery {
+func (o *Order) QueryCreator() *PersonQuery {
 	return NewOrderClient(o.config).QueryCreator(o)
 }
 
@@ -302,17 +302,17 @@ func (o *Order) QueryOrderStatus() *OrderStatusCodeQuery {
 }
 
 // QueryManagementStaff queries the "management_staff" edge of the Order entity.
-func (o *Order) QueryManagementStaff() *UserQuery {
+func (o *Order) QueryManagementStaff() *PersonQuery {
 	return NewOrderClient(o.config).QueryManagementStaff(o)
 }
 
 // QueryWarehouseStaff queries the "warehouse_staff" edge of the Order entity.
-func (o *Order) QueryWarehouseStaff() *UserQuery {
+func (o *Order) QueryWarehouseStaff() *PersonQuery {
 	return NewOrderClient(o.config).QueryWarehouseStaff(o)
 }
 
 // QueryDeliveryStaff queries the "delivery_staff" edge of the Order entity.
-func (o *Order) QueryDeliveryStaff() *UserQuery {
+func (o *Order) QueryDeliveryStaff() *PersonQuery {
 	return NewOrderClient(o.config).QueryDeliveryStaff(o)
 }
 

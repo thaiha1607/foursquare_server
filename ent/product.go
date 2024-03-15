@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -32,10 +33,8 @@ type Product struct {
 	Price decimal.Decimal `json:"price,omitempty"`
 	// Qty holds the value of the "qty" field.
 	Qty decimal.Decimal `json:"qty,omitempty"`
-	// UnitOfMeasurement holds the value of the "unit_of_measurement" field.
-	UnitOfMeasurement *string `json:"unit_of_measurement,omitempty"`
-	// Type holds the value of the "type" field.
-	Type *string `json:"type,omitempty"`
+	// Colors holds the value of the "colors" field.
+	Colors []string `json:"colors,omitempty"`
 	// Provider holds the value of the "provider" field.
 	Provider *string `json:"provider,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -78,11 +77,13 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case product.FieldColors:
+			values[i] = new([]byte)
 		case product.FieldPrice, product.FieldQty:
 			values[i] = new(decimal.Decimal)
 		case product.FieldYear:
 			values[i] = new(sql.NullInt64)
-		case product.FieldID, product.FieldName, product.FieldDescription, product.FieldUnitOfMeasurement, product.FieldType, product.FieldProvider:
+		case product.FieldID, product.FieldName, product.FieldDescription, product.FieldProvider:
 			values[i] = new(sql.NullString)
 		case product.FieldCreatedAt, product.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -151,19 +152,13 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				pr.Qty = *value
 			}
-		case product.FieldUnitOfMeasurement:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field unit_of_measurement", values[i])
-			} else if value.Valid {
-				pr.UnitOfMeasurement = new(string)
-				*pr.UnitOfMeasurement = value.String
-			}
-		case product.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				pr.Type = new(string)
-				*pr.Type = value.String
+		case product.FieldColors:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field colors", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &pr.Colors); err != nil {
+					return fmt.Errorf("unmarshal field colors: %w", err)
+				}
 			}
 		case product.FieldProvider:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -243,15 +238,8 @@ func (pr *Product) String() string {
 	builder.WriteString("qty=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Qty))
 	builder.WriteString(", ")
-	if v := pr.UnitOfMeasurement; v != nil {
-		builder.WriteString("unit_of_measurement=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := pr.Type; v != nil {
-		builder.WriteString("type=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("colors=")
+	builder.WriteString(fmt.Sprintf("%v", pr.Colors))
 	builder.WriteString(", ")
 	if v := pr.Provider; v != nil {
 		builder.WriteString("provider=")

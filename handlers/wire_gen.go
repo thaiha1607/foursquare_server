@@ -51,10 +51,10 @@ func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
-func initializeUserHandler(e *echo.Echo, db *ent.Client) error {
-	userRepository := repositories.NewEntUserRepository(db)
-	userService := services.NewUserService(userRepository)
-	error2 := http.NewUserHandler(e, userService)
+func initializePersonHandler(e *echo.Echo, db *ent.Client) error {
+	personRepository := repositories.NewEntPersonRepository(db)
+	personService := services.NewPersonService(personRepository)
+	error2 := http.NewPersonHandler(e, personService)
 	return error2
 }
 
@@ -104,12 +104,5 @@ func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
 	productRepository := repositories.NewEntProductRepository(db)
 	productService := services.NewProductService(productRepository)
 	error2 := http.NewProductHandler(e, productService)
-	return error2
-}
-
-func initializeAccountHandler(e *echo.Echo, db *ent.Client) error {
-	accountRepository := repositories.NewEntAccountRepository(db)
-	accountService := services.NewAccountService(accountRepository)
-	error2 := http.NewAccountHandler(e, accountService)
 	return error2
 }

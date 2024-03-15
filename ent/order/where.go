@@ -588,7 +588,7 @@ func HasCustomer() predicate.Order {
 }
 
 // HasCustomerWith applies the HasEdge predicate on the "customer" edge with a given conditions (other predicates).
-func HasCustomerWith(preds ...predicate.User) predicate.Order {
+func HasCustomerWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newCustomerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -611,7 +611,7 @@ func HasCreator() predicate.Order {
 }
 
 // HasCreatorWith applies the HasEdge predicate on the "creator" edge with a given conditions (other predicates).
-func HasCreatorWith(preds ...predicate.User) predicate.Order {
+func HasCreatorWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newCreatorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -680,7 +680,7 @@ func HasManagementStaff() predicate.Order {
 }
 
 // HasManagementStaffWith applies the HasEdge predicate on the "management_staff" edge with a given conditions (other predicates).
-func HasManagementStaffWith(preds ...predicate.User) predicate.Order {
+func HasManagementStaffWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newManagementStaffStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -703,7 +703,7 @@ func HasWarehouseStaff() predicate.Order {
 }
 
 // HasWarehouseStaffWith applies the HasEdge predicate on the "warehouse_staff" edge with a given conditions (other predicates).
-func HasWarehouseStaffWith(preds ...predicate.User) predicate.Order {
+func HasWarehouseStaffWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newWarehouseStaffStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -726,7 +726,7 @@ func HasDeliveryStaff() predicate.Order {
 }
 
 // HasDeliveryStaffWith applies the HasEdge predicate on the "delivery_staff" edge with a given conditions (other predicates).
-func HasDeliveryStaffWith(preds ...predicate.User) predicate.Order {
+func HasDeliveryStaffWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newDeliveryStaffStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

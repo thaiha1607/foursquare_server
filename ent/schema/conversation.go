@@ -16,7 +16,7 @@ type Conversation struct {
 // Indexes of the Conversation.
 func (Conversation) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("user_one_id", "user_two_id").
+		index.Fields("person_one_id", "person_two_id").
 			Unique(),
 	}
 }
@@ -30,9 +30,9 @@ func (Conversation) Fields() []ent.Field {
 		field.String("title").
 			Optional().
 			Nillable(),
-		field.UUID("user_one_id", uuid.UUID{}).
+		field.UUID("person_one_id", uuid.UUID{}).
 			Immutable(),
-		field.UUID("user_two_id", uuid.UUID{}).
+		field.UUID("person_two_id", uuid.UUID{}).
 			Immutable(),
 	}
 }
@@ -40,13 +40,13 @@ func (Conversation) Fields() []ent.Field {
 // Edges of the Conversation.
 func (Conversation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user_one", User.Type).
-			Field("user_one_id").
+		edge.To("person_one", Person.Type).
+			Field("person_one_id").
 			Unique().
 			Required().
 			Immutable(),
-		edge.To("user_two", User.Type).
-			Field("user_two_id").
+		edge.To("person_two", Person.Type).
+			Field("person_two_id").
 			Unique().
 			Required().
 			Immutable(),

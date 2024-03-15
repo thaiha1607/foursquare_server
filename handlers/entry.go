@@ -16,7 +16,7 @@ func initializeApi(e *echo.Echo, db *ent.Client) {
 	initializeInvoiceLineItemHandler(e, db)
 	initializeProductImageHandler(e, db)
 	initializeOrderLineItemHandler(e, db)
-	initializeUserHandler(e, db)
+	initializePersonHandler(e, db)
 	initializeFinancialTransactionHandler(e, db)
 	initializeProductTagHandler(e, db)
 	initializeMessageHandler(e, db)
@@ -24,5 +24,4 @@ func initializeApi(e *echo.Echo, db *ent.Client) {
 	initializeInvoiceHandler(e, db)
 	initializeConversationHandler(e, db)
 	initializeProductHandler(e, db)
-	initializeAccountHandler(e, db)
 }

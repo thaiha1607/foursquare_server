@@ -36,8 +36,8 @@ func (e *entConversationRepository) Store(ctx context.Context, obj *ent.Conversa
 	res, err = e.Client.Conversation.
 		Create().
 		SetNillableTitle(obj.Title).
-		SetUserOneID(obj.UserOneID).
-		SetUserTwoID(obj.UserTwoID).
+		SetPersonOneID(obj.PersonOneID).
+		SetPersonTwoID(obj.PersonTwoID).
 		Save(ctx)
 	return
 }

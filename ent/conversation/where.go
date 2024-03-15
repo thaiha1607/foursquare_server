@@ -71,14 +71,14 @@ func Title(v string) predicate.Conversation {
 	return predicate.Conversation(sql.FieldEQ(FieldTitle, v))
 }
 
-// UserOneID applies equality check predicate on the "user_one_id" field. It's identical to UserOneIDEQ.
-func UserOneID(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldEQ(FieldUserOneID, v))
+// PersonOneID applies equality check predicate on the "person_one_id" field. It's identical to PersonOneIDEQ.
+func PersonOneID(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldEQ(FieldPersonOneID, v))
 }
 
-// UserTwoID applies equality check predicate on the "user_two_id" field. It's identical to UserTwoIDEQ.
-func UserTwoID(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldEQ(FieldUserTwoID, v))
+// PersonTwoID applies equality check predicate on the "person_two_id" field. It's identical to PersonTwoIDEQ.
+func PersonTwoID(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldEQ(FieldPersonTwoID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -236,61 +236,61 @@ func TitleContainsFold(v string) predicate.Conversation {
 	return predicate.Conversation(sql.FieldContainsFold(FieldTitle, v))
 }
 
-// UserOneIDEQ applies the EQ predicate on the "user_one_id" field.
-func UserOneIDEQ(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldEQ(FieldUserOneID, v))
+// PersonOneIDEQ applies the EQ predicate on the "person_one_id" field.
+func PersonOneIDEQ(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldEQ(FieldPersonOneID, v))
 }
 
-// UserOneIDNEQ applies the NEQ predicate on the "user_one_id" field.
-func UserOneIDNEQ(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldNEQ(FieldUserOneID, v))
+// PersonOneIDNEQ applies the NEQ predicate on the "person_one_id" field.
+func PersonOneIDNEQ(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldNEQ(FieldPersonOneID, v))
 }
 
-// UserOneIDIn applies the In predicate on the "user_one_id" field.
-func UserOneIDIn(vs ...uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldIn(FieldUserOneID, vs...))
+// PersonOneIDIn applies the In predicate on the "person_one_id" field.
+func PersonOneIDIn(vs ...uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldIn(FieldPersonOneID, vs...))
 }
 
-// UserOneIDNotIn applies the NotIn predicate on the "user_one_id" field.
-func UserOneIDNotIn(vs ...uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldNotIn(FieldUserOneID, vs...))
+// PersonOneIDNotIn applies the NotIn predicate on the "person_one_id" field.
+func PersonOneIDNotIn(vs ...uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldNotIn(FieldPersonOneID, vs...))
 }
 
-// UserTwoIDEQ applies the EQ predicate on the "user_two_id" field.
-func UserTwoIDEQ(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldEQ(FieldUserTwoID, v))
+// PersonTwoIDEQ applies the EQ predicate on the "person_two_id" field.
+func PersonTwoIDEQ(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldEQ(FieldPersonTwoID, v))
 }
 
-// UserTwoIDNEQ applies the NEQ predicate on the "user_two_id" field.
-func UserTwoIDNEQ(v uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldNEQ(FieldUserTwoID, v))
+// PersonTwoIDNEQ applies the NEQ predicate on the "person_two_id" field.
+func PersonTwoIDNEQ(v uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldNEQ(FieldPersonTwoID, v))
 }
 
-// UserTwoIDIn applies the In predicate on the "user_two_id" field.
-func UserTwoIDIn(vs ...uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldIn(FieldUserTwoID, vs...))
+// PersonTwoIDIn applies the In predicate on the "person_two_id" field.
+func PersonTwoIDIn(vs ...uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldIn(FieldPersonTwoID, vs...))
 }
 
-// UserTwoIDNotIn applies the NotIn predicate on the "user_two_id" field.
-func UserTwoIDNotIn(vs ...uuid.UUID) predicate.Conversation {
-	return predicate.Conversation(sql.FieldNotIn(FieldUserTwoID, vs...))
+// PersonTwoIDNotIn applies the NotIn predicate on the "person_two_id" field.
+func PersonTwoIDNotIn(vs ...uuid.UUID) predicate.Conversation {
+	return predicate.Conversation(sql.FieldNotIn(FieldPersonTwoID, vs...))
 }
 
-// HasUserOne applies the HasEdge predicate on the "user_one" edge.
-func HasUserOne() predicate.Conversation {
+// HasPersonOne applies the HasEdge predicate on the "person_one" edge.
+func HasPersonOne() predicate.Conversation {
 	return predicate.Conversation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, UserOneTable, UserOneColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, PersonOneTable, PersonOneColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserOneWith applies the HasEdge predicate on the "user_one" edge with a given conditions (other predicates).
-func HasUserOneWith(preds ...predicate.User) predicate.Conversation {
+// HasPersonOneWith applies the HasEdge predicate on the "person_one" edge with a given conditions (other predicates).
+func HasPersonOneWith(preds ...predicate.Person) predicate.Conversation {
 	return predicate.Conversation(func(s *sql.Selector) {
-		step := newUserOneStep()
+		step := newPersonOneStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -299,21 +299,21 @@ func HasUserOneWith(preds ...predicate.User) predicate.Conversation {
 	})
 }
 
-// HasUserTwo applies the HasEdge predicate on the "user_two" edge.
-func HasUserTwo() predicate.Conversation {
+// HasPersonTwo applies the HasEdge predicate on the "person_two" edge.
+func HasPersonTwo() predicate.Conversation {
 	return predicate.Conversation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, UserTwoTable, UserTwoColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, PersonTwoTable, PersonTwoColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserTwoWith applies the HasEdge predicate on the "user_two" edge with a given conditions (other predicates).
-func HasUserTwoWith(preds ...predicate.User) predicate.Conversation {
+// HasPersonTwoWith applies the HasEdge predicate on the "person_two" edge with a given conditions (other predicates).
+func HasPersonTwoWith(preds ...predicate.Person) predicate.Conversation {
 	return predicate.Conversation(func(s *sql.Selector) {
-		step := newUserTwoStep()
+		step := newPersonTwoStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

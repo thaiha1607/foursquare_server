@@ -57,11 +57,11 @@ func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
 	return nil
 }
 
-func initializeUserHandler(e *echo.Echo, db *ent.Client) error {
+func initializePersonHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
-		http.NewUserHandler,
-		services.NewUserService,
-		repositories.NewEntUserRepository,
+		http.NewPersonHandler,
+		services.NewPersonService,
+		repositories.NewEntPersonRepository,
 	)
 	return nil
 }
@@ -125,15 +125,6 @@ func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
 		http.NewProductHandler,
 		services.NewProductService,
 		repositories.NewEntProductRepository,
-	)
-	return nil
-}
-
-func initializeAccountHandler(e *echo.Echo, db *ent.Client) error {
-	wire.Build(
-		http.NewAccountHandler,
-		services.NewAccountService,
-		repositories.NewEntAccountRepository,
 	)
 	return nil
 }

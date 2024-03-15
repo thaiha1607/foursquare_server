@@ -97,11 +97,11 @@ func (cu *ConversationUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ConversationUpdate) check() error {
-	if _, ok := cu.mutation.UserOneID(); cu.mutation.UserOneCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Conversation.user_one"`)
+	if _, ok := cu.mutation.PersonOneID(); cu.mutation.PersonOneCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Conversation.person_one"`)
 	}
-	if _, ok := cu.mutation.UserTwoID(); cu.mutation.UserTwoCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Conversation.user_two"`)
+	if _, ok := cu.mutation.PersonTwoID(); cu.mutation.PersonTwoCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Conversation.person_two"`)
 	}
 	return nil
 }
@@ -229,11 +229,11 @@ func (cuo *ConversationUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ConversationUpdateOne) check() error {
-	if _, ok := cuo.mutation.UserOneID(); cuo.mutation.UserOneCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Conversation.user_one"`)
+	if _, ok := cuo.mutation.PersonOneID(); cuo.mutation.PersonOneCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Conversation.person_one"`)
 	}
-	if _, ok := cuo.mutation.UserTwoID(); cuo.mutation.UserTwoCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Conversation.user_two"`)
+	if _, ok := cuo.mutation.PersonTwoID(); cuo.mutation.PersonTwoCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Conversation.person_two"`)
 	}
 	return nil
 }

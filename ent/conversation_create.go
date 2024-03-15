@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // ConversationCreate is the builder for creating a Conversation entity.
@@ -64,15 +64,15 @@ func (cc *ConversationCreate) SetNillableTitle(s *string) *ConversationCreate {
 	return cc
 }
 
-// SetUserOneID sets the "user_one_id" field.
-func (cc *ConversationCreate) SetUserOneID(u uuid.UUID) *ConversationCreate {
-	cc.mutation.SetUserOneID(u)
+// SetPersonOneID sets the "person_one_id" field.
+func (cc *ConversationCreate) SetPersonOneID(u uuid.UUID) *ConversationCreate {
+	cc.mutation.SetPersonOneID(u)
 	return cc
 }
 
-// SetUserTwoID sets the "user_two_id" field.
-func (cc *ConversationCreate) SetUserTwoID(u uuid.UUID) *ConversationCreate {
-	cc.mutation.SetUserTwoID(u)
+// SetPersonTwoID sets the "person_two_id" field.
+func (cc *ConversationCreate) SetPersonTwoID(u uuid.UUID) *ConversationCreate {
+	cc.mutation.SetPersonTwoID(u)
 	return cc
 }
 
@@ -90,14 +90,14 @@ func (cc *ConversationCreate) SetNillableID(u *uuid.UUID) *ConversationCreate {
 	return cc
 }
 
-// SetUserOne sets the "user_one" edge to the User entity.
-func (cc *ConversationCreate) SetUserOne(u *User) *ConversationCreate {
-	return cc.SetUserOneID(u.ID)
+// SetPersonOne sets the "person_one" edge to the Person entity.
+func (cc *ConversationCreate) SetPersonOne(p *Person) *ConversationCreate {
+	return cc.SetPersonOneID(p.ID)
 }
 
-// SetUserTwo sets the "user_two" edge to the User entity.
-func (cc *ConversationCreate) SetUserTwo(u *User) *ConversationCreate {
-	return cc.SetUserTwoID(u.ID)
+// SetPersonTwo sets the "person_two" edge to the Person entity.
+func (cc *ConversationCreate) SetPersonTwo(p *Person) *ConversationCreate {
+	return cc.SetPersonTwoID(p.ID)
 }
 
 // Mutation returns the ConversationMutation object of the builder.
@@ -157,17 +157,17 @@ func (cc *ConversationCreate) check() error {
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Conversation.updated_at"`)}
 	}
-	if _, ok := cc.mutation.UserOneID(); !ok {
-		return &ValidationError{Name: "user_one_id", err: errors.New(`ent: missing required field "Conversation.user_one_id"`)}
+	if _, ok := cc.mutation.PersonOneID(); !ok {
+		return &ValidationError{Name: "person_one_id", err: errors.New(`ent: missing required field "Conversation.person_one_id"`)}
 	}
-	if _, ok := cc.mutation.UserTwoID(); !ok {
-		return &ValidationError{Name: "user_two_id", err: errors.New(`ent: missing required field "Conversation.user_two_id"`)}
+	if _, ok := cc.mutation.PersonTwoID(); !ok {
+		return &ValidationError{Name: "person_two_id", err: errors.New(`ent: missing required field "Conversation.person_two_id"`)}
 	}
-	if _, ok := cc.mutation.UserOneID(); !ok {
-		return &ValidationError{Name: "user_one", err: errors.New(`ent: missing required edge "Conversation.user_one"`)}
+	if _, ok := cc.mutation.PersonOneID(); !ok {
+		return &ValidationError{Name: "person_one", err: errors.New(`ent: missing required edge "Conversation.person_one"`)}
 	}
-	if _, ok := cc.mutation.UserTwoID(); !ok {
-		return &ValidationError{Name: "user_two", err: errors.New(`ent: missing required edge "Conversation.user_two"`)}
+	if _, ok := cc.mutation.PersonTwoID(); !ok {
+		return &ValidationError{Name: "person_two", err: errors.New(`ent: missing required edge "Conversation.person_two"`)}
 	}
 	return nil
 }
@@ -216,38 +216,38 @@ func (cc *ConversationCreate) createSpec() (*Conversation, *sqlgraph.CreateSpec)
 		_spec.SetField(conversation.FieldTitle, field.TypeString, value)
 		_node.Title = &value
 	}
-	if nodes := cc.mutation.UserOneIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.PersonOneIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   conversation.UserOneTable,
-			Columns: []string{conversation.UserOneColumn},
+			Table:   conversation.PersonOneTable,
+			Columns: []string{conversation.PersonOneColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserOneID = nodes[0]
+		_node.PersonOneID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.UserTwoIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.PersonTwoIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   conversation.UserTwoTable,
-			Columns: []string{conversation.UserTwoColumn},
+			Table:   conversation.PersonTwoTable,
+			Columns: []string{conversation.PersonTwoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserTwoID = nodes[0]
+		_node.PersonTwoID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

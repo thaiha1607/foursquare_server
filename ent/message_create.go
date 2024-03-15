@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/message"
-	"github.com/thaiha1607/foursquare_server/ent/user"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
 // MessageCreate is the builder for creating a Message entity.
@@ -116,9 +116,9 @@ func (mc *MessageCreate) SetConversation(c *Conversation) *MessageCreate {
 	return mc.SetConversationID(c.ID)
 }
 
-// SetSender sets the "sender" edge to the User entity.
-func (mc *MessageCreate) SetSender(u *User) *MessageCreate {
-	return mc.SetSenderID(u.ID)
+// SetSender sets the "sender" edge to the Person entity.
+func (mc *MessageCreate) SetSender(p *Person) *MessageCreate {
+	return mc.SetSenderID(p.ID)
 }
 
 // Mutation returns the MessageMutation object of the builder.
@@ -297,7 +297,7 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Columns: []string{message.SenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
