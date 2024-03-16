@@ -84,16 +84,16 @@ func main() {
 	e.Use(middleware.Decompress())
 	// Routes
 	handlers.RegisterRoutes(e, db)
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 	go func() {
 		if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()
-	// Graceful shutdown
-	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10s
+	<-ctx.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
