@@ -44,3 +44,6 @@ go.work
 # Environment variables
 .env*
 !.env.example
+
+# Temporary files
+.tmp/
