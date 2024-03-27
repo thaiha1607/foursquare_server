@@ -12,19 +12,26 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
+	"github.com/thaiha1607/foursquare_server/ent/deliveryassignment"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
-	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
+	"github.com/thaiha1607/foursquare_server/ent/orderitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/personaddress"
+	"github.com/thaiha1607/foursquare_server/ent/productcolor"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
+	"github.com/thaiha1607/foursquare_server/ent/productqty"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
+	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
+	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -85,19 +92,26 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			conversation.Table:         conversation.ValidColumn,
-			financialtransaction.Table: financialtransaction.ValidColumn,
-			invoice.Table:              invoice.ValidColumn,
-			invoicelineitem.Table:      invoicelineitem.ValidColumn,
-			message.Table:              message.ValidColumn,
-			order.Table:                order.ValidColumn,
-			orderlineitem.Table:        orderlineitem.ValidColumn,
-			orderstatuscode.Table:      orderstatuscode.ValidColumn,
-			person.Table:               person.ValidColumn,
-			product.Table:              product.ValidColumn,
-			productimage.Table:         productimage.ValidColumn,
-			producttag.Table:           producttag.ValidColumn,
-			tag.Table:                  tag.ValidColumn,
+			address.Table:             address.ValidColumn,
+			conversation.Table:        conversation.ValidColumn,
+			deliveryassignment.Table:  deliveryassignment.ValidColumn,
+			invoice.Table:             invoice.ValidColumn,
+			message.Table:             message.ValidColumn,
+			order.Table:               order.ValidColumn,
+			orderitem.Table:           orderitem.ValidColumn,
+			orderstatuscode.Table:     orderstatuscode.ValidColumn,
+			person.Table:              person.ValidColumn,
+			personaddress.Table:       personaddress.ValidColumn,
+			productcolor.Table:        productcolor.ValidColumn,
+			productimage.Table:        productimage.ValidColumn,
+			productinfo.Table:         productinfo.ValidColumn,
+			productqty.Table:          productqty.ValidColumn,
+			producttag.Table:          producttag.ValidColumn,
+			shipment.Table:            shipment.ValidColumn,
+			shipmentitem.Table:        shipmentitem.ValidColumn,
+			tag.Table:                 tag.ValidColumn,
+			warehouseassignment.Table: warehouseassignment.ValidColumn,
+			workunitinfo.Table:        workunitinfo.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

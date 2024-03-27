@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -112,57 +113,17 @@ func (ou *OrderUpdate) SetNillableStatusCode(i *int) *OrderUpdate {
 	return ou
 }
 
-// SetManagementStaffID sets the "management_staff_id" field.
-func (ou *OrderUpdate) SetManagementStaffID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetManagementStaffID(u)
+// SetStaffID sets the "staff_id" field.
+func (ou *OrderUpdate) SetStaffID(u uuid.UUID) *OrderUpdate {
+	ou.mutation.SetStaffID(u)
 	return ou
 }
 
-// SetNillableManagementStaffID sets the "management_staff_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableManagementStaffID(u *uuid.UUID) *OrderUpdate {
+// SetNillableStaffID sets the "staff_id" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableStaffID(u *uuid.UUID) *OrderUpdate {
 	if u != nil {
-		ou.SetManagementStaffID(*u)
+		ou.SetStaffID(*u)
 	}
-	return ou
-}
-
-// SetWarehouseStaffID sets the "warehouse_staff_id" field.
-func (ou *OrderUpdate) SetWarehouseStaffID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetWarehouseStaffID(u)
-	return ou
-}
-
-// SetNillableWarehouseStaffID sets the "warehouse_staff_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableWarehouseStaffID(u *uuid.UUID) *OrderUpdate {
-	if u != nil {
-		ou.SetWarehouseStaffID(*u)
-	}
-	return ou
-}
-
-// ClearWarehouseStaffID clears the value of the "warehouse_staff_id" field.
-func (ou *OrderUpdate) ClearWarehouseStaffID() *OrderUpdate {
-	ou.mutation.ClearWarehouseStaffID()
-	return ou
-}
-
-// SetDeliveryStaffID sets the "delivery_staff_id" field.
-func (ou *OrderUpdate) SetDeliveryStaffID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetDeliveryStaffID(u)
-	return ou
-}
-
-// SetNillableDeliveryStaffID sets the "delivery_staff_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableDeliveryStaffID(u *uuid.UUID) *OrderUpdate {
-	if u != nil {
-		ou.SetDeliveryStaffID(*u)
-	}
-	return ou
-}
-
-// ClearDeliveryStaffID clears the value of the "delivery_staff_id" field.
-func (ou *OrderUpdate) ClearDeliveryStaffID() *OrderUpdate {
-	ou.mutation.ClearDeliveryStaffID()
 	return ou
 }
 
@@ -186,6 +147,34 @@ func (ou *OrderUpdate) ClearInternalNote() *OrderUpdate {
 	return ou
 }
 
+// SetIsInternal sets the "is_internal" field.
+func (ou *OrderUpdate) SetIsInternal(b bool) *OrderUpdate {
+	ou.mutation.SetIsInternal(b)
+	return ou
+}
+
+// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableIsInternal(b *bool) *OrderUpdate {
+	if b != nil {
+		ou.SetIsInternal(*b)
+	}
+	return ou
+}
+
+// SetAddressID sets the "address_id" field.
+func (ou *OrderUpdate) SetAddressID(s string) *OrderUpdate {
+	ou.mutation.SetAddressID(s)
+	return ou
+}
+
+// SetNillableAddressID sets the "address_id" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableAddressID(s *string) *OrderUpdate {
+	if s != nil {
+		ou.SetAddressID(*s)
+	}
+	return ou
+}
+
 // SetParentOrder sets the "parent_order" edge to the Order entity.
 func (ou *OrderUpdate) SetParentOrder(o *Order) *OrderUpdate {
 	return ou.SetParentOrderID(o.ID)
@@ -202,19 +191,20 @@ func (ou *OrderUpdate) SetOrderStatus(o *OrderStatusCode) *OrderUpdate {
 	return ou.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the Person entity.
-func (ou *OrderUpdate) SetManagementStaff(p *Person) *OrderUpdate {
-	return ou.SetManagementStaffID(p.ID)
+// SetStaff sets the "staff" edge to the Person entity.
+func (ou *OrderUpdate) SetStaff(p *Person) *OrderUpdate {
+	return ou.SetStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
-func (ou *OrderUpdate) SetWarehouseStaff(p *Person) *OrderUpdate {
-	return ou.SetWarehouseStaffID(p.ID)
+// SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
+func (ou *OrderUpdate) SetOrderAddressID(id string) *OrderUpdate {
+	ou.mutation.SetOrderAddressID(id)
+	return ou
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
-func (ou *OrderUpdate) SetDeliveryStaff(p *Person) *OrderUpdate {
-	return ou.SetDeliveryStaffID(p.ID)
+// SetOrderAddress sets the "order_address" edge to the Address entity.
+func (ou *OrderUpdate) SetOrderAddress(a *Address) *OrderUpdate {
+	return ou.SetOrderAddressID(a.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -234,21 +224,15 @@ func (ou *OrderUpdate) ClearOrderStatus() *OrderUpdate {
 	return ou
 }
 
-// ClearManagementStaff clears the "management_staff" edge to the Person entity.
-func (ou *OrderUpdate) ClearManagementStaff() *OrderUpdate {
-	ou.mutation.ClearManagementStaff()
+// ClearStaff clears the "staff" edge to the Person entity.
+func (ou *OrderUpdate) ClearStaff() *OrderUpdate {
+	ou.mutation.ClearStaff()
 	return ou
 }
 
-// ClearWarehouseStaff clears the "warehouse_staff" edge to the Person entity.
-func (ou *OrderUpdate) ClearWarehouseStaff() *OrderUpdate {
-	ou.mutation.ClearWarehouseStaff()
-	return ou
-}
-
-// ClearDeliveryStaff clears the "delivery_staff" edge to the Person entity.
-func (ou *OrderUpdate) ClearDeliveryStaff() *OrderUpdate {
-	ou.mutation.ClearDeliveryStaff()
+// ClearOrderAddress clears the "order_address" edge to the Address entity.
+func (ou *OrderUpdate) ClearOrderAddress() *OrderUpdate {
+	ou.mutation.ClearOrderAddress()
 	return ou
 }
 
@@ -295,6 +279,11 @@ func (ou *OrderUpdate) check() error {
 			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Order.priority": %w`, err)}
 		}
 	}
+	if v, ok := ou.mutation.AddressID(); ok {
+		if err := order.AddressIDValidator(v); err != nil {
+			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
+		}
+	}
 	if _, ok := ou.mutation.CustomerID(); ou.mutation.CustomerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.customer"`)
 	}
@@ -304,8 +293,11 @@ func (ou *OrderUpdate) check() error {
 	if _, ok := ou.mutation.OrderStatusID(); ou.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ou.mutation.ManagementStaffID(); ou.mutation.ManagementStaffCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.management_staff"`)
+	if _, ok := ou.mutation.StaffID(); ou.mutation.StaffCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Order.staff"`)
+	}
+	if _, ok := ou.mutation.OrderAddressID(); ou.mutation.OrderAddressCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Order.order_address"`)
 	}
 	return nil
 }
@@ -342,6 +334,9 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ou.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
+	}
+	if value, ok := ou.mutation.IsInternal(); ok {
+		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
 	}
 	if ou.mutation.ParentOrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -401,12 +396,12 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ou.mutation.ManagementStaffCleared() {
+	if ou.mutation.StaffCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.ManagementStaffTable,
-			Columns: []string{order.ManagementStaffColumn},
+			Table:   order.StaffTable,
+			Columns: []string{order.StaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
@@ -414,12 +409,12 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ou.mutation.ManagementStaffIDs(); len(nodes) > 0 {
+	if nodes := ou.mutation.StaffIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.ManagementStaffTable,
-			Columns: []string{order.ManagementStaffColumn},
+			Table:   order.StaffTable,
+			Columns: []string{order.StaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
@@ -430,57 +425,28 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ou.mutation.WarehouseStaffCleared() {
+	if ou.mutation.OrderAddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.WarehouseStaffTable,
-			Columns: []string{order.WarehouseStaffColumn},
+			Table:   order.OrderAddressTable,
+			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ou.mutation.WarehouseStaffIDs(); len(nodes) > 0 {
+	if nodes := ou.mutation.OrderAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.WarehouseStaffTable,
-			Columns: []string{order.WarehouseStaffColumn},
+			Table:   order.OrderAddressTable,
+			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ou.mutation.DeliveryStaffCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.DeliveryStaffTable,
-			Columns: []string{order.DeliveryStaffColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.DeliveryStaffIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.DeliveryStaffTable,
-			Columns: []string{order.DeliveryStaffColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -589,57 +555,17 @@ func (ouo *OrderUpdateOne) SetNillableStatusCode(i *int) *OrderUpdateOne {
 	return ouo
 }
 
-// SetManagementStaffID sets the "management_staff_id" field.
-func (ouo *OrderUpdateOne) SetManagementStaffID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetManagementStaffID(u)
+// SetStaffID sets the "staff_id" field.
+func (ouo *OrderUpdateOne) SetStaffID(u uuid.UUID) *OrderUpdateOne {
+	ouo.mutation.SetStaffID(u)
 	return ouo
 }
 
-// SetNillableManagementStaffID sets the "management_staff_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableManagementStaffID(u *uuid.UUID) *OrderUpdateOne {
+// SetNillableStaffID sets the "staff_id" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableStaffID(u *uuid.UUID) *OrderUpdateOne {
 	if u != nil {
-		ouo.SetManagementStaffID(*u)
+		ouo.SetStaffID(*u)
 	}
-	return ouo
-}
-
-// SetWarehouseStaffID sets the "warehouse_staff_id" field.
-func (ouo *OrderUpdateOne) SetWarehouseStaffID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetWarehouseStaffID(u)
-	return ouo
-}
-
-// SetNillableWarehouseStaffID sets the "warehouse_staff_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableWarehouseStaffID(u *uuid.UUID) *OrderUpdateOne {
-	if u != nil {
-		ouo.SetWarehouseStaffID(*u)
-	}
-	return ouo
-}
-
-// ClearWarehouseStaffID clears the value of the "warehouse_staff_id" field.
-func (ouo *OrderUpdateOne) ClearWarehouseStaffID() *OrderUpdateOne {
-	ouo.mutation.ClearWarehouseStaffID()
-	return ouo
-}
-
-// SetDeliveryStaffID sets the "delivery_staff_id" field.
-func (ouo *OrderUpdateOne) SetDeliveryStaffID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetDeliveryStaffID(u)
-	return ouo
-}
-
-// SetNillableDeliveryStaffID sets the "delivery_staff_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableDeliveryStaffID(u *uuid.UUID) *OrderUpdateOne {
-	if u != nil {
-		ouo.SetDeliveryStaffID(*u)
-	}
-	return ouo
-}
-
-// ClearDeliveryStaffID clears the value of the "delivery_staff_id" field.
-func (ouo *OrderUpdateOne) ClearDeliveryStaffID() *OrderUpdateOne {
-	ouo.mutation.ClearDeliveryStaffID()
 	return ouo
 }
 
@@ -663,6 +589,34 @@ func (ouo *OrderUpdateOne) ClearInternalNote() *OrderUpdateOne {
 	return ouo
 }
 
+// SetIsInternal sets the "is_internal" field.
+func (ouo *OrderUpdateOne) SetIsInternal(b bool) *OrderUpdateOne {
+	ouo.mutation.SetIsInternal(b)
+	return ouo
+}
+
+// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableIsInternal(b *bool) *OrderUpdateOne {
+	if b != nil {
+		ouo.SetIsInternal(*b)
+	}
+	return ouo
+}
+
+// SetAddressID sets the "address_id" field.
+func (ouo *OrderUpdateOne) SetAddressID(s string) *OrderUpdateOne {
+	ouo.mutation.SetAddressID(s)
+	return ouo
+}
+
+// SetNillableAddressID sets the "address_id" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableAddressID(s *string) *OrderUpdateOne {
+	if s != nil {
+		ouo.SetAddressID(*s)
+	}
+	return ouo
+}
+
 // SetParentOrder sets the "parent_order" edge to the Order entity.
 func (ouo *OrderUpdateOne) SetParentOrder(o *Order) *OrderUpdateOne {
 	return ouo.SetParentOrderID(o.ID)
@@ -679,19 +633,20 @@ func (ouo *OrderUpdateOne) SetOrderStatus(o *OrderStatusCode) *OrderUpdateOne {
 	return ouo.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) SetManagementStaff(p *Person) *OrderUpdateOne {
-	return ouo.SetManagementStaffID(p.ID)
+// SetStaff sets the "staff" edge to the Person entity.
+func (ouo *OrderUpdateOne) SetStaff(p *Person) *OrderUpdateOne {
+	return ouo.SetStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) SetWarehouseStaff(p *Person) *OrderUpdateOne {
-	return ouo.SetWarehouseStaffID(p.ID)
+// SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
+func (ouo *OrderUpdateOne) SetOrderAddressID(id string) *OrderUpdateOne {
+	ouo.mutation.SetOrderAddressID(id)
+	return ouo
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) SetDeliveryStaff(p *Person) *OrderUpdateOne {
-	return ouo.SetDeliveryStaffID(p.ID)
+// SetOrderAddress sets the "order_address" edge to the Address entity.
+func (ouo *OrderUpdateOne) SetOrderAddress(a *Address) *OrderUpdateOne {
+	return ouo.SetOrderAddressID(a.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -711,21 +666,15 @@ func (ouo *OrderUpdateOne) ClearOrderStatus() *OrderUpdateOne {
 	return ouo
 }
 
-// ClearManagementStaff clears the "management_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) ClearManagementStaff() *OrderUpdateOne {
-	ouo.mutation.ClearManagementStaff()
+// ClearStaff clears the "staff" edge to the Person entity.
+func (ouo *OrderUpdateOne) ClearStaff() *OrderUpdateOne {
+	ouo.mutation.ClearStaff()
 	return ouo
 }
 
-// ClearWarehouseStaff clears the "warehouse_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) ClearWarehouseStaff() *OrderUpdateOne {
-	ouo.mutation.ClearWarehouseStaff()
-	return ouo
-}
-
-// ClearDeliveryStaff clears the "delivery_staff" edge to the Person entity.
-func (ouo *OrderUpdateOne) ClearDeliveryStaff() *OrderUpdateOne {
-	ouo.mutation.ClearDeliveryStaff()
+// ClearOrderAddress clears the "order_address" edge to the Address entity.
+func (ouo *OrderUpdateOne) ClearOrderAddress() *OrderUpdateOne {
+	ouo.mutation.ClearOrderAddress()
 	return ouo
 }
 
@@ -785,6 +734,11 @@ func (ouo *OrderUpdateOne) check() error {
 			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Order.priority": %w`, err)}
 		}
 	}
+	if v, ok := ouo.mutation.AddressID(); ok {
+		if err := order.AddressIDValidator(v); err != nil {
+			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
+		}
+	}
 	if _, ok := ouo.mutation.CustomerID(); ouo.mutation.CustomerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.customer"`)
 	}
@@ -794,8 +748,11 @@ func (ouo *OrderUpdateOne) check() error {
 	if _, ok := ouo.mutation.OrderStatusID(); ouo.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ouo.mutation.ManagementStaffID(); ouo.mutation.ManagementStaffCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.management_staff"`)
+	if _, ok := ouo.mutation.StaffID(); ouo.mutation.StaffCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Order.staff"`)
+	}
+	if _, ok := ouo.mutation.OrderAddressID(); ouo.mutation.OrderAddressCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Order.order_address"`)
 	}
 	return nil
 }
@@ -849,6 +806,9 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 	}
 	if ouo.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
+	}
+	if value, ok := ouo.mutation.IsInternal(); ok {
+		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
 	}
 	if ouo.mutation.ParentOrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -908,12 +868,12 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ouo.mutation.ManagementStaffCleared() {
+	if ouo.mutation.StaffCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.ManagementStaffTable,
-			Columns: []string{order.ManagementStaffColumn},
+			Table:   order.StaffTable,
+			Columns: []string{order.StaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
@@ -921,12 +881,12 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ouo.mutation.ManagementStaffIDs(); len(nodes) > 0 {
+	if nodes := ouo.mutation.StaffIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.ManagementStaffTable,
-			Columns: []string{order.ManagementStaffColumn},
+			Table:   order.StaffTable,
+			Columns: []string{order.StaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
@@ -937,57 +897,28 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ouo.mutation.WarehouseStaffCleared() {
+	if ouo.mutation.OrderAddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.WarehouseStaffTable,
-			Columns: []string{order.WarehouseStaffColumn},
+			Table:   order.OrderAddressTable,
+			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ouo.mutation.WarehouseStaffIDs(); len(nodes) > 0 {
+	if nodes := ouo.mutation.OrderAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.WarehouseStaffTable,
-			Columns: []string{order.WarehouseStaffColumn},
+			Table:   order.OrderAddressTable,
+			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ouo.mutation.DeliveryStaffCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.DeliveryStaffTable,
-			Columns: []string{order.DeliveryStaffColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.DeliveryStaffIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.DeliveryStaffTable,
-			Columns: []string{order.DeliveryStaffColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

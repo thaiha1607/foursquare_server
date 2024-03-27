@@ -18,17 +18,17 @@ const (
 	EdgeProducts = "products"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
-	// ProductFieldID holds the string denoting the ID field of the Product.
-	ProductFieldID = "id"
+	// ProductInfoFieldID holds the string denoting the ID field of the ProductInfo.
+	ProductInfoFieldID = "id"
 	// TagFieldID holds the string denoting the ID field of the Tag.
 	TagFieldID = "id"
 	// Table holds the table name of the producttag in the database.
 	Table = "product_tags"
 	// ProductsTable is the table that holds the products relation/edge.
 	ProductsTable = "product_tags"
-	// ProductsInverseTable is the table name for the Product entity.
-	// It exists in this package in order to avoid circular dependency with the "product" package.
-	ProductsInverseTable = "products"
+	// ProductsInverseTable is the table name for the ProductInfo entity.
+	// It exists in this package in order to avoid circular dependency with the "productinfo" package.
+	ProductsInverseTable = "product_info"
 	// ProductsColumn is the table column denoting the products relation/edge.
 	ProductsColumn = "product_id"
 	// TagsTable is the table that holds the tags relation/edge.
@@ -85,7 +85,7 @@ func ByTagsField(field string, opts ...sql.OrderTermOption) OrderOption {
 func newProductsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, ProductsColumn),
-		sqlgraph.To(ProductsInverseTable, ProductFieldID),
+		sqlgraph.To(ProductsInverseTable, ProductInfoFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, ProductsTable, ProductsColumn),
 	)
 }

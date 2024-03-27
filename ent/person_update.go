@@ -11,8 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // PersonUpdate is the builder for updating Person entities.
@@ -68,12 +71,6 @@ func (pu *PersonUpdate) SetNillableEmail(s *string) *PersonUpdate {
 	return pu
 }
 
-// ClearEmail clears the value of the "email" field.
-func (pu *PersonUpdate) ClearEmail() *PersonUpdate {
-	pu.mutation.ClearEmail()
-	return pu
-}
-
 // SetName sets the "name" field.
 func (pu *PersonUpdate) SetName(s string) *PersonUpdate {
 	pu.mutation.SetName(s)
@@ -99,6 +96,12 @@ func (pu *PersonUpdate) SetNillablePhone(s *string) *PersonUpdate {
 	if s != nil {
 		pu.SetPhone(*s)
 	}
+	return pu
+}
+
+// ClearPhone clears the value of the "phone" field.
+func (pu *PersonUpdate) ClearPhone() *PersonUpdate {
+	pu.mutation.ClearPhone()
 	return pu
 }
 
@@ -156,9 +159,76 @@ func (pu *PersonUpdate) SetNillableIsPhoneVerified(b *bool) *PersonUpdate {
 	return pu
 }
 
+// SetWorkUnitID sets the "work_unit_id" field.
+func (pu *PersonUpdate) SetWorkUnitID(u uuid.UUID) *PersonUpdate {
+	pu.mutation.SetWorkUnitID(u)
+	return pu
+}
+
+// SetNillableWorkUnitID sets the "work_unit_id" field if the given value is not nil.
+func (pu *PersonUpdate) SetNillableWorkUnitID(u *uuid.UUID) *PersonUpdate {
+	if u != nil {
+		pu.SetWorkUnitID(*u)
+	}
+	return pu
+}
+
+// ClearWorkUnitID clears the value of the "work_unit_id" field.
+func (pu *PersonUpdate) ClearWorkUnitID() *PersonUpdate {
+	pu.mutation.ClearWorkUnitID()
+	return pu
+}
+
+// SetWorkUnit sets the "work_unit" edge to the WorkUnitInfo entity.
+func (pu *PersonUpdate) SetWorkUnit(w *WorkUnitInfo) *PersonUpdate {
+	return pu.SetWorkUnitID(w.ID)
+}
+
+// AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
+func (pu *PersonUpdate) AddAddressIDs(ids ...string) *PersonUpdate {
+	pu.mutation.AddAddressIDs(ids...)
+	return pu
+}
+
+// AddAddresses adds the "addresses" edges to the Address entity.
+func (pu *PersonUpdate) AddAddresses(a ...*Address) *PersonUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pu.AddAddressIDs(ids...)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (pu *PersonUpdate) Mutation() *PersonMutation {
 	return pu.mutation
+}
+
+// ClearWorkUnit clears the "work_unit" edge to the WorkUnitInfo entity.
+func (pu *PersonUpdate) ClearWorkUnit() *PersonUpdate {
+	pu.mutation.ClearWorkUnit()
+	return pu
+}
+
+// ClearAddresses clears all "addresses" edges to the Address entity.
+func (pu *PersonUpdate) ClearAddresses() *PersonUpdate {
+	pu.mutation.ClearAddresses()
+	return pu
+}
+
+// RemoveAddressIDs removes the "addresses" edge to Address entities by IDs.
+func (pu *PersonUpdate) RemoveAddressIDs(ids ...string) *PersonUpdate {
+	pu.mutation.RemoveAddressIDs(ids...)
+	return pu
+}
+
+// RemoveAddresses removes "addresses" edges to Address entities.
+func (pu *PersonUpdate) RemoveAddresses(a ...*Address) *PersonUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pu.RemoveAddressIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -256,14 +326,14 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Email(); ok {
 		_spec.SetField(person.FieldEmail, field.TypeString, value)
 	}
-	if pu.mutation.EmailCleared() {
-		_spec.ClearField(person.FieldEmail, field.TypeString)
-	}
 	if value, ok := pu.mutation.Name(); ok {
 		_spec.SetField(person.FieldName, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
+	}
+	if pu.mutation.PhoneCleared() {
+		_spec.ClearField(person.FieldPhone, field.TypeString)
 	}
 	if value, ok := pu.mutation.Role(); ok {
 		_spec.SetField(person.FieldRole, field.TypeEnum, value)
@@ -279,6 +349,92 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.IsPhoneVerified(); ok {
 		_spec.SetField(person.FieldIsPhoneVerified, field.TypeBool, value)
+	}
+	if pu.mutation.WorkUnitCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   person.WorkUnitTable,
+			Columns: []string{person.WorkUnitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workunitinfo.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.WorkUnitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   person.WorkUnitTable,
+			Columns: []string{person.WorkUnitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workunitinfo.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		createE := &PersonAddressCreate{config: pu.config, mutation: newPersonAddressMutation(pu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !pu.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PersonAddressCreate{config: pu.config, mutation: newPersonAddressMutation(pu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PersonAddressCreate{config: pu.config, mutation: newPersonAddressMutation(pu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -340,12 +496,6 @@ func (puo *PersonUpdateOne) SetNillableEmail(s *string) *PersonUpdateOne {
 	return puo
 }
 
-// ClearEmail clears the value of the "email" field.
-func (puo *PersonUpdateOne) ClearEmail() *PersonUpdateOne {
-	puo.mutation.ClearEmail()
-	return puo
-}
-
 // SetName sets the "name" field.
 func (puo *PersonUpdateOne) SetName(s string) *PersonUpdateOne {
 	puo.mutation.SetName(s)
@@ -371,6 +521,12 @@ func (puo *PersonUpdateOne) SetNillablePhone(s *string) *PersonUpdateOne {
 	if s != nil {
 		puo.SetPhone(*s)
 	}
+	return puo
+}
+
+// ClearPhone clears the value of the "phone" field.
+func (puo *PersonUpdateOne) ClearPhone() *PersonUpdateOne {
+	puo.mutation.ClearPhone()
 	return puo
 }
 
@@ -428,9 +584,76 @@ func (puo *PersonUpdateOne) SetNillableIsPhoneVerified(b *bool) *PersonUpdateOne
 	return puo
 }
 
+// SetWorkUnitID sets the "work_unit_id" field.
+func (puo *PersonUpdateOne) SetWorkUnitID(u uuid.UUID) *PersonUpdateOne {
+	puo.mutation.SetWorkUnitID(u)
+	return puo
+}
+
+// SetNillableWorkUnitID sets the "work_unit_id" field if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableWorkUnitID(u *uuid.UUID) *PersonUpdateOne {
+	if u != nil {
+		puo.SetWorkUnitID(*u)
+	}
+	return puo
+}
+
+// ClearWorkUnitID clears the value of the "work_unit_id" field.
+func (puo *PersonUpdateOne) ClearWorkUnitID() *PersonUpdateOne {
+	puo.mutation.ClearWorkUnitID()
+	return puo
+}
+
+// SetWorkUnit sets the "work_unit" edge to the WorkUnitInfo entity.
+func (puo *PersonUpdateOne) SetWorkUnit(w *WorkUnitInfo) *PersonUpdateOne {
+	return puo.SetWorkUnitID(w.ID)
+}
+
+// AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
+func (puo *PersonUpdateOne) AddAddressIDs(ids ...string) *PersonUpdateOne {
+	puo.mutation.AddAddressIDs(ids...)
+	return puo
+}
+
+// AddAddresses adds the "addresses" edges to the Address entity.
+func (puo *PersonUpdateOne) AddAddresses(a ...*Address) *PersonUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return puo.AddAddressIDs(ids...)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (puo *PersonUpdateOne) Mutation() *PersonMutation {
 	return puo.mutation
+}
+
+// ClearWorkUnit clears the "work_unit" edge to the WorkUnitInfo entity.
+func (puo *PersonUpdateOne) ClearWorkUnit() *PersonUpdateOne {
+	puo.mutation.ClearWorkUnit()
+	return puo
+}
+
+// ClearAddresses clears all "addresses" edges to the Address entity.
+func (puo *PersonUpdateOne) ClearAddresses() *PersonUpdateOne {
+	puo.mutation.ClearAddresses()
+	return puo
+}
+
+// RemoveAddressIDs removes the "addresses" edge to Address entities by IDs.
+func (puo *PersonUpdateOne) RemoveAddressIDs(ids ...string) *PersonUpdateOne {
+	puo.mutation.RemoveAddressIDs(ids...)
+	return puo
+}
+
+// RemoveAddresses removes "addresses" edges to Address entities.
+func (puo *PersonUpdateOne) RemoveAddresses(a ...*Address) *PersonUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return puo.RemoveAddressIDs(ids...)
 }
 
 // Where appends a list predicates to the PersonUpdate builder.
@@ -558,14 +781,14 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	if value, ok := puo.mutation.Email(); ok {
 		_spec.SetField(person.FieldEmail, field.TypeString, value)
 	}
-	if puo.mutation.EmailCleared() {
-		_spec.ClearField(person.FieldEmail, field.TypeString)
-	}
 	if value, ok := puo.mutation.Name(); ok {
 		_spec.SetField(person.FieldName, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
+	}
+	if puo.mutation.PhoneCleared() {
+		_spec.ClearField(person.FieldPhone, field.TypeString)
 	}
 	if value, ok := puo.mutation.Role(); ok {
 		_spec.SetField(person.FieldRole, field.TypeEnum, value)
@@ -581,6 +804,92 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	}
 	if value, ok := puo.mutation.IsPhoneVerified(); ok {
 		_spec.SetField(person.FieldIsPhoneVerified, field.TypeBool, value)
+	}
+	if puo.mutation.WorkUnitCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   person.WorkUnitTable,
+			Columns: []string{person.WorkUnitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workunitinfo.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.WorkUnitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   person.WorkUnitTable,
+			Columns: []string{person.WorkUnitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workunitinfo.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		createE := &PersonAddressCreate{config: puo.config, mutation: newPersonAddressMutation(puo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !puo.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PersonAddressCreate{config: puo.config, mutation: newPersonAddressMutation(puo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PersonAddressCreate{config: puo.config, mutation: newPersonAddressMutation(puo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Person{config: puo.config}
 	_spec.Assign = _node.assignValues

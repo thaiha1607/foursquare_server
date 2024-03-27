@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,17 +12,23 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/person"
+	"github.com/thaiha1607/foursquare_server/ent/personaddress"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // PersonQuery is the builder for querying Person entities.
 type PersonQuery struct {
 	config
-	ctx        *QueryContext
-	order      []person.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Person
+	ctx                 *QueryContext
+	order               []person.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Person
+	withWorkUnit        *WorkUnitInfoQuery
+	withAddresses       *AddressQuery
+	withPersonAddresses *PersonAddressQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +63,72 @@ func (pq *PersonQuery) Unique(unique bool) *PersonQuery {
 func (pq *PersonQuery) Order(o ...person.OrderOption) *PersonQuery {
 	pq.order = append(pq.order, o...)
 	return pq
+}
+
+// QueryWorkUnit chains the current query on the "work_unit" edge.
+func (pq *PersonQuery) QueryWorkUnit() *WorkUnitInfoQuery {
+	query := (&WorkUnitInfoClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(workunitinfo.Table, workunitinfo.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, person.WorkUnitTable, person.WorkUnitColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAddresses chains the current query on the "addresses" edge.
+func (pq *PersonQuery) QueryAddresses() *AddressQuery {
+	query := (&AddressClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(address.Table, address.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, person.AddressesTable, person.AddressesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPersonAddresses chains the current query on the "person_addresses" edge.
+func (pq *PersonQuery) QueryPersonAddresses() *PersonAddressQuery {
+	query := (&PersonAddressClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(personaddress.Table, personaddress.PersonsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, person.PersonAddressesTable, person.PersonAddressesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Person entity from the query.
@@ -245,15 +318,51 @@ func (pq *PersonQuery) Clone() *PersonQuery {
 		return nil
 	}
 	return &PersonQuery{
-		config:     pq.config,
-		ctx:        pq.ctx.Clone(),
-		order:      append([]person.OrderOption{}, pq.order...),
-		inters:     append([]Interceptor{}, pq.inters...),
-		predicates: append([]predicate.Person{}, pq.predicates...),
+		config:              pq.config,
+		ctx:                 pq.ctx.Clone(),
+		order:               append([]person.OrderOption{}, pq.order...),
+		inters:              append([]Interceptor{}, pq.inters...),
+		predicates:          append([]predicate.Person{}, pq.predicates...),
+		withWorkUnit:        pq.withWorkUnit.Clone(),
+		withAddresses:       pq.withAddresses.Clone(),
+		withPersonAddresses: pq.withPersonAddresses.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
+}
+
+// WithWorkUnit tells the query-builder to eager-load the nodes that are connected to
+// the "work_unit" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithWorkUnit(opts ...func(*WorkUnitInfoQuery)) *PersonQuery {
+	query := (&WorkUnitInfoClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withWorkUnit = query
+	return pq
+}
+
+// WithAddresses tells the query-builder to eager-load the nodes that are connected to
+// the "addresses" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithAddresses(opts ...func(*AddressQuery)) *PersonQuery {
+	query := (&AddressClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withAddresses = query
+	return pq
+}
+
+// WithPersonAddresses tells the query-builder to eager-load the nodes that are connected to
+// the "person_addresses" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithPersonAddresses(opts ...func(*PersonAddressQuery)) *PersonQuery {
+	query := (&PersonAddressClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withPersonAddresses = query
+	return pq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,8 +441,13 @@ func (pq *PersonQuery) prepareQuery(ctx context.Context) error {
 
 func (pq *PersonQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Person, error) {
 	var (
-		nodes = []*Person{}
-		_spec = pq.querySpec()
+		nodes       = []*Person{}
+		_spec       = pq.querySpec()
+		loadedTypes = [3]bool{
+			pq.withWorkUnit != nil,
+			pq.withAddresses != nil,
+			pq.withPersonAddresses != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Person).scanValues(nil, columns)
@@ -341,6 +455,7 @@ func (pq *PersonQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Perso
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Person{config: pq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +467,151 @@ func (pq *PersonQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Perso
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := pq.withWorkUnit; query != nil {
+		if err := pq.loadWorkUnit(ctx, query, nodes, nil,
+			func(n *Person, e *WorkUnitInfo) { n.Edges.WorkUnit = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withAddresses; query != nil {
+		if err := pq.loadAddresses(ctx, query, nodes,
+			func(n *Person) { n.Edges.Addresses = []*Address{} },
+			func(n *Person, e *Address) { n.Edges.Addresses = append(n.Edges.Addresses, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withPersonAddresses; query != nil {
+		if err := pq.loadPersonAddresses(ctx, query, nodes,
+			func(n *Person) { n.Edges.PersonAddresses = []*PersonAddress{} },
+			func(n *Person, e *PersonAddress) { n.Edges.PersonAddresses = append(n.Edges.PersonAddresses, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (pq *PersonQuery) loadWorkUnit(ctx context.Context, query *WorkUnitInfoQuery, nodes []*Person, init func(*Person), assign func(*Person, *WorkUnitInfo)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Person)
+	for i := range nodes {
+		if nodes[i].WorkUnitID == nil {
+			continue
+		}
+		fk := *nodes[i].WorkUnitID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(workunitinfo.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "work_unit_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (pq *PersonQuery) loadAddresses(ctx context.Context, query *AddressQuery, nodes []*Person, init func(*Person), assign func(*Person, *Address)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Person)
+	nids := make(map[string]map[*Person]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(person.AddressesTable)
+		s.Join(joinT).On(s.C(address.FieldID), joinT.C(person.AddressesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(person.AddressesPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(person.AddressesPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Person]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Address](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "addresses" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (pq *PersonQuery) loadPersonAddresses(ctx context.Context, query *PersonAddressQuery, nodes []*Person, init func(*Person), assign func(*Person, *PersonAddress)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Person)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(personaddress.FieldPersonID)
+	}
+	query.Where(predicate.PersonAddress(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(person.PersonAddressesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.PersonID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "person_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (pq *PersonQuery) sqlCount(ctx context.Context) (int, error) {
@@ -379,6 +638,9 @@ func (pq *PersonQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != person.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if pq.withWorkUnit != nil {
+			_spec.Node.AddColumnOnce(person.FieldWorkUnitID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

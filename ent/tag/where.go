@@ -237,7 +237,7 @@ func HasProducts() predicate.Tag {
 }
 
 // HasProductsWith applies the HasEdge predicate on the "products" edge with a given conditions (other predicates).
-func HasProductsWith(preds ...predicate.Product) predicate.Tag {
+func HasProductsWith(preds ...predicate.ProductInfo) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
 		step := newProductsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

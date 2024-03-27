@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
@@ -24,7 +24,7 @@ type TagQuery struct {
 	order           []tag.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Tag
-	withProducts    *ProductQuery
+	withProducts    *ProductInfoQuery
 	withProductTags *ProductTagQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -63,8 +63,8 @@ func (tq *TagQuery) Order(o ...tag.OrderOption) *TagQuery {
 }
 
 // QueryProducts chains the current query on the "products" edge.
-func (tq *TagQuery) QueryProducts() *ProductQuery {
-	query := (&ProductClient{config: tq.config}).Query()
+func (tq *TagQuery) QueryProducts() *ProductInfoQuery {
+	query := (&ProductInfoClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -75,7 +75,7 @@ func (tq *TagQuery) QueryProducts() *ProductQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
-			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.To(productinfo.Table, productinfo.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, tag.ProductsTable, tag.ProductsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
@@ -308,8 +308,8 @@ func (tq *TagQuery) Clone() *TagQuery {
 
 // WithProducts tells the query-builder to eager-load the nodes that are connected to
 // the "products" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TagQuery) WithProducts(opts ...func(*ProductQuery)) *TagQuery {
-	query := (&ProductClient{config: tq.config}).Query()
+func (tq *TagQuery) WithProducts(opts ...func(*ProductInfoQuery)) *TagQuery {
+	query := (&ProductInfoClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -431,8 +431,8 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 	}
 	if query := tq.withProducts; query != nil {
 		if err := tq.loadProducts(ctx, query, nodes,
-			func(n *Tag) { n.Edges.Products = []*Product{} },
-			func(n *Tag, e *Product) { n.Edges.Products = append(n.Edges.Products, e) }); err != nil {
+			func(n *Tag) { n.Edges.Products = []*ProductInfo{} },
+			func(n *Tag, e *ProductInfo) { n.Edges.Products = append(n.Edges.Products, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -446,7 +446,7 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 	return nodes, nil
 }
 
-func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Product)) error {
+func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductInfoQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *ProductInfo)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Tag)
 	nids := make(map[string]map[*Tag]struct{})
@@ -459,7 +459,7 @@ func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(tag.ProductsTable)
-		s.Join(joinT).On(s.C(product.FieldID), joinT.C(tag.ProductsPrimaryKey[0]))
+		s.Join(joinT).On(s.C(productinfo.FieldID), joinT.C(tag.ProductsPrimaryKey[0]))
 		s.Where(sql.InValues(joinT.C(tag.ProductsPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(tag.ProductsPrimaryKey[1]))
@@ -492,7 +492,7 @@ func (tq *TagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Product](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*ProductInfo](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}

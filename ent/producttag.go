@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
@@ -29,7 +29,7 @@ type ProductTag struct {
 // ProductTagEdges holds the relations/edges for other nodes in the graph.
 type ProductTagEdges struct {
 	// Products holds the value of the products edge.
-	Products *Product `json:"products,omitempty"`
+	Products *ProductInfo `json:"products,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags *Tag `json:"tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -39,11 +39,11 @@ type ProductTagEdges struct {
 
 // ProductsOrErr returns the Products value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ProductTagEdges) ProductsOrErr() (*Product, error) {
+func (e ProductTagEdges) ProductsOrErr() (*ProductInfo, error) {
 	if e.Products != nil {
 		return e.Products, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: product.Label}
+		return nil, &NotFoundError{label: productinfo.Label}
 	}
 	return nil, &NotLoadedError{edge: "products"}
 }
@@ -107,7 +107,7 @@ func (pt *ProductTag) Value(name string) (ent.Value, error) {
 }
 
 // QueryProducts queries the "products" edge of the ProductTag entity.
-func (pt *ProductTag) QueryProducts() *ProductQuery {
+func (pt *ProductTag) QueryProducts() *ProductInfoQuery {
 	return NewProductTagClient(pt.config).QueryProducts(pt)
 }
 

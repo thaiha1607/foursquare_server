@@ -34,14 +34,14 @@ const (
 	FieldType = "type"
 	// FieldStatusCode holds the string denoting the status_code field in the database.
 	FieldStatusCode = "status_code"
-	// FieldManagementStaffID holds the string denoting the management_staff_id field in the database.
-	FieldManagementStaffID = "management_staff_id"
-	// FieldWarehouseStaffID holds the string denoting the warehouse_staff_id field in the database.
-	FieldWarehouseStaffID = "warehouse_staff_id"
-	// FieldDeliveryStaffID holds the string denoting the delivery_staff_id field in the database.
-	FieldDeliveryStaffID = "delivery_staff_id"
+	// FieldStaffID holds the string denoting the staff_id field in the database.
+	FieldStaffID = "staff_id"
 	// FieldInternalNote holds the string denoting the internal_note field in the database.
 	FieldInternalNote = "internal_note"
+	// FieldIsInternal holds the string denoting the is_internal field in the database.
+	FieldIsInternal = "is_internal"
+	// FieldAddressID holds the string denoting the address_id field in the database.
+	FieldAddressID = "address_id"
 	// EdgeCustomer holds the string denoting the customer edge name in mutations.
 	EdgeCustomer = "customer"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
@@ -50,12 +50,10 @@ const (
 	EdgeParentOrder = "parent_order"
 	// EdgeOrderStatus holds the string denoting the order_status edge name in mutations.
 	EdgeOrderStatus = "order_status"
-	// EdgeManagementStaff holds the string denoting the management_staff edge name in mutations.
-	EdgeManagementStaff = "management_staff"
-	// EdgeWarehouseStaff holds the string denoting the warehouse_staff edge name in mutations.
-	EdgeWarehouseStaff = "warehouse_staff"
-	// EdgeDeliveryStaff holds the string denoting the delivery_staff edge name in mutations.
-	EdgeDeliveryStaff = "delivery_staff"
+	// EdgeStaff holds the string denoting the staff edge name in mutations.
+	EdgeStaff = "staff"
+	// EdgeOrderAddress holds the string denoting the order_address edge name in mutations.
+	EdgeOrderAddress = "order_address"
 	// Table holds the table name of the order in the database.
 	Table = "orders"
 	// CustomerTable is the table that holds the customer relation/edge.
@@ -83,27 +81,20 @@ const (
 	OrderStatusInverseTable = "order_status_codes"
 	// OrderStatusColumn is the table column denoting the order_status relation/edge.
 	OrderStatusColumn = "status_code"
-	// ManagementStaffTable is the table that holds the management_staff relation/edge.
-	ManagementStaffTable = "orders"
-	// ManagementStaffInverseTable is the table name for the Person entity.
+	// StaffTable is the table that holds the staff relation/edge.
+	StaffTable = "orders"
+	// StaffInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
-	ManagementStaffInverseTable = "persons"
-	// ManagementStaffColumn is the table column denoting the management_staff relation/edge.
-	ManagementStaffColumn = "management_staff_id"
-	// WarehouseStaffTable is the table that holds the warehouse_staff relation/edge.
-	WarehouseStaffTable = "orders"
-	// WarehouseStaffInverseTable is the table name for the Person entity.
-	// It exists in this package in order to avoid circular dependency with the "person" package.
-	WarehouseStaffInverseTable = "persons"
-	// WarehouseStaffColumn is the table column denoting the warehouse_staff relation/edge.
-	WarehouseStaffColumn = "warehouse_staff_id"
-	// DeliveryStaffTable is the table that holds the delivery_staff relation/edge.
-	DeliveryStaffTable = "orders"
-	// DeliveryStaffInverseTable is the table name for the Person entity.
-	// It exists in this package in order to avoid circular dependency with the "person" package.
-	DeliveryStaffInverseTable = "persons"
-	// DeliveryStaffColumn is the table column denoting the delivery_staff relation/edge.
-	DeliveryStaffColumn = "delivery_staff_id"
+	StaffInverseTable = "persons"
+	// StaffColumn is the table column denoting the staff relation/edge.
+	StaffColumn = "staff_id"
+	// OrderAddressTable is the table that holds the order_address relation/edge.
+	OrderAddressTable = "orders"
+	// OrderAddressInverseTable is the table name for the Address entity.
+	// It exists in this package in order to avoid circular dependency with the "address" package.
+	OrderAddressInverseTable = "addresses"
+	// OrderAddressColumn is the table column denoting the order_address relation/edge.
+	OrderAddressColumn = "address_id"
 )
 
 // Columns holds all SQL columns for order fields.
@@ -118,10 +109,10 @@ var Columns = []string{
 	FieldPriority,
 	FieldType,
 	FieldStatusCode,
-	FieldManagementStaffID,
-	FieldWarehouseStaffID,
-	FieldDeliveryStaffID,
+	FieldStaffID,
 	FieldInternalNote,
+	FieldIsInternal,
+	FieldAddressID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -147,6 +138,10 @@ var (
 	PriorityValidator func(int) error
 	// DefaultStatusCode holds the default value on creation for the "status_code" field.
 	DefaultStatusCode int
+	// DefaultIsInternal holds the default value on creation for the "is_internal" field.
+	DefaultIsInternal bool
+	// AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
+	AddressIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -163,7 +158,6 @@ const (
 	TypeReturn   Type = "RETURN"
 	TypeExchange Type = "EXCHANGE"
 	TypeTransfer Type = "TRANSFER"
-	TypeInternal Type = "INTERNAL"
 	TypeOther    Type = "OTHER"
 )
 
@@ -174,7 +168,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeSale, TypeReturn, TypeExchange, TypeTransfer, TypeInternal, TypeOther:
+	case TypeSale, TypeReturn, TypeExchange, TypeTransfer, TypeOther:
 		return nil
 	default:
 		return fmt.Errorf("order: invalid enum value for type field: %q", _type)
@@ -234,24 +228,24 @@ func ByStatusCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatusCode, opts...).ToFunc()
 }
 
-// ByManagementStaffID orders the results by the management_staff_id field.
-func ByManagementStaffID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldManagementStaffID, opts...).ToFunc()
-}
-
-// ByWarehouseStaffID orders the results by the warehouse_staff_id field.
-func ByWarehouseStaffID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWarehouseStaffID, opts...).ToFunc()
-}
-
-// ByDeliveryStaffID orders the results by the delivery_staff_id field.
-func ByDeliveryStaffID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeliveryStaffID, opts...).ToFunc()
+// ByStaffID orders the results by the staff_id field.
+func ByStaffID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStaffID, opts...).ToFunc()
 }
 
 // ByInternalNote orders the results by the internal_note field.
 func ByInternalNote(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInternalNote, opts...).ToFunc()
+}
+
+// ByIsInternal orders the results by the is_internal field.
+func ByIsInternal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsInternal, opts...).ToFunc()
+}
+
+// ByAddressID orders the results by the address_id field.
+func ByAddressID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAddressID, opts...).ToFunc()
 }
 
 // ByCustomerField orders the results by customer field.
@@ -282,24 +276,17 @@ func ByOrderStatusField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByManagementStaffField orders the results by management_staff field.
-func ByManagementStaffField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByStaffField orders the results by staff field.
+func ByStaffField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newManagementStaffStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newStaffStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByWarehouseStaffField orders the results by warehouse_staff field.
-func ByWarehouseStaffField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByOrderAddressField orders the results by order_address field.
+func ByOrderAddressField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWarehouseStaffStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByDeliveryStaffField orders the results by delivery_staff field.
-func ByDeliveryStaffField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDeliveryStaffStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newOrderAddressStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newCustomerStep() *sqlgraph.Step {
@@ -330,24 +317,17 @@ func newOrderStatusStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, OrderStatusTable, OrderStatusColumn),
 	)
 }
-func newManagementStaffStep() *sqlgraph.Step {
+func newStaffStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ManagementStaffInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, ManagementStaffTable, ManagementStaffColumn),
+		sqlgraph.To(StaffInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, StaffTable, StaffColumn),
 	)
 }
-func newWarehouseStaffStep() *sqlgraph.Step {
+func newOrderAddressStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WarehouseStaffInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, WarehouseStaffTable, WarehouseStaffColumn),
-	)
-}
-func newDeliveryStaffStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DeliveryStaffInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, DeliveryStaffTable, DeliveryStaffColumn),
+		sqlgraph.To(OrderAddressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, OrderAddressTable, OrderAddressColumn),
 	)
 }

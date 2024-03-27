@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -133,37 +134,9 @@ func (oc *OrderCreate) SetNillableStatusCode(i *int) *OrderCreate {
 	return oc
 }
 
-// SetManagementStaffID sets the "management_staff_id" field.
-func (oc *OrderCreate) SetManagementStaffID(u uuid.UUID) *OrderCreate {
-	oc.mutation.SetManagementStaffID(u)
-	return oc
-}
-
-// SetWarehouseStaffID sets the "warehouse_staff_id" field.
-func (oc *OrderCreate) SetWarehouseStaffID(u uuid.UUID) *OrderCreate {
-	oc.mutation.SetWarehouseStaffID(u)
-	return oc
-}
-
-// SetNillableWarehouseStaffID sets the "warehouse_staff_id" field if the given value is not nil.
-func (oc *OrderCreate) SetNillableWarehouseStaffID(u *uuid.UUID) *OrderCreate {
-	if u != nil {
-		oc.SetWarehouseStaffID(*u)
-	}
-	return oc
-}
-
-// SetDeliveryStaffID sets the "delivery_staff_id" field.
-func (oc *OrderCreate) SetDeliveryStaffID(u uuid.UUID) *OrderCreate {
-	oc.mutation.SetDeliveryStaffID(u)
-	return oc
-}
-
-// SetNillableDeliveryStaffID sets the "delivery_staff_id" field if the given value is not nil.
-func (oc *OrderCreate) SetNillableDeliveryStaffID(u *uuid.UUID) *OrderCreate {
-	if u != nil {
-		oc.SetDeliveryStaffID(*u)
-	}
+// SetStaffID sets the "staff_id" field.
+func (oc *OrderCreate) SetStaffID(u uuid.UUID) *OrderCreate {
+	oc.mutation.SetStaffID(u)
 	return oc
 }
 
@@ -178,6 +151,26 @@ func (oc *OrderCreate) SetNillableInternalNote(s *string) *OrderCreate {
 	if s != nil {
 		oc.SetInternalNote(*s)
 	}
+	return oc
+}
+
+// SetIsInternal sets the "is_internal" field.
+func (oc *OrderCreate) SetIsInternal(b bool) *OrderCreate {
+	oc.mutation.SetIsInternal(b)
+	return oc
+}
+
+// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableIsInternal(b *bool) *OrderCreate {
+	if b != nil {
+		oc.SetIsInternal(*b)
+	}
+	return oc
+}
+
+// SetAddressID sets the "address_id" field.
+func (oc *OrderCreate) SetAddressID(s string) *OrderCreate {
+	oc.mutation.SetAddressID(s)
 	return oc
 }
 
@@ -227,19 +220,20 @@ func (oc *OrderCreate) SetOrderStatus(o *OrderStatusCode) *OrderCreate {
 	return oc.SetOrderStatusID(o.ID)
 }
 
-// SetManagementStaff sets the "management_staff" edge to the Person entity.
-func (oc *OrderCreate) SetManagementStaff(p *Person) *OrderCreate {
-	return oc.SetManagementStaffID(p.ID)
+// SetStaff sets the "staff" edge to the Person entity.
+func (oc *OrderCreate) SetStaff(p *Person) *OrderCreate {
+	return oc.SetStaffID(p.ID)
 }
 
-// SetWarehouseStaff sets the "warehouse_staff" edge to the Person entity.
-func (oc *OrderCreate) SetWarehouseStaff(p *Person) *OrderCreate {
-	return oc.SetWarehouseStaffID(p.ID)
+// SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
+func (oc *OrderCreate) SetOrderAddressID(id string) *OrderCreate {
+	oc.mutation.SetOrderAddressID(id)
+	return oc
 }
 
-// SetDeliveryStaff sets the "delivery_staff" edge to the Person entity.
-func (oc *OrderCreate) SetDeliveryStaff(p *Person) *OrderCreate {
-	return oc.SetDeliveryStaffID(p.ID)
+// SetOrderAddress sets the "order_address" edge to the Address entity.
+func (oc *OrderCreate) SetOrderAddress(a *Address) *OrderCreate {
+	return oc.SetOrderAddressID(a.ID)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -297,6 +291,10 @@ func (oc *OrderCreate) defaults() {
 		v := order.DefaultStatusCode
 		oc.mutation.SetStatusCode(v)
 	}
+	if _, ok := oc.mutation.IsInternal(); !ok {
+		v := order.DefaultIsInternal
+		oc.mutation.SetIsInternal(v)
+	}
 	if _, ok := oc.mutation.ID(); !ok {
 		v := order.DefaultID()
 		oc.mutation.SetID(v)
@@ -336,8 +334,19 @@ func (oc *OrderCreate) check() error {
 	if _, ok := oc.mutation.StatusCode(); !ok {
 		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Order.status_code"`)}
 	}
-	if _, ok := oc.mutation.ManagementStaffID(); !ok {
-		return &ValidationError{Name: "management_staff_id", err: errors.New(`ent: missing required field "Order.management_staff_id"`)}
+	if _, ok := oc.mutation.StaffID(); !ok {
+		return &ValidationError{Name: "staff_id", err: errors.New(`ent: missing required field "Order.staff_id"`)}
+	}
+	if _, ok := oc.mutation.IsInternal(); !ok {
+		return &ValidationError{Name: "is_internal", err: errors.New(`ent: missing required field "Order.is_internal"`)}
+	}
+	if _, ok := oc.mutation.AddressID(); !ok {
+		return &ValidationError{Name: "address_id", err: errors.New(`ent: missing required field "Order.address_id"`)}
+	}
+	if v, ok := oc.mutation.AddressID(); ok {
+		if err := order.AddressIDValidator(v); err != nil {
+			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
+		}
 	}
 	if _, ok := oc.mutation.CustomerID(); !ok {
 		return &ValidationError{Name: "customer", err: errors.New(`ent: missing required edge "Order.customer"`)}
@@ -348,8 +357,11 @@ func (oc *OrderCreate) check() error {
 	if _, ok := oc.mutation.OrderStatusID(); !ok {
 		return &ValidationError{Name: "order_status", err: errors.New(`ent: missing required edge "Order.order_status"`)}
 	}
-	if _, ok := oc.mutation.ManagementStaffID(); !ok {
-		return &ValidationError{Name: "management_staff", err: errors.New(`ent: missing required edge "Order.management_staff"`)}
+	if _, ok := oc.mutation.StaffID(); !ok {
+		return &ValidationError{Name: "staff", err: errors.New(`ent: missing required edge "Order.staff"`)}
+	}
+	if _, ok := oc.mutation.OrderAddressID(); !ok {
+		return &ValidationError{Name: "order_address", err: errors.New(`ent: missing required edge "Order.order_address"`)}
 	}
 	return nil
 }
@@ -410,6 +422,10 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_spec.SetField(order.FieldInternalNote, field.TypeString, value)
 		_node.InternalNote = &value
 	}
+	if value, ok := oc.mutation.IsInternal(); ok {
+		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
+		_node.IsInternal = value
+	}
 	if nodes := oc.mutation.CustomerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -458,7 +474,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ParentOrderID = nodes[0]
+		_node.ParentOrderID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := oc.mutation.OrderStatusIDs(); len(nodes) > 0 {
@@ -478,12 +494,12 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_node.StatusCode = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := oc.mutation.ManagementStaffIDs(); len(nodes) > 0 {
+	if nodes := oc.mutation.StaffIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.ManagementStaffTable,
-			Columns: []string{order.ManagementStaffColumn},
+			Table:   order.StaffTable,
+			Columns: []string{order.StaffColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
@@ -492,41 +508,24 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ManagementStaffID = nodes[0]
+		_node.StaffID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := oc.mutation.WarehouseStaffIDs(); len(nodes) > 0 {
+	if nodes := oc.mutation.OrderAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   order.WarehouseStaffTable,
-			Columns: []string{order.WarehouseStaffColumn},
+			Table:   order.OrderAddressTable,
+			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.WarehouseStaffID = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := oc.mutation.DeliveryStaffIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   order.DeliveryStaffTable,
-			Columns: []string{order.DeliveryStaffColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.DeliveryStaffID = &nodes[0]
+		_node.AddressID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

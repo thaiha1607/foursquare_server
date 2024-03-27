@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 )
 
 // ProductImage is the model entity for the ProductImage schema.
@@ -36,7 +36,7 @@ type ProductImage struct {
 // ProductImageEdges holds the relations/edges for other nodes in the graph.
 type ProductImageEdges struct {
 	// Product holds the value of the product edge.
-	Product *Product `json:"product,omitempty"`
+	Product *ProductInfo `json:"product,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -44,11 +44,11 @@ type ProductImageEdges struct {
 
 // ProductOrErr returns the Product value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ProductImageEdges) ProductOrErr() (*Product, error) {
+func (e ProductImageEdges) ProductOrErr() (*ProductInfo, error) {
 	if e.Product != nil {
 		return e.Product, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: product.Label}
+		return nil, &NotFoundError{label: productinfo.Label}
 	}
 	return nil, &NotLoadedError{edge: "product"}
 }
@@ -123,7 +123,7 @@ func (pi *ProductImage) Value(name string) (ent.Value, error) {
 }
 
 // QueryProduct queries the "product" edge of the ProductImage entity.
-func (pi *ProductImage) QueryProduct() *ProductQuery {
+func (pi *ProductImage) QueryProduct() *ProductInfoQuery {
 	return NewProductImageClient(pi.config).QueryProduct(pi)
 }
 

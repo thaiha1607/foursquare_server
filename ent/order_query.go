@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -20,17 +21,16 @@ import (
 // OrderQuery is the builder for querying Order entities.
 type OrderQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []order.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Order
-	withCustomer        *PersonQuery
-	withCreator         *PersonQuery
-	withParentOrder     *OrderQuery
-	withOrderStatus     *OrderStatusCodeQuery
-	withManagementStaff *PersonQuery
-	withWarehouseStaff  *PersonQuery
-	withDeliveryStaff   *PersonQuery
+	ctx              *QueryContext
+	order            []order.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.Order
+	withCustomer     *PersonQuery
+	withCreator      *PersonQuery
+	withParentOrder  *OrderQuery
+	withOrderStatus  *OrderStatusCodeQuery
+	withStaff        *PersonQuery
+	withOrderAddress *AddressQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -155,8 +155,8 @@ func (oq *OrderQuery) QueryOrderStatus() *OrderStatusCodeQuery {
 	return query
 }
 
-// QueryManagementStaff chains the current query on the "management_staff" edge.
-func (oq *OrderQuery) QueryManagementStaff() *PersonQuery {
+// QueryStaff chains the current query on the "staff" edge.
+func (oq *OrderQuery) QueryStaff() *PersonQuery {
 	query := (&PersonClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
@@ -169,7 +169,7 @@ func (oq *OrderQuery) QueryManagementStaff() *PersonQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, order.ManagementStaffTable, order.ManagementStaffColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, order.StaffTable, order.StaffColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
 		return fromU, nil
@@ -177,9 +177,9 @@ func (oq *OrderQuery) QueryManagementStaff() *PersonQuery {
 	return query
 }
 
-// QueryWarehouseStaff chains the current query on the "warehouse_staff" edge.
-func (oq *OrderQuery) QueryWarehouseStaff() *PersonQuery {
-	query := (&PersonClient{config: oq.config}).Query()
+// QueryOrderAddress chains the current query on the "order_address" edge.
+func (oq *OrderQuery) QueryOrderAddress() *AddressQuery {
+	query := (&AddressClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -190,30 +190,8 @@ func (oq *OrderQuery) QueryWarehouseStaff() *PersonQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, order.WarehouseStaffTable, order.WarehouseStaffColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryDeliveryStaff chains the current query on the "delivery_staff" edge.
-func (oq *OrderQuery) QueryDeliveryStaff() *PersonQuery {
-	query := (&PersonClient{config: oq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := oq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := oq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, order.DeliveryStaffTable, order.DeliveryStaffColumn),
+			sqlgraph.To(address.Table, address.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, order.OrderAddressTable, order.OrderAddressColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
 		return fromU, nil
@@ -408,18 +386,17 @@ func (oq *OrderQuery) Clone() *OrderQuery {
 		return nil
 	}
 	return &OrderQuery{
-		config:              oq.config,
-		ctx:                 oq.ctx.Clone(),
-		order:               append([]order.OrderOption{}, oq.order...),
-		inters:              append([]Interceptor{}, oq.inters...),
-		predicates:          append([]predicate.Order{}, oq.predicates...),
-		withCustomer:        oq.withCustomer.Clone(),
-		withCreator:         oq.withCreator.Clone(),
-		withParentOrder:     oq.withParentOrder.Clone(),
-		withOrderStatus:     oq.withOrderStatus.Clone(),
-		withManagementStaff: oq.withManagementStaff.Clone(),
-		withWarehouseStaff:  oq.withWarehouseStaff.Clone(),
-		withDeliveryStaff:   oq.withDeliveryStaff.Clone(),
+		config:           oq.config,
+		ctx:              oq.ctx.Clone(),
+		order:            append([]order.OrderOption{}, oq.order...),
+		inters:           append([]Interceptor{}, oq.inters...),
+		predicates:       append([]predicate.Order{}, oq.predicates...),
+		withCustomer:     oq.withCustomer.Clone(),
+		withCreator:      oq.withCreator.Clone(),
+		withParentOrder:  oq.withParentOrder.Clone(),
+		withOrderStatus:  oq.withOrderStatus.Clone(),
+		withStaff:        oq.withStaff.Clone(),
+		withOrderAddress: oq.withOrderAddress.Clone(),
 		// clone intermediate query.
 		sql:  oq.sql.Clone(),
 		path: oq.path,
@@ -470,36 +447,25 @@ func (oq *OrderQuery) WithOrderStatus(opts ...func(*OrderStatusCodeQuery)) *Orde
 	return oq
 }
 
-// WithManagementStaff tells the query-builder to eager-load the nodes that are connected to
-// the "management_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithManagementStaff(opts ...func(*PersonQuery)) *OrderQuery {
+// WithStaff tells the query-builder to eager-load the nodes that are connected to
+// the "staff" edge. The optional arguments are used to configure the query builder of the edge.
+func (oq *OrderQuery) WithStaff(opts ...func(*PersonQuery)) *OrderQuery {
 	query := (&PersonClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	oq.withManagementStaff = query
+	oq.withStaff = query
 	return oq
 }
 
-// WithWarehouseStaff tells the query-builder to eager-load the nodes that are connected to
-// the "warehouse_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithWarehouseStaff(opts ...func(*PersonQuery)) *OrderQuery {
-	query := (&PersonClient{config: oq.config}).Query()
+// WithOrderAddress tells the query-builder to eager-load the nodes that are connected to
+// the "order_address" edge. The optional arguments are used to configure the query builder of the edge.
+func (oq *OrderQuery) WithOrderAddress(opts ...func(*AddressQuery)) *OrderQuery {
+	query := (&AddressClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	oq.withWarehouseStaff = query
-	return oq
-}
-
-// WithDeliveryStaff tells the query-builder to eager-load the nodes that are connected to
-// the "delivery_staff" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithDeliveryStaff(opts ...func(*PersonQuery)) *OrderQuery {
-	query := (&PersonClient{config: oq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	oq.withDeliveryStaff = query
+	oq.withOrderAddress = query
 	return oq
 }
 
@@ -581,14 +547,13 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	var (
 		nodes       = []*Order{}
 		_spec       = oq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [6]bool{
 			oq.withCustomer != nil,
 			oq.withCreator != nil,
 			oq.withParentOrder != nil,
 			oq.withOrderStatus != nil,
-			oq.withManagementStaff != nil,
-			oq.withWarehouseStaff != nil,
-			oq.withDeliveryStaff != nil,
+			oq.withStaff != nil,
+			oq.withOrderAddress != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -633,21 +598,15 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 			return nil, err
 		}
 	}
-	if query := oq.withManagementStaff; query != nil {
-		if err := oq.loadManagementStaff(ctx, query, nodes, nil,
-			func(n *Order, e *Person) { n.Edges.ManagementStaff = e }); err != nil {
+	if query := oq.withStaff; query != nil {
+		if err := oq.loadStaff(ctx, query, nodes, nil,
+			func(n *Order, e *Person) { n.Edges.Staff = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := oq.withWarehouseStaff; query != nil {
-		if err := oq.loadWarehouseStaff(ctx, query, nodes, nil,
-			func(n *Order, e *Person) { n.Edges.WarehouseStaff = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := oq.withDeliveryStaff; query != nil {
-		if err := oq.loadDeliveryStaff(ctx, query, nodes, nil,
-			func(n *Order, e *Person) { n.Edges.DeliveryStaff = e }); err != nil {
+	if query := oq.withOrderAddress; query != nil {
+		if err := oq.loadOrderAddress(ctx, query, nodes, nil,
+			func(n *Order, e *Address) { n.Edges.OrderAddress = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -716,7 +675,10 @@ func (oq *OrderQuery) loadParentOrder(ctx context.Context, query *OrderQuery, no
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
-		fk := nodes[i].ParentOrderID
+		if nodes[i].ParentOrderID == nil {
+			continue
+		}
+		fk := *nodes[i].ParentOrderID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -770,11 +732,11 @@ func (oq *OrderQuery) loadOrderStatus(ctx context.Context, query *OrderStatusCod
 	}
 	return nil
 }
-func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
+func (oq *OrderQuery) loadStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
-		fk := nodes[i].ManagementStaffID
+		fk := nodes[i].StaffID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -791,7 +753,7 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *PersonQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "management_staff_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "staff_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -799,14 +761,11 @@ func (oq *OrderQuery) loadManagementStaff(ctx context.Context, query *PersonQuer
 	}
 	return nil
 }
-func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Order)
+func (oq *OrderQuery) loadOrderAddress(ctx context.Context, query *AddressQuery, nodes []*Order, init func(*Order), assign func(*Order, *Address)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Order)
 	for i := range nodes {
-		if nodes[i].WarehouseStaffID == nil {
-			continue
-		}
-		fk := *nodes[i].WarehouseStaffID
+		fk := nodes[i].AddressID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -815,7 +774,7 @@ func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *PersonQuery
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(person.IDIn(ids...))
+	query.Where(address.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -823,39 +782,7 @@ func (oq *OrderQuery) loadWarehouseStaff(ctx context.Context, query *PersonQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "warehouse_staff_id" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (oq *OrderQuery) loadDeliveryStaff(ctx context.Context, query *PersonQuery, nodes []*Order, init func(*Order), assign func(*Order, *Person)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Order)
-	for i := range nodes {
-		if nodes[i].DeliveryStaffID == nil {
-			continue
-		}
-		fk := *nodes[i].DeliveryStaffID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(person.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "delivery_staff_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "address_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -901,14 +828,11 @@ func (oq *OrderQuery) querySpec() *sqlgraph.QuerySpec {
 		if oq.withOrderStatus != nil {
 			_spec.Node.AddColumnOnce(order.FieldStatusCode)
 		}
-		if oq.withManagementStaff != nil {
-			_spec.Node.AddColumnOnce(order.FieldManagementStaffID)
+		if oq.withStaff != nil {
+			_spec.Node.AddColumnOnce(order.FieldStaffID)
 		}
-		if oq.withWarehouseStaff != nil {
-			_spec.Node.AddColumnOnce(order.FieldWarehouseStaffID)
-		}
-		if oq.withDeliveryStaff != nil {
-			_spec.Node.AddColumnOnce(order.FieldDeliveryStaffID)
+		if oq.withOrderAddress != nil {
+			_spec.Node.AddColumnOnce(order.FieldAddressID)
 		}
 	}
 	if ps := oq.predicates; len(ps) > 0 {

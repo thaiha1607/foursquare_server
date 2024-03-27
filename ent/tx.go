@@ -12,32 +12,46 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Address is the client for interacting with the Address builders.
+	Address *AddressClient
 	// Conversation is the client for interacting with the Conversation builders.
 	Conversation *ConversationClient
-	// FinancialTransaction is the client for interacting with the FinancialTransaction builders.
-	FinancialTransaction *FinancialTransactionClient
+	// DeliveryAssignment is the client for interacting with the DeliveryAssignment builders.
+	DeliveryAssignment *DeliveryAssignmentClient
 	// Invoice is the client for interacting with the Invoice builders.
 	Invoice *InvoiceClient
-	// InvoiceLineItem is the client for interacting with the InvoiceLineItem builders.
-	InvoiceLineItem *InvoiceLineItemClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
-	// OrderLineItem is the client for interacting with the OrderLineItem builders.
-	OrderLineItem *OrderLineItemClient
+	// OrderItem is the client for interacting with the OrderItem builders.
+	OrderItem *OrderItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
 	OrderStatusCode *OrderStatusCodeClient
 	// Person is the client for interacting with the Person builders.
 	Person *PersonClient
-	// Product is the client for interacting with the Product builders.
-	Product *ProductClient
+	// PersonAddress is the client for interacting with the PersonAddress builders.
+	PersonAddress *PersonAddressClient
+	// ProductColor is the client for interacting with the ProductColor builders.
+	ProductColor *ProductColorClient
 	// ProductImage is the client for interacting with the ProductImage builders.
 	ProductImage *ProductImageClient
+	// ProductInfo is the client for interacting with the ProductInfo builders.
+	ProductInfo *ProductInfoClient
+	// ProductQty is the client for interacting with the ProductQty builders.
+	ProductQty *ProductQtyClient
 	// ProductTag is the client for interacting with the ProductTag builders.
 	ProductTag *ProductTagClient
+	// Shipment is the client for interacting with the Shipment builders.
+	Shipment *ShipmentClient
+	// ShipmentItem is the client for interacting with the ShipmentItem builders.
+	ShipmentItem *ShipmentItemClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
+	// WarehouseAssignment is the client for interacting with the WarehouseAssignment builders.
+	WarehouseAssignment *WarehouseAssignmentClient
+	// WorkUnitInfo is the client for interacting with the WorkUnitInfo builders.
+	WorkUnitInfo *WorkUnitInfoClient
 
 	// lazily loaded.
 	client     *Client
@@ -169,19 +183,26 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Address = NewAddressClient(tx.config)
 	tx.Conversation = NewConversationClient(tx.config)
-	tx.FinancialTransaction = NewFinancialTransactionClient(tx.config)
+	tx.DeliveryAssignment = NewDeliveryAssignmentClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
-	tx.InvoiceLineItem = NewInvoiceLineItemClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
-	tx.OrderLineItem = NewOrderLineItemClient(tx.config)
+	tx.OrderItem = NewOrderItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
 	tx.Person = NewPersonClient(tx.config)
-	tx.Product = NewProductClient(tx.config)
+	tx.PersonAddress = NewPersonAddressClient(tx.config)
+	tx.ProductColor = NewProductColorClient(tx.config)
 	tx.ProductImage = NewProductImageClient(tx.config)
+	tx.ProductInfo = NewProductInfoClient(tx.config)
+	tx.ProductQty = NewProductQtyClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
+	tx.Shipment = NewShipmentClient(tx.config)
+	tx.ShipmentItem = NewShipmentItemClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
+	tx.WarehouseAssignment = NewWarehouseAssignmentClient(tx.config)
+	tx.WorkUnitInfo = NewWorkUnitInfoClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -191,7 +212,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Conversation.QueryXXX(), the query will be executed
+// applies a query, for example: Address.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

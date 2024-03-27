@@ -30,13 +30,6 @@ func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
-func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) error {
-	invoiceLineItemRepository := repositories.NewEntInvoiceLineItemRepository(db)
-	invoiceLineItemService := services.NewInvoiceLineItemService(invoiceLineItemRepository)
-	error2 := http.NewInvoiceLineItemHandler(e, invoiceLineItemService)
-	return error2
-}
-
 func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	productImageRepository := repositories.NewEntProductImageRepository(db)
 	productImageService := services.NewProductImageService(productImageRepository)
@@ -44,10 +37,10 @@ func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
-func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
-	orderLineItemRepository := repositories.NewEntOrderLineItemRepository(db)
-	orderLineItemService := services.NewOrderLineItemService(orderLineItemRepository)
-	error2 := http.NewOrderLineItemHandler(e, orderLineItemService)
+func initializeOrderItemHandler(e *echo.Echo, db *ent.Client) error {
+	orderItemRepository := repositories.NewEntOrderItemRepository(db)
+	orderItemService := services.NewOrderItemService(orderItemRepository)
+	error2 := http.NewOrderItemHandler(e, orderItemService)
 	return error2
 }
 
@@ -55,13 +48,6 @@ func initializePersonHandler(e *echo.Echo, db *ent.Client) error {
 	personRepository := repositories.NewEntPersonRepository(db)
 	personService := services.NewPersonService(personRepository)
 	error2 := http.NewPersonHandler(e, personService)
-	return error2
-}
-
-func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) error {
-	financialTransactionRepository := repositories.NewEntFinancialTransactionRepository(db)
-	financialTransactionService := services.NewFinancialTransactionService(financialTransactionRepository)
-	error2 := http.NewFinancialTransactionHandler(e, financialTransactionService)
 	return error2
 }
 
@@ -97,12 +83,5 @@ func initializeConversationHandler(e *echo.Echo, db *ent.Client) error {
 	conversationRepository := repositories.NewEntConversationRepository(db)
 	conversationService := services.NewConversationService(conversationRepository)
 	error2 := http.NewConversationHandler(e, conversationService)
-	return error2
-}
-
-func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
-	productRepository := repositories.NewEntProductRepository(db)
-	productService := services.NewProductService(productRepository)
-	error2 := http.NewProductHandler(e, productService)
 	return error2
 }

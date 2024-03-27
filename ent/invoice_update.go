@@ -34,26 +34,6 @@ func (iu *InvoiceUpdate) SetUpdatedAt(t time.Time) *InvoiceUpdate {
 	return iu
 }
 
-// SetComment sets the "comment" field.
-func (iu *InvoiceUpdate) SetComment(s string) *InvoiceUpdate {
-	iu.mutation.SetComment(s)
-	return iu
-}
-
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (iu *InvoiceUpdate) SetNillableComment(s *string) *InvoiceUpdate {
-	if s != nil {
-		iu.SetComment(*s)
-	}
-	return iu
-}
-
-// ClearComment clears the value of the "comment" field.
-func (iu *InvoiceUpdate) ClearComment() *InvoiceUpdate {
-	iu.mutation.ClearComment()
-	return iu
-}
-
 // SetNote sets the "note" field.
 func (iu *InvoiceUpdate) SetNote(s string) *InvoiceUpdate {
 	iu.mutation.SetNote(s)
@@ -85,6 +65,26 @@ func (iu *InvoiceUpdate) SetNillableStatus(i *invoice.Status) *InvoiceUpdate {
 	if i != nil {
 		iu.SetStatus(*i)
 	}
+	return iu
+}
+
+// SetPaymentMethod sets the "payment_method" field.
+func (iu *InvoiceUpdate) SetPaymentMethod(im invoice.PaymentMethod) *InvoiceUpdate {
+	iu.mutation.SetPaymentMethod(im)
+	return iu
+}
+
+// SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
+func (iu *InvoiceUpdate) SetNillablePaymentMethod(im *invoice.PaymentMethod) *InvoiceUpdate {
+	if im != nil {
+		iu.SetPaymentMethod(*im)
+	}
+	return iu
+}
+
+// ClearPaymentMethod clears the value of the "payment_method" field.
+func (iu *InvoiceUpdate) ClearPaymentMethod() *InvoiceUpdate {
+	iu.mutation.ClearPaymentMethod()
 	return iu
 }
 
@@ -136,6 +136,11 @@ func (iu *InvoiceUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
 		}
 	}
+	if v, ok := iu.mutation.PaymentMethod(); ok {
+		if err := invoice.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "Invoice.payment_method": %w`, err)}
+		}
+	}
 	if _, ok := iu.mutation.OrderID(); iu.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
 	}
@@ -157,12 +162,6 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoice.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iu.mutation.Comment(); ok {
-		_spec.SetField(invoice.FieldComment, field.TypeString, value)
-	}
-	if iu.mutation.CommentCleared() {
-		_spec.ClearField(invoice.FieldComment, field.TypeString)
-	}
 	if value, ok := iu.mutation.Note(); ok {
 		_spec.SetField(invoice.FieldNote, field.TypeString, value)
 	}
@@ -171,6 +170,12 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := iu.mutation.PaymentMethod(); ok {
+		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
+	}
+	if iu.mutation.PaymentMethodCleared() {
+		_spec.ClearField(invoice.FieldPaymentMethod, field.TypeEnum)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -195,26 +200,6 @@ type InvoiceUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (iuo *InvoiceUpdateOne) SetUpdatedAt(t time.Time) *InvoiceUpdateOne {
 	iuo.mutation.SetUpdatedAt(t)
-	return iuo
-}
-
-// SetComment sets the "comment" field.
-func (iuo *InvoiceUpdateOne) SetComment(s string) *InvoiceUpdateOne {
-	iuo.mutation.SetComment(s)
-	return iuo
-}
-
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (iuo *InvoiceUpdateOne) SetNillableComment(s *string) *InvoiceUpdateOne {
-	if s != nil {
-		iuo.SetComment(*s)
-	}
-	return iuo
-}
-
-// ClearComment clears the value of the "comment" field.
-func (iuo *InvoiceUpdateOne) ClearComment() *InvoiceUpdateOne {
-	iuo.mutation.ClearComment()
 	return iuo
 }
 
@@ -249,6 +234,26 @@ func (iuo *InvoiceUpdateOne) SetNillableStatus(i *invoice.Status) *InvoiceUpdate
 	if i != nil {
 		iuo.SetStatus(*i)
 	}
+	return iuo
+}
+
+// SetPaymentMethod sets the "payment_method" field.
+func (iuo *InvoiceUpdateOne) SetPaymentMethod(im invoice.PaymentMethod) *InvoiceUpdateOne {
+	iuo.mutation.SetPaymentMethod(im)
+	return iuo
+}
+
+// SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
+func (iuo *InvoiceUpdateOne) SetNillablePaymentMethod(im *invoice.PaymentMethod) *InvoiceUpdateOne {
+	if im != nil {
+		iuo.SetPaymentMethod(*im)
+	}
+	return iuo
+}
+
+// ClearPaymentMethod clears the value of the "payment_method" field.
+func (iuo *InvoiceUpdateOne) ClearPaymentMethod() *InvoiceUpdateOne {
+	iuo.mutation.ClearPaymentMethod()
 	return iuo
 }
 
@@ -313,6 +318,11 @@ func (iuo *InvoiceUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
 		}
 	}
+	if v, ok := iuo.mutation.PaymentMethod(); ok {
+		if err := invoice.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "Invoice.payment_method": %w`, err)}
+		}
+	}
 	if _, ok := iuo.mutation.OrderID(); iuo.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Invoice.order"`)
 	}
@@ -351,12 +361,6 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	if value, ok := iuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoice.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iuo.mutation.Comment(); ok {
-		_spec.SetField(invoice.FieldComment, field.TypeString, value)
-	}
-	if iuo.mutation.CommentCleared() {
-		_spec.ClearField(invoice.FieldComment, field.TypeString)
-	}
 	if value, ok := iuo.mutation.Note(); ok {
 		_spec.SetField(invoice.FieldNote, field.TypeString, value)
 	}
@@ -365,6 +369,12 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	}
 	if value, ok := iuo.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := iuo.mutation.PaymentMethod(); ok {
+		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
+	}
+	if iuo.mutation.PaymentMethodCleared() {
+		_spec.ClearField(invoice.FieldPaymentMethod, field.TypeEnum)
 	}
 	_node = &Invoice{config: iuo.config}
 	_spec.Assign = _node.assignValues

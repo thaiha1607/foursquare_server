@@ -28,7 +28,7 @@ func (Tag) Fields() []ent.Field {
 // Edges of the Tag.
 func (Tag) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("products", Product.Type).
+		edge.From("products", ProductInfo.Type).
 			Ref("tags").
 			Through("product_tags", ProductTag.Type),
 	}

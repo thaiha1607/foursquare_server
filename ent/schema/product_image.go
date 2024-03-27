@@ -45,7 +45,7 @@ func (ProductImage) Fields() []ent.Field {
 // Edges of the ProductImage.
 func (ProductImage) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("product", Product.Type).
+		edge.To("product", ProductInfo.Type).
 			Field("product_id").
 			Unique().
 			Required().

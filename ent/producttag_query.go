@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
@@ -22,7 +22,7 @@ type ProductTagQuery struct {
 	order        []producttag.OrderOption
 	inters       []Interceptor
 	predicates   []predicate.ProductTag
-	withProducts *ProductQuery
+	withProducts *ProductInfoQuery
 	withTags     *TagQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (ptq *ProductTagQuery) Order(o ...producttag.OrderOption) *ProductTagQuery 
 }
 
 // QueryProducts chains the current query on the "products" edge.
-func (ptq *ProductTagQuery) QueryProducts() *ProductQuery {
-	query := (&ProductClient{config: ptq.config}).Query()
+func (ptq *ProductTagQuery) QueryProducts() *ProductInfoQuery {
+	query := (&ProductInfoClient{config: ptq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ptq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (ptq *ProductTagQuery) QueryProducts() *ProductQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(producttag.Table, producttag.ProductsColumn, selector),
-			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.To(productinfo.Table, productinfo.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, producttag.ProductsTable, producttag.ProductsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ptq.driver.Dialect(), step)
@@ -234,8 +234,8 @@ func (ptq *ProductTagQuery) Clone() *ProductTagQuery {
 
 // WithProducts tells the query-builder to eager-load the nodes that are connected to
 // the "products" edge. The optional arguments are used to configure the query builder of the edge.
-func (ptq *ProductTagQuery) WithProducts(opts ...func(*ProductQuery)) *ProductTagQuery {
-	query := (&ProductClient{config: ptq.config}).Query()
+func (ptq *ProductTagQuery) WithProducts(opts ...func(*ProductInfoQuery)) *ProductTagQuery {
+	query := (&ProductInfoClient{config: ptq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -357,7 +357,7 @@ func (ptq *ProductTagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	}
 	if query := ptq.withProducts; query != nil {
 		if err := ptq.loadProducts(ctx, query, nodes, nil,
-			func(n *ProductTag, e *Product) { n.Edges.Products = e }); err != nil {
+			func(n *ProductTag, e *ProductInfo) { n.Edges.Products = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -370,7 +370,7 @@ func (ptq *ProductTagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	return nodes, nil
 }
 
-func (ptq *ProductTagQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes []*ProductTag, init func(*ProductTag), assign func(*ProductTag, *Product)) error {
+func (ptq *ProductTagQuery) loadProducts(ctx context.Context, query *ProductInfoQuery, nodes []*ProductTag, init func(*ProductTag), assign func(*ProductTag, *ProductInfo)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ProductTag)
 	for i := range nodes {
@@ -383,7 +383,7 @@ func (ptq *ProductTagQuery) loadProducts(ctx context.Context, query *ProductQuer
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(product.IDIn(ids...))
+	query.Where(productinfo.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

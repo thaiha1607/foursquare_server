@@ -26,33 +26,31 @@ func (Order) Fields() []ent.Field {
 		field.UUID("created_by", uuid.UUID{}).
 			Immutable(),
 		field.UUID("parent_order_id", uuid.UUID{}).
-			Optional(),
+			Optional().
+			Nillable(),
 		field.Int("priority").
 			Default(0).
-			Range(0, 10),
+			Range(0, 100),
 		field.Enum("type").
 			NamedValues(
 				"Sale", "SALE",
 				"Return", "RETURN",
 				"Exchange", "EXCHANGE",
 				"Transfer", "TRANSFER",
-				"Internal", "INTERNAL",
 				"Other", "OTHER",
 			).
 			Default("SALE").
 			Immutable(),
 		field.Int("status_code").
 			Default(1),
-		field.UUID("management_staff_id", uuid.UUID{}),
-		field.UUID("warehouse_staff_id", uuid.UUID{}).
-			Optional().
-			Nillable(),
-		field.UUID("delivery_staff_id", uuid.UUID{}).
-			Optional().
-			Nillable(),
+		field.UUID("staff_id", uuid.UUID{}),
 		field.String("internal_note").
 			Optional().
 			Nillable(),
+		field.Bool("is_internal").
+			Default(false),
+		field.String("address_id").
+			NotEmpty(),
 	}
 }
 
@@ -76,16 +74,14 @@ func (Order) Edges() []ent.Edge {
 			Field("status_code").
 			Unique().
 			Required(),
-		edge.To("management_staff", Person.Type).
-			Field("management_staff_id").
+		edge.To("staff", Person.Type).
+			Field("staff_id").
 			Unique().
 			Required(),
-		edge.To("warehouse_staff", Person.Type).
-			Field("warehouse_staff_id").
-			Unique(),
-		edge.To("delivery_staff", Person.Type).
-			Field("delivery_staff_id").
-			Unique(),
+		edge.To("order_address", Address.Type).
+			Field("address_id").
+			Unique().
+			Required(),
 	}
 }
 

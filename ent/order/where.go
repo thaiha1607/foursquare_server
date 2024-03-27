@@ -96,24 +96,24 @@ func StatusCode(v int) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldStatusCode, v))
 }
 
-// ManagementStaffID applies equality check predicate on the "management_staff_id" field. It's identical to ManagementStaffIDEQ.
-func ManagementStaffID(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldManagementStaffID, v))
-}
-
-// WarehouseStaffID applies equality check predicate on the "warehouse_staff_id" field. It's identical to WarehouseStaffIDEQ.
-func WarehouseStaffID(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldWarehouseStaffID, v))
-}
-
-// DeliveryStaffID applies equality check predicate on the "delivery_staff_id" field. It's identical to DeliveryStaffIDEQ.
-func DeliveryStaffID(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldDeliveryStaffID, v))
+// StaffID applies equality check predicate on the "staff_id" field. It's identical to StaffIDEQ.
+func StaffID(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldStaffID, v))
 }
 
 // InternalNote applies equality check predicate on the "internal_note" field. It's identical to InternalNoteEQ.
 func InternalNote(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldInternalNote, v))
+}
+
+// IsInternal applies equality check predicate on the "is_internal" field. It's identical to IsInternalEQ.
+func IsInternal(v bool) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldIsInternal, v))
+}
+
+// AddressID applies equality check predicate on the "address_id" field. It's identical to AddressIDEQ.
+func AddressID(v string) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldAddressID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -421,84 +421,24 @@ func StatusCodeNotIn(vs ...int) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldStatusCode, vs...))
 }
 
-// ManagementStaffIDEQ applies the EQ predicate on the "management_staff_id" field.
-func ManagementStaffIDEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldManagementStaffID, v))
+// StaffIDEQ applies the EQ predicate on the "staff_id" field.
+func StaffIDEQ(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldStaffID, v))
 }
 
-// ManagementStaffIDNEQ applies the NEQ predicate on the "management_staff_id" field.
-func ManagementStaffIDNEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNEQ(FieldManagementStaffID, v))
+// StaffIDNEQ applies the NEQ predicate on the "staff_id" field.
+func StaffIDNEQ(v uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldStaffID, v))
 }
 
-// ManagementStaffIDIn applies the In predicate on the "management_staff_id" field.
-func ManagementStaffIDIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldIn(FieldManagementStaffID, vs...))
+// StaffIDIn applies the In predicate on the "staff_id" field.
+func StaffIDIn(vs ...uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldStaffID, vs...))
 }
 
-// ManagementStaffIDNotIn applies the NotIn predicate on the "management_staff_id" field.
-func ManagementStaffIDNotIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNotIn(FieldManagementStaffID, vs...))
-}
-
-// WarehouseStaffIDEQ applies the EQ predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldWarehouseStaffID, v))
-}
-
-// WarehouseStaffIDNEQ applies the NEQ predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDNEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNEQ(FieldWarehouseStaffID, v))
-}
-
-// WarehouseStaffIDIn applies the In predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldIn(FieldWarehouseStaffID, vs...))
-}
-
-// WarehouseStaffIDNotIn applies the NotIn predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDNotIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNotIn(FieldWarehouseStaffID, vs...))
-}
-
-// WarehouseStaffIDIsNil applies the IsNil predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDIsNil() predicate.Order {
-	return predicate.Order(sql.FieldIsNull(FieldWarehouseStaffID))
-}
-
-// WarehouseStaffIDNotNil applies the NotNil predicate on the "warehouse_staff_id" field.
-func WarehouseStaffIDNotNil() predicate.Order {
-	return predicate.Order(sql.FieldNotNull(FieldWarehouseStaffID))
-}
-
-// DeliveryStaffIDEQ applies the EQ predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldDeliveryStaffID, v))
-}
-
-// DeliveryStaffIDNEQ applies the NEQ predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDNEQ(v uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNEQ(FieldDeliveryStaffID, v))
-}
-
-// DeliveryStaffIDIn applies the In predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldIn(FieldDeliveryStaffID, vs...))
-}
-
-// DeliveryStaffIDNotIn applies the NotIn predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDNotIn(vs ...uuid.UUID) predicate.Order {
-	return predicate.Order(sql.FieldNotIn(FieldDeliveryStaffID, vs...))
-}
-
-// DeliveryStaffIDIsNil applies the IsNil predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDIsNil() predicate.Order {
-	return predicate.Order(sql.FieldIsNull(FieldDeliveryStaffID))
-}
-
-// DeliveryStaffIDNotNil applies the NotNil predicate on the "delivery_staff_id" field.
-func DeliveryStaffIDNotNil() predicate.Order {
-	return predicate.Order(sql.FieldNotNull(FieldDeliveryStaffID))
+// StaffIDNotIn applies the NotIn predicate on the "staff_id" field.
+func StaffIDNotIn(vs ...uuid.UUID) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldStaffID, vs...))
 }
 
 // InternalNoteEQ applies the EQ predicate on the "internal_note" field.
@@ -574,6 +514,81 @@ func InternalNoteEqualFold(v string) predicate.Order {
 // InternalNoteContainsFold applies the ContainsFold predicate on the "internal_note" field.
 func InternalNoteContainsFold(v string) predicate.Order {
 	return predicate.Order(sql.FieldContainsFold(FieldInternalNote, v))
+}
+
+// IsInternalEQ applies the EQ predicate on the "is_internal" field.
+func IsInternalEQ(v bool) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldIsInternal, v))
+}
+
+// IsInternalNEQ applies the NEQ predicate on the "is_internal" field.
+func IsInternalNEQ(v bool) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldIsInternal, v))
+}
+
+// AddressIDEQ applies the EQ predicate on the "address_id" field.
+func AddressIDEQ(v string) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldAddressID, v))
+}
+
+// AddressIDNEQ applies the NEQ predicate on the "address_id" field.
+func AddressIDNEQ(v string) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldAddressID, v))
+}
+
+// AddressIDIn applies the In predicate on the "address_id" field.
+func AddressIDIn(vs ...string) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldAddressID, vs...))
+}
+
+// AddressIDNotIn applies the NotIn predicate on the "address_id" field.
+func AddressIDNotIn(vs ...string) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldAddressID, vs...))
+}
+
+// AddressIDGT applies the GT predicate on the "address_id" field.
+func AddressIDGT(v string) predicate.Order {
+	return predicate.Order(sql.FieldGT(FieldAddressID, v))
+}
+
+// AddressIDGTE applies the GTE predicate on the "address_id" field.
+func AddressIDGTE(v string) predicate.Order {
+	return predicate.Order(sql.FieldGTE(FieldAddressID, v))
+}
+
+// AddressIDLT applies the LT predicate on the "address_id" field.
+func AddressIDLT(v string) predicate.Order {
+	return predicate.Order(sql.FieldLT(FieldAddressID, v))
+}
+
+// AddressIDLTE applies the LTE predicate on the "address_id" field.
+func AddressIDLTE(v string) predicate.Order {
+	return predicate.Order(sql.FieldLTE(FieldAddressID, v))
+}
+
+// AddressIDContains applies the Contains predicate on the "address_id" field.
+func AddressIDContains(v string) predicate.Order {
+	return predicate.Order(sql.FieldContains(FieldAddressID, v))
+}
+
+// AddressIDHasPrefix applies the HasPrefix predicate on the "address_id" field.
+func AddressIDHasPrefix(v string) predicate.Order {
+	return predicate.Order(sql.FieldHasPrefix(FieldAddressID, v))
+}
+
+// AddressIDHasSuffix applies the HasSuffix predicate on the "address_id" field.
+func AddressIDHasSuffix(v string) predicate.Order {
+	return predicate.Order(sql.FieldHasSuffix(FieldAddressID, v))
+}
+
+// AddressIDEqualFold applies the EqualFold predicate on the "address_id" field.
+func AddressIDEqualFold(v string) predicate.Order {
+	return predicate.Order(sql.FieldEqualFold(FieldAddressID, v))
+}
+
+// AddressIDContainsFold applies the ContainsFold predicate on the "address_id" field.
+func AddressIDContainsFold(v string) predicate.Order {
+	return predicate.Order(sql.FieldContainsFold(FieldAddressID, v))
 }
 
 // HasCustomer applies the HasEdge predicate on the "customer" edge.
@@ -668,21 +683,21 @@ func HasOrderStatusWith(preds ...predicate.OrderStatusCode) predicate.Order {
 	})
 }
 
-// HasManagementStaff applies the HasEdge predicate on the "management_staff" edge.
-func HasManagementStaff() predicate.Order {
+// HasStaff applies the HasEdge predicate on the "staff" edge.
+func HasStaff() predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ManagementStaffTable, ManagementStaffColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, StaffTable, StaffColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasManagementStaffWith applies the HasEdge predicate on the "management_staff" edge with a given conditions (other predicates).
-func HasManagementStaffWith(preds ...predicate.Person) predicate.Order {
+// HasStaffWith applies the HasEdge predicate on the "staff" edge with a given conditions (other predicates).
+func HasStaffWith(preds ...predicate.Person) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
-		step := newManagementStaffStep()
+		step := newStaffStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -691,44 +706,21 @@ func HasManagementStaffWith(preds ...predicate.Person) predicate.Order {
 	})
 }
 
-// HasWarehouseStaff applies the HasEdge predicate on the "warehouse_staff" edge.
-func HasWarehouseStaff() predicate.Order {
+// HasOrderAddress applies the HasEdge predicate on the "order_address" edge.
+func HasOrderAddress() predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, WarehouseStaffTable, WarehouseStaffColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, OrderAddressTable, OrderAddressColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasWarehouseStaffWith applies the HasEdge predicate on the "warehouse_staff" edge with a given conditions (other predicates).
-func HasWarehouseStaffWith(preds ...predicate.Person) predicate.Order {
+// HasOrderAddressWith applies the HasEdge predicate on the "order_address" edge with a given conditions (other predicates).
+func HasOrderAddressWith(preds ...predicate.Address) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
-		step := newWarehouseStaffStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasDeliveryStaff applies the HasEdge predicate on the "delivery_staff" edge.
-func HasDeliveryStaff() predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, DeliveryStaffTable, DeliveryStaffColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasDeliveryStaffWith applies the HasEdge predicate on the "delivery_staff" edge with a given conditions (other predicates).
-func HasDeliveryStaffWith(preds ...predicate.Person) predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := newDeliveryStaffStep()
+		step := newOrderAddressStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

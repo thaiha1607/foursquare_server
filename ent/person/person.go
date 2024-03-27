@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -35,8 +36,35 @@ const (
 	FieldIsEmailVerified = "is_email_verified"
 	// FieldIsPhoneVerified holds the string denoting the is_phone_verified field in the database.
 	FieldIsPhoneVerified = "is_phone_verified"
+	// FieldWorkUnitID holds the string denoting the work_unit_id field in the database.
+	FieldWorkUnitID = "work_unit_id"
+	// EdgeWorkUnit holds the string denoting the work_unit edge name in mutations.
+	EdgeWorkUnit = "work_unit"
+	// EdgeAddresses holds the string denoting the addresses edge name in mutations.
+	EdgeAddresses = "addresses"
+	// EdgePersonAddresses holds the string denoting the person_addresses edge name in mutations.
+	EdgePersonAddresses = "person_addresses"
 	// Table holds the table name of the person in the database.
 	Table = "persons"
+	// WorkUnitTable is the table that holds the work_unit relation/edge.
+	WorkUnitTable = "persons"
+	// WorkUnitInverseTable is the table name for the WorkUnitInfo entity.
+	// It exists in this package in order to avoid circular dependency with the "workunitinfo" package.
+	WorkUnitInverseTable = "work_unit_info"
+	// WorkUnitColumn is the table column denoting the work_unit relation/edge.
+	WorkUnitColumn = "work_unit_id"
+	// AddressesTable is the table that holds the addresses relation/edge. The primary key declared below.
+	AddressesTable = "person_addresses"
+	// AddressesInverseTable is the table name for the Address entity.
+	// It exists in this package in order to avoid circular dependency with the "address" package.
+	AddressesInverseTable = "addresses"
+	// PersonAddressesTable is the table that holds the person_addresses relation/edge.
+	PersonAddressesTable = "person_addresses"
+	// PersonAddressesInverseTable is the table name for the PersonAddress entity.
+	// It exists in this package in order to avoid circular dependency with the "personaddress" package.
+	PersonAddressesInverseTable = "person_addresses"
+	// PersonAddressesColumn is the table column denoting the person_addresses relation/edge.
+	PersonAddressesColumn = "person_id"
 )
 
 // Columns holds all SQL columns for person fields.
@@ -52,7 +80,14 @@ var Columns = []string{
 	FieldPasswordHash,
 	FieldIsEmailVerified,
 	FieldIsPhoneVerified,
+	FieldWorkUnitID,
 }
+
+var (
+	// AddressesPrimaryKey and AddressesColumn2 are the table columns denoting the
+	// primary key for the addresses relation (M2M).
+	AddressesPrimaryKey = []string{"person_id", "address_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -97,11 +132,11 @@ const DefaultRole = RoleCustomer
 
 // Role values.
 const (
-	RoleAdmin      Role = "ADMIN"
-	RoleCustomer   Role = "CUSTOMER"
-	RoleWarehouse  Role = "WAREHOUSE"
-	RoleDelivery   Role = "DELIVERY"
-	RoleManagement Role = "MANAGEMENT"
+	RoleSalesperson Role = "SALESPERSON"
+	RoleCustomer    Role = "CUSTOMER"
+	RoleWarehouse   Role = "WAREHOUSE"
+	RoleDelivery    Role = "DELIVERY"
+	RoleManagement  Role = "MANAGEMENT"
 )
 
 func (r Role) String() string {
@@ -111,7 +146,7 @@ func (r Role) String() string {
 // RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
 func RoleValidator(r Role) error {
 	switch r {
-	case RoleAdmin, RoleCustomer, RoleWarehouse, RoleDelivery, RoleManagement:
+	case RoleSalesperson, RoleCustomer, RoleWarehouse, RoleDelivery, RoleManagement:
 		return nil
 	default:
 		return fmt.Errorf("person: invalid enum value for role field: %q", r)
@@ -169,4 +204,65 @@ func ByIsEmailVerified(opts ...sql.OrderTermOption) OrderOption {
 // ByIsPhoneVerified orders the results by the is_phone_verified field.
 func ByIsPhoneVerified(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsPhoneVerified, opts...).ToFunc()
+}
+
+// ByWorkUnitID orders the results by the work_unit_id field.
+func ByWorkUnitID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWorkUnitID, opts...).ToFunc()
+}
+
+// ByWorkUnitField orders the results by work_unit field.
+func ByWorkUnitField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWorkUnitStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByAddressesCount orders the results by addresses count.
+func ByAddressesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAddressesStep(), opts...)
+	}
+}
+
+// ByAddresses orders the results by addresses terms.
+func ByAddresses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAddressesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPersonAddressesCount orders the results by person_addresses count.
+func ByPersonAddressesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPersonAddressesStep(), opts...)
+	}
+}
+
+// ByPersonAddresses orders the results by person_addresses terms.
+func ByPersonAddresses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPersonAddressesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newWorkUnitStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WorkUnitInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, WorkUnitTable, WorkUnitColumn),
+	)
+}
+func newAddressesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AddressesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, AddressesTable, AddressesPrimaryKey...),
+	)
+}
+func newPersonAddressesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PersonAddressesInverseTable, PersonAddressesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, PersonAddressesTable, PersonAddressesColumn),
+	)
 }

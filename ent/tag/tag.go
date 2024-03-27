@@ -29,9 +29,9 @@ const (
 	Table = "tags"
 	// ProductsTable is the table that holds the products relation/edge. The primary key declared below.
 	ProductsTable = "product_tags"
-	// ProductsInverseTable is the table name for the Product entity.
-	// It exists in this package in order to avoid circular dependency with the "product" package.
-	ProductsInverseTable = "products"
+	// ProductsInverseTable is the table name for the ProductInfo entity.
+	// It exists in this package in order to avoid circular dependency with the "productinfo" package.
+	ProductsInverseTable = "product_info"
 	// ProductTagsTable is the table that holds the product_tags relation/edge.
 	ProductTagsTable = "product_tags"
 	// ProductTagsInverseTable is the table name for the ProductTag entity.

@@ -6,25 +6,69 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/financialtransaction"
+	"github.com/thaiha1607/foursquare_server/ent/deliveryassignment"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
-	"github.com/thaiha1607/foursquare_server/ent/invoicelineitem"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
-	"github.com/thaiha1607/foursquare_server/ent/orderlineitem"
+	"github.com/thaiha1607/foursquare_server/ent/orderitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/personaddress"
+	"github.com/thaiha1607/foursquare_server/ent/productcolor"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
+	"github.com/thaiha1607/foursquare_server/ent/productqty"
 	"github.com/thaiha1607/foursquare_server/ent/schema"
+	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
+	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	addressMixin := schema.Address{}.Mixin()
+	addressHooks := schema.Address{}.Hooks()
+	address.Hooks[0] = addressHooks[0]
+	addressMixinFields0 := addressMixin[0].Fields()
+	_ = addressMixinFields0
+	addressFields := schema.Address{}.Fields()
+	_ = addressFields
+	// addressDescCreatedAt is the schema descriptor for created_at field.
+	addressDescCreatedAt := addressMixinFields0[0].Descriptor()
+	// address.DefaultCreatedAt holds the default value on creation for the created_at field.
+	address.DefaultCreatedAt = addressDescCreatedAt.Default.(func() time.Time)
+	// addressDescUpdatedAt is the schema descriptor for updated_at field.
+	addressDescUpdatedAt := addressMixinFields0[1].Descriptor()
+	// address.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	address.DefaultUpdatedAt = addressDescUpdatedAt.Default.(func() time.Time)
+	// address.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	address.UpdateDefaultUpdatedAt = addressDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// addressDescLine1 is the schema descriptor for line1 field.
+	addressDescLine1 := addressFields[1].Descriptor()
+	// address.Line1Validator is a validator for the "line1" field. It is called by the builders before save.
+	address.Line1Validator = addressDescLine1.Validators[0].(func(string) error)
+	// addressDescCity is the schema descriptor for city field.
+	addressDescCity := addressFields[3].Descriptor()
+	// address.CityValidator is a validator for the "city" field. It is called by the builders before save.
+	address.CityValidator = addressDescCity.Validators[0].(func(string) error)
+	// addressDescZipOrPostcode is the schema descriptor for zip_or_postcode field.
+	addressDescZipOrPostcode := addressFields[5].Descriptor()
+	// address.ZipOrPostcodeValidator is a validator for the "zip_or_postcode" field. It is called by the builders before save.
+	address.ZipOrPostcodeValidator = addressDescZipOrPostcode.Validators[0].(func(string) error)
+	// addressDescCountry is the schema descriptor for country field.
+	addressDescCountry := addressFields[6].Descriptor()
+	// address.CountryValidator is a validator for the "country" field. It is called by the builders before save.
+	address.CountryValidator = addressDescCountry.Validators[0].(func(string) error)
+	// addressDescID is the schema descriptor for id field.
+	addressDescID := addressFields[0].Descriptor()
+	// address.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	address.IDValidator = addressDescID.Validators[0].(func(string) error)
 	conversationMixin := schema.Conversation{}.Mixin()
 	conversationMixinFields0 := conversationMixin[0].Fields()
 	_ = conversationMixinFields0
@@ -44,29 +88,25 @@ func init() {
 	conversationDescID := conversationFields[0].Descriptor()
 	// conversation.DefaultID holds the default value on creation for the id field.
 	conversation.DefaultID = conversationDescID.Default.(func() uuid.UUID)
-	financialtransactionMixin := schema.FinancialTransaction{}.Mixin()
-	financialtransactionMixinFields0 := financialtransactionMixin[0].Fields()
-	_ = financialtransactionMixinFields0
-	financialtransactionFields := schema.FinancialTransaction{}.Fields()
-	_ = financialtransactionFields
-	// financialtransactionDescCreatedAt is the schema descriptor for created_at field.
-	financialtransactionDescCreatedAt := financialtransactionMixinFields0[0].Descriptor()
-	// financialtransaction.DefaultCreatedAt holds the default value on creation for the created_at field.
-	financialtransaction.DefaultCreatedAt = financialtransactionDescCreatedAt.Default.(func() time.Time)
-	// financialtransactionDescUpdatedAt is the schema descriptor for updated_at field.
-	financialtransactionDescUpdatedAt := financialtransactionMixinFields0[1].Descriptor()
-	// financialtransaction.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	financialtransaction.DefaultUpdatedAt = financialtransactionDescUpdatedAt.Default.(func() time.Time)
-	// financialtransaction.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	financialtransaction.UpdateDefaultUpdatedAt = financialtransactionDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// financialtransactionDescIsInternal is the schema descriptor for is_internal field.
-	financialtransactionDescIsInternal := financialtransactionFields[4].Descriptor()
-	// financialtransaction.DefaultIsInternal holds the default value on creation for the is_internal field.
-	financialtransaction.DefaultIsInternal = financialtransactionDescIsInternal.Default.(bool)
-	// financialtransactionDescID is the schema descriptor for id field.
-	financialtransactionDescID := financialtransactionFields[0].Descriptor()
-	// financialtransaction.DefaultID holds the default value on creation for the id field.
-	financialtransaction.DefaultID = financialtransactionDescID.Default.(func() uuid.UUID)
+	deliveryassignmentMixin := schema.DeliveryAssignment{}.Mixin()
+	deliveryassignmentMixinFields0 := deliveryassignmentMixin[0].Fields()
+	_ = deliveryassignmentMixinFields0
+	deliveryassignmentFields := schema.DeliveryAssignment{}.Fields()
+	_ = deliveryassignmentFields
+	// deliveryassignmentDescCreatedAt is the schema descriptor for created_at field.
+	deliveryassignmentDescCreatedAt := deliveryassignmentMixinFields0[0].Descriptor()
+	// deliveryassignment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	deliveryassignment.DefaultCreatedAt = deliveryassignmentDescCreatedAt.Default.(func() time.Time)
+	// deliveryassignmentDescUpdatedAt is the schema descriptor for updated_at field.
+	deliveryassignmentDescUpdatedAt := deliveryassignmentMixinFields0[1].Descriptor()
+	// deliveryassignment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	deliveryassignment.DefaultUpdatedAt = deliveryassignmentDescUpdatedAt.Default.(func() time.Time)
+	// deliveryassignment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	deliveryassignment.UpdateDefaultUpdatedAt = deliveryassignmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deliveryassignmentDescID is the schema descriptor for id field.
+	deliveryassignmentDescID := deliveryassignmentFields[0].Descriptor()
+	// deliveryassignment.DefaultID holds the default value on creation for the id field.
+	deliveryassignment.DefaultID = deliveryassignmentDescID.Default.(func() uuid.UUID)
 	invoiceMixin := schema.Invoice{}.Mixin()
 	invoiceMixinFields0 := invoiceMixin[0].Fields()
 	_ = invoiceMixinFields0
@@ -86,16 +126,6 @@ func init() {
 	invoiceDescID := invoiceFields[0].Descriptor()
 	// invoice.DefaultID holds the default value on creation for the id field.
 	invoice.DefaultID = invoiceDescID.Default.(func() uuid.UUID)
-	invoicelineitemFields := schema.InvoiceLineItem{}.Fields()
-	_ = invoicelineitemFields
-	// invoicelineitemDescCreatedAt is the schema descriptor for created_at field.
-	invoicelineitemDescCreatedAt := invoicelineitemFields[5].Descriptor()
-	// invoicelineitem.DefaultCreatedAt holds the default value on creation for the created_at field.
-	invoicelineitem.DefaultCreatedAt = invoicelineitemDescCreatedAt.Default.(func() time.Time)
-	// invoicelineitemDescID is the schema descriptor for id field.
-	invoicelineitemDescID := invoicelineitemFields[0].Descriptor()
-	// invoicelineitem.DefaultID holds the default value on creation for the id field.
-	invoicelineitem.DefaultID = invoicelineitemDescID.Default.(func() uuid.UUID)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
@@ -148,29 +178,37 @@ func init() {
 	orderDescStatusCode := orderFields[7].Descriptor()
 	// order.DefaultStatusCode holds the default value on creation for the status_code field.
 	order.DefaultStatusCode = orderDescStatusCode.Default.(int)
+	// orderDescIsInternal is the schema descriptor for is_internal field.
+	orderDescIsInternal := orderFields[10].Descriptor()
+	// order.DefaultIsInternal holds the default value on creation for the is_internal field.
+	order.DefaultIsInternal = orderDescIsInternal.Default.(bool)
+	// orderDescAddressID is the schema descriptor for address_id field.
+	orderDescAddressID := orderFields[11].Descriptor()
+	// order.AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
+	order.AddressIDValidator = orderDescAddressID.Validators[0].(func(string) error)
 	// orderDescID is the schema descriptor for id field.
 	orderDescID := orderFields[0].Descriptor()
 	// order.DefaultID holds the default value on creation for the id field.
 	order.DefaultID = orderDescID.Default.(func() uuid.UUID)
-	orderlineitemMixin := schema.OrderLineItem{}.Mixin()
-	orderlineitemMixinFields0 := orderlineitemMixin[0].Fields()
-	_ = orderlineitemMixinFields0
-	orderlineitemFields := schema.OrderLineItem{}.Fields()
-	_ = orderlineitemFields
-	// orderlineitemDescCreatedAt is the schema descriptor for created_at field.
-	orderlineitemDescCreatedAt := orderlineitemMixinFields0[0].Descriptor()
-	// orderlineitem.DefaultCreatedAt holds the default value on creation for the created_at field.
-	orderlineitem.DefaultCreatedAt = orderlineitemDescCreatedAt.Default.(func() time.Time)
-	// orderlineitemDescUpdatedAt is the schema descriptor for updated_at field.
-	orderlineitemDescUpdatedAt := orderlineitemMixinFields0[1].Descriptor()
-	// orderlineitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	orderlineitem.DefaultUpdatedAt = orderlineitemDescUpdatedAt.Default.(func() time.Time)
-	// orderlineitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	orderlineitem.UpdateDefaultUpdatedAt = orderlineitemDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// orderlineitemDescID is the schema descriptor for id field.
-	orderlineitemDescID := orderlineitemFields[0].Descriptor()
-	// orderlineitem.DefaultID holds the default value on creation for the id field.
-	orderlineitem.DefaultID = orderlineitemDescID.Default.(func() uuid.UUID)
+	orderitemMixin := schema.OrderItem{}.Mixin()
+	orderitemMixinFields0 := orderitemMixin[0].Fields()
+	_ = orderitemMixinFields0
+	orderitemFields := schema.OrderItem{}.Fields()
+	_ = orderitemFields
+	// orderitemDescCreatedAt is the schema descriptor for created_at field.
+	orderitemDescCreatedAt := orderitemMixinFields0[0].Descriptor()
+	// orderitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	orderitem.DefaultCreatedAt = orderitemDescCreatedAt.Default.(func() time.Time)
+	// orderitemDescUpdatedAt is the schema descriptor for updated_at field.
+	orderitemDescUpdatedAt := orderitemMixinFields0[1].Descriptor()
+	// orderitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	orderitem.DefaultUpdatedAt = orderitemDescUpdatedAt.Default.(func() time.Time)
+	// orderitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	orderitem.UpdateDefaultUpdatedAt = orderitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// orderitemDescID is the schema descriptor for id field.
+	orderitemDescID := orderitemFields[0].Descriptor()
+	// orderitem.DefaultID holds the default value on creation for the id field.
+	orderitem.DefaultID = orderitemDescID.Default.(func() uuid.UUID)
 	orderstatuscodeMixin := schema.OrderStatusCode{}.Mixin()
 	orderstatuscodeMixinFields0 := orderstatuscodeMixin[0].Fields()
 	_ = orderstatuscodeMixinFields0
@@ -230,7 +268,21 @@ func init() {
 	// personDescEmail is the schema descriptor for email field.
 	personDescEmail := personFields[1].Descriptor()
 	// person.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	person.EmailValidator = personDescEmail.Validators[0].(func(string) error)
+	person.EmailValidator = func() func(string) error {
+		validators := personDescEmail.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(email string) error {
+			for _, fn := range fns {
+				if err := fn(email); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// personDescName is the schema descriptor for name field.
 	personDescName := personFields[3].Descriptor()
 	// person.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -255,54 +307,55 @@ func init() {
 	personDescID := personFields[2].Descriptor()
 	// person.DefaultID holds the default value on creation for the id field.
 	person.DefaultID = personDescID.Default.(func() uuid.UUID)
-	productMixin := schema.Product{}.Mixin()
-	productHooks := schema.Product{}.Hooks()
-	product.Hooks[0] = productHooks[0]
-	productMixinFields0 := productMixin[0].Fields()
-	_ = productMixinFields0
-	productFields := schema.Product{}.Fields()
-	_ = productFields
-	// productDescCreatedAt is the schema descriptor for created_at field.
-	productDescCreatedAt := productMixinFields0[0].Descriptor()
-	// product.DefaultCreatedAt holds the default value on creation for the created_at field.
-	product.DefaultCreatedAt = productDescCreatedAt.Default.(func() time.Time)
-	// productDescUpdatedAt is the schema descriptor for updated_at field.
-	productDescUpdatedAt := productMixinFields0[1].Descriptor()
-	// product.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	product.DefaultUpdatedAt = productDescUpdatedAt.Default.(func() time.Time)
-	// product.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	product.UpdateDefaultUpdatedAt = productDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// productDescName is the schema descriptor for name field.
-	productDescName := productFields[0].Descriptor()
-	// product.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	product.NameValidator = productDescName.Validators[0].(func(string) error)
-	// productDescDescription is the schema descriptor for description field.
-	productDescDescription := productFields[1].Descriptor()
-	// product.DefaultDescription holds the default value on creation for the description field.
-	product.DefaultDescription = productDescDescription.Default.(string)
-	// productDescYear is the schema descriptor for year field.
-	productDescYear := productFields[3].Descriptor()
-	// product.YearValidator is a validator for the "year" field. It is called by the builders before save.
-	product.YearValidator = func() func(int) error {
-		validators := productDescYear.Validators
-		fns := [...]func(int) error{
-			validators[0].(func(int) error),
-			validators[1].(func(int) error),
-		}
-		return func(year int) error {
-			for _, fn := range fns {
-				if err := fn(year); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// productDescID is the schema descriptor for id field.
-	productDescID := productFields[2].Descriptor()
-	// product.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	product.IDValidator = func() func(string) error {
-		validators := productDescID.Validators
+	personaddressMixin := schema.PersonAddress{}.Mixin()
+	personaddressMixinFields0 := personaddressMixin[0].Fields()
+	_ = personaddressMixinFields0
+	personaddressFields := schema.PersonAddress{}.Fields()
+	_ = personaddressFields
+	// personaddressDescCreatedAt is the schema descriptor for created_at field.
+	personaddressDescCreatedAt := personaddressMixinFields0[0].Descriptor()
+	// personaddress.DefaultCreatedAt holds the default value on creation for the created_at field.
+	personaddress.DefaultCreatedAt = personaddressDescCreatedAt.Default.(func() time.Time)
+	// personaddressDescUpdatedAt is the schema descriptor for updated_at field.
+	personaddressDescUpdatedAt := personaddressMixinFields0[1].Descriptor()
+	// personaddress.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	personaddress.DefaultUpdatedAt = personaddressDescUpdatedAt.Default.(func() time.Time)
+	// personaddress.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	personaddress.UpdateDefaultUpdatedAt = personaddressDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// personaddressDescAddressID is the schema descriptor for address_id field.
+	personaddressDescAddressID := personaddressFields[1].Descriptor()
+	// personaddress.AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
+	personaddress.AddressIDValidator = personaddressDescAddressID.Validators[0].(func(string) error)
+	productcolorMixin := schema.ProductColor{}.Mixin()
+	productcolorHooks := schema.ProductColor{}.Hooks()
+	productcolor.Hooks[0] = productcolorHooks[0]
+	productcolorMixinFields0 := productcolorMixin[0].Fields()
+	_ = productcolorMixinFields0
+	productcolorFields := schema.ProductColor{}.Fields()
+	_ = productcolorFields
+	// productcolorDescCreatedAt is the schema descriptor for created_at field.
+	productcolorDescCreatedAt := productcolorMixinFields0[0].Descriptor()
+	// productcolor.DefaultCreatedAt holds the default value on creation for the created_at field.
+	productcolor.DefaultCreatedAt = productcolorDescCreatedAt.Default.(func() time.Time)
+	// productcolorDescUpdatedAt is the schema descriptor for updated_at field.
+	productcolorDescUpdatedAt := productcolorMixinFields0[1].Descriptor()
+	// productcolor.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	productcolor.DefaultUpdatedAt = productcolorDescUpdatedAt.Default.(func() time.Time)
+	// productcolor.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	productcolor.UpdateDefaultUpdatedAt = productcolorDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// productcolorDescName is the schema descriptor for name field.
+	productcolorDescName := productcolorFields[1].Descriptor()
+	// productcolor.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	productcolor.NameValidator = productcolorDescName.Validators[0].(func(string) error)
+	// productcolorDescColorCode is the schema descriptor for color_code field.
+	productcolorDescColorCode := productcolorFields[2].Descriptor()
+	// productcolor.ColorCodeValidator is a validator for the "color_code" field. It is called by the builders before save.
+	productcolor.ColorCodeValidator = productcolorDescColorCode.Validators[0].(func(string) error)
+	// productcolorDescID is the schema descriptor for id field.
+	productcolorDescID := productcolorFields[0].Descriptor()
+	// productcolor.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	productcolor.IDValidator = func() func(string) error {
+		validators := productcolorDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
@@ -339,6 +392,152 @@ func init() {
 	productimageDescID := productimageFields[0].Descriptor()
 	// productimage.DefaultID holds the default value on creation for the id field.
 	productimage.DefaultID = productimageDescID.Default.(func() uuid.UUID)
+	productinfoMixin := schema.ProductInfo{}.Mixin()
+	productinfoHooks := schema.ProductInfo{}.Hooks()
+	productinfo.Hooks[0] = productinfoHooks[0]
+	productinfoMixinFields0 := productinfoMixin[0].Fields()
+	_ = productinfoMixinFields0
+	productinfoFields := schema.ProductInfo{}.Fields()
+	_ = productinfoFields
+	// productinfoDescCreatedAt is the schema descriptor for created_at field.
+	productinfoDescCreatedAt := productinfoMixinFields0[0].Descriptor()
+	// productinfo.DefaultCreatedAt holds the default value on creation for the created_at field.
+	productinfo.DefaultCreatedAt = productinfoDescCreatedAt.Default.(func() time.Time)
+	// productinfoDescUpdatedAt is the schema descriptor for updated_at field.
+	productinfoDescUpdatedAt := productinfoMixinFields0[1].Descriptor()
+	// productinfo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	productinfo.DefaultUpdatedAt = productinfoDescUpdatedAt.Default.(func() time.Time)
+	// productinfo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	productinfo.UpdateDefaultUpdatedAt = productinfoDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// productinfoDescName is the schema descriptor for name field.
+	productinfoDescName := productinfoFields[1].Descriptor()
+	// productinfo.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	productinfo.NameValidator = productinfoDescName.Validators[0].(func(string) error)
+	// productinfoDescDescription is the schema descriptor for description field.
+	productinfoDescDescription := productinfoFields[2].Descriptor()
+	// productinfo.DefaultDescription holds the default value on creation for the description field.
+	productinfo.DefaultDescription = productinfoDescDescription.Default.(string)
+	// productinfoDescYear is the schema descriptor for year field.
+	productinfoDescYear := productinfoFields[3].Descriptor()
+	// productinfo.YearValidator is a validator for the "year" field. It is called by the builders before save.
+	productinfo.YearValidator = func() func(int) error {
+		validators := productinfoDescYear.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(year int) error {
+			for _, fn := range fns {
+				if err := fn(year); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// productinfoDescID is the schema descriptor for id field.
+	productinfoDescID := productinfoFields[0].Descriptor()
+	// productinfo.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	productinfo.IDValidator = func() func(string) error {
+		validators := productinfoDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	productqtyMixin := schema.ProductQty{}.Mixin()
+	productqtyMixinFields0 := productqtyMixin[0].Fields()
+	_ = productqtyMixinFields0
+	productqtyFields := schema.ProductQty{}.Fields()
+	_ = productqtyFields
+	// productqtyDescCreatedAt is the schema descriptor for created_at field.
+	productqtyDescCreatedAt := productqtyMixinFields0[0].Descriptor()
+	// productqty.DefaultCreatedAt holds the default value on creation for the created_at field.
+	productqty.DefaultCreatedAt = productqtyDescCreatedAt.Default.(func() time.Time)
+	// productqtyDescUpdatedAt is the schema descriptor for updated_at field.
+	productqtyDescUpdatedAt := productqtyMixinFields0[1].Descriptor()
+	// productqty.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	productqty.DefaultUpdatedAt = productqtyDescUpdatedAt.Default.(func() time.Time)
+	// productqty.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	productqty.UpdateDefaultUpdatedAt = productqtyDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// productqtyDescProductID is the schema descriptor for product_id field.
+	productqtyDescProductID := productqtyFields[2].Descriptor()
+	// productqty.ProductIDValidator is a validator for the "product_id" field. It is called by the builders before save.
+	productqty.ProductIDValidator = productqtyDescProductID.Validators[0].(func(string) error)
+	// productqtyDescProductColorID is the schema descriptor for product_color_id field.
+	productqtyDescProductColorID := productqtyFields[3].Descriptor()
+	// productqty.ProductColorIDValidator is a validator for the "product_color_id" field. It is called by the builders before save.
+	productqty.ProductColorIDValidator = productqtyDescProductColorID.Validators[0].(func(string) error)
+	// productqtyDescID is the schema descriptor for id field.
+	productqtyDescID := productqtyFields[0].Descriptor()
+	// productqty.DefaultID holds the default value on creation for the id field.
+	productqty.DefaultID = productqtyDescID.Default.(func() uuid.UUID)
+	shipmentMixin := schema.Shipment{}.Mixin()
+	shipmentHooks := schema.Shipment{}.Hooks()
+	shipment.Hooks[0] = shipmentHooks[0]
+	shipmentMixinFields0 := shipmentMixin[0].Fields()
+	_ = shipmentMixinFields0
+	shipmentFields := schema.Shipment{}.Fields()
+	_ = shipmentFields
+	// shipmentDescCreatedAt is the schema descriptor for created_at field.
+	shipmentDescCreatedAt := shipmentMixinFields0[0].Descriptor()
+	// shipment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	shipment.DefaultCreatedAt = shipmentDescCreatedAt.Default.(func() time.Time)
+	// shipmentDescUpdatedAt is the schema descriptor for updated_at field.
+	shipmentDescUpdatedAt := shipmentMixinFields0[1].Descriptor()
+	// shipment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	shipment.DefaultUpdatedAt = shipmentDescUpdatedAt.Default.(func() time.Time)
+	// shipment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	shipment.UpdateDefaultUpdatedAt = shipmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// shipmentDescShipmentTrackingNumber is the schema descriptor for shipment_tracking_number field.
+	shipmentDescShipmentTrackingNumber := shipmentFields[3].Descriptor()
+	// shipment.ShipmentTrackingNumberValidator is a validator for the "shipment_tracking_number" field. It is called by the builders before save.
+	shipment.ShipmentTrackingNumberValidator = func() func(string) error {
+		validators := shipmentDescShipmentTrackingNumber.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(shipment_tracking_number string) error {
+			for _, fn := range fns {
+				if err := fn(shipment_tracking_number); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// shipmentDescID is the schema descriptor for id field.
+	shipmentDescID := shipmentFields[0].Descriptor()
+	// shipment.DefaultID holds the default value on creation for the id field.
+	shipment.DefaultID = shipmentDescID.Default.(func() uuid.UUID)
+	shipmentitemMixin := schema.ShipmentItem{}.Mixin()
+	shipmentitemMixinFields0 := shipmentitemMixin[0].Fields()
+	_ = shipmentitemMixinFields0
+	shipmentitemFields := schema.ShipmentItem{}.Fields()
+	_ = shipmentitemFields
+	// shipmentitemDescCreatedAt is the schema descriptor for created_at field.
+	shipmentitemDescCreatedAt := shipmentitemMixinFields0[0].Descriptor()
+	// shipmentitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	shipmentitem.DefaultCreatedAt = shipmentitemDescCreatedAt.Default.(func() time.Time)
+	// shipmentitemDescUpdatedAt is the schema descriptor for updated_at field.
+	shipmentitemDescUpdatedAt := shipmentitemMixinFields0[1].Descriptor()
+	// shipmentitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	shipmentitem.DefaultUpdatedAt = shipmentitemDescUpdatedAt.Default.(func() time.Time)
+	// shipmentitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	shipmentitem.UpdateDefaultUpdatedAt = shipmentitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// shipmentitemDescID is the schema descriptor for id field.
+	shipmentitemDescID := shipmentitemFields[0].Descriptor()
+	// shipmentitem.DefaultID holds the default value on creation for the id field.
+	shipmentitem.DefaultID = shipmentitemDescID.Default.(func() uuid.UUID)
 	tagMixin := schema.Tag{}.Mixin()
 	tagHooks := schema.Tag{}.Hooks()
 	tag.Hooks[0] = tagHooks[0]
@@ -378,6 +577,35 @@ func init() {
 			return nil
 		}
 	}()
+	warehouseassignmentMixin := schema.WarehouseAssignment{}.Mixin()
+	warehouseassignmentMixinFields0 := warehouseassignmentMixin[0].Fields()
+	_ = warehouseassignmentMixinFields0
+	warehouseassignmentFields := schema.WarehouseAssignment{}.Fields()
+	_ = warehouseassignmentFields
+	// warehouseassignmentDescCreatedAt is the schema descriptor for created_at field.
+	warehouseassignmentDescCreatedAt := warehouseassignmentMixinFields0[0].Descriptor()
+	// warehouseassignment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	warehouseassignment.DefaultCreatedAt = warehouseassignmentDescCreatedAt.Default.(func() time.Time)
+	// warehouseassignmentDescUpdatedAt is the schema descriptor for updated_at field.
+	warehouseassignmentDescUpdatedAt := warehouseassignmentMixinFields0[1].Descriptor()
+	// warehouseassignment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	warehouseassignment.DefaultUpdatedAt = warehouseassignmentDescUpdatedAt.Default.(func() time.Time)
+	// warehouseassignment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	warehouseassignment.UpdateDefaultUpdatedAt = warehouseassignmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// warehouseassignmentDescID is the schema descriptor for id field.
+	warehouseassignmentDescID := warehouseassignmentFields[0].Descriptor()
+	// warehouseassignment.DefaultID holds the default value on creation for the id field.
+	warehouseassignment.DefaultID = warehouseassignmentDescID.Default.(func() uuid.UUID)
+	workunitinfoFields := schema.WorkUnitInfo{}.Fields()
+	_ = workunitinfoFields
+	// workunitinfoDescName is the schema descriptor for name field.
+	workunitinfoDescName := workunitinfoFields[1].Descriptor()
+	// workunitinfo.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	workunitinfo.NameValidator = workunitinfoDescName.Validators[0].(func(string) error)
+	// workunitinfoDescID is the schema descriptor for id field.
+	workunitinfoDescID := workunitinfoFields[0].Descriptor()
+	// workunitinfo.DefaultID holds the default value on creation for the id field.
+	workunitinfo.DefaultID = workunitinfoDescID.Default.(func() uuid.UUID)
 }
 
 const (

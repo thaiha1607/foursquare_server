@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -49,14 +49,14 @@ func (tu *TagUpdate) SetNillableTitle(s *string) *TagUpdate {
 	return tu
 }
 
-// AddProductIDs adds the "products" edge to the Product entity by IDs.
+// AddProductIDs adds the "products" edge to the ProductInfo entity by IDs.
 func (tu *TagUpdate) AddProductIDs(ids ...string) *TagUpdate {
 	tu.mutation.AddProductIDs(ids...)
 	return tu
 }
 
-// AddProducts adds the "products" edges to the Product entity.
-func (tu *TagUpdate) AddProducts(p ...*Product) *TagUpdate {
+// AddProducts adds the "products" edges to the ProductInfo entity.
+func (tu *TagUpdate) AddProducts(p ...*ProductInfo) *TagUpdate {
 	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -69,20 +69,20 @@ func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
 }
 
-// ClearProducts clears all "products" edges to the Product entity.
+// ClearProducts clears all "products" edges to the ProductInfo entity.
 func (tu *TagUpdate) ClearProducts() *TagUpdate {
 	tu.mutation.ClearProducts()
 	return tu
 }
 
-// RemoveProductIDs removes the "products" edge to Product entities by IDs.
+// RemoveProductIDs removes the "products" edge to ProductInfo entities by IDs.
 func (tu *TagUpdate) RemoveProductIDs(ids ...string) *TagUpdate {
 	tu.mutation.RemoveProductIDs(ids...)
 	return tu
 }
 
-// RemoveProducts removes "products" edges to Product entities.
-func (tu *TagUpdate) RemoveProducts(p ...*Product) *TagUpdate {
+// RemoveProducts removes "products" edges to ProductInfo entities.
+func (tu *TagUpdate) RemoveProducts(p ...*ProductInfo) *TagUpdate {
 	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -168,7 +168,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -181,7 +181,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -197,7 +197,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -245,14 +245,14 @@ func (tuo *TagUpdateOne) SetNillableTitle(s *string) *TagUpdateOne {
 	return tuo
 }
 
-// AddProductIDs adds the "products" edge to the Product entity by IDs.
+// AddProductIDs adds the "products" edge to the ProductInfo entity by IDs.
 func (tuo *TagUpdateOne) AddProductIDs(ids ...string) *TagUpdateOne {
 	tuo.mutation.AddProductIDs(ids...)
 	return tuo
 }
 
-// AddProducts adds the "products" edges to the Product entity.
-func (tuo *TagUpdateOne) AddProducts(p ...*Product) *TagUpdateOne {
+// AddProducts adds the "products" edges to the ProductInfo entity.
+func (tuo *TagUpdateOne) AddProducts(p ...*ProductInfo) *TagUpdateOne {
 	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -265,20 +265,20 @@ func (tuo *TagUpdateOne) Mutation() *TagMutation {
 	return tuo.mutation
 }
 
-// ClearProducts clears all "products" edges to the Product entity.
+// ClearProducts clears all "products" edges to the ProductInfo entity.
 func (tuo *TagUpdateOne) ClearProducts() *TagUpdateOne {
 	tuo.mutation.ClearProducts()
 	return tuo
 }
 
-// RemoveProductIDs removes the "products" edge to Product entities by IDs.
+// RemoveProductIDs removes the "products" edge to ProductInfo entities by IDs.
 func (tuo *TagUpdateOne) RemoveProductIDs(ids ...string) *TagUpdateOne {
 	tuo.mutation.RemoveProductIDs(ids...)
 	return tuo
 }
 
-// RemoveProducts removes "products" edges to Product entities.
-func (tuo *TagUpdateOne) RemoveProducts(p ...*Product) *TagUpdateOne {
+// RemoveProducts removes "products" edges to ProductInfo entities.
+func (tuo *TagUpdateOne) RemoveProducts(p ...*ProductInfo) *TagUpdateOne {
 	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -394,7 +394,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -407,7 +407,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -423,7 +423,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

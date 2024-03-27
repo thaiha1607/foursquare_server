@@ -32,7 +32,7 @@ type Tag struct {
 // TagEdges holds the relations/edges for other nodes in the graph.
 type TagEdges struct {
 	// Products holds the value of the products edge.
-	Products []*Product `json:"products,omitempty"`
+	Products []*ProductInfo `json:"products,omitempty"`
 	// ProductTags holds the value of the product_tags edge.
 	ProductTags []*ProductTag `json:"product_tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -42,7 +42,7 @@ type TagEdges struct {
 
 // ProductsOrErr returns the Products value or an error if the edge
 // was not loaded in eager-loading.
-func (e TagEdges) ProductsOrErr() ([]*Product, error) {
+func (e TagEdges) ProductsOrErr() ([]*ProductInfo, error) {
 	if e.loadedTypes[0] {
 		return e.Products, nil
 	}
@@ -120,7 +120,7 @@ func (t *Tag) Value(name string) (ent.Value, error) {
 }
 
 // QueryProducts queries the "products" edge of the Tag entity.
-func (t *Tag) QueryProducts() *ProductQuery {
+func (t *Tag) QueryProducts() *ProductInfoQuery {
 	return NewTagClient(t.config).QueryProducts(t)
 }
 

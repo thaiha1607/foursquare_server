@@ -36,9 +36,7 @@ func (e *entPersonRepository) Store(ctx context.Context, obj *ent.Person) (res *
 	res, err = e.Client.Person.
 		Create().
 		SetAvatarURL(obj.AvatarURL).
-		SetNillableEmail(obj.Email).
 		SetName(obj.Name).
-		SetPhone(obj.Phone).
 		Save(ctx)
 	return
 
@@ -48,9 +46,7 @@ func (e *entPersonRepository) Update(ctx context.Context, id uuid.UUID, obj *ent
 	res, err = e.Client.Person.
 		UpdateOneID(id).
 		SetAvatarURL(obj.AvatarURL).
-		SetNillableEmail(obj.Email).
 		SetNillableName(&obj.Name).
-		SetNillablePhone(&obj.Phone).
 		Save(ctx)
 	return
 }

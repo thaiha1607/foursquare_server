@@ -6,17 +6,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Address is the predicate function for address builders.
+type Address func(*sql.Selector)
+
 // Conversation is the predicate function for conversation builders.
 type Conversation func(*sql.Selector)
 
-// FinancialTransaction is the predicate function for financialtransaction builders.
-type FinancialTransaction func(*sql.Selector)
+// DeliveryAssignment is the predicate function for deliveryassignment builders.
+type DeliveryAssignment func(*sql.Selector)
 
 // Invoice is the predicate function for invoice builders.
 type Invoice func(*sql.Selector)
-
-// InvoiceLineItem is the predicate function for invoicelineitem builders.
-type InvoiceLineItem func(*sql.Selector)
 
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
@@ -24,8 +24,8 @@ type Message func(*sql.Selector)
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
 
-// OrderLineItem is the predicate function for orderlineitem builders.
-type OrderLineItem func(*sql.Selector)
+// OrderItem is the predicate function for orderitem builders.
+type OrderItem func(*sql.Selector)
 
 // OrderStatusCode is the predicate function for orderstatuscode builders.
 type OrderStatusCode func(*sql.Selector)
@@ -33,14 +33,35 @@ type OrderStatusCode func(*sql.Selector)
 // Person is the predicate function for person builders.
 type Person func(*sql.Selector)
 
-// Product is the predicate function for product builders.
-type Product func(*sql.Selector)
+// PersonAddress is the predicate function for personaddress builders.
+type PersonAddress func(*sql.Selector)
+
+// ProductColor is the predicate function for productcolor builders.
+type ProductColor func(*sql.Selector)
 
 // ProductImage is the predicate function for productimage builders.
 type ProductImage func(*sql.Selector)
 
+// ProductInfo is the predicate function for productinfo builders.
+type ProductInfo func(*sql.Selector)
+
+// ProductQty is the predicate function for productqty builders.
+type ProductQty func(*sql.Selector)
+
 // ProductTag is the predicate function for producttag builders.
 type ProductTag func(*sql.Selector)
 
+// Shipment is the predicate function for shipment builders.
+type Shipment func(*sql.Selector)
+
+// ShipmentItem is the predicate function for shipmentitem builders.
+type ShipmentItem func(*sql.Selector)
+
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
+
+// WarehouseAssignment is the predicate function for warehouseassignment builders.
+type WarehouseAssignment func(*sql.Selector)
+
+// WorkUnitInfo is the predicate function for workunitinfo builders.
+type WorkUnitInfo func(*sql.Selector)

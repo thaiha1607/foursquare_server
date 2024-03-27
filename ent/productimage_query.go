@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
-	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 )
 
 // ProductImageQuery is the builder for querying ProductImage entities.
@@ -23,7 +23,7 @@ type ProductImageQuery struct {
 	order       []productimage.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.ProductImage
-	withProduct *ProductQuery
+	withProduct *ProductInfoQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,8 +61,8 @@ func (piq *ProductImageQuery) Order(o ...productimage.OrderOption) *ProductImage
 }
 
 // QueryProduct chains the current query on the "product" edge.
-func (piq *ProductImageQuery) QueryProduct() *ProductQuery {
-	query := (&ProductClient{config: piq.config}).Query()
+func (piq *ProductImageQuery) QueryProduct() *ProductInfoQuery {
+	query := (&ProductInfoClient{config: piq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := piq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (piq *ProductImageQuery) QueryProduct() *ProductQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(productimage.Table, productimage.FieldID, selector),
-			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.To(productinfo.Table, productinfo.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, productimage.ProductTable, productimage.ProductColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(piq.driver.Dialect(), step)
@@ -283,8 +283,8 @@ func (piq *ProductImageQuery) Clone() *ProductImageQuery {
 
 // WithProduct tells the query-builder to eager-load the nodes that are connected to
 // the "product" edge. The optional arguments are used to configure the query builder of the edge.
-func (piq *ProductImageQuery) WithProduct(opts ...func(*ProductQuery)) *ProductImageQuery {
-	query := (&ProductClient{config: piq.config}).Query()
+func (piq *ProductImageQuery) WithProduct(opts ...func(*ProductInfoQuery)) *ProductImageQuery {
+	query := (&ProductInfoClient{config: piq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -394,14 +394,14 @@ func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	}
 	if query := piq.withProduct; query != nil {
 		if err := piq.loadProduct(ctx, query, nodes, nil,
-			func(n *ProductImage, e *Product) { n.Edges.Product = e }); err != nil {
+			func(n *ProductImage, e *ProductInfo) { n.Edges.Product = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (piq *ProductImageQuery) loadProduct(ctx context.Context, query *ProductQuery, nodes []*ProductImage, init func(*ProductImage), assign func(*ProductImage, *Product)) error {
+func (piq *ProductImageQuery) loadProduct(ctx context.Context, query *ProductInfoQuery, nodes []*ProductImage, init func(*ProductImage), assign func(*ProductImage, *ProductInfo)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ProductImage)
 	for i := range nodes {
@@ -414,7 +414,7 @@ func (piq *ProductImageQuery) loadProduct(ctx context.Context, query *ProductQue
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(product.IDIn(ids...))
+	query.Where(productinfo.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

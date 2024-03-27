@@ -34,7 +34,7 @@ func (ProductTag) Fields() []ent.Field {
 // Edges of the ProductTag.
 func (ProductTag) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("products", Product.Type).
+		edge.To("products", ProductInfo.Type).
 			Field("product_id").
 			Unique().
 			Required().

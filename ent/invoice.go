@@ -28,14 +28,14 @@ type Invoice struct {
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// Total holds the value of the "total" field.
 	Total decimal.Decimal `json:"total,omitempty"`
-	// Comment holds the value of the "comment" field.
-	Comment *string `json:"comment,omitempty"`
 	// Note holds the value of the "note" field.
 	Note *string `json:"note,omitempty"`
 	// Type holds the value of the "type" field.
 	Type invoice.Type `json:"type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status invoice.Status `json:"status,omitempty"`
+	// PaymentMethod holds the value of the "payment_method" field.
+	PaymentMethod *invoice.PaymentMethod `json:"payment_method,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the InvoiceQuery when eager-loading is set.
 	Edges        InvoiceEdges `json:"edges"`
@@ -69,7 +69,7 @@ func (*Invoice) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case invoice.FieldTotal:
 			values[i] = new(decimal.Decimal)
-		case invoice.FieldComment, invoice.FieldNote, invoice.FieldType, invoice.FieldStatus:
+		case invoice.FieldNote, invoice.FieldType, invoice.FieldStatus, invoice.FieldPaymentMethod:
 			values[i] = new(sql.NullString)
 		case invoice.FieldCreatedAt, invoice.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -120,13 +120,6 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				i.Total = *value
 			}
-		case invoice.FieldComment:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field comment", values[j])
-			} else if value.Valid {
-				i.Comment = new(string)
-				*i.Comment = value.String
-			}
 		case invoice.FieldNote:
 			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field note", values[j])
@@ -145,6 +138,13 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[j])
 			} else if value.Valid {
 				i.Status = invoice.Status(value.String)
+			}
+		case invoice.FieldPaymentMethod:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field payment_method", values[j])
+			} else if value.Valid {
+				i.PaymentMethod = new(invoice.PaymentMethod)
+				*i.PaymentMethod = invoice.PaymentMethod(value.String)
 			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
@@ -199,11 +199,6 @@ func (i *Invoice) String() string {
 	builder.WriteString("total=")
 	builder.WriteString(fmt.Sprintf("%v", i.Total))
 	builder.WriteString(", ")
-	if v := i.Comment; v != nil {
-		builder.WriteString("comment=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
 	if v := i.Note; v != nil {
 		builder.WriteString("note=")
 		builder.WriteString(*v)
@@ -214,6 +209,11 @@ func (i *Invoice) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", i.Status))
+	builder.WriteString(", ")
+	if v := i.PaymentMethod; v != nil {
+		builder.WriteString("payment_method=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

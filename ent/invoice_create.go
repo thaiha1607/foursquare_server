@@ -63,20 +63,6 @@ func (ic *InvoiceCreate) SetTotal(d decimal.Decimal) *InvoiceCreate {
 	return ic
 }
 
-// SetComment sets the "comment" field.
-func (ic *InvoiceCreate) SetComment(s string) *InvoiceCreate {
-	ic.mutation.SetComment(s)
-	return ic
-}
-
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (ic *InvoiceCreate) SetNillableComment(s *string) *InvoiceCreate {
-	if s != nil {
-		ic.SetComment(*s)
-	}
-	return ic
-}
-
 // SetNote sets the "note" field.
 func (ic *InvoiceCreate) SetNote(s string) *InvoiceCreate {
 	ic.mutation.SetNote(s)
@@ -115,6 +101,20 @@ func (ic *InvoiceCreate) SetStatus(i invoice.Status) *InvoiceCreate {
 func (ic *InvoiceCreate) SetNillableStatus(i *invoice.Status) *InvoiceCreate {
 	if i != nil {
 		ic.SetStatus(*i)
+	}
+	return ic
+}
+
+// SetPaymentMethod sets the "payment_method" field.
+func (ic *InvoiceCreate) SetPaymentMethod(im invoice.PaymentMethod) *InvoiceCreate {
+	ic.mutation.SetPaymentMethod(im)
+	return ic
+}
+
+// SetNillablePaymentMethod sets the "payment_method" field if the given value is not nil.
+func (ic *InvoiceCreate) SetNillablePaymentMethod(im *invoice.PaymentMethod) *InvoiceCreate {
+	if im != nil {
+		ic.SetPaymentMethod(*im)
 	}
 	return ic
 }
@@ -189,6 +189,10 @@ func (ic *InvoiceCreate) defaults() {
 		v := invoice.DefaultStatus
 		ic.mutation.SetStatus(v)
 	}
+	if _, ok := ic.mutation.PaymentMethod(); !ok {
+		v := invoice.DefaultPaymentMethod
+		ic.mutation.SetPaymentMethod(v)
+	}
 	if _, ok := ic.mutation.ID(); !ok {
 		v := invoice.DefaultID()
 		ic.mutation.SetID(v)
@@ -223,6 +227,11 @@ func (ic *InvoiceCreate) check() error {
 	if v, ok := ic.mutation.Status(); ok {
 		if err := invoice.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Invoice.status": %w`, err)}
+		}
+	}
+	if v, ok := ic.mutation.PaymentMethod(); ok {
+		if err := invoice.PaymentMethodValidator(v); err != nil {
+			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "Invoice.payment_method": %w`, err)}
 		}
 	}
 	if _, ok := ic.mutation.OrderID(); !ok {
@@ -275,10 +284,6 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 		_spec.SetField(invoice.FieldTotal, field.TypeFloat64, value)
 		_node.Total = value
 	}
-	if value, ok := ic.mutation.Comment(); ok {
-		_spec.SetField(invoice.FieldComment, field.TypeString, value)
-		_node.Comment = &value
-	}
 	if value, ok := ic.mutation.Note(); ok {
 		_spec.SetField(invoice.FieldNote, field.TypeString, value)
 		_node.Note = &value
@@ -290,6 +295,10 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Status(); ok {
 		_spec.SetField(invoice.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := ic.mutation.PaymentMethod(); ok {
+		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
+		_node.PaymentMethod = &value
 	}
 	if nodes := ic.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

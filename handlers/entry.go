@@ -13,15 +13,12 @@ func RegisterRoutes(e *echo.Echo, db *ent.Client) {
 func initializeApi(e *echo.Echo, db *ent.Client) {
 	initializeOrderHandler(e, db)
 	initializeOrderStatusCodeHandler(e, db)
-	initializeInvoiceLineItemHandler(e, db)
 	initializeProductImageHandler(e, db)
-	initializeOrderLineItemHandler(e, db)
+	initializeOrderItemHandler(e, db)
 	initializePersonHandler(e, db)
-	initializeFinancialTransactionHandler(e, db)
 	initializeProductTagHandler(e, db)
 	initializeMessageHandler(e, db)
 	initializeTagHandler(e, db)
 	initializeInvoiceHandler(e, db)
 	initializeConversationHandler(e, db)
-	initializeProductHandler(e, db)
 }

@@ -24,14 +24,14 @@ const (
 	FieldOrderID = "order_id"
 	// FieldTotal holds the string denoting the total field in the database.
 	FieldTotal = "total"
-	// FieldComment holds the string denoting the comment field in the database.
-	FieldComment = "comment"
 	// FieldNote holds the string denoting the note field in the database.
 	FieldNote = "note"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldPaymentMethod holds the string denoting the payment_method field in the database.
+	FieldPaymentMethod = "payment_method"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
 	// Table holds the table name of the invoice in the database.
@@ -52,10 +52,10 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldOrderID,
 	FieldTotal,
-	FieldComment,
 	FieldNote,
 	FieldType,
 	FieldStatus,
+	FieldPaymentMethod,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -149,6 +149,38 @@ func StatusValidator(s Status) error {
 	}
 }
 
+// PaymentMethod defines the type for the "payment_method" enum field.
+type PaymentMethod string
+
+// PaymentMethodCash is the default value of the PaymentMethod enum.
+const DefaultPaymentMethod = PaymentMethodCash
+
+// PaymentMethod values.
+const (
+	PaymentMethodCash        PaymentMethod = "CASH"
+	PaymentMethodEFT         PaymentMethod = "ELECTRONIC_FUNDS_TRANSFER"
+	PaymentMethodGiftCard    PaymentMethod = "GIFT_CARD"
+	PaymentMethodCreditCard  PaymentMethod = "CREDIT_CARD"
+	PaymentMethodDebitCard   PaymentMethod = "DEBIT_CARD"
+	PaymentMethodPrepaidCard PaymentMethod = "PREPAID_CARD"
+	PaymentMethodCheck       PaymentMethod = "CHECK"
+	PaymentMethodOther       PaymentMethod = "OTHER"
+)
+
+func (pm PaymentMethod) String() string {
+	return string(pm)
+}
+
+// PaymentMethodValidator is a validator for the "payment_method" field enum values. It is called by the builders before save.
+func PaymentMethodValidator(pm PaymentMethod) error {
+	switch pm {
+	case PaymentMethodCash, PaymentMethodEFT, PaymentMethodGiftCard, PaymentMethodCreditCard, PaymentMethodDebitCard, PaymentMethodPrepaidCard, PaymentMethodCheck, PaymentMethodOther:
+		return nil
+	default:
+		return fmt.Errorf("invoice: invalid enum value for payment_method field: %q", pm)
+	}
+}
+
 // OrderOption defines the ordering options for the Invoice queries.
 type OrderOption func(*sql.Selector)
 
@@ -177,11 +209,6 @@ func ByTotal(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotal, opts...).ToFunc()
 }
 
-// ByComment orders the results by the comment field.
-func ByComment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldComment, opts...).ToFunc()
-}
-
 // ByNote orders the results by the note field.
 func ByNote(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNote, opts...).ToFunc()
@@ -195,6 +222,11 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByPaymentMethod orders the results by the payment_method field.
+func ByPaymentMethod(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPaymentMethod, opts...).ToFunc()
 }
 
 // ByOrderField orders the results by order field.

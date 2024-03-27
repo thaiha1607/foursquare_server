@@ -29,9 +29,6 @@ func (Invoice) Fields() []ent.Field {
 				dialect.MySQL:    "decimal(12,2)",
 			}).
 			Immutable(),
-		field.String("comment").
-			Optional().
-			Nillable(),
 		field.String("note").
 			Optional().
 			Nillable(),
@@ -64,6 +61,19 @@ func (Invoice) Fields() []ent.Field {
 				"Debt", "DEBT",
 				"Other", "OTHER",
 			).Default("DRAFT"),
+		field.Enum("payment_method").
+			NamedValues(
+				"Cash", "CASH",
+				"EFT", "ELECTRONIC_FUNDS_TRANSFER",
+				"GiftCard", "GIFT_CARD",
+				"CreditCard", "CREDIT_CARD",
+				"DebitCard", "DEBIT_CARD",
+				"PrepaidCard", "PREPAID_CARD",
+				"Check", "CHECK",
+				"Other", "OTHER",
+			).Default("CASH").
+			Optional().
+			Nillable(),
 	}
 }
 

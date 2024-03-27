@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/thaiha1607/foursquare_server/ent/product"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 )
 
@@ -61,14 +61,14 @@ func (tc *TagCreate) SetID(s string) *TagCreate {
 	return tc
 }
 
-// AddProductIDs adds the "products" edge to the Product entity by IDs.
+// AddProductIDs adds the "products" edge to the ProductInfo entity by IDs.
 func (tc *TagCreate) AddProductIDs(ids ...string) *TagCreate {
 	tc.mutation.AddProductIDs(ids...)
 	return tc
 }
 
-// AddProducts adds the "products" edges to the Product entity.
-func (tc *TagCreate) AddProducts(p ...*Product) *TagCreate {
+// AddProducts adds the "products" edges to the ProductInfo entity.
+func (tc *TagCreate) AddProducts(p ...*ProductInfo) *TagCreate {
 	ids := make([]string, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -206,7 +206,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Columns: tag.ProductsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

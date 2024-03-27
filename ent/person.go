@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/person"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // Person is the model entity for the Person schema.
@@ -25,11 +26,11 @@ type Person struct {
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL string `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
-	Email *string `json:"email,omitempty"`
+	Email string `json:"email,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Phone holds the value of the "phone" field.
-	Phone string `json:"phone,omitempty"`
+	Phone *string `json:"phone,omitempty"`
 	// Role holds the value of the "role" field.
 	Role person.Role `json:"role,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
@@ -38,7 +39,54 @@ type Person struct {
 	IsEmailVerified bool `json:"is_email_verified,omitempty"`
 	// IsPhoneVerified holds the value of the "is_phone_verified" field.
 	IsPhoneVerified bool `json:"is_phone_verified,omitempty"`
-	selectValues    sql.SelectValues
+	// WorkUnitID holds the value of the "work_unit_id" field.
+	WorkUnitID *uuid.UUID `json:"work_unit_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the PersonQuery when eager-loading is set.
+	Edges        PersonEdges `json:"edges"`
+	selectValues sql.SelectValues
+}
+
+// PersonEdges holds the relations/edges for other nodes in the graph.
+type PersonEdges struct {
+	// WorkUnit holds the value of the work_unit edge.
+	WorkUnit *WorkUnitInfo `json:"work_unit,omitempty"`
+	// Addresses holds the value of the addresses edge.
+	Addresses []*Address `json:"addresses,omitempty"`
+	// PersonAddresses holds the value of the person_addresses edge.
+	PersonAddresses []*PersonAddress `json:"person_addresses,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [3]bool
+}
+
+// WorkUnitOrErr returns the WorkUnit value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) WorkUnitOrErr() (*WorkUnitInfo, error) {
+	if e.WorkUnit != nil {
+		return e.WorkUnit, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: workunitinfo.Label}
+	}
+	return nil, &NotLoadedError{edge: "work_unit"}
+}
+
+// AddressesOrErr returns the Addresses value or an error if the edge
+// was not loaded in eager-loading.
+func (e PersonEdges) AddressesOrErr() ([]*Address, error) {
+	if e.loadedTypes[1] {
+		return e.Addresses, nil
+	}
+	return nil, &NotLoadedError{edge: "addresses"}
+}
+
+// PersonAddressesOrErr returns the PersonAddresses value or an error if the edge
+// was not loaded in eager-loading.
+func (e PersonEdges) PersonAddressesOrErr() ([]*PersonAddress, error) {
+	if e.loadedTypes[2] {
+		return e.PersonAddresses, nil
+	}
+	return nil, &NotLoadedError{edge: "person_addresses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -46,6 +94,8 @@ func (*Person) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case person.FieldWorkUnitID:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case person.FieldPasswordHash:
 			values[i] = new([]byte)
 		case person.FieldIsEmailVerified, person.FieldIsPhoneVerified:
@@ -99,8 +149,7 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				pe.Email = new(string)
-				*pe.Email = value.String
+				pe.Email = value.String
 			}
 		case person.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,7 +161,8 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
 			} else if value.Valid {
-				pe.Phone = value.String
+				pe.Phone = new(string)
+				*pe.Phone = value.String
 			}
 		case person.FieldRole:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -138,6 +188,13 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pe.IsPhoneVerified = value.Bool
 			}
+		case person.FieldWorkUnitID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field work_unit_id", values[i])
+			} else if value.Valid {
+				pe.WorkUnitID = new(uuid.UUID)
+				*pe.WorkUnitID = *value.S.(*uuid.UUID)
+			}
 		default:
 			pe.selectValues.Set(columns[i], values[i])
 		}
@@ -149,6 +206,21 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pe *Person) Value(name string) (ent.Value, error) {
 	return pe.selectValues.Get(name)
+}
+
+// QueryWorkUnit queries the "work_unit" edge of the Person entity.
+func (pe *Person) QueryWorkUnit() *WorkUnitInfoQuery {
+	return NewPersonClient(pe.config).QueryWorkUnit(pe)
+}
+
+// QueryAddresses queries the "addresses" edge of the Person entity.
+func (pe *Person) QueryAddresses() *AddressQuery {
+	return NewPersonClient(pe.config).QueryAddresses(pe)
+}
+
+// QueryPersonAddresses queries the "person_addresses" edge of the Person entity.
+func (pe *Person) QueryPersonAddresses() *PersonAddressQuery {
+	return NewPersonClient(pe.config).QueryPersonAddresses(pe)
 }
 
 // Update returns a builder for updating this Person.
@@ -183,16 +255,16 @@ func (pe *Person) String() string {
 	builder.WriteString("avatar_url=")
 	builder.WriteString(pe.AvatarURL)
 	builder.WriteString(", ")
-	if v := pe.Email; v != nil {
-		builder.WriteString("email=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("email=")
+	builder.WriteString(pe.Email)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(pe.Name)
 	builder.WriteString(", ")
-	builder.WriteString("phone=")
-	builder.WriteString(pe.Phone)
+	if v := pe.Phone; v != nil {
+		builder.WriteString("phone=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", pe.Role))
@@ -204,6 +276,11 @@ func (pe *Person) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("is_phone_verified=")
 	builder.WriteString(fmt.Sprintf("%v", pe.IsPhoneVerified))
+	builder.WriteString(", ")
+	if v := pe.WorkUnitID; v != nil {
+		builder.WriteString("work_unit_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
@@ -98,6 +99,11 @@ func IsEmailVerified(v bool) predicate.Person {
 // IsPhoneVerified applies equality check predicate on the "is_phone_verified" field. It's identical to IsPhoneVerifiedEQ.
 func IsPhoneVerified(v bool) predicate.Person {
 	return predicate.Person(sql.FieldEQ(FieldIsPhoneVerified, v))
+}
+
+// WorkUnitID applies equality check predicate on the "work_unit_id" field. It's identical to WorkUnitIDEQ.
+func WorkUnitID(v uuid.UUID) predicate.Person {
+	return predicate.Person(sql.FieldEQ(FieldWorkUnitID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -310,16 +316,6 @@ func EmailHasSuffix(v string) predicate.Person {
 	return predicate.Person(sql.FieldHasSuffix(FieldEmail, v))
 }
 
-// EmailIsNil applies the IsNil predicate on the "email" field.
-func EmailIsNil() predicate.Person {
-	return predicate.Person(sql.FieldIsNull(FieldEmail))
-}
-
-// EmailNotNil applies the NotNil predicate on the "email" field.
-func EmailNotNil() predicate.Person {
-	return predicate.Person(sql.FieldNotNull(FieldEmail))
-}
-
 // EmailEqualFold applies the EqualFold predicate on the "email" field.
 func EmailEqualFold(v string) predicate.Person {
 	return predicate.Person(sql.FieldEqualFold(FieldEmail, v))
@@ -450,6 +446,16 @@ func PhoneHasSuffix(v string) predicate.Person {
 	return predicate.Person(sql.FieldHasSuffix(FieldPhone, v))
 }
 
+// PhoneIsNil applies the IsNil predicate on the "phone" field.
+func PhoneIsNil() predicate.Person {
+	return predicate.Person(sql.FieldIsNull(FieldPhone))
+}
+
+// PhoneNotNil applies the NotNil predicate on the "phone" field.
+func PhoneNotNil() predicate.Person {
+	return predicate.Person(sql.FieldNotNull(FieldPhone))
+}
+
 // PhoneEqualFold applies the EqualFold predicate on the "phone" field.
 func PhoneEqualFold(v string) predicate.Person {
 	return predicate.Person(sql.FieldEqualFold(FieldPhone, v))
@@ -548,6 +554,105 @@ func IsPhoneVerifiedEQ(v bool) predicate.Person {
 // IsPhoneVerifiedNEQ applies the NEQ predicate on the "is_phone_verified" field.
 func IsPhoneVerifiedNEQ(v bool) predicate.Person {
 	return predicate.Person(sql.FieldNEQ(FieldIsPhoneVerified, v))
+}
+
+// WorkUnitIDEQ applies the EQ predicate on the "work_unit_id" field.
+func WorkUnitIDEQ(v uuid.UUID) predicate.Person {
+	return predicate.Person(sql.FieldEQ(FieldWorkUnitID, v))
+}
+
+// WorkUnitIDNEQ applies the NEQ predicate on the "work_unit_id" field.
+func WorkUnitIDNEQ(v uuid.UUID) predicate.Person {
+	return predicate.Person(sql.FieldNEQ(FieldWorkUnitID, v))
+}
+
+// WorkUnitIDIn applies the In predicate on the "work_unit_id" field.
+func WorkUnitIDIn(vs ...uuid.UUID) predicate.Person {
+	return predicate.Person(sql.FieldIn(FieldWorkUnitID, vs...))
+}
+
+// WorkUnitIDNotIn applies the NotIn predicate on the "work_unit_id" field.
+func WorkUnitIDNotIn(vs ...uuid.UUID) predicate.Person {
+	return predicate.Person(sql.FieldNotIn(FieldWorkUnitID, vs...))
+}
+
+// WorkUnitIDIsNil applies the IsNil predicate on the "work_unit_id" field.
+func WorkUnitIDIsNil() predicate.Person {
+	return predicate.Person(sql.FieldIsNull(FieldWorkUnitID))
+}
+
+// WorkUnitIDNotNil applies the NotNil predicate on the "work_unit_id" field.
+func WorkUnitIDNotNil() predicate.Person {
+	return predicate.Person(sql.FieldNotNull(FieldWorkUnitID))
+}
+
+// HasWorkUnit applies the HasEdge predicate on the "work_unit" edge.
+func HasWorkUnit() predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, WorkUnitTable, WorkUnitColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWorkUnitWith applies the HasEdge predicate on the "work_unit" edge with a given conditions (other predicates).
+func HasWorkUnitWith(preds ...predicate.WorkUnitInfo) predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := newWorkUnitStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAddresses applies the HasEdge predicate on the "addresses" edge.
+func HasAddresses() predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, AddressesTable, AddressesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAddressesWith applies the HasEdge predicate on the "addresses" edge with a given conditions (other predicates).
+func HasAddressesWith(preds ...predicate.Address) predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := newAddressesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPersonAddresses applies the HasEdge predicate on the "person_addresses" edge.
+func HasPersonAddresses() predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, PersonAddressesTable, PersonAddressesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPersonAddressesWith applies the HasEdge predicate on the "person_addresses" edge with a given conditions (other predicates).
+func HasPersonAddressesWith(preds ...predicate.PersonAddress) predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := newPersonAddressesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

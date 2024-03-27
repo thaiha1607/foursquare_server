@@ -13,14 +13,6 @@ type Conversation struct {
 	ent.Schema
 }
 
-// Indexes of the Conversation.
-func (Conversation) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("person_one_id", "person_two_id").
-			Unique(),
-	}
-}
-
 // Fields of the Conversation.
 func (Conversation) Fields() []ent.Field {
 	return []ent.Field{
@@ -50,6 +42,14 @@ func (Conversation) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
+	}
+}
+
+// Indexes of the Conversation.
+func (Conversation) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("person_one_id", "person_two_id").
+			Unique(),
 	}
 }
 

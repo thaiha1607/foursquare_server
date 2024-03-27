@@ -30,15 +30,6 @@ func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
 	return nil
 }
 
-func initializeInvoiceLineItemHandler(e *echo.Echo, db *ent.Client) error {
-	wire.Build(
-		http.NewInvoiceLineItemHandler,
-		services.NewInvoiceLineItemService,
-		repositories.NewEntInvoiceLineItemRepository,
-	)
-	return nil
-}
-
 func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
 		http.NewProductImageHandler,
@@ -48,11 +39,11 @@ func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	return nil
 }
 
-func initializeOrderLineItemHandler(e *echo.Echo, db *ent.Client) error {
+func initializeOrderItemHandler(e *echo.Echo, db *ent.Client) error {
 	wire.Build(
-		http.NewOrderLineItemHandler,
-		services.NewOrderLineItemService,
-		repositories.NewEntOrderLineItemRepository,
+		http.NewOrderItemHandler,
+		services.NewOrderItemService,
+		repositories.NewEntOrderItemRepository,
 	)
 	return nil
 }
@@ -62,15 +53,6 @@ func initializePersonHandler(e *echo.Echo, db *ent.Client) error {
 		http.NewPersonHandler,
 		services.NewPersonService,
 		repositories.NewEntPersonRepository,
-	)
-	return nil
-}
-
-func initializeFinancialTransactionHandler(e *echo.Echo, db *ent.Client) error {
-	wire.Build(
-		http.NewFinancialTransactionHandler,
-		services.NewFinancialTransactionService,
-		repositories.NewEntFinancialTransactionRepository,
 	)
 	return nil
 }
@@ -116,15 +98,6 @@ func initializeConversationHandler(e *echo.Echo, db *ent.Client) error {
 		http.NewConversationHandler,
 		services.NewConversationService,
 		repositories.NewEntConversationRepository,
-	)
-	return nil
-}
-
-func initializeProductHandler(e *echo.Echo, db *ent.Client) error {
-	wire.Build(
-		http.NewProductHandler,
-		services.NewProductService,
-		repositories.NewEntProductRepository,
 	)
 	return nil
 }

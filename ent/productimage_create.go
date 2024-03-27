@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/product"
 	"github.com/thaiha1607/foursquare_server/ent/productimage"
+	"github.com/thaiha1607/foursquare_server/ent/productinfo"
 )
 
 // ProductImageCreate is the builder for creating a ProductImage entity.
@@ -76,8 +76,8 @@ func (pic *ProductImageCreate) SetNillableID(u *uuid.UUID) *ProductImageCreate {
 	return pic
 }
 
-// SetProduct sets the "product" edge to the Product entity.
-func (pic *ProductImageCreate) SetProduct(p *Product) *ProductImageCreate {
+// SetProduct sets the "product" edge to the ProductInfo entity.
+func (pic *ProductImageCreate) SetProduct(p *ProductInfo) *ProductImageCreate {
 	return pic.SetProductID(p.ID)
 }
 
@@ -207,7 +207,7 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 			Columns: []string{productimage.ProductColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(productinfo.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

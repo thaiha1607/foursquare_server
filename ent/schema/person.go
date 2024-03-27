@@ -1,10 +1,14 @@
 package schema
 
 import (
+	"errors"
 	"net/mail"
 	"net/url"
+	"regexp"
+	"strings"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -32,19 +36,30 @@ func (Person) Fields() []ent.Field {
 					return err
 				},
 			).
-			Optional().
-			Nillable().
+			NotEmpty().
 			Unique(),
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.String("name").
 			NotEmpty(),
 		field.String("phone").
-			NotEmpty().
+			Optional().
+			Nillable().
+			Validate(
+				func(s string) error {
+					e164Regex := `^\+[1-9]\d{1,14}$`
+					re := regexp.MustCompile(e164Regex)
+					s = strings.ReplaceAll(s, " ", "")
+					if re.Find([]byte(s)) == nil {
+						return errors.New("invalid phone number. Phone number must be in E.164 format")
+					}
+					return nil
+				},
+			).
 			Unique(),
 		field.Enum("role").
 			NamedValues(
-				"Admin", "ADMIN",
+				"Salesperson", "SALESPERSON",
 				"Customer", "CUSTOMER",
 				"Warehouse", "WAREHOUSE",
 				"Delivery", "DELIVERY",
@@ -59,12 +74,21 @@ func (Person) Fields() []ent.Field {
 			Default(false),
 		field.Bool("is_phone_verified").
 			Default(false),
+		field.UUID("work_unit_id", uuid.UUID{}).
+			Optional().
+			Nillable(),
 	}
 }
 
 // Edges of the Person.
 func (Person) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("work_unit", WorkUnitInfo.Type).
+			Field("work_unit_id").
+			Unique(),
+		edge.To("addresses", Address.Type).
+			Through("person_addresses", PersonAddress.Type),
+	}
 }
 
 // Mixin of the Person.

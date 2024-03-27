@@ -9,6 +9,25 @@ import (
 )
 
 var (
+	// AddressesColumns holds the columns for the "addresses" table.
+	AddressesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "line1", Type: field.TypeString},
+		{Name: "line2", Type: field.TypeString, Nullable: true},
+		{Name: "city", Type: field.TypeString},
+		{Name: "state_or_province", Type: field.TypeString, Nullable: true},
+		{Name: "zip_or_postcode", Type: field.TypeString},
+		{Name: "country", Type: field.TypeString},
+		{Name: "other_address_details", Type: field.TypeString, Nullable: true},
+	}
+	// AddressesTable holds the schema information for the "addresses" table.
+	AddressesTable = &schema.Table{
+		Name:       "addresses",
+		Columns:    AddressesColumns,
+		PrimaryKey: []*schema.Column{AddressesColumns[0]},
+	}
 	// ConversationsColumns holds the columns for the "conversations" table.
 	ConversationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -45,27 +64,32 @@ var (
 			},
 		},
 	}
-	// FinancialTransactionsColumns holds the columns for the "financial_transactions" table.
-	FinancialTransactionsColumns = []*schema.Column{
+	// DeliveryAssignmentsColumns holds the columns for the "delivery_assignments" table.
+	DeliveryAssignmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "amount", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "comment", Type: field.TypeString, Nullable: true},
-		{Name: "is_internal", Type: field.TypeBool, Default: false},
-		{Name: "payment_method", Type: field.TypeEnum, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
-		{Name: "invoice_id", Type: field.TypeUUID},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING", "ACCEPTED", "REJECTED"}, Default: "PENDING"},
+		{Name: "note", Type: field.TypeString, Nullable: true},
+		{Name: "shipment_id", Type: field.TypeUUID},
+		{Name: "staff_id", Type: field.TypeUUID},
 	}
-	// FinancialTransactionsTable holds the schema information for the "financial_transactions" table.
-	FinancialTransactionsTable = &schema.Table{
-		Name:       "financial_transactions",
-		Columns:    FinancialTransactionsColumns,
-		PrimaryKey: []*schema.Column{FinancialTransactionsColumns[0]},
+	// DeliveryAssignmentsTable holds the schema information for the "delivery_assignments" table.
+	DeliveryAssignmentsTable = &schema.Table{
+		Name:       "delivery_assignments",
+		Columns:    DeliveryAssignmentsColumns,
+		PrimaryKey: []*schema.Column{DeliveryAssignmentsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "financial_transactions_invoices_invoice",
-				Columns:    []*schema.Column{FinancialTransactionsColumns[7]},
-				RefColumns: []*schema.Column{InvoicesColumns[0]},
+				Symbol:     "delivery_assignments_shipments_shipment",
+				Columns:    []*schema.Column{DeliveryAssignmentsColumns[5]},
+				RefColumns: []*schema.Column{ShipmentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "delivery_assignments_persons_staff",
+				Columns:    []*schema.Column{DeliveryAssignmentsColumns[6]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -76,10 +100,10 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "comment", Type: field.TypeString, Nullable: true},
 		{Name: "note", Type: field.TypeString, Nullable: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"PRO_FORMA", "REGULAR", "PAST_DUE", "INTERIM", "TIMESHEET", "FINAL", "CREDIT", "DEBIT", "MIXED", "COMMERCIAL", "RECURRING", "OTHER"}, Default: "PRO_FORMA"},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DRAFT", "ACTIVE", "SENT", "DISPUTED", "OVERDUE", "PARTIAL", "PAID", "VOID", "DEBT", "OTHER"}, Default: "DRAFT"},
+		{Name: "payment_method", Type: field.TypeEnum, Nullable: true, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
 		{Name: "order_id", Type: field.TypeUUID},
 	}
 	// InvoicesTable holds the schema information for the "invoices" table.
@@ -93,42 +117,6 @@ var (
 				Columns:    []*schema.Column{InvoicesColumns[8]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// InvoiceLineItemsColumns holds the columns for the "invoice_line_items" table.
-	InvoiceLineItemsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
-		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "invoice_id", Type: field.TypeUUID},
-		{Name: "order_line_item_id", Type: field.TypeUUID},
-	}
-	// InvoiceLineItemsTable holds the schema information for the "invoice_line_items" table.
-	InvoiceLineItemsTable = &schema.Table{
-		Name:       "invoice_line_items",
-		Columns:    InvoiceLineItemsColumns,
-		PrimaryKey: []*schema.Column{InvoiceLineItemsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "invoice_line_items_invoices_invoice",
-				Columns:    []*schema.Column{InvoiceLineItemsColumns[4]},
-				RefColumns: []*schema.Column{InvoicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "invoice_line_items_order_line_items_order_line_item",
-				Columns:    []*schema.Column{InvoiceLineItemsColumns[5]},
-				RefColumns: []*schema.Column{OrderLineItemsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "invoicelineitem_invoice_id_order_line_item_id",
-				Unique:  true,
-				Columns: []*schema.Column{InvoiceLineItemsColumns[4], InvoiceLineItemsColumns[5]},
 			},
 		},
 	}
@@ -170,15 +158,15 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "note", Type: field.TypeString, Nullable: true},
 		{Name: "priority", Type: field.TypeInt, Default: 0},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"SALE", "RETURN", "EXCHANGE", "TRANSFER", "INTERNAL", "OTHER"}, Default: "SALE"},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SALE", "RETURN", "EXCHANGE", "TRANSFER", "OTHER"}, Default: "SALE"},
 		{Name: "internal_note", Type: field.TypeString, Nullable: true},
+		{Name: "is_internal", Type: field.TypeBool, Default: false},
 		{Name: "customer_id", Type: field.TypeUUID},
 		{Name: "created_by", Type: field.TypeUUID},
 		{Name: "parent_order_id", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "status_code", Type: field.TypeInt, Default: 1},
-		{Name: "management_staff_id", Type: field.TypeUUID},
-		{Name: "warehouse_staff_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "delivery_staff_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "staff_id", Type: field.TypeUUID},
+		{Name: "address_id", Type: field.TypeString},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
 	OrdersTable = &schema.Table{
@@ -188,81 +176,98 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "orders_persons_customer",
-				Columns:    []*schema.Column{OrdersColumns[7]},
-				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "orders_persons_creator",
 				Columns:    []*schema.Column{OrdersColumns[8]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_orders_parent_order",
+				Symbol:     "orders_persons_creator",
 				Columns:    []*schema.Column{OrdersColumns[9]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "orders_orders_parent_order",
+				Columns:    []*schema.Column{OrdersColumns[10]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "orders_order_status_codes_order_status",
-				Columns:    []*schema.Column{OrdersColumns[10]},
+				Columns:    []*schema.Column{OrdersColumns[11]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_persons_management_staff",
-				Columns:    []*schema.Column{OrdersColumns[11]},
+				Symbol:     "orders_persons_staff",
+				Columns:    []*schema.Column{OrdersColumns[12]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "orders_persons_warehouse_staff",
-				Columns:    []*schema.Column{OrdersColumns[12]},
-				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "orders_persons_delivery_staff",
+				Symbol:     "orders_addresses_order_address",
 				Columns:    []*schema.Column{OrdersColumns[13]},
-				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.SetNull,
+				RefColumns: []*schema.Column{AddressesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// OrderLineItemsColumns holds the columns for the "order_line_items" table.
-	OrderLineItemsColumns = []*schema.Column{
+	// OrderItemsColumns holds the columns for the "order_items" table.
+	OrderItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "price_per_unit", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELIVERED", "OUT_OF_STOCK", "IN_TRANSIT", "IN_STOCK"}, Default: "IN_STOCK"},
 		{Name: "order_id", Type: field.TypeUUID},
 		{Name: "product_id", Type: field.TypeString},
+		{Name: "product_color_id", Type: field.TypeString},
+		{Name: "src_unit_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "dst_unit_id", Type: field.TypeUUID, Nullable: true},
 	}
-	// OrderLineItemsTable holds the schema information for the "order_line_items" table.
-	OrderLineItemsTable = &schema.Table{
-		Name:       "order_line_items",
-		Columns:    OrderLineItemsColumns,
-		PrimaryKey: []*schema.Column{OrderLineItemsColumns[0]},
+	// OrderItemsTable holds the schema information for the "order_items" table.
+	OrderItemsTable = &schema.Table{
+		Name:       "order_items",
+		Columns:    OrderItemsColumns,
+		PrimaryKey: []*schema.Column{OrderItemsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "order_line_items_orders_order",
-				Columns:    []*schema.Column{OrderLineItemsColumns[4]},
+				Symbol:     "order_items_orders_order",
+				Columns:    []*schema.Column{OrderItemsColumns[6]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "order_line_items_products_product",
-				Columns:    []*schema.Column{OrderLineItemsColumns[5]},
-				RefColumns: []*schema.Column{ProductsColumns[0]},
+				Symbol:     "order_items_product_info_product",
+				Columns:    []*schema.Column{OrderItemsColumns[7]},
+				RefColumns: []*schema.Column{ProductInfoColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "order_items_product_color_product_color",
+				Columns:    []*schema.Column{OrderItemsColumns[8]},
+				RefColumns: []*schema.Column{ProductColorColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "order_items_work_unit_info_source_work_unit",
+				Columns:    []*schema.Column{OrderItemsColumns[9]},
+				RefColumns: []*schema.Column{WorkUnitInfoColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "order_items_work_unit_info_destination_work_unit",
+				Columns:    []*schema.Column{OrderItemsColumns[10]},
+				RefColumns: []*schema.Column{WorkUnitInfoColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "orderlineitem_order_id_product_id",
+				Name:    "orderitem_order_id_product_id_product_color_id",
 				Unique:  true,
-				Columns: []*schema.Column{OrderLineItemsColumns[4], OrderLineItemsColumns[5]},
+				Columns: []*schema.Column{OrderItemsColumns[6], OrderItemsColumns[7], OrderItemsColumns[8]},
 			},
 		},
 	}
@@ -285,38 +290,69 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
-		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeString, Unique: true},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"ADMIN", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
+		{Name: "phone", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"SALESPERSON", "CUSTOMER", "WAREHOUSE", "DELIVERY", "MANAGEMENT"}, Default: "CUSTOMER"},
 		{Name: "password_hash", Type: field.TypeBytes, Nullable: true},
 		{Name: "is_email_verified", Type: field.TypeBool, Default: false},
 		{Name: "is_phone_verified", Type: field.TypeBool, Default: false},
+		{Name: "work_unit_id", Type: field.TypeUUID, Nullable: true},
 	}
 	// PersonsTable holds the schema information for the "persons" table.
 	PersonsTable = &schema.Table{
 		Name:       "persons",
 		Columns:    PersonsColumns,
 		PrimaryKey: []*schema.Column{PersonsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "persons_work_unit_info_work_unit",
+				Columns:    []*schema.Column{PersonsColumns[11]},
+				RefColumns: []*schema.Column{WorkUnitInfoColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
-	// ProductsColumns holds the columns for the "products" table.
-	ProductsColumns = []*schema.Column{
+	// PersonAddressesColumns holds the columns for the "person_addresses" table.
+	PersonAddressesColumns = []*schema.Column{
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "person_id", Type: field.TypeUUID},
+		{Name: "address_id", Type: field.TypeString},
+	}
+	// PersonAddressesTable holds the schema information for the "person_addresses" table.
+	PersonAddressesTable = &schema.Table{
+		Name:       "person_addresses",
+		Columns:    PersonAddressesColumns,
+		PrimaryKey: []*schema.Column{PersonAddressesColumns[2], PersonAddressesColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "person_addresses_persons_persons",
+				Columns:    []*schema.Column{PersonAddressesColumns[2]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "person_addresses_addresses_addresses",
+				Columns:    []*schema.Column{PersonAddressesColumns[3]},
+				RefColumns: []*schema.Column{AddressesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ProductColorColumns holds the columns for the "product_color" table.
+	ProductColorColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "year", Type: field.TypeInt, Nullable: true},
-		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "colors", Type: field.TypeJSON, Nullable: true},
-		{Name: "provider", Type: field.TypeString, Nullable: true},
+		{Name: "color_code", Type: field.TypeString},
 	}
-	// ProductsTable holds the schema information for the "products" table.
-	ProductsTable = &schema.Table{
-		Name:       "products",
-		Columns:    ProductsColumns,
-		PrimaryKey: []*schema.Column{ProductsColumns[0]},
+	// ProductColorTable holds the schema information for the "product_color" table.
+	ProductColorTable = &schema.Table{
+		Name:       "product_color",
+		Columns:    ProductColorColumns,
+		PrimaryKey: []*schema.Column{ProductColorColumns[0]},
 	}
 	// ProductImagesColumns holds the columns for the "product_images" table.
 	ProductImagesColumns = []*schema.Column{
@@ -333,10 +369,70 @@ var (
 		PrimaryKey: []*schema.Column{ProductImagesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "product_images_products_product",
+				Symbol:     "product_images_product_info_product",
 				Columns:    []*schema.Column{ProductImagesColumns[4]},
-				RefColumns: []*schema.Column{ProductsColumns[0]},
+				RefColumns: []*schema.Column{ProductInfoColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ProductInfoColumns holds the columns for the "product_info" table.
+	ProductInfoColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "year", Type: field.TypeInt, Nullable: true},
+		{Name: "provider", Type: field.TypeString, Nullable: true},
+	}
+	// ProductInfoTable holds the schema information for the "product_info" table.
+	ProductInfoTable = &schema.Table{
+		Name:       "product_info",
+		Columns:    ProductInfoColumns,
+		PrimaryKey: []*schema.Column{ProductInfoColumns[0]},
+	}
+	// ProductQtyColumns holds the columns for the "product_qty" table.
+	ProductQtyColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "price_per_unit", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "work_unit_id", Type: field.TypeUUID},
+		{Name: "product_id", Type: field.TypeString},
+		{Name: "product_color_id", Type: field.TypeString},
+	}
+	// ProductQtyTable holds the schema information for the "product_qty" table.
+	ProductQtyTable = &schema.Table{
+		Name:       "product_qty",
+		Columns:    ProductQtyColumns,
+		PrimaryKey: []*schema.Column{ProductQtyColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "product_qty_work_unit_info_work_unit",
+				Columns:    []*schema.Column{ProductQtyColumns[5]},
+				RefColumns: []*schema.Column{WorkUnitInfoColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "product_qty_product_info_product",
+				Columns:    []*schema.Column{ProductQtyColumns[6]},
+				RefColumns: []*schema.Column{ProductInfoColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "product_qty_product_color_product_color",
+				Columns:    []*schema.Column{ProductQtyColumns[7]},
+				RefColumns: []*schema.Column{ProductColorColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "productqty_work_unit_id_product_id_product_color_id",
+				Unique:  true,
+				Columns: []*schema.Column{ProductQtyColumns[5], ProductQtyColumns[6], ProductQtyColumns[7]},
 			},
 		},
 	}
@@ -352,9 +448,9 @@ var (
 		PrimaryKey: []*schema.Column{ProductTagsColumns[0], ProductTagsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "product_tags_products_products",
+				Symbol:     "product_tags_product_info_products",
 				Columns:    []*schema.Column{ProductTagsColumns[0]},
-				RefColumns: []*schema.Column{ProductsColumns[0]},
+				RefColumns: []*schema.Column{ProductInfoColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
@@ -362,6 +458,74 @@ var (
 				Columns:    []*schema.Column{ProductTagsColumns[1]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ShipmentsColumns holds the columns for the "shipments" table.
+	ShipmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "shipment_tracking_number", Type: field.TypeString, Size: 26},
+		{Name: "shipment_date", Type: field.TypeTime},
+		{Name: "note", Type: field.TypeString, Nullable: true},
+		{Name: "order_id", Type: field.TypeUUID},
+		{Name: "invoice_id", Type: field.TypeUUID},
+	}
+	// ShipmentsTable holds the schema information for the "shipments" table.
+	ShipmentsTable = &schema.Table{
+		Name:       "shipments",
+		Columns:    ShipmentsColumns,
+		PrimaryKey: []*schema.Column{ShipmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "shipments_orders_order",
+				Columns:    []*schema.Column{ShipmentsColumns[6]},
+				RefColumns: []*schema.Column{OrdersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "shipments_invoices_invoice",
+				Columns:    []*schema.Column{ShipmentsColumns[7]},
+				RefColumns: []*schema.Column{InvoicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// InvoiceLineItemsColumns holds the columns for the "invoice_line_items" table.
+	InvoiceLineItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
+		{Name: "shipment_id", Type: field.TypeUUID},
+		{Name: "order_item_id", Type: field.TypeUUID},
+	}
+	// InvoiceLineItemsTable holds the schema information for the "invoice_line_items" table.
+	InvoiceLineItemsTable = &schema.Table{
+		Name:       "invoice_line_items",
+		Columns:    InvoiceLineItemsColumns,
+		PrimaryKey: []*schema.Column{InvoiceLineItemsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invoice_line_items_shipments_shipment",
+				Columns:    []*schema.Column{InvoiceLineItemsColumns[5]},
+				RefColumns: []*schema.Column{ShipmentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "invoice_line_items_order_items_order_item",
+				Columns:    []*schema.Column{InvoiceLineItemsColumns[6]},
+				RefColumns: []*schema.Column{OrderItemsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "shipmentitem_shipment_id_order_item_id",
+				Unique:  true,
+				Columns: []*schema.Column{InvoiceLineItemsColumns[5], InvoiceLineItemsColumns[6]},
 			},
 		},
 	}
@@ -378,37 +542,98 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// WarehouseAssignmentsColumns holds the columns for the "warehouse_assignments" table.
+	WarehouseAssignmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING", "ACCEPTED", "REJECTED"}, Default: "PENDING"},
+		{Name: "note", Type: field.TypeString, Nullable: true},
+		{Name: "order_id", Type: field.TypeUUID},
+		{Name: "work_unit_id", Type: field.TypeUUID},
+		{Name: "staff_id", Type: field.TypeUUID, Nullable: true},
+	}
+	// WarehouseAssignmentsTable holds the schema information for the "warehouse_assignments" table.
+	WarehouseAssignmentsTable = &schema.Table{
+		Name:       "warehouse_assignments",
+		Columns:    WarehouseAssignmentsColumns,
+		PrimaryKey: []*schema.Column{WarehouseAssignmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "warehouse_assignments_orders_order",
+				Columns:    []*schema.Column{WarehouseAssignmentsColumns[5]},
+				RefColumns: []*schema.Column{OrdersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "warehouse_assignments_work_unit_info_work_unit",
+				Columns:    []*schema.Column{WarehouseAssignmentsColumns[6]},
+				RefColumns: []*schema.Column{WorkUnitInfoColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "warehouse_assignments_persons_staff",
+				Columns:    []*schema.Column{WarehouseAssignmentsColumns[7]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// WorkUnitInfoColumns holds the columns for the "work_unit_info" table.
+	WorkUnitInfoColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"WAREHOUSE", "OFFICE", "DELIVERY"}, Default: "WAREHOUSE"},
+		{Name: "address_id", Type: field.TypeString, Nullable: true},
+	}
+	// WorkUnitInfoTable holds the schema information for the "work_unit_info" table.
+	WorkUnitInfoTable = &schema.Table{
+		Name:       "work_unit_info",
+		Columns:    WorkUnitInfoColumns,
+		PrimaryKey: []*schema.Column{WorkUnitInfoColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "work_unit_info_addresses_address",
+				Columns:    []*schema.Column{WorkUnitInfoColumns[3]},
+				RefColumns: []*schema.Column{AddressesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AddressesTable,
 		ConversationsTable,
-		FinancialTransactionsTable,
+		DeliveryAssignmentsTable,
 		InvoicesTable,
-		InvoiceLineItemsTable,
 		MessagesTable,
 		OrdersTable,
-		OrderLineItemsTable,
+		OrderItemsTable,
 		OrderStatusCodesTable,
 		PersonsTable,
-		ProductsTable,
+		PersonAddressesTable,
+		ProductColorTable,
 		ProductImagesTable,
+		ProductInfoTable,
+		ProductQtyTable,
 		ProductTagsTable,
+		ShipmentsTable,
+		InvoiceLineItemsTable,
 		TagsTable,
+		WarehouseAssignmentsTable,
+		WorkUnitInfoTable,
 	}
 )
 
 func init() {
 	ConversationsTable.ForeignKeys[0].RefTable = PersonsTable
 	ConversationsTable.ForeignKeys[1].RefTable = PersonsTable
-	FinancialTransactionsTable.ForeignKeys[0].RefTable = InvoicesTable
-	FinancialTransactionsTable.Annotation = &entsql.Annotation{
-		Table: "financial_transactions",
+	DeliveryAssignmentsTable.ForeignKeys[0].RefTable = ShipmentsTable
+	DeliveryAssignmentsTable.ForeignKeys[1].RefTable = PersonsTable
+	DeliveryAssignmentsTable.Annotation = &entsql.Annotation{
+		Table: "delivery_assignments",
 	}
 	InvoicesTable.ForeignKeys[0].RefTable = OrdersTable
-	InvoiceLineItemsTable.ForeignKeys[0].RefTable = InvoicesTable
-	InvoiceLineItemsTable.ForeignKeys[1].RefTable = OrderLineItemsTable
-	InvoiceLineItemsTable.Annotation = &entsql.Annotation{
-		Table: "invoice_line_items",
-	}
 	MessagesTable.ForeignKeys[0].RefTable = ConversationsTable
 	MessagesTable.ForeignKeys[1].RefTable = PersonsTable
 	OrdersTable.ForeignKeys[0].RefTable = PersonsTable
@@ -416,23 +641,60 @@ func init() {
 	OrdersTable.ForeignKeys[2].RefTable = OrdersTable
 	OrdersTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
 	OrdersTable.ForeignKeys[4].RefTable = PersonsTable
-	OrdersTable.ForeignKeys[5].RefTable = PersonsTable
-	OrdersTable.ForeignKeys[6].RefTable = PersonsTable
-	OrderLineItemsTable.ForeignKeys[0].RefTable = OrdersTable
-	OrderLineItemsTable.ForeignKeys[1].RefTable = ProductsTable
-	OrderLineItemsTable.Annotation = &entsql.Annotation{
-		Table: "order_line_items",
+	OrdersTable.ForeignKeys[5].RefTable = AddressesTable
+	OrderItemsTable.ForeignKeys[0].RefTable = OrdersTable
+	OrderItemsTable.ForeignKeys[1].RefTable = ProductInfoTable
+	OrderItemsTable.ForeignKeys[2].RefTable = ProductColorTable
+	OrderItemsTable.ForeignKeys[3].RefTable = WorkUnitInfoTable
+	OrderItemsTable.ForeignKeys[4].RefTable = WorkUnitInfoTable
+	OrderItemsTable.Annotation = &entsql.Annotation{
+		Table: "order_items",
 	}
 	OrderStatusCodesTable.Annotation = &entsql.Annotation{
 		Table: "order_status_codes",
 	}
-	ProductImagesTable.ForeignKeys[0].RefTable = ProductsTable
+	PersonsTable.ForeignKeys[0].RefTable = WorkUnitInfoTable
+	PersonAddressesTable.ForeignKeys[0].RefTable = PersonsTable
+	PersonAddressesTable.ForeignKeys[1].RefTable = AddressesTable
+	PersonAddressesTable.Annotation = &entsql.Annotation{
+		Table: "person_addresses",
+	}
+	ProductColorTable.Annotation = &entsql.Annotation{
+		Table: "product_color",
+	}
+	ProductImagesTable.ForeignKeys[0].RefTable = ProductInfoTable
 	ProductImagesTable.Annotation = &entsql.Annotation{
 		Table: "product_images",
 	}
-	ProductTagsTable.ForeignKeys[0].RefTable = ProductsTable
+	ProductInfoTable.Annotation = &entsql.Annotation{
+		Table: "product_info",
+	}
+	ProductQtyTable.ForeignKeys[0].RefTable = WorkUnitInfoTable
+	ProductQtyTable.ForeignKeys[1].RefTable = ProductInfoTable
+	ProductQtyTable.ForeignKeys[2].RefTable = ProductColorTable
+	ProductQtyTable.Annotation = &entsql.Annotation{
+		Table: "product_qty",
+	}
+	ProductTagsTable.ForeignKeys[0].RefTable = ProductInfoTable
 	ProductTagsTable.ForeignKeys[1].RefTable = TagsTable
 	ProductTagsTable.Annotation = &entsql.Annotation{
 		Table: "product_tags",
+	}
+	ShipmentsTable.ForeignKeys[0].RefTable = OrdersTable
+	ShipmentsTable.ForeignKeys[1].RefTable = InvoicesTable
+	InvoiceLineItemsTable.ForeignKeys[0].RefTable = ShipmentsTable
+	InvoiceLineItemsTable.ForeignKeys[1].RefTable = OrderItemsTable
+	InvoiceLineItemsTable.Annotation = &entsql.Annotation{
+		Table: "invoice_line_items",
+	}
+	WarehouseAssignmentsTable.ForeignKeys[0].RefTable = OrdersTable
+	WarehouseAssignmentsTable.ForeignKeys[1].RefTable = WorkUnitInfoTable
+	WarehouseAssignmentsTable.ForeignKeys[2].RefTable = PersonsTable
+	WarehouseAssignmentsTable.Annotation = &entsql.Annotation{
+		Table: "warehouse_assignments",
+	}
+	WorkUnitInfoTable.ForeignKeys[0].RefTable = AddressesTable
+	WorkUnitInfoTable.Annotation = &entsql.Annotation{
+		Table: "work_unit_info",
 	}
 }

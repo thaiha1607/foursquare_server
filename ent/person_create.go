@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/person"
+	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
 )
 
 // PersonCreate is the builder for creating a Person entity.
@@ -69,14 +71,6 @@ func (pc *PersonCreate) SetEmail(s string) *PersonCreate {
 	return pc
 }
 
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (pc *PersonCreate) SetNillableEmail(s *string) *PersonCreate {
-	if s != nil {
-		pc.SetEmail(*s)
-	}
-	return pc
-}
-
 // SetName sets the "name" field.
 func (pc *PersonCreate) SetName(s string) *PersonCreate {
 	pc.mutation.SetName(s)
@@ -86,6 +80,14 @@ func (pc *PersonCreate) SetName(s string) *PersonCreate {
 // SetPhone sets the "phone" field.
 func (pc *PersonCreate) SetPhone(s string) *PersonCreate {
 	pc.mutation.SetPhone(s)
+	return pc
+}
+
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (pc *PersonCreate) SetNillablePhone(s *string) *PersonCreate {
+	if s != nil {
+		pc.SetPhone(*s)
+	}
 	return pc
 }
 
@@ -137,6 +139,20 @@ func (pc *PersonCreate) SetNillableIsPhoneVerified(b *bool) *PersonCreate {
 	return pc
 }
 
+// SetWorkUnitID sets the "work_unit_id" field.
+func (pc *PersonCreate) SetWorkUnitID(u uuid.UUID) *PersonCreate {
+	pc.mutation.SetWorkUnitID(u)
+	return pc
+}
+
+// SetNillableWorkUnitID sets the "work_unit_id" field if the given value is not nil.
+func (pc *PersonCreate) SetNillableWorkUnitID(u *uuid.UUID) *PersonCreate {
+	if u != nil {
+		pc.SetWorkUnitID(*u)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PersonCreate) SetID(u uuid.UUID) *PersonCreate {
 	pc.mutation.SetID(u)
@@ -149,6 +165,26 @@ func (pc *PersonCreate) SetNillableID(u *uuid.UUID) *PersonCreate {
 		pc.SetID(*u)
 	}
 	return pc
+}
+
+// SetWorkUnit sets the "work_unit" edge to the WorkUnitInfo entity.
+func (pc *PersonCreate) SetWorkUnit(w *WorkUnitInfo) *PersonCreate {
+	return pc.SetWorkUnitID(w.ID)
+}
+
+// AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
+func (pc *PersonCreate) AddAddressIDs(ids ...string) *PersonCreate {
+	pc.mutation.AddAddressIDs(ids...)
+	return pc
+}
+
+// AddAddresses adds the "addresses" edges to the Address entity.
+func (pc *PersonCreate) AddAddresses(a ...*Address) *PersonCreate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pc.AddAddressIDs(ids...)
 }
 
 // Mutation returns the PersonMutation object of the builder.
@@ -225,6 +261,9 @@ func (pc *PersonCreate) check() error {
 			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "Person.avatar_url": %w`, err)}
 		}
 	}
+	if _, ok := pc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Person.email"`)}
+	}
 	if v, ok := pc.mutation.Email(); ok {
 		if err := person.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Person.email": %w`, err)}
@@ -237,9 +276,6 @@ func (pc *PersonCreate) check() error {
 		if err := person.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Person.name": %w`, err)}
 		}
-	}
-	if _, ok := pc.mutation.Phone(); !ok {
-		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Person.phone"`)}
 	}
 	if v, ok := pc.mutation.Phone(); ok {
 		if err := person.PhoneValidator(v); err != nil {
@@ -314,7 +350,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Email(); ok {
 		_spec.SetField(person.FieldEmail, field.TypeString, value)
-		_node.Email = &value
+		_node.Email = value
 	}
 	if value, ok := pc.mutation.Name(); ok {
 		_spec.SetField(person.FieldName, field.TypeString, value)
@@ -322,7 +358,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
-		_node.Phone = value
+		_node.Phone = &value
 	}
 	if value, ok := pc.mutation.Role(); ok {
 		_spec.SetField(person.FieldRole, field.TypeEnum, value)
@@ -339,6 +375,43 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.IsPhoneVerified(); ok {
 		_spec.SetField(person.FieldIsPhoneVerified, field.TypeBool, value)
 		_node.IsPhoneVerified = value
+	}
+	if nodes := pc.mutation.WorkUnitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   person.WorkUnitTable,
+			Columns: []string{person.WorkUnitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workunitinfo.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.WorkUnitID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   person.AddressesTable,
+			Columns: person.AddressesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PersonAddressCreate{config: pc.config, mutation: newPersonAddressMutation(pc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

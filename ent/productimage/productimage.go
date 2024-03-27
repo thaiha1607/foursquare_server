@@ -29,9 +29,9 @@ const (
 	Table = "product_images"
 	// ProductTable is the table that holds the product relation/edge.
 	ProductTable = "product_images"
-	// ProductInverseTable is the table name for the Product entity.
-	// It exists in this package in order to avoid circular dependency with the "product" package.
-	ProductInverseTable = "products"
+	// ProductInverseTable is the table name for the ProductInfo entity.
+	// It exists in this package in order to avoid circular dependency with the "productinfo" package.
+	ProductInverseTable = "product_info"
 	// ProductColumn is the table column denoting the product relation/edge.
 	ProductColumn = "product_id"
 )
