@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -20,12 +21,16 @@ type ShipmentHistory struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ShipmentID holds the value of the "shipment_id" field.
 	ShipmentID string `json:"shipment_id,omitempty"`
 	// PersonID holds the value of the "person_id" field.
 	PersonID uuid.UUID `json:"person_id,omitempty"`
-	// PrevStatusCode holds the value of the "prev_status_code" field.
-	PrevStatusCode *int `json:"prev_status_code,omitempty"`
+	// OldStatusCode holds the value of the "old_status_code" field.
+	OldStatusCode *int `json:"old_status_code,omitempty"`
 	// NewStatusCode holds the value of the "new_status_code" field.
 	NewStatusCode *int `json:"new_status_code,omitempty"`
 	// Description holds the value of the "description" field.
@@ -42,8 +47,8 @@ type ShipmentHistoryEdges struct {
 	Shipment *Shipment `json:"shipment,omitempty"`
 	// Person holds the value of the person edge.
 	Person *Person `json:"person,omitempty"`
-	// PrevStatus holds the value of the prev_status edge.
-	PrevStatus *OrderStatusCode `json:"prev_status,omitempty"`
+	// OldStatus holds the value of the old_status edge.
+	OldStatus *OrderStatusCode `json:"old_status,omitempty"`
 	// NewStatus holds the value of the new_status edge.
 	NewStatus *OrderStatusCode `json:"new_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -73,15 +78,15 @@ func (e ShipmentHistoryEdges) PersonOrErr() (*Person, error) {
 	return nil, &NotLoadedError{edge: "person"}
 }
 
-// PrevStatusOrErr returns the PrevStatus value or an error if the edge
+// OldStatusOrErr returns the OldStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ShipmentHistoryEdges) PrevStatusOrErr() (*OrderStatusCode, error) {
-	if e.PrevStatus != nil {
-		return e.PrevStatus, nil
+func (e ShipmentHistoryEdges) OldStatusOrErr() (*OrderStatusCode, error) {
+	if e.OldStatus != nil {
+		return e.OldStatus, nil
 	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: orderstatuscode.Label}
 	}
-	return nil, &NotLoadedError{edge: "prev_status"}
+	return nil, &NotLoadedError{edge: "old_status"}
 }
 
 // NewStatusOrErr returns the NewStatus value or an error if the edge
@@ -100,10 +105,12 @@ func (*ShipmentHistory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case shipmenthistory.FieldPrevStatusCode, shipmenthistory.FieldNewStatusCode:
+		case shipmenthistory.FieldOldStatusCode, shipmenthistory.FieldNewStatusCode:
 			values[i] = new(sql.NullInt64)
 		case shipmenthistory.FieldShipmentID, shipmenthistory.FieldDescription:
 			values[i] = new(sql.NullString)
+		case shipmenthistory.FieldCreatedAt, shipmenthistory.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case shipmenthistory.FieldID, shipmenthistory.FieldPersonID:
 			values[i] = new(uuid.UUID)
 		default:
@@ -127,6 +134,18 @@ func (sh *ShipmentHistory) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				sh.ID = *value
 			}
+		case shipmenthistory.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				sh.CreatedAt = value.Time
+			}
+		case shipmenthistory.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				sh.UpdatedAt = value.Time
+			}
 		case shipmenthistory.FieldShipmentID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field shipment_id", values[i])
@@ -139,12 +158,12 @@ func (sh *ShipmentHistory) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				sh.PersonID = *value
 			}
-		case shipmenthistory.FieldPrevStatusCode:
+		case shipmenthistory.FieldOldStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field prev_status_code", values[i])
+				return fmt.Errorf("unexpected type %T for field old_status_code", values[i])
 			} else if value.Valid {
-				sh.PrevStatusCode = new(int)
-				*sh.PrevStatusCode = int(value.Int64)
+				sh.OldStatusCode = new(int)
+				*sh.OldStatusCode = int(value.Int64)
 			}
 		case shipmenthistory.FieldNewStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -183,9 +202,9 @@ func (sh *ShipmentHistory) QueryPerson() *PersonQuery {
 	return NewShipmentHistoryClient(sh.config).QueryPerson(sh)
 }
 
-// QueryPrevStatus queries the "prev_status" edge of the ShipmentHistory entity.
-func (sh *ShipmentHistory) QueryPrevStatus() *OrderStatusCodeQuery {
-	return NewShipmentHistoryClient(sh.config).QueryPrevStatus(sh)
+// QueryOldStatus queries the "old_status" edge of the ShipmentHistory entity.
+func (sh *ShipmentHistory) QueryOldStatus() *OrderStatusCodeQuery {
+	return NewShipmentHistoryClient(sh.config).QueryOldStatus(sh)
 }
 
 // QueryNewStatus queries the "new_status" edge of the ShipmentHistory entity.
@@ -216,14 +235,20 @@ func (sh *ShipmentHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("ShipmentHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", sh.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(sh.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(sh.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("shipment_id=")
 	builder.WriteString(sh.ShipmentID)
 	builder.WriteString(", ")
 	builder.WriteString("person_id=")
 	builder.WriteString(fmt.Sprintf("%v", sh.PersonID))
 	builder.WriteString(", ")
-	if v := sh.PrevStatusCode; v != nil {
-		builder.WriteString("prev_status_code=")
+	if v := sh.OldStatusCode; v != nil {
+		builder.WriteString("old_status_code=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

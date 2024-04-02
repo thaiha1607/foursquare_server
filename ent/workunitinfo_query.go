@@ -298,12 +298,12 @@ func (wuiq *WorkUnitInfoQuery) WithAddress(opts ...func(*AddressQuery)) *WorkUni
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.WorkUnitInfo.Query().
-//		GroupBy(workunitinfo.FieldName).
+//		GroupBy(workunitinfo.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (wuiq *WorkUnitInfoQuery) GroupBy(field string, fields ...string) *WorkUnitInfoGroupBy {
@@ -321,11 +321,11 @@ func (wuiq *WorkUnitInfoQuery) GroupBy(field string, fields ...string) *WorkUnit
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.WorkUnitInfo.Query().
-//		Select(workunitinfo.FieldName).
+//		Select(workunitinfo.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (wuiq *WorkUnitInfoQuery) Select(fields ...string) *WorkUnitInfoSelect {
 	wuiq.ctx.Fields = append(wuiq.ctx.Fields, fields...)

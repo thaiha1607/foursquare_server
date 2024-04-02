@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,6 +20,34 @@ type WorkUnitInfoCreate struct {
 	config
 	mutation *WorkUnitInfoMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (wuic *WorkUnitInfoCreate) SetCreatedAt(t time.Time) *WorkUnitInfoCreate {
+	wuic.mutation.SetCreatedAt(t)
+	return wuic
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (wuic *WorkUnitInfoCreate) SetNillableCreatedAt(t *time.Time) *WorkUnitInfoCreate {
+	if t != nil {
+		wuic.SetCreatedAt(*t)
+	}
+	return wuic
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (wuic *WorkUnitInfoCreate) SetUpdatedAt(t time.Time) *WorkUnitInfoCreate {
+	wuic.mutation.SetUpdatedAt(t)
+	return wuic
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (wuic *WorkUnitInfoCreate) SetNillableUpdatedAt(t *time.Time) *WorkUnitInfoCreate {
+	if t != nil {
+		wuic.SetUpdatedAt(*t)
+	}
+	return wuic
 }
 
 // SetName sets the "name" field.
@@ -123,6 +152,14 @@ func (wuic *WorkUnitInfoCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (wuic *WorkUnitInfoCreate) defaults() {
+	if _, ok := wuic.mutation.CreatedAt(); !ok {
+		v := workunitinfo.DefaultCreatedAt()
+		wuic.mutation.SetCreatedAt(v)
+	}
+	if _, ok := wuic.mutation.UpdatedAt(); !ok {
+		v := workunitinfo.DefaultUpdatedAt()
+		wuic.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := wuic.mutation.GetType(); !ok {
 		v := workunitinfo.DefaultType
 		wuic.mutation.SetType(v)
@@ -135,6 +172,12 @@ func (wuic *WorkUnitInfoCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (wuic *WorkUnitInfoCreate) check() error {
+	if _, ok := wuic.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "WorkUnitInfo.created_at"`)}
+	}
+	if _, ok := wuic.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "WorkUnitInfo.updated_at"`)}
+	}
 	if _, ok := wuic.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "WorkUnitInfo.name"`)}
 	}
@@ -190,6 +233,14 @@ func (wuic *WorkUnitInfoCreate) createSpec() (*WorkUnitInfo, *sqlgraph.CreateSpe
 	if id, ok := wuic.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := wuic.mutation.CreatedAt(); ok {
+		_spec.SetField(workunitinfo.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := wuic.mutation.UpdatedAt(); ok {
+		_spec.SetField(workunitinfo.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if value, ok := wuic.mutation.Name(); ok {
 		_spec.SetField(workunitinfo.FieldName, field.TypeString, value)

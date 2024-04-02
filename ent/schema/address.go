@@ -19,21 +19,28 @@ func (Address) Fields() []ent.Field {
 			Default(uuid.New).
 			Immutable(),
 		field.String("line1").
-			NotEmpty(),
+			NotEmpty().
+			Immutable(),
 		field.String("line2").
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 		field.String("city").
-			NotEmpty(),
+			NotEmpty().
+			Immutable(),
 		field.String("state_or_province").
-			NotEmpty(),
+			NotEmpty().
+			Immutable(),
 		field.String("zip_or_postcode").
-			NotEmpty(),
+			NotEmpty().
+			Immutable(),
 		field.String("country").
-			NotEmpty(),
+			NotEmpty().
+			Immutable(),
 		field.String("other_address_details").
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 	}
 }
 

@@ -21,14 +21,14 @@ import (
 // InvoiceHistoryQuery is the builder for querying InvoiceHistory entities.
 type InvoiceHistoryQuery struct {
 	config
-	ctx            *QueryContext
-	order          []invoicehistory.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.InvoiceHistory
-	withInvoice    *InvoiceQuery
-	withPerson     *PersonQuery
-	withPrevStatus *OrderStatusCodeQuery
-	withNewStatus  *OrderStatusCodeQuery
+	ctx           *QueryContext
+	order         []invoicehistory.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.InvoiceHistory
+	withInvoice   *InvoiceQuery
+	withPerson    *PersonQuery
+	withOldStatus *OrderStatusCodeQuery
+	withNewStatus *OrderStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -109,8 +109,8 @@ func (ihq *InvoiceHistoryQuery) QueryPerson() *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus chains the current query on the "prev_status" edge.
-func (ihq *InvoiceHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
+// QueryOldStatus chains the current query on the "old_status" edge.
+func (ihq *InvoiceHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ihq.prepareQuery(ctx); err != nil {
@@ -123,7 +123,7 @@ func (ihq *InvoiceHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, selector),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.PrevStatusTable, invoicehistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.OldStatusTable, invoicehistory.OldStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ihq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,15 +340,15 @@ func (ihq *InvoiceHistoryQuery) Clone() *InvoiceHistoryQuery {
 		return nil
 	}
 	return &InvoiceHistoryQuery{
-		config:         ihq.config,
-		ctx:            ihq.ctx.Clone(),
-		order:          append([]invoicehistory.OrderOption{}, ihq.order...),
-		inters:         append([]Interceptor{}, ihq.inters...),
-		predicates:     append([]predicate.InvoiceHistory{}, ihq.predicates...),
-		withInvoice:    ihq.withInvoice.Clone(),
-		withPerson:     ihq.withPerson.Clone(),
-		withPrevStatus: ihq.withPrevStatus.Clone(),
-		withNewStatus:  ihq.withNewStatus.Clone(),
+		config:        ihq.config,
+		ctx:           ihq.ctx.Clone(),
+		order:         append([]invoicehistory.OrderOption{}, ihq.order...),
+		inters:        append([]Interceptor{}, ihq.inters...),
+		predicates:    append([]predicate.InvoiceHistory{}, ihq.predicates...),
+		withInvoice:   ihq.withInvoice.Clone(),
+		withPerson:    ihq.withPerson.Clone(),
+		withOldStatus: ihq.withOldStatus.Clone(),
+		withNewStatus: ihq.withNewStatus.Clone(),
 		// clone intermediate query.
 		sql:  ihq.sql.Clone(),
 		path: ihq.path,
@@ -377,14 +377,14 @@ func (ihq *InvoiceHistoryQuery) WithPerson(opts ...func(*PersonQuery)) *InvoiceH
 	return ihq
 }
 
-// WithPrevStatus tells the query-builder to eager-load the nodes that are connected to
-// the "prev_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (ihq *InvoiceHistoryQuery) WithPrevStatus(opts ...func(*OrderStatusCodeQuery)) *InvoiceHistoryQuery {
+// WithOldStatus tells the query-builder to eager-load the nodes that are connected to
+// the "old_status" edge. The optional arguments are used to configure the query builder of the edge.
+func (ihq *InvoiceHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery)) *InvoiceHistoryQuery {
 	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ihq.withPrevStatus = query
+	ihq.withOldStatus = query
 	return ihq
 }
 
@@ -480,7 +480,7 @@ func (ihq *InvoiceHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 		loadedTypes = [4]bool{
 			ihq.withInvoice != nil,
 			ihq.withPerson != nil,
-			ihq.withPrevStatus != nil,
+			ihq.withOldStatus != nil,
 			ihq.withNewStatus != nil,
 		}
 	)
@@ -514,9 +514,9 @@ func (ihq *InvoiceHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 			return nil, err
 		}
 	}
-	if query := ihq.withPrevStatus; query != nil {
-		if err := ihq.loadPrevStatus(ctx, query, nodes, nil,
-			func(n *InvoiceHistory, e *OrderStatusCode) { n.Edges.PrevStatus = e }); err != nil {
+	if query := ihq.withOldStatus; query != nil {
+		if err := ihq.loadOldStatus(ctx, query, nodes, nil,
+			func(n *InvoiceHistory, e *OrderStatusCode) { n.Edges.OldStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,14 +587,14 @@ func (ihq *InvoiceHistoryQuery) loadPerson(ctx context.Context, query *PersonQue
 	}
 	return nil
 }
-func (ihq *InvoiceHistoryQuery) loadPrevStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *OrderStatusCode)) error {
+func (ihq *InvoiceHistoryQuery) loadOldStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *OrderStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*InvoiceHistory)
 	for i := range nodes {
-		if nodes[i].PrevStatusCode == nil {
+		if nodes[i].OldStatusCode == nil {
 			continue
 		}
-		fk := *nodes[i].PrevStatusCode
+		fk := *nodes[i].OldStatusCode
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -611,7 +611,7 @@ func (ihq *InvoiceHistoryQuery) loadPrevStatus(ctx context.Context, query *Order
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "prev_status_code" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "old_status_code" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -683,8 +683,8 @@ func (ihq *InvoiceHistoryQuery) querySpec() *sqlgraph.QuerySpec {
 		if ihq.withPerson != nil {
 			_spec.Node.AddColumnOnce(invoicehistory.FieldPersonID)
 		}
-		if ihq.withPrevStatus != nil {
-			_spec.Node.AddColumnOnce(invoicehistory.FieldPrevStatusCode)
+		if ihq.withOldStatus != nil {
+			_spec.Node.AddColumnOnce(invoicehistory.FieldOldStatusCode)
 		}
 		if ihq.withNewStatus != nil {
 			_spec.Node.AddColumnOnce(invoicehistory.FieldNewStatusCode)

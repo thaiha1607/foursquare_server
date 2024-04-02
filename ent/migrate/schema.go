@@ -98,7 +98,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "invoice_id", Type: field.TypeUUID},
 		{Name: "person_id", Type: field.TypeUUID},
-		{Name: "prev_status_code", Type: field.TypeInt, Nullable: true},
+		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
 	// InvoiceHistoriesTable holds the schema information for the "invoice_histories" table.
@@ -120,7 +120,7 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "invoice_histories_order_status_codes_prev_status",
+				Symbol:     "invoice_histories_order_status_codes_old_status",
 				Columns:    []*schema.Column{InvoiceHistoriesColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -233,7 +233,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "order_id", Type: field.TypeUUID},
 		{Name: "person_id", Type: field.TypeUUID},
-		{Name: "prev_status_code", Type: field.TypeInt, Nullable: true},
+		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
 	// OrderHistoriesTable holds the schema information for the "order_histories" table.
@@ -255,7 +255,7 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "order_histories_order_status_codes_prev_status",
+				Symbol:     "order_histories_order_status_codes_old_status",
 				Columns:    []*schema.Column{OrderHistoriesColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -558,10 +558,12 @@ var (
 	// ShipmentHistoriesColumns holds the columns for the "shipment_histories" table.
 	ShipmentHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "shipment_id", Type: field.TypeString, Size: 26},
 		{Name: "person_id", Type: field.TypeUUID},
-		{Name: "prev_status_code", Type: field.TypeInt, Nullable: true},
+		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
 	// ShipmentHistoriesTable holds the schema information for the "shipment_histories" table.
@@ -572,25 +574,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "shipment_histories_shipments_shipment",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[2]},
+				Columns:    []*schema.Column{ShipmentHistoriesColumns[4]},
 				RefColumns: []*schema.Column{ShipmentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "shipment_histories_persons_person",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[3]},
+				Columns:    []*schema.Column{ShipmentHistoriesColumns[5]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "shipment_histories_order_status_codes_prev_status",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[4]},
+				Symbol:     "shipment_histories_order_status_codes_old_status",
+				Columns:    []*schema.Column{ShipmentHistoriesColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "shipment_histories_order_status_codes_new_status",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[5]},
+				Columns:    []*schema.Column{ShipmentHistoriesColumns[7]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -686,6 +688,8 @@ var (
 	// WorkUnitInfoColumns holds the columns for the "work_unit_info" table.
 	WorkUnitInfoColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"WAREHOUSE", "OFFICE", "DELIVERY"}, Default: "WAREHOUSE"},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
@@ -699,7 +703,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "work_unit_info_addresses_address",
-				Columns:    []*schema.Column{WorkUnitInfoColumns[4]},
+				Columns:    []*schema.Column{WorkUnitInfoColumns[6]},
 				RefColumns: []*schema.Column{AddressesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

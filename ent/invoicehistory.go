@@ -29,8 +29,8 @@ type InvoiceHistory struct {
 	InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
 	// PersonID holds the value of the "person_id" field.
 	PersonID uuid.UUID `json:"person_id,omitempty"`
-	// PrevStatusCode holds the value of the "prev_status_code" field.
-	PrevStatusCode *int `json:"prev_status_code,omitempty"`
+	// OldStatusCode holds the value of the "old_status_code" field.
+	OldStatusCode *int `json:"old_status_code,omitempty"`
 	// NewStatusCode holds the value of the "new_status_code" field.
 	NewStatusCode *int `json:"new_status_code,omitempty"`
 	// Description holds the value of the "description" field.
@@ -47,8 +47,8 @@ type InvoiceHistoryEdges struct {
 	Invoice *Invoice `json:"invoice,omitempty"`
 	// Person holds the value of the person edge.
 	Person *Person `json:"person,omitempty"`
-	// PrevStatus holds the value of the prev_status edge.
-	PrevStatus *OrderStatusCode `json:"prev_status,omitempty"`
+	// OldStatus holds the value of the old_status edge.
+	OldStatus *OrderStatusCode `json:"old_status,omitempty"`
 	// NewStatus holds the value of the new_status edge.
 	NewStatus *OrderStatusCode `json:"new_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -78,15 +78,15 @@ func (e InvoiceHistoryEdges) PersonOrErr() (*Person, error) {
 	return nil, &NotLoadedError{edge: "person"}
 }
 
-// PrevStatusOrErr returns the PrevStatus value or an error if the edge
+// OldStatusOrErr returns the OldStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e InvoiceHistoryEdges) PrevStatusOrErr() (*OrderStatusCode, error) {
-	if e.PrevStatus != nil {
-		return e.PrevStatus, nil
+func (e InvoiceHistoryEdges) OldStatusOrErr() (*OrderStatusCode, error) {
+	if e.OldStatus != nil {
+		return e.OldStatus, nil
 	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: orderstatuscode.Label}
 	}
-	return nil, &NotLoadedError{edge: "prev_status"}
+	return nil, &NotLoadedError{edge: "old_status"}
 }
 
 // NewStatusOrErr returns the NewStatus value or an error if the edge
@@ -105,7 +105,7 @@ func (*InvoiceHistory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case invoicehistory.FieldPrevStatusCode, invoicehistory.FieldNewStatusCode:
+		case invoicehistory.FieldOldStatusCode, invoicehistory.FieldNewStatusCode:
 			values[i] = new(sql.NullInt64)
 		case invoicehistory.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -158,12 +158,12 @@ func (ih *InvoiceHistory) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				ih.PersonID = *value
 			}
-		case invoicehistory.FieldPrevStatusCode:
+		case invoicehistory.FieldOldStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field prev_status_code", values[i])
+				return fmt.Errorf("unexpected type %T for field old_status_code", values[i])
 			} else if value.Valid {
-				ih.PrevStatusCode = new(int)
-				*ih.PrevStatusCode = int(value.Int64)
+				ih.OldStatusCode = new(int)
+				*ih.OldStatusCode = int(value.Int64)
 			}
 		case invoicehistory.FieldNewStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -202,9 +202,9 @@ func (ih *InvoiceHistory) QueryPerson() *PersonQuery {
 	return NewInvoiceHistoryClient(ih.config).QueryPerson(ih)
 }
 
-// QueryPrevStatus queries the "prev_status" edge of the InvoiceHistory entity.
-func (ih *InvoiceHistory) QueryPrevStatus() *OrderStatusCodeQuery {
-	return NewInvoiceHistoryClient(ih.config).QueryPrevStatus(ih)
+// QueryOldStatus queries the "old_status" edge of the InvoiceHistory entity.
+func (ih *InvoiceHistory) QueryOldStatus() *OrderStatusCodeQuery {
+	return NewInvoiceHistoryClient(ih.config).QueryOldStatus(ih)
 }
 
 // QueryNewStatus queries the "new_status" edge of the InvoiceHistory entity.
@@ -247,8 +247,8 @@ func (ih *InvoiceHistory) String() string {
 	builder.WriteString("person_id=")
 	builder.WriteString(fmt.Sprintf("%v", ih.PersonID))
 	builder.WriteString(", ")
-	if v := ih.PrevStatusCode; v != nil {
-		builder.WriteString("prev_status_code=")
+	if v := ih.OldStatusCode; v != nil {
+		builder.WriteString("old_status_code=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

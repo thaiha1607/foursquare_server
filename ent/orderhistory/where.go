@@ -76,9 +76,9 @@ func PersonID(v uuid.UUID) predicate.OrderHistory {
 	return predicate.OrderHistory(sql.FieldEQ(FieldPersonID, v))
 }
 
-// PrevStatusCode applies equality check predicate on the "prev_status_code" field. It's identical to PrevStatusCodeEQ.
-func PrevStatusCode(v int) predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldEQ(FieldPrevStatusCode, v))
+// OldStatusCode applies equality check predicate on the "old_status_code" field. It's identical to OldStatusCodeEQ.
+func OldStatusCode(v int) predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldEQ(FieldOldStatusCode, v))
 }
 
 // NewStatusCode applies equality check predicate on the "new_status_code" field. It's identical to NewStatusCodeEQ.
@@ -211,34 +211,34 @@ func PersonIDNotIn(vs ...uuid.UUID) predicate.OrderHistory {
 	return predicate.OrderHistory(sql.FieldNotIn(FieldPersonID, vs...))
 }
 
-// PrevStatusCodeEQ applies the EQ predicate on the "prev_status_code" field.
-func PrevStatusCodeEQ(v int) predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldEQ(FieldPrevStatusCode, v))
+// OldStatusCodeEQ applies the EQ predicate on the "old_status_code" field.
+func OldStatusCodeEQ(v int) predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldEQ(FieldOldStatusCode, v))
 }
 
-// PrevStatusCodeNEQ applies the NEQ predicate on the "prev_status_code" field.
-func PrevStatusCodeNEQ(v int) predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldNEQ(FieldPrevStatusCode, v))
+// OldStatusCodeNEQ applies the NEQ predicate on the "old_status_code" field.
+func OldStatusCodeNEQ(v int) predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldNEQ(FieldOldStatusCode, v))
 }
 
-// PrevStatusCodeIn applies the In predicate on the "prev_status_code" field.
-func PrevStatusCodeIn(vs ...int) predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldIn(FieldPrevStatusCode, vs...))
+// OldStatusCodeIn applies the In predicate on the "old_status_code" field.
+func OldStatusCodeIn(vs ...int) predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldIn(FieldOldStatusCode, vs...))
 }
 
-// PrevStatusCodeNotIn applies the NotIn predicate on the "prev_status_code" field.
-func PrevStatusCodeNotIn(vs ...int) predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldNotIn(FieldPrevStatusCode, vs...))
+// OldStatusCodeNotIn applies the NotIn predicate on the "old_status_code" field.
+func OldStatusCodeNotIn(vs ...int) predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldNotIn(FieldOldStatusCode, vs...))
 }
 
-// PrevStatusCodeIsNil applies the IsNil predicate on the "prev_status_code" field.
-func PrevStatusCodeIsNil() predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldIsNull(FieldPrevStatusCode))
+// OldStatusCodeIsNil applies the IsNil predicate on the "old_status_code" field.
+func OldStatusCodeIsNil() predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldIsNull(FieldOldStatusCode))
 }
 
-// PrevStatusCodeNotNil applies the NotNil predicate on the "prev_status_code" field.
-func PrevStatusCodeNotNil() predicate.OrderHistory {
-	return predicate.OrderHistory(sql.FieldNotNull(FieldPrevStatusCode))
+// OldStatusCodeNotNil applies the NotNil predicate on the "old_status_code" field.
+func OldStatusCodeNotNil() predicate.OrderHistory {
+	return predicate.OrderHistory(sql.FieldNotNull(FieldOldStatusCode))
 }
 
 // NewStatusCodeEQ applies the EQ predicate on the "new_status_code" field.
@@ -392,21 +392,21 @@ func HasPersonWith(preds ...predicate.Person) predicate.OrderHistory {
 	})
 }
 
-// HasPrevStatus applies the HasEdge predicate on the "prev_status" edge.
-func HasPrevStatus() predicate.OrderHistory {
+// HasOldStatus applies the HasEdge predicate on the "old_status" edge.
+func HasOldStatus() predicate.OrderHistory {
 	return predicate.OrderHistory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, PrevStatusTable, PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, OldStatusTable, OldStatusColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasPrevStatusWith applies the HasEdge predicate on the "prev_status" edge with a given conditions (other predicates).
-func HasPrevStatusWith(preds ...predicate.OrderStatusCode) predicate.OrderHistory {
+// HasOldStatusWith applies the HasEdge predicate on the "old_status" edge with a given conditions (other predicates).
+func HasOldStatusWith(preds ...predicate.OrderStatusCode) predicate.OrderHistory {
 	return predicate.OrderHistory(func(s *sql.Selector) {
-		step := newPrevStatusStep()
+		step := newOldStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -64,16 +64,16 @@ func (ihc *InvoiceHistoryCreate) SetPersonID(u uuid.UUID) *InvoiceHistoryCreate 
 	return ihc
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (ihc *InvoiceHistoryCreate) SetPrevStatusCode(i int) *InvoiceHistoryCreate {
-	ihc.mutation.SetPrevStatusCode(i)
+// SetOldStatusCode sets the "old_status_code" field.
+func (ihc *InvoiceHistoryCreate) SetOldStatusCode(i int) *InvoiceHistoryCreate {
+	ihc.mutation.SetOldStatusCode(i)
 	return ihc
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (ihc *InvoiceHistoryCreate) SetNillablePrevStatusCode(i *int) *InvoiceHistoryCreate {
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (ihc *InvoiceHistoryCreate) SetNillableOldStatusCode(i *int) *InvoiceHistoryCreate {
 	if i != nil {
-		ihc.SetPrevStatusCode(*i)
+		ihc.SetOldStatusCode(*i)
 	}
 	return ihc
 }
@@ -130,23 +130,23 @@ func (ihc *InvoiceHistoryCreate) SetPerson(p *Person) *InvoiceHistoryCreate {
 	return ihc.SetPersonID(p.ID)
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (ihc *InvoiceHistoryCreate) SetPrevStatusID(id int) *InvoiceHistoryCreate {
-	ihc.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (ihc *InvoiceHistoryCreate) SetOldStatusID(id int) *InvoiceHistoryCreate {
+	ihc.mutation.SetOldStatusID(id)
 	return ihc
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ihc *InvoiceHistoryCreate) SetNillablePrevStatusID(id *int) *InvoiceHistoryCreate {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (ihc *InvoiceHistoryCreate) SetNillableOldStatusID(id *int) *InvoiceHistoryCreate {
 	if id != nil {
-		ihc = ihc.SetPrevStatusID(*id)
+		ihc = ihc.SetOldStatusID(*id)
 	}
 	return ihc
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (ihc *InvoiceHistoryCreate) SetPrevStatus(o *OrderStatusCode) *InvoiceHistoryCreate {
-	return ihc.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (ihc *InvoiceHistoryCreate) SetOldStatus(o *OrderStatusCode) *InvoiceHistoryCreate {
+	return ihc.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -318,12 +318,12 @@ func (ihc *InvoiceHistoryCreate) createSpec() (*InvoiceHistory, *sqlgraph.Create
 		_node.PersonID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ihc.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := ihc.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   invoicehistory.PrevStatusTable,
-			Columns: []string{invoicehistory.PrevStatusColumn},
+			Table:   invoicehistory.OldStatusTable,
+			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -332,7 +332,7 @@ func (ihc *InvoiceHistoryCreate) createSpec() (*InvoiceHistory, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.PrevStatusCode = &nodes[0]
+		_node.OldStatusCode = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ihc.mutation.NewStatusIDs(); len(nodes) > 0 {

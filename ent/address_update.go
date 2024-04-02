@@ -36,116 +36,6 @@ func (au *AddressUpdate) SetUpdatedAt(t time.Time) *AddressUpdate {
 	return au
 }
 
-// SetLine1 sets the "line1" field.
-func (au *AddressUpdate) SetLine1(s string) *AddressUpdate {
-	au.mutation.SetLine1(s)
-	return au
-}
-
-// SetNillableLine1 sets the "line1" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableLine1(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetLine1(*s)
-	}
-	return au
-}
-
-// SetLine2 sets the "line2" field.
-func (au *AddressUpdate) SetLine2(s string) *AddressUpdate {
-	au.mutation.SetLine2(s)
-	return au
-}
-
-// SetNillableLine2 sets the "line2" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableLine2(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetLine2(*s)
-	}
-	return au
-}
-
-// ClearLine2 clears the value of the "line2" field.
-func (au *AddressUpdate) ClearLine2() *AddressUpdate {
-	au.mutation.ClearLine2()
-	return au
-}
-
-// SetCity sets the "city" field.
-func (au *AddressUpdate) SetCity(s string) *AddressUpdate {
-	au.mutation.SetCity(s)
-	return au
-}
-
-// SetNillableCity sets the "city" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableCity(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetCity(*s)
-	}
-	return au
-}
-
-// SetStateOrProvince sets the "state_or_province" field.
-func (au *AddressUpdate) SetStateOrProvince(s string) *AddressUpdate {
-	au.mutation.SetStateOrProvince(s)
-	return au
-}
-
-// SetNillableStateOrProvince sets the "state_or_province" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableStateOrProvince(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetStateOrProvince(*s)
-	}
-	return au
-}
-
-// SetZipOrPostcode sets the "zip_or_postcode" field.
-func (au *AddressUpdate) SetZipOrPostcode(s string) *AddressUpdate {
-	au.mutation.SetZipOrPostcode(s)
-	return au
-}
-
-// SetNillableZipOrPostcode sets the "zip_or_postcode" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableZipOrPostcode(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetZipOrPostcode(*s)
-	}
-	return au
-}
-
-// SetCountry sets the "country" field.
-func (au *AddressUpdate) SetCountry(s string) *AddressUpdate {
-	au.mutation.SetCountry(s)
-	return au
-}
-
-// SetNillableCountry sets the "country" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableCountry(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetCountry(*s)
-	}
-	return au
-}
-
-// SetOtherAddressDetails sets the "other_address_details" field.
-func (au *AddressUpdate) SetOtherAddressDetails(s string) *AddressUpdate {
-	au.mutation.SetOtherAddressDetails(s)
-	return au
-}
-
-// SetNillableOtherAddressDetails sets the "other_address_details" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableOtherAddressDetails(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetOtherAddressDetails(*s)
-	}
-	return au
-}
-
-// ClearOtherAddressDetails clears the value of the "other_address_details" field.
-func (au *AddressUpdate) ClearOtherAddressDetails() *AddressUpdate {
-	au.mutation.ClearOtherAddressDetails()
-	return au
-}
-
 // AddPersonIDs adds the "persons" edge to the Person entity by IDs.
 func (au *AddressUpdate) AddPersonIDs(ids ...uuid.UUID) *AddressUpdate {
 	au.mutation.AddPersonIDs(ids...)
@@ -223,40 +113,7 @@ func (au *AddressUpdate) defaults() {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (au *AddressUpdate) check() error {
-	if v, ok := au.mutation.Line1(); ok {
-		if err := address.Line1Validator(v); err != nil {
-			return &ValidationError{Name: "line1", err: fmt.Errorf(`ent: validator failed for field "Address.line1": %w`, err)}
-		}
-	}
-	if v, ok := au.mutation.City(); ok {
-		if err := address.CityValidator(v); err != nil {
-			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
-		}
-	}
-	if v, ok := au.mutation.StateOrProvince(); ok {
-		if err := address.StateOrProvinceValidator(v); err != nil {
-			return &ValidationError{Name: "state_or_province", err: fmt.Errorf(`ent: validator failed for field "Address.state_or_province": %w`, err)}
-		}
-	}
-	if v, ok := au.mutation.ZipOrPostcode(); ok {
-		if err := address.ZipOrPostcodeValidator(v); err != nil {
-			return &ValidationError{Name: "zip_or_postcode", err: fmt.Errorf(`ent: validator failed for field "Address.zip_or_postcode": %w`, err)}
-		}
-	}
-	if v, ok := au.mutation.Country(); ok {
-		if err := address.CountryValidator(v); err != nil {
-			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -268,29 +125,8 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.UpdatedAt(); ok {
 		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := au.mutation.Line1(); ok {
-		_spec.SetField(address.FieldLine1, field.TypeString, value)
-	}
-	if value, ok := au.mutation.Line2(); ok {
-		_spec.SetField(address.FieldLine2, field.TypeString, value)
-	}
 	if au.mutation.Line2Cleared() {
 		_spec.ClearField(address.FieldLine2, field.TypeString)
-	}
-	if value, ok := au.mutation.City(); ok {
-		_spec.SetField(address.FieldCity, field.TypeString, value)
-	}
-	if value, ok := au.mutation.StateOrProvince(); ok {
-		_spec.SetField(address.FieldStateOrProvince, field.TypeString, value)
-	}
-	if value, ok := au.mutation.ZipOrPostcode(); ok {
-		_spec.SetField(address.FieldZipOrPostcode, field.TypeString, value)
-	}
-	if value, ok := au.mutation.Country(); ok {
-		_spec.SetField(address.FieldCountry, field.TypeString, value)
-	}
-	if value, ok := au.mutation.OtherAddressDetails(); ok {
-		_spec.SetField(address.FieldOtherAddressDetails, field.TypeString, value)
 	}
 	if au.mutation.OtherAddressDetailsCleared() {
 		_spec.ClearField(address.FieldOtherAddressDetails, field.TypeString)
@@ -375,116 +211,6 @@ type AddressUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (auo *AddressUpdateOne) SetUpdatedAt(t time.Time) *AddressUpdateOne {
 	auo.mutation.SetUpdatedAt(t)
-	return auo
-}
-
-// SetLine1 sets the "line1" field.
-func (auo *AddressUpdateOne) SetLine1(s string) *AddressUpdateOne {
-	auo.mutation.SetLine1(s)
-	return auo
-}
-
-// SetNillableLine1 sets the "line1" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableLine1(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetLine1(*s)
-	}
-	return auo
-}
-
-// SetLine2 sets the "line2" field.
-func (auo *AddressUpdateOne) SetLine2(s string) *AddressUpdateOne {
-	auo.mutation.SetLine2(s)
-	return auo
-}
-
-// SetNillableLine2 sets the "line2" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableLine2(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetLine2(*s)
-	}
-	return auo
-}
-
-// ClearLine2 clears the value of the "line2" field.
-func (auo *AddressUpdateOne) ClearLine2() *AddressUpdateOne {
-	auo.mutation.ClearLine2()
-	return auo
-}
-
-// SetCity sets the "city" field.
-func (auo *AddressUpdateOne) SetCity(s string) *AddressUpdateOne {
-	auo.mutation.SetCity(s)
-	return auo
-}
-
-// SetNillableCity sets the "city" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableCity(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetCity(*s)
-	}
-	return auo
-}
-
-// SetStateOrProvince sets the "state_or_province" field.
-func (auo *AddressUpdateOne) SetStateOrProvince(s string) *AddressUpdateOne {
-	auo.mutation.SetStateOrProvince(s)
-	return auo
-}
-
-// SetNillableStateOrProvince sets the "state_or_province" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableStateOrProvince(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetStateOrProvince(*s)
-	}
-	return auo
-}
-
-// SetZipOrPostcode sets the "zip_or_postcode" field.
-func (auo *AddressUpdateOne) SetZipOrPostcode(s string) *AddressUpdateOne {
-	auo.mutation.SetZipOrPostcode(s)
-	return auo
-}
-
-// SetNillableZipOrPostcode sets the "zip_or_postcode" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableZipOrPostcode(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetZipOrPostcode(*s)
-	}
-	return auo
-}
-
-// SetCountry sets the "country" field.
-func (auo *AddressUpdateOne) SetCountry(s string) *AddressUpdateOne {
-	auo.mutation.SetCountry(s)
-	return auo
-}
-
-// SetNillableCountry sets the "country" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableCountry(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetCountry(*s)
-	}
-	return auo
-}
-
-// SetOtherAddressDetails sets the "other_address_details" field.
-func (auo *AddressUpdateOne) SetOtherAddressDetails(s string) *AddressUpdateOne {
-	auo.mutation.SetOtherAddressDetails(s)
-	return auo
-}
-
-// SetNillableOtherAddressDetails sets the "other_address_details" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableOtherAddressDetails(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetOtherAddressDetails(*s)
-	}
-	return auo
-}
-
-// ClearOtherAddressDetails clears the value of the "other_address_details" field.
-func (auo *AddressUpdateOne) ClearOtherAddressDetails() *AddressUpdateOne {
-	auo.mutation.ClearOtherAddressDetails()
 	return auo
 }
 
@@ -578,40 +304,7 @@ func (auo *AddressUpdateOne) defaults() {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (auo *AddressUpdateOne) check() error {
-	if v, ok := auo.mutation.Line1(); ok {
-		if err := address.Line1Validator(v); err != nil {
-			return &ValidationError{Name: "line1", err: fmt.Errorf(`ent: validator failed for field "Address.line1": %w`, err)}
-		}
-	}
-	if v, ok := auo.mutation.City(); ok {
-		if err := address.CityValidator(v); err != nil {
-			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
-		}
-	}
-	if v, ok := auo.mutation.StateOrProvince(); ok {
-		if err := address.StateOrProvinceValidator(v); err != nil {
-			return &ValidationError{Name: "state_or_province", err: fmt.Errorf(`ent: validator failed for field "Address.state_or_province": %w`, err)}
-		}
-	}
-	if v, ok := auo.mutation.ZipOrPostcode(); ok {
-		if err := address.ZipOrPostcodeValidator(v); err != nil {
-			return &ValidationError{Name: "zip_or_postcode", err: fmt.Errorf(`ent: validator failed for field "Address.zip_or_postcode": %w`, err)}
-		}
-	}
-	if v, ok := auo.mutation.Country(); ok {
-		if err := address.CountryValidator(v); err != nil {
-			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err error) {
-	if err := auo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	id, ok := auo.mutation.ID()
 	if !ok {
@@ -640,29 +333,8 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 	if value, ok := auo.mutation.UpdatedAt(); ok {
 		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := auo.mutation.Line1(); ok {
-		_spec.SetField(address.FieldLine1, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.Line2(); ok {
-		_spec.SetField(address.FieldLine2, field.TypeString, value)
-	}
 	if auo.mutation.Line2Cleared() {
 		_spec.ClearField(address.FieldLine2, field.TypeString)
-	}
-	if value, ok := auo.mutation.City(); ok {
-		_spec.SetField(address.FieldCity, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.StateOrProvince(); ok {
-		_spec.SetField(address.FieldStateOrProvince, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.ZipOrPostcode(); ok {
-		_spec.SetField(address.FieldZipOrPostcode, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.Country(); ok {
-		_spec.SetField(address.FieldCountry, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.OtherAddressDetails(); ok {
-		_spec.SetField(address.FieldOtherAddressDetails, field.TypeString, value)
 	}
 	if auo.mutation.OtherAddressDetailsCleared() {
 		_spec.ClearField(address.FieldOtherAddressDetails, field.TypeString)

@@ -32,7 +32,7 @@ func (ShipmentHistory) Fields() []ent.Field {
 			Immutable(),
 		field.UUID("person_id", uuid.UUID{}).
 			Immutable(),
-		field.Int("prev_status_code").
+		field.Int("old_status_code").
 			Optional().
 			Nillable(),
 		field.Int("new_status_code").
@@ -57,11 +57,18 @@ func (ShipmentHistory) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
-		edge.To("prev_status", OrderStatusCode.Type).
-			Field("prev_status_code").
+		edge.To("old_status", OrderStatusCode.Type).
+			Field("old_status_code").
 			Unique(),
 		edge.To("new_status", OrderStatusCode.Type).
 			Field("new_status_code").
 			Unique(),
+	}
+}
+
+// Mixin of the ShipmentHistory.
+func (ShipmentHistory) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
 	}
 }

@@ -532,8 +532,21 @@ func init() {
 			return nil
 		}
 	}()
+	shipmenthistoryMixin := schema.ShipmentHistory{}.Mixin()
+	shipmenthistoryMixinFields0 := shipmenthistoryMixin[0].Fields()
+	_ = shipmenthistoryMixinFields0
 	shipmenthistoryFields := schema.ShipmentHistory{}.Fields()
 	_ = shipmenthistoryFields
+	// shipmenthistoryDescCreatedAt is the schema descriptor for created_at field.
+	shipmenthistoryDescCreatedAt := shipmenthistoryMixinFields0[0].Descriptor()
+	// shipmenthistory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	shipmenthistory.DefaultCreatedAt = shipmenthistoryDescCreatedAt.Default.(func() time.Time)
+	// shipmenthistoryDescUpdatedAt is the schema descriptor for updated_at field.
+	shipmenthistoryDescUpdatedAt := shipmenthistoryMixinFields0[1].Descriptor()
+	// shipmenthistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	shipmenthistory.DefaultUpdatedAt = shipmenthistoryDescUpdatedAt.Default.(func() time.Time)
+	// shipmenthistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	shipmenthistory.UpdateDefaultUpdatedAt = shipmenthistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// shipmenthistoryDescShipmentID is the schema descriptor for shipment_id field.
 	shipmenthistoryDescShipmentID := shipmenthistoryFields[1].Descriptor()
 	// shipmenthistory.ShipmentIDValidator is a validator for the "shipment_id" field. It is called by the builders before save.
@@ -623,8 +636,21 @@ func init() {
 	warehouseassignmentDescID := warehouseassignmentFields[0].Descriptor()
 	// warehouseassignment.DefaultID holds the default value on creation for the id field.
 	warehouseassignment.DefaultID = warehouseassignmentDescID.Default.(func() uuid.UUID)
+	workunitinfoMixin := schema.WorkUnitInfo{}.Mixin()
+	workunitinfoMixinFields0 := workunitinfoMixin[0].Fields()
+	_ = workunitinfoMixinFields0
 	workunitinfoFields := schema.WorkUnitInfo{}.Fields()
 	_ = workunitinfoFields
+	// workunitinfoDescCreatedAt is the schema descriptor for created_at field.
+	workunitinfoDescCreatedAt := workunitinfoMixinFields0[0].Descriptor()
+	// workunitinfo.DefaultCreatedAt holds the default value on creation for the created_at field.
+	workunitinfo.DefaultCreatedAt = workunitinfoDescCreatedAt.Default.(func() time.Time)
+	// workunitinfoDescUpdatedAt is the schema descriptor for updated_at field.
+	workunitinfoDescUpdatedAt := workunitinfoMixinFields0[1].Descriptor()
+	// workunitinfo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	workunitinfo.DefaultUpdatedAt = workunitinfoDescUpdatedAt.Default.(func() time.Time)
+	// workunitinfo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	workunitinfo.UpdateDefaultUpdatedAt = workunitinfoDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// workunitinfoDescName is the schema descriptor for name field.
 	workunitinfoDescName := workunitinfoFields[1].Descriptor()
 	// workunitinfo.NameValidator is a validator for the "name" field. It is called by the builders before save.

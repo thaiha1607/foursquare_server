@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -23,6 +24,34 @@ type ShipmentHistoryCreate struct {
 	hooks    []Hook
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (shc *ShipmentHistoryCreate) SetCreatedAt(t time.Time) *ShipmentHistoryCreate {
+	shc.mutation.SetCreatedAt(t)
+	return shc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (shc *ShipmentHistoryCreate) SetNillableCreatedAt(t *time.Time) *ShipmentHistoryCreate {
+	if t != nil {
+		shc.SetCreatedAt(*t)
+	}
+	return shc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (shc *ShipmentHistoryCreate) SetUpdatedAt(t time.Time) *ShipmentHistoryCreate {
+	shc.mutation.SetUpdatedAt(t)
+	return shc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (shc *ShipmentHistoryCreate) SetNillableUpdatedAt(t *time.Time) *ShipmentHistoryCreate {
+	if t != nil {
+		shc.SetUpdatedAt(*t)
+	}
+	return shc
+}
+
 // SetShipmentID sets the "shipment_id" field.
 func (shc *ShipmentHistoryCreate) SetShipmentID(s string) *ShipmentHistoryCreate {
 	shc.mutation.SetShipmentID(s)
@@ -35,16 +64,16 @@ func (shc *ShipmentHistoryCreate) SetPersonID(u uuid.UUID) *ShipmentHistoryCreat
 	return shc
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (shc *ShipmentHistoryCreate) SetPrevStatusCode(i int) *ShipmentHistoryCreate {
-	shc.mutation.SetPrevStatusCode(i)
+// SetOldStatusCode sets the "old_status_code" field.
+func (shc *ShipmentHistoryCreate) SetOldStatusCode(i int) *ShipmentHistoryCreate {
+	shc.mutation.SetOldStatusCode(i)
 	return shc
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (shc *ShipmentHistoryCreate) SetNillablePrevStatusCode(i *int) *ShipmentHistoryCreate {
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (shc *ShipmentHistoryCreate) SetNillableOldStatusCode(i *int) *ShipmentHistoryCreate {
 	if i != nil {
-		shc.SetPrevStatusCode(*i)
+		shc.SetOldStatusCode(*i)
 	}
 	return shc
 }
@@ -101,23 +130,23 @@ func (shc *ShipmentHistoryCreate) SetPerson(p *Person) *ShipmentHistoryCreate {
 	return shc.SetPersonID(p.ID)
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (shc *ShipmentHistoryCreate) SetPrevStatusID(id int) *ShipmentHistoryCreate {
-	shc.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (shc *ShipmentHistoryCreate) SetOldStatusID(id int) *ShipmentHistoryCreate {
+	shc.mutation.SetOldStatusID(id)
 	return shc
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shc *ShipmentHistoryCreate) SetNillablePrevStatusID(id *int) *ShipmentHistoryCreate {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (shc *ShipmentHistoryCreate) SetNillableOldStatusID(id *int) *ShipmentHistoryCreate {
 	if id != nil {
-		shc = shc.SetPrevStatusID(*id)
+		shc = shc.SetOldStatusID(*id)
 	}
 	return shc
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (shc *ShipmentHistoryCreate) SetPrevStatus(o *OrderStatusCode) *ShipmentHistoryCreate {
-	return shc.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (shc *ShipmentHistoryCreate) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryCreate {
+	return shc.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -174,6 +203,14 @@ func (shc *ShipmentHistoryCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (shc *ShipmentHistoryCreate) defaults() {
+	if _, ok := shc.mutation.CreatedAt(); !ok {
+		v := shipmenthistory.DefaultCreatedAt()
+		shc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := shc.mutation.UpdatedAt(); !ok {
+		v := shipmenthistory.DefaultUpdatedAt()
+		shc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := shc.mutation.ID(); !ok {
 		v := shipmenthistory.DefaultID()
 		shc.mutation.SetID(v)
@@ -182,6 +219,12 @@ func (shc *ShipmentHistoryCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (shc *ShipmentHistoryCreate) check() error {
+	if _, ok := shc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ShipmentHistory.created_at"`)}
+	}
+	if _, ok := shc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ShipmentHistory.updated_at"`)}
+	}
 	if _, ok := shc.mutation.ShipmentID(); !ok {
 		return &ValidationError{Name: "shipment_id", err: errors.New(`ent: missing required field "ShipmentHistory.shipment_id"`)}
 	}
@@ -234,6 +277,14 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
+	if value, ok := shc.mutation.CreatedAt(); ok {
+		_spec.SetField(shipmenthistory.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := shc.mutation.UpdatedAt(); ok {
+		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if value, ok := shc.mutation.Description(); ok {
 		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)
 		_node.Description = &value
@@ -272,12 +323,12 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 		_node.PersonID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := shc.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := shc.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   shipmenthistory.PrevStatusTable,
-			Columns: []string{shipmenthistory.PrevStatusColumn},
+			Table:   shipmenthistory.OldStatusTable,
+			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -286,7 +337,7 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.PrevStatusCode = &nodes[0]
+		_node.OldStatusCode = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := shc.mutation.NewStatusIDs(); len(nodes) > 0 {

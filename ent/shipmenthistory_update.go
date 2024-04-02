@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,23 +29,29 @@ func (shu *ShipmentHistoryUpdate) Where(ps ...predicate.ShipmentHistory) *Shipme
 	return shu
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (shu *ShipmentHistoryUpdate) SetPrevStatusCode(i int) *ShipmentHistoryUpdate {
-	shu.mutation.SetPrevStatusCode(i)
+// SetUpdatedAt sets the "updated_at" field.
+func (shu *ShipmentHistoryUpdate) SetUpdatedAt(t time.Time) *ShipmentHistoryUpdate {
+	shu.mutation.SetUpdatedAt(t)
 	return shu
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillablePrevStatusCode(i *int) *ShipmentHistoryUpdate {
+// SetOldStatusCode sets the "old_status_code" field.
+func (shu *ShipmentHistoryUpdate) SetOldStatusCode(i int) *ShipmentHistoryUpdate {
+	shu.mutation.SetOldStatusCode(i)
+	return shu
+}
+
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (shu *ShipmentHistoryUpdate) SetNillableOldStatusCode(i *int) *ShipmentHistoryUpdate {
 	if i != nil {
-		shu.SetPrevStatusCode(*i)
+		shu.SetOldStatusCode(*i)
 	}
 	return shu
 }
 
-// ClearPrevStatusCode clears the value of the "prev_status_code" field.
-func (shu *ShipmentHistoryUpdate) ClearPrevStatusCode() *ShipmentHistoryUpdate {
-	shu.mutation.ClearPrevStatusCode()
+// ClearOldStatusCode clears the value of the "old_status_code" field.
+func (shu *ShipmentHistoryUpdate) ClearOldStatusCode() *ShipmentHistoryUpdate {
+	shu.mutation.ClearOldStatusCode()
 	return shu
 }
 
@@ -88,23 +95,23 @@ func (shu *ShipmentHistoryUpdate) ClearDescription() *ShipmentHistoryUpdate {
 	return shu
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (shu *ShipmentHistoryUpdate) SetPrevStatusID(id int) *ShipmentHistoryUpdate {
-	shu.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (shu *ShipmentHistoryUpdate) SetOldStatusID(id int) *ShipmentHistoryUpdate {
+	shu.mutation.SetOldStatusID(id)
 	return shu
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillablePrevStatusID(id *int) *ShipmentHistoryUpdate {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (shu *ShipmentHistoryUpdate) SetNillableOldStatusID(id *int) *ShipmentHistoryUpdate {
 	if id != nil {
-		shu = shu.SetPrevStatusID(*id)
+		shu = shu.SetOldStatusID(*id)
 	}
 	return shu
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) SetPrevStatus(o *OrderStatusCode) *ShipmentHistoryUpdate {
-	return shu.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (shu *ShipmentHistoryUpdate) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryUpdate {
+	return shu.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -131,9 +138,9 @@ func (shu *ShipmentHistoryUpdate) Mutation() *ShipmentHistoryMutation {
 	return shu.mutation
 }
 
-// ClearPrevStatus clears the "prev_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) ClearPrevStatus() *ShipmentHistoryUpdate {
-	shu.mutation.ClearPrevStatus()
+// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+func (shu *ShipmentHistoryUpdate) ClearOldStatus() *ShipmentHistoryUpdate {
+	shu.mutation.ClearOldStatus()
 	return shu
 }
 
@@ -145,6 +152,7 @@ func (shu *ShipmentHistoryUpdate) ClearNewStatus() *ShipmentHistoryUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (shu *ShipmentHistoryUpdate) Save(ctx context.Context) (int, error) {
+	shu.defaults()
 	return withHooks(ctx, shu.sqlSave, shu.mutation, shu.hooks)
 }
 
@@ -167,6 +175,14 @@ func (shu *ShipmentHistoryUpdate) Exec(ctx context.Context) error {
 func (shu *ShipmentHistoryUpdate) ExecX(ctx context.Context) {
 	if err := shu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (shu *ShipmentHistoryUpdate) defaults() {
+	if _, ok := shu.mutation.UpdatedAt(); !ok {
+		v := shipmenthistory.UpdateDefaultUpdatedAt()
+		shu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -193,18 +209,21 @@ func (shu *ShipmentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error
 			}
 		}
 	}
+	if value, ok := shu.mutation.UpdatedAt(); ok {
+		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
+	}
 	if value, ok := shu.mutation.Description(); ok {
 		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)
 	}
 	if shu.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)
 	}
-	if shu.mutation.PrevStatusCleared() {
+	if shu.mutation.OldStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   shipmenthistory.PrevStatusTable,
-			Columns: []string{shipmenthistory.PrevStatusColumn},
+			Table:   shipmenthistory.OldStatusTable,
+			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -212,12 +231,12 @@ func (shu *ShipmentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := shu.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := shu.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   shipmenthistory.PrevStatusTable,
-			Columns: []string{shipmenthistory.PrevStatusColumn},
+			Table:   shipmenthistory.OldStatusTable,
+			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -277,23 +296,29 @@ type ShipmentHistoryUpdateOne struct {
 	mutation *ShipmentHistoryMutation
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) SetPrevStatusCode(i int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetPrevStatusCode(i)
+// SetUpdatedAt sets the "updated_at" field.
+func (shuo *ShipmentHistoryUpdateOne) SetUpdatedAt(t time.Time) *ShipmentHistoryUpdateOne {
+	shuo.mutation.SetUpdatedAt(t)
 	return shuo
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillablePrevStatusCode(i *int) *ShipmentHistoryUpdateOne {
+// SetOldStatusCode sets the "old_status_code" field.
+func (shuo *ShipmentHistoryUpdateOne) SetOldStatusCode(i int) *ShipmentHistoryUpdateOne {
+	shuo.mutation.SetOldStatusCode(i)
+	return shuo
+}
+
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (shuo *ShipmentHistoryUpdateOne) SetNillableOldStatusCode(i *int) *ShipmentHistoryUpdateOne {
 	if i != nil {
-		shuo.SetPrevStatusCode(*i)
+		shuo.SetOldStatusCode(*i)
 	}
 	return shuo
 }
 
-// ClearPrevStatusCode clears the value of the "prev_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) ClearPrevStatusCode() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearPrevStatusCode()
+// ClearOldStatusCode clears the value of the "old_status_code" field.
+func (shuo *ShipmentHistoryUpdateOne) ClearOldStatusCode() *ShipmentHistoryUpdateOne {
+	shuo.mutation.ClearOldStatusCode()
 	return shuo
 }
 
@@ -337,23 +362,23 @@ func (shuo *ShipmentHistoryUpdateOne) ClearDescription() *ShipmentHistoryUpdateO
 	return shuo
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (shuo *ShipmentHistoryUpdateOne) SetPrevStatusID(id int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (shuo *ShipmentHistoryUpdateOne) SetOldStatusID(id int) *ShipmentHistoryUpdateOne {
+	shuo.mutation.SetOldStatusID(id)
 	return shuo
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillablePrevStatusID(id *int) *ShipmentHistoryUpdateOne {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (shuo *ShipmentHistoryUpdateOne) SetNillableOldStatusID(id *int) *ShipmentHistoryUpdateOne {
 	if id != nil {
-		shuo = shuo.SetPrevStatusID(*id)
+		shuo = shuo.SetOldStatusID(*id)
 	}
 	return shuo
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) SetPrevStatus(o *OrderStatusCode) *ShipmentHistoryUpdateOne {
-	return shuo.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (shuo *ShipmentHistoryUpdateOne) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryUpdateOne {
+	return shuo.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -380,9 +405,9 @@ func (shuo *ShipmentHistoryUpdateOne) Mutation() *ShipmentHistoryMutation {
 	return shuo.mutation
 }
 
-// ClearPrevStatus clears the "prev_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) ClearPrevStatus() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearPrevStatus()
+// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+func (shuo *ShipmentHistoryUpdateOne) ClearOldStatus() *ShipmentHistoryUpdateOne {
+	shuo.mutation.ClearOldStatus()
 	return shuo
 }
 
@@ -407,6 +432,7 @@ func (shuo *ShipmentHistoryUpdateOne) Select(field string, fields ...string) *Sh
 
 // Save executes the query and returns the updated ShipmentHistory entity.
 func (shuo *ShipmentHistoryUpdateOne) Save(ctx context.Context) (*ShipmentHistory, error) {
+	shuo.defaults()
 	return withHooks(ctx, shuo.sqlSave, shuo.mutation, shuo.hooks)
 }
 
@@ -429,6 +455,14 @@ func (shuo *ShipmentHistoryUpdateOne) Exec(ctx context.Context) error {
 func (shuo *ShipmentHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := shuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (shuo *ShipmentHistoryUpdateOne) defaults() {
+	if _, ok := shuo.mutation.UpdatedAt(); !ok {
+		v := shipmenthistory.UpdateDefaultUpdatedAt()
+		shuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -472,18 +506,21 @@ func (shuo *ShipmentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Shipm
 			}
 		}
 	}
+	if value, ok := shuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
+	}
 	if value, ok := shuo.mutation.Description(); ok {
 		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)
 	}
 	if shuo.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)
 	}
-	if shuo.mutation.PrevStatusCleared() {
+	if shuo.mutation.OldStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   shipmenthistory.PrevStatusTable,
-			Columns: []string{shipmenthistory.PrevStatusColumn},
+			Table:   shipmenthistory.OldStatusTable,
+			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -491,12 +528,12 @@ func (shuo *ShipmentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Shipm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := shuo.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := shuo.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   shipmenthistory.PrevStatusTable,
-			Columns: []string{shipmenthistory.PrevStatusColumn},
+			Table:   shipmenthistory.OldStatusTable,
+			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),

@@ -1001,15 +1001,15 @@ func (c *InvoiceHistoryClient) QueryPerson(ih *InvoiceHistory) *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus queries the prev_status edge of a InvoiceHistory.
-func (c *InvoiceHistoryClient) QueryPrevStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
+// QueryOldStatus queries the old_status edge of a InvoiceHistory.
+func (c *InvoiceHistoryClient) QueryOldStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ih.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.PrevStatusTable, invoicehistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.OldStatusTable, invoicehistory.OldStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
 		return fromV, nil
@@ -1592,15 +1592,15 @@ func (c *OrderHistoryClient) QueryPerson(oh *OrderHistory) *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus queries the prev_status edge of a OrderHistory.
-func (c *OrderHistoryClient) QueryPrevStatus(oh *OrderHistory) *OrderStatusCodeQuery {
+// QueryOldStatus queries the old_status edge of a OrderHistory.
+func (c *OrderHistoryClient) QueryOldStatus(oh *OrderHistory) *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := oh.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, id),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.PrevStatusTable, orderhistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.OldStatusTable, orderhistory.OldStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(oh.driver.Dialect(), step)
 		return fromV, nil
@@ -3360,15 +3360,15 @@ func (c *ShipmentHistoryClient) QueryPerson(sh *ShipmentHistory) *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus queries the prev_status edge of a ShipmentHistory.
-func (c *ShipmentHistoryClient) QueryPrevStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
+// QueryOldStatus queries the old_status edge of a ShipmentHistory.
+func (c *ShipmentHistoryClient) QueryOldStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := sh.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.PrevStatusTable, shipmenthistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.OldStatusTable, shipmenthistory.OldStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
 		return fromV, nil

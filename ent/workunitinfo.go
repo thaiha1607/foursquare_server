@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,6 +19,10 @@ type WorkUnitInfo struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// AddressID holds the value of the "address_id" field.
@@ -61,6 +66,8 @@ func (*WorkUnitInfo) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case workunitinfo.FieldName, workunitinfo.FieldType, workunitinfo.FieldImageURL:
 			values[i] = new(sql.NullString)
+		case workunitinfo.FieldCreatedAt, workunitinfo.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case workunitinfo.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
@@ -83,6 +90,18 @@ func (wui *WorkUnitInfo) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				wui.ID = *value
+			}
+		case workunitinfo.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				wui.CreatedAt = value.Time
+			}
+		case workunitinfo.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				wui.UpdatedAt = value.Time
 			}
 		case workunitinfo.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -151,6 +170,12 @@ func (wui *WorkUnitInfo) String() string {
 	var builder strings.Builder
 	builder.WriteString("WorkUnitInfo(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", wui.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(wui.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(wui.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(wui.Name)
 	builder.WriteString(", ")

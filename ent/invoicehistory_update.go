@@ -35,23 +35,23 @@ func (ihu *InvoiceHistoryUpdate) SetUpdatedAt(t time.Time) *InvoiceHistoryUpdate
 	return ihu
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (ihu *InvoiceHistoryUpdate) SetPrevStatusCode(i int) *InvoiceHistoryUpdate {
-	ihu.mutation.SetPrevStatusCode(i)
+// SetOldStatusCode sets the "old_status_code" field.
+func (ihu *InvoiceHistoryUpdate) SetOldStatusCode(i int) *InvoiceHistoryUpdate {
+	ihu.mutation.SetOldStatusCode(i)
 	return ihu
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (ihu *InvoiceHistoryUpdate) SetNillablePrevStatusCode(i *int) *InvoiceHistoryUpdate {
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (ihu *InvoiceHistoryUpdate) SetNillableOldStatusCode(i *int) *InvoiceHistoryUpdate {
 	if i != nil {
-		ihu.SetPrevStatusCode(*i)
+		ihu.SetOldStatusCode(*i)
 	}
 	return ihu
 }
 
-// ClearPrevStatusCode clears the value of the "prev_status_code" field.
-func (ihu *InvoiceHistoryUpdate) ClearPrevStatusCode() *InvoiceHistoryUpdate {
-	ihu.mutation.ClearPrevStatusCode()
+// ClearOldStatusCode clears the value of the "old_status_code" field.
+func (ihu *InvoiceHistoryUpdate) ClearOldStatusCode() *InvoiceHistoryUpdate {
+	ihu.mutation.ClearOldStatusCode()
 	return ihu
 }
 
@@ -95,23 +95,23 @@ func (ihu *InvoiceHistoryUpdate) ClearDescription() *InvoiceHistoryUpdate {
 	return ihu
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (ihu *InvoiceHistoryUpdate) SetPrevStatusID(id int) *InvoiceHistoryUpdate {
-	ihu.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (ihu *InvoiceHistoryUpdate) SetOldStatusID(id int) *InvoiceHistoryUpdate {
+	ihu.mutation.SetOldStatusID(id)
 	return ihu
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ihu *InvoiceHistoryUpdate) SetNillablePrevStatusID(id *int) *InvoiceHistoryUpdate {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (ihu *InvoiceHistoryUpdate) SetNillableOldStatusID(id *int) *InvoiceHistoryUpdate {
 	if id != nil {
-		ihu = ihu.SetPrevStatusID(*id)
+		ihu = ihu.SetOldStatusID(*id)
 	}
 	return ihu
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (ihu *InvoiceHistoryUpdate) SetPrevStatus(o *OrderStatusCode) *InvoiceHistoryUpdate {
-	return ihu.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (ihu *InvoiceHistoryUpdate) SetOldStatus(o *OrderStatusCode) *InvoiceHistoryUpdate {
+	return ihu.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -138,9 +138,9 @@ func (ihu *InvoiceHistoryUpdate) Mutation() *InvoiceHistoryMutation {
 	return ihu.mutation
 }
 
-// ClearPrevStatus clears the "prev_status" edge to the OrderStatusCode entity.
-func (ihu *InvoiceHistoryUpdate) ClearPrevStatus() *InvoiceHistoryUpdate {
-	ihu.mutation.ClearPrevStatus()
+// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+func (ihu *InvoiceHistoryUpdate) ClearOldStatus() *InvoiceHistoryUpdate {
+	ihu.mutation.ClearOldStatus()
 	return ihu
 }
 
@@ -218,12 +218,12 @@ func (ihu *InvoiceHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 	if ihu.mutation.DescriptionCleared() {
 		_spec.ClearField(invoicehistory.FieldDescription, field.TypeString)
 	}
-	if ihu.mutation.PrevStatusCleared() {
+	if ihu.mutation.OldStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   invoicehistory.PrevStatusTable,
-			Columns: []string{invoicehistory.PrevStatusColumn},
+			Table:   invoicehistory.OldStatusTable,
+			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -231,12 +231,12 @@ func (ihu *InvoiceHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ihu.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := ihu.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   invoicehistory.PrevStatusTable,
-			Columns: []string{invoicehistory.PrevStatusColumn},
+			Table:   invoicehistory.OldStatusTable,
+			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -302,23 +302,23 @@ func (ihuo *InvoiceHistoryUpdateOne) SetUpdatedAt(t time.Time) *InvoiceHistoryUp
 	return ihuo
 }
 
-// SetPrevStatusCode sets the "prev_status_code" field.
-func (ihuo *InvoiceHistoryUpdateOne) SetPrevStatusCode(i int) *InvoiceHistoryUpdateOne {
-	ihuo.mutation.SetPrevStatusCode(i)
+// SetOldStatusCode sets the "old_status_code" field.
+func (ihuo *InvoiceHistoryUpdateOne) SetOldStatusCode(i int) *InvoiceHistoryUpdateOne {
+	ihuo.mutation.SetOldStatusCode(i)
 	return ihuo
 }
 
-// SetNillablePrevStatusCode sets the "prev_status_code" field if the given value is not nil.
-func (ihuo *InvoiceHistoryUpdateOne) SetNillablePrevStatusCode(i *int) *InvoiceHistoryUpdateOne {
+// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
+func (ihuo *InvoiceHistoryUpdateOne) SetNillableOldStatusCode(i *int) *InvoiceHistoryUpdateOne {
 	if i != nil {
-		ihuo.SetPrevStatusCode(*i)
+		ihuo.SetOldStatusCode(*i)
 	}
 	return ihuo
 }
 
-// ClearPrevStatusCode clears the value of the "prev_status_code" field.
-func (ihuo *InvoiceHistoryUpdateOne) ClearPrevStatusCode() *InvoiceHistoryUpdateOne {
-	ihuo.mutation.ClearPrevStatusCode()
+// ClearOldStatusCode clears the value of the "old_status_code" field.
+func (ihuo *InvoiceHistoryUpdateOne) ClearOldStatusCode() *InvoiceHistoryUpdateOne {
+	ihuo.mutation.ClearOldStatusCode()
 	return ihuo
 }
 
@@ -362,23 +362,23 @@ func (ihuo *InvoiceHistoryUpdateOne) ClearDescription() *InvoiceHistoryUpdateOne
 	return ihuo
 }
 
-// SetPrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID.
-func (ihuo *InvoiceHistoryUpdateOne) SetPrevStatusID(id int) *InvoiceHistoryUpdateOne {
-	ihuo.mutation.SetPrevStatusID(id)
+// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+func (ihuo *InvoiceHistoryUpdateOne) SetOldStatusID(id int) *InvoiceHistoryUpdateOne {
+	ihuo.mutation.SetOldStatusID(id)
 	return ihuo
 }
 
-// SetNillablePrevStatusID sets the "prev_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ihuo *InvoiceHistoryUpdateOne) SetNillablePrevStatusID(id *int) *InvoiceHistoryUpdateOne {
+// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+func (ihuo *InvoiceHistoryUpdateOne) SetNillableOldStatusID(id *int) *InvoiceHistoryUpdateOne {
 	if id != nil {
-		ihuo = ihuo.SetPrevStatusID(*id)
+		ihuo = ihuo.SetOldStatusID(*id)
 	}
 	return ihuo
 }
 
-// SetPrevStatus sets the "prev_status" edge to the OrderStatusCode entity.
-func (ihuo *InvoiceHistoryUpdateOne) SetPrevStatus(o *OrderStatusCode) *InvoiceHistoryUpdateOne {
-	return ihuo.SetPrevStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
+func (ihuo *InvoiceHistoryUpdateOne) SetOldStatus(o *OrderStatusCode) *InvoiceHistoryUpdateOne {
+	return ihuo.SetOldStatusID(o.ID)
 }
 
 // SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
@@ -405,9 +405,9 @@ func (ihuo *InvoiceHistoryUpdateOne) Mutation() *InvoiceHistoryMutation {
 	return ihuo.mutation
 }
 
-// ClearPrevStatus clears the "prev_status" edge to the OrderStatusCode entity.
-func (ihuo *InvoiceHistoryUpdateOne) ClearPrevStatus() *InvoiceHistoryUpdateOne {
-	ihuo.mutation.ClearPrevStatus()
+// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+func (ihuo *InvoiceHistoryUpdateOne) ClearOldStatus() *InvoiceHistoryUpdateOne {
+	ihuo.mutation.ClearOldStatus()
 	return ihuo
 }
 
@@ -515,12 +515,12 @@ func (ihuo *InvoiceHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Invoic
 	if ihuo.mutation.DescriptionCleared() {
 		_spec.ClearField(invoicehistory.FieldDescription, field.TypeString)
 	}
-	if ihuo.mutation.PrevStatusCleared() {
+	if ihuo.mutation.OldStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   invoicehistory.PrevStatusTable,
-			Columns: []string{invoicehistory.PrevStatusColumn},
+			Table:   invoicehistory.OldStatusTable,
+			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
@@ -528,12 +528,12 @@ func (ihuo *InvoiceHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Invoic
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ihuo.mutation.PrevStatusIDs(); len(nodes) > 0 {
+	if nodes := ihuo.mutation.OldStatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   invoicehistory.PrevStatusTable,
-			Columns: []string{invoicehistory.PrevStatusColumn},
+			Table:   invoicehistory.OldStatusTable,
+			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),

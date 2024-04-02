@@ -21,14 +21,14 @@ import (
 // OrderHistoryQuery is the builder for querying OrderHistory entities.
 type OrderHistoryQuery struct {
 	config
-	ctx            *QueryContext
-	order          []orderhistory.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.OrderHistory
-	withOrder      *OrderQuery
-	withPerson     *PersonQuery
-	withPrevStatus *OrderStatusCodeQuery
-	withNewStatus  *OrderStatusCodeQuery
+	ctx           *QueryContext
+	order         []orderhistory.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.OrderHistory
+	withOrder     *OrderQuery
+	withPerson    *PersonQuery
+	withOldStatus *OrderStatusCodeQuery
+	withNewStatus *OrderStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -109,8 +109,8 @@ func (ohq *OrderHistoryQuery) QueryPerson() *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus chains the current query on the "prev_status" edge.
-func (ohq *OrderHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
+// QueryOldStatus chains the current query on the "old_status" edge.
+func (ohq *OrderHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: ohq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ohq.prepareQuery(ctx); err != nil {
@@ -123,7 +123,7 @@ func (ohq *OrderHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, selector),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.PrevStatusTable, orderhistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.OldStatusTable, orderhistory.OldStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ohq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,15 +340,15 @@ func (ohq *OrderHistoryQuery) Clone() *OrderHistoryQuery {
 		return nil
 	}
 	return &OrderHistoryQuery{
-		config:         ohq.config,
-		ctx:            ohq.ctx.Clone(),
-		order:          append([]orderhistory.OrderOption{}, ohq.order...),
-		inters:         append([]Interceptor{}, ohq.inters...),
-		predicates:     append([]predicate.OrderHistory{}, ohq.predicates...),
-		withOrder:      ohq.withOrder.Clone(),
-		withPerson:     ohq.withPerson.Clone(),
-		withPrevStatus: ohq.withPrevStatus.Clone(),
-		withNewStatus:  ohq.withNewStatus.Clone(),
+		config:        ohq.config,
+		ctx:           ohq.ctx.Clone(),
+		order:         append([]orderhistory.OrderOption{}, ohq.order...),
+		inters:        append([]Interceptor{}, ohq.inters...),
+		predicates:    append([]predicate.OrderHistory{}, ohq.predicates...),
+		withOrder:     ohq.withOrder.Clone(),
+		withPerson:    ohq.withPerson.Clone(),
+		withOldStatus: ohq.withOldStatus.Clone(),
+		withNewStatus: ohq.withNewStatus.Clone(),
 		// clone intermediate query.
 		sql:  ohq.sql.Clone(),
 		path: ohq.path,
@@ -377,14 +377,14 @@ func (ohq *OrderHistoryQuery) WithPerson(opts ...func(*PersonQuery)) *OrderHisto
 	return ohq
 }
 
-// WithPrevStatus tells the query-builder to eager-load the nodes that are connected to
-// the "prev_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (ohq *OrderHistoryQuery) WithPrevStatus(opts ...func(*OrderStatusCodeQuery)) *OrderHistoryQuery {
+// WithOldStatus tells the query-builder to eager-load the nodes that are connected to
+// the "old_status" edge. The optional arguments are used to configure the query builder of the edge.
+func (ohq *OrderHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery)) *OrderHistoryQuery {
 	query := (&OrderStatusCodeClient{config: ohq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ohq.withPrevStatus = query
+	ohq.withOldStatus = query
 	return ohq
 }
 
@@ -480,7 +480,7 @@ func (ohq *OrderHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		loadedTypes = [4]bool{
 			ohq.withOrder != nil,
 			ohq.withPerson != nil,
-			ohq.withPrevStatus != nil,
+			ohq.withOldStatus != nil,
 			ohq.withNewStatus != nil,
 		}
 	)
@@ -514,9 +514,9 @@ func (ohq *OrderHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
-	if query := ohq.withPrevStatus; query != nil {
-		if err := ohq.loadPrevStatus(ctx, query, nodes, nil,
-			func(n *OrderHistory, e *OrderStatusCode) { n.Edges.PrevStatus = e }); err != nil {
+	if query := ohq.withOldStatus; query != nil {
+		if err := ohq.loadOldStatus(ctx, query, nodes, nil,
+			func(n *OrderHistory, e *OrderStatusCode) { n.Edges.OldStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,14 +587,14 @@ func (ohq *OrderHistoryQuery) loadPerson(ctx context.Context, query *PersonQuery
 	}
 	return nil
 }
-func (ohq *OrderHistoryQuery) loadPrevStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*OrderHistory, init func(*OrderHistory), assign func(*OrderHistory, *OrderStatusCode)) error {
+func (ohq *OrderHistoryQuery) loadOldStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*OrderHistory, init func(*OrderHistory), assign func(*OrderHistory, *OrderStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*OrderHistory)
 	for i := range nodes {
-		if nodes[i].PrevStatusCode == nil {
+		if nodes[i].OldStatusCode == nil {
 			continue
 		}
-		fk := *nodes[i].PrevStatusCode
+		fk := *nodes[i].OldStatusCode
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -611,7 +611,7 @@ func (ohq *OrderHistoryQuery) loadPrevStatus(ctx context.Context, query *OrderSt
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "prev_status_code" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "old_status_code" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -683,8 +683,8 @@ func (ohq *OrderHistoryQuery) querySpec() *sqlgraph.QuerySpec {
 		if ohq.withPerson != nil {
 			_spec.Node.AddColumnOnce(orderhistory.FieldPersonID)
 		}
-		if ohq.withPrevStatus != nil {
-			_spec.Node.AddColumnOnce(orderhistory.FieldPrevStatusCode)
+		if ohq.withOldStatus != nil {
+			_spec.Node.AddColumnOnce(orderhistory.FieldOldStatusCode)
 		}
 		if ohq.withNewStatus != nil {
 			_spec.Node.AddColumnOnce(orderhistory.FieldNewStatusCode)

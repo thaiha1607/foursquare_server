@@ -60,3 +60,10 @@ func (WorkUnitInfo) Edges() []ent.Edge {
 			Unique(),
 	}
 }
+
+// Mixin of the WorkUnitInfo.
+func (WorkUnitInfo) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
+}

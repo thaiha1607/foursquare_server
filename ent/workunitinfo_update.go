@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +27,12 @@ type WorkUnitInfoUpdate struct {
 // Where appends a list predicates to the WorkUnitInfoUpdate builder.
 func (wuiu *WorkUnitInfoUpdate) Where(ps ...predicate.WorkUnitInfo) *WorkUnitInfoUpdate {
 	wuiu.mutation.Where(ps...)
+	return wuiu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (wuiu *WorkUnitInfoUpdate) SetUpdatedAt(t time.Time) *WorkUnitInfoUpdate {
+	wuiu.mutation.SetUpdatedAt(t)
 	return wuiu
 }
 
@@ -115,6 +122,7 @@ func (wuiu *WorkUnitInfoUpdate) ClearAddress() *WorkUnitInfoUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wuiu *WorkUnitInfoUpdate) Save(ctx context.Context) (int, error) {
+	wuiu.defaults()
 	return withHooks(ctx, wuiu.sqlSave, wuiu.mutation, wuiu.hooks)
 }
 
@@ -137,6 +145,14 @@ func (wuiu *WorkUnitInfoUpdate) Exec(ctx context.Context) error {
 func (wuiu *WorkUnitInfoUpdate) ExecX(ctx context.Context) {
 	if err := wuiu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (wuiu *WorkUnitInfoUpdate) defaults() {
+	if _, ok := wuiu.mutation.UpdatedAt(); !ok {
+		v := workunitinfo.UpdateDefaultUpdatedAt()
+		wuiu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -171,6 +187,9 @@ func (wuiu *WorkUnitInfoUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := wuiu.mutation.UpdatedAt(); ok {
+		_spec.SetField(workunitinfo.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := wuiu.mutation.Name(); ok {
 		_spec.SetField(workunitinfo.FieldName, field.TypeString, value)
@@ -231,6 +250,12 @@ type WorkUnitInfoUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *WorkUnitInfoMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (wuiuo *WorkUnitInfoUpdateOne) SetUpdatedAt(t time.Time) *WorkUnitInfoUpdateOne {
+	wuiuo.mutation.SetUpdatedAt(t)
+	return wuiuo
 }
 
 // SetName sets the "name" field.
@@ -332,6 +357,7 @@ func (wuiuo *WorkUnitInfoUpdateOne) Select(field string, fields ...string) *Work
 
 // Save executes the query and returns the updated WorkUnitInfo entity.
 func (wuiuo *WorkUnitInfoUpdateOne) Save(ctx context.Context) (*WorkUnitInfo, error) {
+	wuiuo.defaults()
 	return withHooks(ctx, wuiuo.sqlSave, wuiuo.mutation, wuiuo.hooks)
 }
 
@@ -354,6 +380,14 @@ func (wuiuo *WorkUnitInfoUpdateOne) Exec(ctx context.Context) error {
 func (wuiuo *WorkUnitInfoUpdateOne) ExecX(ctx context.Context) {
 	if err := wuiuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (wuiuo *WorkUnitInfoUpdateOne) defaults() {
+	if _, ok := wuiuo.mutation.UpdatedAt(); !ok {
+		v := workunitinfo.UpdateDefaultUpdatedAt()
+		wuiuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -405,6 +439,9 @@ func (wuiuo *WorkUnitInfoUpdateOne) sqlSave(ctx context.Context) (_node *WorkUni
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := wuiuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(workunitinfo.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := wuiuo.mutation.Name(); ok {
 		_spec.SetField(workunitinfo.FieldName, field.TypeString, value)

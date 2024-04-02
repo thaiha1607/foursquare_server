@@ -23,8 +23,8 @@ const (
 	FieldOrderID = "order_id"
 	// FieldPersonID holds the string denoting the person_id field in the database.
 	FieldPersonID = "person_id"
-	// FieldPrevStatusCode holds the string denoting the prev_status_code field in the database.
-	FieldPrevStatusCode = "prev_status_code"
+	// FieldOldStatusCode holds the string denoting the old_status_code field in the database.
+	FieldOldStatusCode = "old_status_code"
 	// FieldNewStatusCode holds the string denoting the new_status_code field in the database.
 	FieldNewStatusCode = "new_status_code"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -33,8 +33,8 @@ const (
 	EdgeOrder = "order"
 	// EdgePerson holds the string denoting the person edge name in mutations.
 	EdgePerson = "person"
-	// EdgePrevStatus holds the string denoting the prev_status edge name in mutations.
-	EdgePrevStatus = "prev_status"
+	// EdgeOldStatus holds the string denoting the old_status edge name in mutations.
+	EdgeOldStatus = "old_status"
 	// EdgeNewStatus holds the string denoting the new_status edge name in mutations.
 	EdgeNewStatus = "new_status"
 	// Table holds the table name of the orderhistory in the database.
@@ -53,13 +53,13 @@ const (
 	PersonInverseTable = "persons"
 	// PersonColumn is the table column denoting the person relation/edge.
 	PersonColumn = "person_id"
-	// PrevStatusTable is the table that holds the prev_status relation/edge.
-	PrevStatusTable = "order_histories"
-	// PrevStatusInverseTable is the table name for the OrderStatusCode entity.
+	// OldStatusTable is the table that holds the old_status relation/edge.
+	OldStatusTable = "order_histories"
+	// OldStatusInverseTable is the table name for the OrderStatusCode entity.
 	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
-	PrevStatusInverseTable = "order_status_codes"
-	// PrevStatusColumn is the table column denoting the prev_status relation/edge.
-	PrevStatusColumn = "prev_status_code"
+	OldStatusInverseTable = "order_status_codes"
+	// OldStatusColumn is the table column denoting the old_status relation/edge.
+	OldStatusColumn = "old_status_code"
 	// NewStatusTable is the table that holds the new_status relation/edge.
 	NewStatusTable = "order_histories"
 	// NewStatusInverseTable is the table name for the OrderStatusCode entity.
@@ -76,7 +76,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldOrderID,
 	FieldPersonID,
-	FieldPrevStatusCode,
+	FieldOldStatusCode,
 	FieldNewStatusCode,
 	FieldDescription,
 }
@@ -130,9 +130,9 @@ func ByPersonID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPersonID, opts...).ToFunc()
 }
 
-// ByPrevStatusCode orders the results by the prev_status_code field.
-func ByPrevStatusCode(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPrevStatusCode, opts...).ToFunc()
+// ByOldStatusCode orders the results by the old_status_code field.
+func ByOldStatusCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOldStatusCode, opts...).ToFunc()
 }
 
 // ByNewStatusCode orders the results by the new_status_code field.
@@ -159,10 +159,10 @@ func ByPersonField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByPrevStatusField orders the results by prev_status field.
-func ByPrevStatusField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByOldStatusField orders the results by old_status field.
+func ByOldStatusField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newPrevStatusStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newOldStatusStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -186,11 +186,11 @@ func newPersonStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, PersonTable, PersonColumn),
 	)
 }
-func newPrevStatusStep() *sqlgraph.Step {
+func newOldStatusStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(PrevStatusInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, PrevStatusTable, PrevStatusColumn),
+		sqlgraph.To(OldStatusInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, OldStatusTable, OldStatusColumn),
 	)
 }
 func newNewStatusStep() *sqlgraph.Step {

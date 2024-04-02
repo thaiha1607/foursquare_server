@@ -21,14 +21,14 @@ import (
 // ShipmentHistoryQuery is the builder for querying ShipmentHistory entities.
 type ShipmentHistoryQuery struct {
 	config
-	ctx            *QueryContext
-	order          []shipmenthistory.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.ShipmentHistory
-	withShipment   *ShipmentQuery
-	withPerson     *PersonQuery
-	withPrevStatus *OrderStatusCodeQuery
-	withNewStatus  *OrderStatusCodeQuery
+	ctx           *QueryContext
+	order         []shipmenthistory.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.ShipmentHistory
+	withShipment  *ShipmentQuery
+	withPerson    *PersonQuery
+	withOldStatus *OrderStatusCodeQuery
+	withNewStatus *OrderStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -109,8 +109,8 @@ func (shq *ShipmentHistoryQuery) QueryPerson() *PersonQuery {
 	return query
 }
 
-// QueryPrevStatus chains the current query on the "prev_status" edge.
-func (shq *ShipmentHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
+// QueryOldStatus chains the current query on the "old_status" edge.
+func (shq *ShipmentHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 	query := (&OrderStatusCodeClient{config: shq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := shq.prepareQuery(ctx); err != nil {
@@ -123,7 +123,7 @@ func (shq *ShipmentHistoryQuery) QueryPrevStatus() *OrderStatusCodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, selector),
 			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.PrevStatusTable, shipmenthistory.PrevStatusColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.OldStatusTable, shipmenthistory.OldStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(shq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,15 +340,15 @@ func (shq *ShipmentHistoryQuery) Clone() *ShipmentHistoryQuery {
 		return nil
 	}
 	return &ShipmentHistoryQuery{
-		config:         shq.config,
-		ctx:            shq.ctx.Clone(),
-		order:          append([]shipmenthistory.OrderOption{}, shq.order...),
-		inters:         append([]Interceptor{}, shq.inters...),
-		predicates:     append([]predicate.ShipmentHistory{}, shq.predicates...),
-		withShipment:   shq.withShipment.Clone(),
-		withPerson:     shq.withPerson.Clone(),
-		withPrevStatus: shq.withPrevStatus.Clone(),
-		withNewStatus:  shq.withNewStatus.Clone(),
+		config:        shq.config,
+		ctx:           shq.ctx.Clone(),
+		order:         append([]shipmenthistory.OrderOption{}, shq.order...),
+		inters:        append([]Interceptor{}, shq.inters...),
+		predicates:    append([]predicate.ShipmentHistory{}, shq.predicates...),
+		withShipment:  shq.withShipment.Clone(),
+		withPerson:    shq.withPerson.Clone(),
+		withOldStatus: shq.withOldStatus.Clone(),
+		withNewStatus: shq.withNewStatus.Clone(),
 		// clone intermediate query.
 		sql:  shq.sql.Clone(),
 		path: shq.path,
@@ -377,14 +377,14 @@ func (shq *ShipmentHistoryQuery) WithPerson(opts ...func(*PersonQuery)) *Shipmen
 	return shq
 }
 
-// WithPrevStatus tells the query-builder to eager-load the nodes that are connected to
-// the "prev_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (shq *ShipmentHistoryQuery) WithPrevStatus(opts ...func(*OrderStatusCodeQuery)) *ShipmentHistoryQuery {
+// WithOldStatus tells the query-builder to eager-load the nodes that are connected to
+// the "old_status" edge. The optional arguments are used to configure the query builder of the edge.
+func (shq *ShipmentHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery)) *ShipmentHistoryQuery {
 	query := (&OrderStatusCodeClient{config: shq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	shq.withPrevStatus = query
+	shq.withOldStatus = query
 	return shq
 }
 
@@ -405,12 +405,12 @@ func (shq *ShipmentHistoryQuery) WithNewStatus(opts ...func(*OrderStatusCodeQuer
 // Example:
 //
 //	var v []struct {
-//		ShipmentID string `json:"shipment_id,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ShipmentHistory.Query().
-//		GroupBy(shipmenthistory.FieldShipmentID).
+//		GroupBy(shipmenthistory.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (shq *ShipmentHistoryQuery) GroupBy(field string, fields ...string) *ShipmentHistoryGroupBy {
@@ -428,11 +428,11 @@ func (shq *ShipmentHistoryQuery) GroupBy(field string, fields ...string) *Shipme
 // Example:
 //
 //	var v []struct {
-//		ShipmentID string `json:"shipment_id,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.ShipmentHistory.Query().
-//		Select(shipmenthistory.FieldShipmentID).
+//		Select(shipmenthistory.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (shq *ShipmentHistoryQuery) Select(fields ...string) *ShipmentHistorySelect {
 	shq.ctx.Fields = append(shq.ctx.Fields, fields...)
@@ -480,7 +480,7 @@ func (shq *ShipmentHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 		loadedTypes = [4]bool{
 			shq.withShipment != nil,
 			shq.withPerson != nil,
-			shq.withPrevStatus != nil,
+			shq.withOldStatus != nil,
 			shq.withNewStatus != nil,
 		}
 	)
@@ -514,9 +514,9 @@ func (shq *ShipmentHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 			return nil, err
 		}
 	}
-	if query := shq.withPrevStatus; query != nil {
-		if err := shq.loadPrevStatus(ctx, query, nodes, nil,
-			func(n *ShipmentHistory, e *OrderStatusCode) { n.Edges.PrevStatus = e }); err != nil {
+	if query := shq.withOldStatus; query != nil {
+		if err := shq.loadOldStatus(ctx, query, nodes, nil,
+			func(n *ShipmentHistory, e *OrderStatusCode) { n.Edges.OldStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,14 +587,14 @@ func (shq *ShipmentHistoryQuery) loadPerson(ctx context.Context, query *PersonQu
 	}
 	return nil
 }
-func (shq *ShipmentHistoryQuery) loadPrevStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *OrderStatusCode)) error {
+func (shq *ShipmentHistoryQuery) loadOldStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *OrderStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ShipmentHistory)
 	for i := range nodes {
-		if nodes[i].PrevStatusCode == nil {
+		if nodes[i].OldStatusCode == nil {
 			continue
 		}
-		fk := *nodes[i].PrevStatusCode
+		fk := *nodes[i].OldStatusCode
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -611,7 +611,7 @@ func (shq *ShipmentHistoryQuery) loadPrevStatus(ctx context.Context, query *Orde
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "prev_status_code" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "old_status_code" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -683,8 +683,8 @@ func (shq *ShipmentHistoryQuery) querySpec() *sqlgraph.QuerySpec {
 		if shq.withPerson != nil {
 			_spec.Node.AddColumnOnce(shipmenthistory.FieldPersonID)
 		}
-		if shq.withPrevStatus != nil {
-			_spec.Node.AddColumnOnce(shipmenthistory.FieldPrevStatusCode)
+		if shq.withOldStatus != nil {
+			_spec.Node.AddColumnOnce(shipmenthistory.FieldOldStatusCode)
 		}
 		if shq.withNewStatus != nil {
 			_spec.Node.AddColumnOnce(shipmenthistory.FieldNewStatusCode)
