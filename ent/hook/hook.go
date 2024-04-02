@@ -33,18 +33,6 @@ func (f ConversationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConversationMutation", m)
 }
 
-// The DeliveryAssignmentFunc type is an adapter to allow the use of ordinary
-// function as DeliveryAssignment mutator.
-type DeliveryAssignmentFunc func(context.Context, *ent.DeliveryAssignmentMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f DeliveryAssignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.DeliveryAssignmentMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeliveryAssignmentMutation", m)
-}
-
 // The InvoiceFunc type is an adapter to allow the use of ordinary
 // function as Invoice mutator.
 type InvoiceFunc func(context.Context, *ent.InvoiceMutation) (ent.Value, error)
@@ -55,6 +43,18 @@ func (f InvoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceMutation", m)
+}
+
+// The InvoiceHistoryFunc type is an adapter to allow the use of ordinary
+// function as InvoiceHistory mutator.
+type InvoiceHistoryFunc func(context.Context, *ent.InvoiceHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvoiceHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.InvoiceHistoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceHistoryMutation", m)
 }
 
 // The MessageFunc type is an adapter to allow the use of ordinary
@@ -79,6 +79,18 @@ func (f OrderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderMutation", m)
+}
+
+// The OrderHistoryFunc type is an adapter to allow the use of ordinary
+// function as OrderHistory mutator.
+type OrderHistoryFunc func(context.Context, *ent.OrderHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OrderHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OrderHistoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderHistoryMutation", m)
 }
 
 // The OrderItemFunc type is an adapter to allow the use of ordinary
@@ -199,6 +211,18 @@ func (f ShipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ShipmentMutation", m)
+}
+
+// The ShipmentHistoryFunc type is an adapter to allow the use of ordinary
+// function as ShipmentHistory mutator.
+type ShipmentHistoryFunc func(context.Context, *ent.ShipmentHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ShipmentHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ShipmentHistoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ShipmentHistoryMutation", m)
 }
 
 // The ShipmentItemFunc type is an adapter to allow the use of ordinary

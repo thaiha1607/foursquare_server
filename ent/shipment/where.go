@@ -12,48 +12,58 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Shipment {
+func ID(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Shipment {
+func IDEQ(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Shipment {
+func IDNEQ(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Shipment {
+func IDIn(ids ...string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Shipment {
+func IDNotIn(ids ...string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Shipment {
+func IDGT(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Shipment {
+func IDGTE(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Shipment {
+func IDLT(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Shipment {
+func IDLTE(id string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldLTE(FieldID, id))
+}
+
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Shipment {
+	return predicate.Shipment(sql.FieldContainsFold(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -76,9 +86,9 @@ func InvoiceID(v uuid.UUID) predicate.Shipment {
 	return predicate.Shipment(sql.FieldEQ(FieldInvoiceID, v))
 }
 
-// ShipmentTrackingNumber applies equality check predicate on the "shipment_tracking_number" field. It's identical to ShipmentTrackingNumberEQ.
-func ShipmentTrackingNumber(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldEQ(FieldShipmentTrackingNumber, v))
+// StaffID applies equality check predicate on the "staff_id" field. It's identical to StaffIDEQ.
+func StaffID(v uuid.UUID) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEQ(FieldStaffID, v))
 }
 
 // ShipmentDate applies equality check predicate on the "shipment_date" field. It's identical to ShipmentDateEQ.
@@ -211,69 +221,24 @@ func InvoiceIDNotIn(vs ...uuid.UUID) predicate.Shipment {
 	return predicate.Shipment(sql.FieldNotIn(FieldInvoiceID, vs...))
 }
 
-// ShipmentTrackingNumberEQ applies the EQ predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberEQ(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldEQ(FieldShipmentTrackingNumber, v))
+// StaffIDEQ applies the EQ predicate on the "staff_id" field.
+func StaffIDEQ(v uuid.UUID) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEQ(FieldStaffID, v))
 }
 
-// ShipmentTrackingNumberNEQ applies the NEQ predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberNEQ(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldNEQ(FieldShipmentTrackingNumber, v))
+// StaffIDNEQ applies the NEQ predicate on the "staff_id" field.
+func StaffIDNEQ(v uuid.UUID) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNEQ(FieldStaffID, v))
 }
 
-// ShipmentTrackingNumberIn applies the In predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberIn(vs ...string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldIn(FieldShipmentTrackingNumber, vs...))
+// StaffIDIn applies the In predicate on the "staff_id" field.
+func StaffIDIn(vs ...uuid.UUID) predicate.Shipment {
+	return predicate.Shipment(sql.FieldIn(FieldStaffID, vs...))
 }
 
-// ShipmentTrackingNumberNotIn applies the NotIn predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberNotIn(vs ...string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldNotIn(FieldShipmentTrackingNumber, vs...))
-}
-
-// ShipmentTrackingNumberGT applies the GT predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberGT(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldGT(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberGTE applies the GTE predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberGTE(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldGTE(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberLT applies the LT predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberLT(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldLT(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberLTE applies the LTE predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberLTE(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldLTE(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberContains applies the Contains predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberContains(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldContains(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberHasPrefix applies the HasPrefix predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberHasPrefix(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldHasPrefix(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberHasSuffix applies the HasSuffix predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberHasSuffix(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldHasSuffix(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberEqualFold applies the EqualFold predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberEqualFold(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldEqualFold(FieldShipmentTrackingNumber, v))
-}
-
-// ShipmentTrackingNumberContainsFold applies the ContainsFold predicate on the "shipment_tracking_number" field.
-func ShipmentTrackingNumberContainsFold(v string) predicate.Shipment {
-	return predicate.Shipment(sql.FieldContainsFold(FieldShipmentTrackingNumber, v))
+// StaffIDNotIn applies the NotIn predicate on the "staff_id" field.
+func StaffIDNotIn(vs ...uuid.UUID) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNotIn(FieldStaffID, vs...))
 }
 
 // ShipmentDateEQ applies the EQ predicate on the "shipment_date" field.
@@ -391,6 +356,26 @@ func NoteContainsFold(v string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldContainsFold(FieldNote, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Shipment {
+	return predicate.Shipment(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNotIn(FieldStatus, vs...))
+}
+
 // HasOrder applies the HasEdge predicate on the "order" edge.
 func HasOrder() predicate.Shipment {
 	return predicate.Shipment(func(s *sql.Selector) {
@@ -429,6 +414,29 @@ func HasInvoice() predicate.Shipment {
 func HasInvoiceWith(preds ...predicate.Invoice) predicate.Shipment {
 	return predicate.Shipment(func(s *sql.Selector) {
 		step := newInvoiceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasStaff applies the HasEdge predicate on the "staff" edge.
+func HasStaff() predicate.Shipment {
+	return predicate.Shipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, StaffTable, StaffColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStaffWith applies the HasEdge predicate on the "staff" edge with a given conditions (other predicates).
+func HasStaffWith(preds ...predicate.Person) predicate.Shipment {
+	return predicate.Shipment(func(s *sql.Selector) {
+		step := newStaffStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

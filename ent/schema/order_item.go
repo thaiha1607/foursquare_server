@@ -60,6 +60,7 @@ func (OrderItem) Fields() []ent.Field {
 				"OutOfStock", "OUT_OF_STOCK",
 				"InTransit", "IN_TRANSIT",
 				"InStock", "IN_STOCK",
+				"PartiallyDelivered", "PARTIALLY_DELIVERED",
 			).
 			Default("IN_STOCK"),
 	}

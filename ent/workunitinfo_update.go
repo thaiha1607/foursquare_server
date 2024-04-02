@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
@@ -43,15 +44,15 @@ func (wuiu *WorkUnitInfoUpdate) SetNillableName(s *string) *WorkUnitInfoUpdate {
 }
 
 // SetAddressID sets the "address_id" field.
-func (wuiu *WorkUnitInfoUpdate) SetAddressID(s string) *WorkUnitInfoUpdate {
-	wuiu.mutation.SetAddressID(s)
+func (wuiu *WorkUnitInfoUpdate) SetAddressID(u uuid.UUID) *WorkUnitInfoUpdate {
+	wuiu.mutation.SetAddressID(u)
 	return wuiu
 }
 
 // SetNillableAddressID sets the "address_id" field if the given value is not nil.
-func (wuiu *WorkUnitInfoUpdate) SetNillableAddressID(s *string) *WorkUnitInfoUpdate {
-	if s != nil {
-		wuiu.SetAddressID(*s)
+func (wuiu *WorkUnitInfoUpdate) SetNillableAddressID(u *uuid.UUID) *WorkUnitInfoUpdate {
+	if u != nil {
+		wuiu.SetAddressID(*u)
 	}
 	return wuiu
 }
@@ -73,6 +74,26 @@ func (wuiu *WorkUnitInfoUpdate) SetNillableType(w *workunitinfo.Type) *WorkUnitI
 	if w != nil {
 		wuiu.SetType(*w)
 	}
+	return wuiu
+}
+
+// SetImageURL sets the "image_url" field.
+func (wuiu *WorkUnitInfoUpdate) SetImageURL(s string) *WorkUnitInfoUpdate {
+	wuiu.mutation.SetImageURL(s)
+	return wuiu
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (wuiu *WorkUnitInfoUpdate) SetNillableImageURL(s *string) *WorkUnitInfoUpdate {
+	if s != nil {
+		wuiu.SetImageURL(*s)
+	}
+	return wuiu
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (wuiu *WorkUnitInfoUpdate) ClearImageURL() *WorkUnitInfoUpdate {
+	wuiu.mutation.ClearImageURL()
 	return wuiu
 }
 
@@ -131,6 +152,11 @@ func (wuiu *WorkUnitInfoUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.type": %w`, err)}
 		}
 	}
+	if v, ok := wuiu.mutation.ImageURL(); ok {
+		if err := workunitinfo.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.image_url": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -152,6 +178,12 @@ func (wuiu *WorkUnitInfoUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := wuiu.mutation.GetType(); ok {
 		_spec.SetField(workunitinfo.FieldType, field.TypeEnum, value)
 	}
+	if value, ok := wuiu.mutation.ImageURL(); ok {
+		_spec.SetField(workunitinfo.FieldImageURL, field.TypeString, value)
+	}
+	if wuiu.mutation.ImageURLCleared() {
+		_spec.ClearField(workunitinfo.FieldImageURL, field.TypeString)
+	}
 	if wuiu.mutation.AddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -160,7 +192,7 @@ func (wuiu *WorkUnitInfoUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{workunitinfo.AddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -173,7 +205,7 @@ func (wuiu *WorkUnitInfoUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{workunitinfo.AddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -216,15 +248,15 @@ func (wuiuo *WorkUnitInfoUpdateOne) SetNillableName(s *string) *WorkUnitInfoUpda
 }
 
 // SetAddressID sets the "address_id" field.
-func (wuiuo *WorkUnitInfoUpdateOne) SetAddressID(s string) *WorkUnitInfoUpdateOne {
-	wuiuo.mutation.SetAddressID(s)
+func (wuiuo *WorkUnitInfoUpdateOne) SetAddressID(u uuid.UUID) *WorkUnitInfoUpdateOne {
+	wuiuo.mutation.SetAddressID(u)
 	return wuiuo
 }
 
 // SetNillableAddressID sets the "address_id" field if the given value is not nil.
-func (wuiuo *WorkUnitInfoUpdateOne) SetNillableAddressID(s *string) *WorkUnitInfoUpdateOne {
-	if s != nil {
-		wuiuo.SetAddressID(*s)
+func (wuiuo *WorkUnitInfoUpdateOne) SetNillableAddressID(u *uuid.UUID) *WorkUnitInfoUpdateOne {
+	if u != nil {
+		wuiuo.SetAddressID(*u)
 	}
 	return wuiuo
 }
@@ -246,6 +278,26 @@ func (wuiuo *WorkUnitInfoUpdateOne) SetNillableType(w *workunitinfo.Type) *WorkU
 	if w != nil {
 		wuiuo.SetType(*w)
 	}
+	return wuiuo
+}
+
+// SetImageURL sets the "image_url" field.
+func (wuiuo *WorkUnitInfoUpdateOne) SetImageURL(s string) *WorkUnitInfoUpdateOne {
+	wuiuo.mutation.SetImageURL(s)
+	return wuiuo
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (wuiuo *WorkUnitInfoUpdateOne) SetNillableImageURL(s *string) *WorkUnitInfoUpdateOne {
+	if s != nil {
+		wuiuo.SetImageURL(*s)
+	}
+	return wuiuo
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (wuiuo *WorkUnitInfoUpdateOne) ClearImageURL() *WorkUnitInfoUpdateOne {
+	wuiuo.mutation.ClearImageURL()
 	return wuiuo
 }
 
@@ -317,6 +369,11 @@ func (wuiuo *WorkUnitInfoUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.type": %w`, err)}
 		}
 	}
+	if v, ok := wuiuo.mutation.ImageURL(); ok {
+		if err := workunitinfo.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.image_url": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -355,6 +412,12 @@ func (wuiuo *WorkUnitInfoUpdateOne) sqlSave(ctx context.Context) (_node *WorkUni
 	if value, ok := wuiuo.mutation.GetType(); ok {
 		_spec.SetField(workunitinfo.FieldType, field.TypeEnum, value)
 	}
+	if value, ok := wuiuo.mutation.ImageURL(); ok {
+		_spec.SetField(workunitinfo.FieldImageURL, field.TypeString, value)
+	}
+	if wuiuo.mutation.ImageURLCleared() {
+		_spec.ClearField(workunitinfo.FieldImageURL, field.TypeString)
+	}
 	if wuiuo.mutation.AddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -363,7 +426,7 @@ func (wuiuo *WorkUnitInfoUpdateOne) sqlSave(ctx context.Context) (_node *WorkUni
 			Columns: []string{workunitinfo.AddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -376,7 +439,7 @@ func (wuiuo *WorkUnitInfoUpdateOne) sqlSave(ctx context.Context) (_node *WorkUni
 			Columns: []string{workunitinfo.AddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -18,10 +18,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/deliveryassignment"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
+	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
 	"github.com/thaiha1607/foursquare_server/ent/orderitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -32,6 +33,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/productqty"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
@@ -47,14 +49,16 @@ type Client struct {
 	Address *AddressClient
 	// Conversation is the client for interacting with the Conversation builders.
 	Conversation *ConversationClient
-	// DeliveryAssignment is the client for interacting with the DeliveryAssignment builders.
-	DeliveryAssignment *DeliveryAssignmentClient
 	// Invoice is the client for interacting with the Invoice builders.
 	Invoice *InvoiceClient
+	// InvoiceHistory is the client for interacting with the InvoiceHistory builders.
+	InvoiceHistory *InvoiceHistoryClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
+	// OrderHistory is the client for interacting with the OrderHistory builders.
+	OrderHistory *OrderHistoryClient
 	// OrderItem is the client for interacting with the OrderItem builders.
 	OrderItem *OrderItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
@@ -75,6 +79,8 @@ type Client struct {
 	ProductTag *ProductTagClient
 	// Shipment is the client for interacting with the Shipment builders.
 	Shipment *ShipmentClient
+	// ShipmentHistory is the client for interacting with the ShipmentHistory builders.
+	ShipmentHistory *ShipmentHistoryClient
 	// ShipmentItem is the client for interacting with the ShipmentItem builders.
 	ShipmentItem *ShipmentItemClient
 	// Tag is the client for interacting with the Tag builders.
@@ -96,10 +102,11 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Address = NewAddressClient(c.config)
 	c.Conversation = NewConversationClient(c.config)
-	c.DeliveryAssignment = NewDeliveryAssignmentClient(c.config)
 	c.Invoice = NewInvoiceClient(c.config)
+	c.InvoiceHistory = NewInvoiceHistoryClient(c.config)
 	c.Message = NewMessageClient(c.config)
 	c.Order = NewOrderClient(c.config)
+	c.OrderHistory = NewOrderHistoryClient(c.config)
 	c.OrderItem = NewOrderItemClient(c.config)
 	c.OrderStatusCode = NewOrderStatusCodeClient(c.config)
 	c.Person = NewPersonClient(c.config)
@@ -110,6 +117,7 @@ func (c *Client) init() {
 	c.ProductQty = NewProductQtyClient(c.config)
 	c.ProductTag = NewProductTagClient(c.config)
 	c.Shipment = NewShipmentClient(c.config)
+	c.ShipmentHistory = NewShipmentHistoryClient(c.config)
 	c.ShipmentItem = NewShipmentItemClient(c.config)
 	c.Tag = NewTagClient(c.config)
 	c.WarehouseAssignment = NewWarehouseAssignmentClient(c.config)
@@ -208,10 +216,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:              cfg,
 		Address:             NewAddressClient(cfg),
 		Conversation:        NewConversationClient(cfg),
-		DeliveryAssignment:  NewDeliveryAssignmentClient(cfg),
 		Invoice:             NewInvoiceClient(cfg),
+		InvoiceHistory:      NewInvoiceHistoryClient(cfg),
 		Message:             NewMessageClient(cfg),
 		Order:               NewOrderClient(cfg),
+		OrderHistory:        NewOrderHistoryClient(cfg),
 		OrderItem:           NewOrderItemClient(cfg),
 		OrderStatusCode:     NewOrderStatusCodeClient(cfg),
 		Person:              NewPersonClient(cfg),
@@ -222,6 +231,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProductQty:          NewProductQtyClient(cfg),
 		ProductTag:          NewProductTagClient(cfg),
 		Shipment:            NewShipmentClient(cfg),
+		ShipmentHistory:     NewShipmentHistoryClient(cfg),
 		ShipmentItem:        NewShipmentItemClient(cfg),
 		Tag:                 NewTagClient(cfg),
 		WarehouseAssignment: NewWarehouseAssignmentClient(cfg),
@@ -247,10 +257,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:              cfg,
 		Address:             NewAddressClient(cfg),
 		Conversation:        NewConversationClient(cfg),
-		DeliveryAssignment:  NewDeliveryAssignmentClient(cfg),
 		Invoice:             NewInvoiceClient(cfg),
+		InvoiceHistory:      NewInvoiceHistoryClient(cfg),
 		Message:             NewMessageClient(cfg),
 		Order:               NewOrderClient(cfg),
+		OrderHistory:        NewOrderHistoryClient(cfg),
 		OrderItem:           NewOrderItemClient(cfg),
 		OrderStatusCode:     NewOrderStatusCodeClient(cfg),
 		Person:              NewPersonClient(cfg),
@@ -261,6 +272,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProductQty:          NewProductQtyClient(cfg),
 		ProductTag:          NewProductTagClient(cfg),
 		Shipment:            NewShipmentClient(cfg),
+		ShipmentHistory:     NewShipmentHistoryClient(cfg),
 		ShipmentItem:        NewShipmentItemClient(cfg),
 		Tag:                 NewTagClient(cfg),
 		WarehouseAssignment: NewWarehouseAssignmentClient(cfg),
@@ -294,10 +306,11 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Address, c.Conversation, c.DeliveryAssignment, c.Invoice, c.Message, c.Order,
-		c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress, c.ProductColor,
-		c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag, c.Shipment,
-		c.ShipmentItem, c.Tag, c.WarehouseAssignment, c.WorkUnitInfo,
+		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.Message, c.Order,
+		c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress,
+		c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag,
+		c.Shipment, c.ShipmentHistory, c.ShipmentItem, c.Tag, c.WarehouseAssignment,
+		c.WorkUnitInfo,
 	} {
 		n.Use(hooks...)
 	}
@@ -307,10 +320,11 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Address, c.Conversation, c.DeliveryAssignment, c.Invoice, c.Message, c.Order,
-		c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress, c.ProductColor,
-		c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag, c.Shipment,
-		c.ShipmentItem, c.Tag, c.WarehouseAssignment, c.WorkUnitInfo,
+		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.Message, c.Order,
+		c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress,
+		c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag,
+		c.Shipment, c.ShipmentHistory, c.ShipmentItem, c.Tag, c.WarehouseAssignment,
+		c.WorkUnitInfo,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -323,14 +337,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Address.mutate(ctx, m)
 	case *ConversationMutation:
 		return c.Conversation.mutate(ctx, m)
-	case *DeliveryAssignmentMutation:
-		return c.DeliveryAssignment.mutate(ctx, m)
 	case *InvoiceMutation:
 		return c.Invoice.mutate(ctx, m)
+	case *InvoiceHistoryMutation:
+		return c.InvoiceHistory.mutate(ctx, m)
 	case *MessageMutation:
 		return c.Message.mutate(ctx, m)
 	case *OrderMutation:
 		return c.Order.mutate(ctx, m)
+	case *OrderHistoryMutation:
+		return c.OrderHistory.mutate(ctx, m)
 	case *OrderItemMutation:
 		return c.OrderItem.mutate(ctx, m)
 	case *OrderStatusCodeMutation:
@@ -351,6 +367,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProductTag.mutate(ctx, m)
 	case *ShipmentMutation:
 		return c.Shipment.mutate(ctx, m)
+	case *ShipmentHistoryMutation:
+		return c.ShipmentHistory.mutate(ctx, m)
 	case *ShipmentItemMutation:
 		return c.ShipmentItem.mutate(ctx, m)
 	case *TagMutation:
@@ -425,7 +443,7 @@ func (c *AddressClient) UpdateOne(a *Address) *AddressUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AddressClient) UpdateOneID(id string) *AddressUpdateOne {
+func (c *AddressClient) UpdateOneID(id uuid.UUID) *AddressUpdateOne {
 	mutation := newAddressMutation(c.config, OpUpdateOne, withAddressID(id))
 	return &AddressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -442,7 +460,7 @@ func (c *AddressClient) DeleteOne(a *Address) *AddressDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AddressClient) DeleteOneID(id string) *AddressDeleteOne {
+func (c *AddressClient) DeleteOneID(id uuid.UUID) *AddressDeleteOne {
 	builder := c.Delete().Where(address.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -459,12 +477,12 @@ func (c *AddressClient) Query() *AddressQuery {
 }
 
 // Get returns a Address entity by its id.
-func (c *AddressClient) Get(ctx context.Context, id string) (*Address, error) {
+func (c *AddressClient) Get(ctx context.Context, id uuid.UUID) (*Address, error) {
 	return c.Query().Where(address.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AddressClient) GetX(ctx context.Context, id string) *Address {
+func (c *AddressClient) GetX(ctx context.Context, id uuid.UUID) *Address {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -506,8 +524,7 @@ func (c *AddressClient) QueryPersonAddresses(a *Address) *PersonAddressQuery {
 
 // Hooks returns the client hooks.
 func (c *AddressClient) Hooks() []Hook {
-	hooks := c.hooks.Address
-	return append(hooks[:len(hooks):len(hooks)], address.Hooks[:]...)
+	return c.hooks.Address
 }
 
 // Interceptors returns the client interceptors.
@@ -695,171 +712,6 @@ func (c *ConversationClient) mutate(ctx context.Context, m *ConversationMutation
 	}
 }
 
-// DeliveryAssignmentClient is a client for the DeliveryAssignment schema.
-type DeliveryAssignmentClient struct {
-	config
-}
-
-// NewDeliveryAssignmentClient returns a client for the DeliveryAssignment from the given config.
-func NewDeliveryAssignmentClient(c config) *DeliveryAssignmentClient {
-	return &DeliveryAssignmentClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `deliveryassignment.Hooks(f(g(h())))`.
-func (c *DeliveryAssignmentClient) Use(hooks ...Hook) {
-	c.hooks.DeliveryAssignment = append(c.hooks.DeliveryAssignment, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `deliveryassignment.Intercept(f(g(h())))`.
-func (c *DeliveryAssignmentClient) Intercept(interceptors ...Interceptor) {
-	c.inters.DeliveryAssignment = append(c.inters.DeliveryAssignment, interceptors...)
-}
-
-// Create returns a builder for creating a DeliveryAssignment entity.
-func (c *DeliveryAssignmentClient) Create() *DeliveryAssignmentCreate {
-	mutation := newDeliveryAssignmentMutation(c.config, OpCreate)
-	return &DeliveryAssignmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of DeliveryAssignment entities.
-func (c *DeliveryAssignmentClient) CreateBulk(builders ...*DeliveryAssignmentCreate) *DeliveryAssignmentCreateBulk {
-	return &DeliveryAssignmentCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *DeliveryAssignmentClient) MapCreateBulk(slice any, setFunc func(*DeliveryAssignmentCreate, int)) *DeliveryAssignmentCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &DeliveryAssignmentCreateBulk{err: fmt.Errorf("calling to DeliveryAssignmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*DeliveryAssignmentCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &DeliveryAssignmentCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for DeliveryAssignment.
-func (c *DeliveryAssignmentClient) Update() *DeliveryAssignmentUpdate {
-	mutation := newDeliveryAssignmentMutation(c.config, OpUpdate)
-	return &DeliveryAssignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *DeliveryAssignmentClient) UpdateOne(da *DeliveryAssignment) *DeliveryAssignmentUpdateOne {
-	mutation := newDeliveryAssignmentMutation(c.config, OpUpdateOne, withDeliveryAssignment(da))
-	return &DeliveryAssignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *DeliveryAssignmentClient) UpdateOneID(id uuid.UUID) *DeliveryAssignmentUpdateOne {
-	mutation := newDeliveryAssignmentMutation(c.config, OpUpdateOne, withDeliveryAssignmentID(id))
-	return &DeliveryAssignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for DeliveryAssignment.
-func (c *DeliveryAssignmentClient) Delete() *DeliveryAssignmentDelete {
-	mutation := newDeliveryAssignmentMutation(c.config, OpDelete)
-	return &DeliveryAssignmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *DeliveryAssignmentClient) DeleteOne(da *DeliveryAssignment) *DeliveryAssignmentDeleteOne {
-	return c.DeleteOneID(da.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *DeliveryAssignmentClient) DeleteOneID(id uuid.UUID) *DeliveryAssignmentDeleteOne {
-	builder := c.Delete().Where(deliveryassignment.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &DeliveryAssignmentDeleteOne{builder}
-}
-
-// Query returns a query builder for DeliveryAssignment.
-func (c *DeliveryAssignmentClient) Query() *DeliveryAssignmentQuery {
-	return &DeliveryAssignmentQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeDeliveryAssignment},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a DeliveryAssignment entity by its id.
-func (c *DeliveryAssignmentClient) Get(ctx context.Context, id uuid.UUID) (*DeliveryAssignment, error) {
-	return c.Query().Where(deliveryassignment.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *DeliveryAssignmentClient) GetX(ctx context.Context, id uuid.UUID) *DeliveryAssignment {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryShipment queries the shipment edge of a DeliveryAssignment.
-func (c *DeliveryAssignmentClient) QueryShipment(da *DeliveryAssignment) *ShipmentQuery {
-	query := (&ShipmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := da.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(deliveryassignment.Table, deliveryassignment.FieldID, id),
-			sqlgraph.To(shipment.Table, shipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, deliveryassignment.ShipmentTable, deliveryassignment.ShipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(da.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryStaff queries the staff edge of a DeliveryAssignment.
-func (c *DeliveryAssignmentClient) QueryStaff(da *DeliveryAssignment) *PersonQuery {
-	query := (&PersonClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := da.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(deliveryassignment.Table, deliveryassignment.FieldID, id),
-			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, deliveryassignment.StaffTable, deliveryassignment.StaffColumn),
-		)
-		fromV = sqlgraph.Neighbors(da.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *DeliveryAssignmentClient) Hooks() []Hook {
-	return c.hooks.DeliveryAssignment
-}
-
-// Interceptors returns the client interceptors.
-func (c *DeliveryAssignmentClient) Interceptors() []Interceptor {
-	return c.inters.DeliveryAssignment
-}
-
-func (c *DeliveryAssignmentClient) mutate(ctx context.Context, m *DeliveryAssignmentMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&DeliveryAssignmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&DeliveryAssignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&DeliveryAssignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&DeliveryAssignmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown DeliveryAssignment mutation op: %q", m.Op())
-	}
-}
-
 // InvoiceClient is a client for the Invoice schema.
 type InvoiceClient struct {
 	config
@@ -1006,6 +858,203 @@ func (c *InvoiceClient) mutate(ctx context.Context, m *InvoiceMutation) (Value, 
 		return (&InvoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Invoice mutation op: %q", m.Op())
+	}
+}
+
+// InvoiceHistoryClient is a client for the InvoiceHistory schema.
+type InvoiceHistoryClient struct {
+	config
+}
+
+// NewInvoiceHistoryClient returns a client for the InvoiceHistory from the given config.
+func NewInvoiceHistoryClient(c config) *InvoiceHistoryClient {
+	return &InvoiceHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `invoicehistory.Hooks(f(g(h())))`.
+func (c *InvoiceHistoryClient) Use(hooks ...Hook) {
+	c.hooks.InvoiceHistory = append(c.hooks.InvoiceHistory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `invoicehistory.Intercept(f(g(h())))`.
+func (c *InvoiceHistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.InvoiceHistory = append(c.inters.InvoiceHistory, interceptors...)
+}
+
+// Create returns a builder for creating a InvoiceHistory entity.
+func (c *InvoiceHistoryClient) Create() *InvoiceHistoryCreate {
+	mutation := newInvoiceHistoryMutation(c.config, OpCreate)
+	return &InvoiceHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvoiceHistory entities.
+func (c *InvoiceHistoryClient) CreateBulk(builders ...*InvoiceHistoryCreate) *InvoiceHistoryCreateBulk {
+	return &InvoiceHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *InvoiceHistoryClient) MapCreateBulk(slice any, setFunc func(*InvoiceHistoryCreate, int)) *InvoiceHistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &InvoiceHistoryCreateBulk{err: fmt.Errorf("calling to InvoiceHistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*InvoiceHistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &InvoiceHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvoiceHistory.
+func (c *InvoiceHistoryClient) Update() *InvoiceHistoryUpdate {
+	mutation := newInvoiceHistoryMutation(c.config, OpUpdate)
+	return &InvoiceHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvoiceHistoryClient) UpdateOne(ih *InvoiceHistory) *InvoiceHistoryUpdateOne {
+	mutation := newInvoiceHistoryMutation(c.config, OpUpdateOne, withInvoiceHistory(ih))
+	return &InvoiceHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvoiceHistoryClient) UpdateOneID(id uuid.UUID) *InvoiceHistoryUpdateOne {
+	mutation := newInvoiceHistoryMutation(c.config, OpUpdateOne, withInvoiceHistoryID(id))
+	return &InvoiceHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvoiceHistory.
+func (c *InvoiceHistoryClient) Delete() *InvoiceHistoryDelete {
+	mutation := newInvoiceHistoryMutation(c.config, OpDelete)
+	return &InvoiceHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *InvoiceHistoryClient) DeleteOne(ih *InvoiceHistory) *InvoiceHistoryDeleteOne {
+	return c.DeleteOneID(ih.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *InvoiceHistoryClient) DeleteOneID(id uuid.UUID) *InvoiceHistoryDeleteOne {
+	builder := c.Delete().Where(invoicehistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvoiceHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for InvoiceHistory.
+func (c *InvoiceHistoryClient) Query() *InvoiceHistoryQuery {
+	return &InvoiceHistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeInvoiceHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a InvoiceHistory entity by its id.
+func (c *InvoiceHistoryClient) Get(ctx context.Context, id uuid.UUID) (*InvoiceHistory, error) {
+	return c.Query().Where(invoicehistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvoiceHistoryClient) GetX(ctx context.Context, id uuid.UUID) *InvoiceHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryInvoice queries the invoice edge of a InvoiceHistory.
+func (c *InvoiceHistoryClient) QueryInvoice(ih *InvoiceHistory) *InvoiceQuery {
+	query := (&InvoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ih.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
+			sqlgraph.To(invoice.Table, invoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.InvoiceTable, invoicehistory.InvoiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPerson queries the person edge of a InvoiceHistory.
+func (c *InvoiceHistoryClient) QueryPerson(ih *InvoiceHistory) *PersonQuery {
+	query := (&PersonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ih.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.PersonTable, invoicehistory.PersonColumn),
+		)
+		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrevStatus queries the prev_status edge of a InvoiceHistory.
+func (c *InvoiceHistoryClient) QueryPrevStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ih.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.PrevStatusTable, invoicehistory.PrevStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNewStatus queries the new_status edge of a InvoiceHistory.
+func (c *InvoiceHistoryClient) QueryNewStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ih.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.NewStatusTable, invoicehistory.NewStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvoiceHistoryClient) Hooks() []Hook {
+	return c.hooks.InvoiceHistory
+}
+
+// Interceptors returns the client interceptors.
+func (c *InvoiceHistoryClient) Interceptors() []Interceptor {
+	return c.inters.InvoiceHistory
+}
+
+func (c *InvoiceHistoryClient) mutate(ctx context.Context, m *InvoiceHistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&InvoiceHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&InvoiceHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&InvoiceHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&InvoiceHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown InvoiceHistory mutation op: %q", m.Op())
 	}
 }
 
@@ -1400,6 +1449,203 @@ func (c *OrderClient) mutate(ctx context.Context, m *OrderMutation) (Value, erro
 		return (&OrderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Order mutation op: %q", m.Op())
+	}
+}
+
+// OrderHistoryClient is a client for the OrderHistory schema.
+type OrderHistoryClient struct {
+	config
+}
+
+// NewOrderHistoryClient returns a client for the OrderHistory from the given config.
+func NewOrderHistoryClient(c config) *OrderHistoryClient {
+	return &OrderHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `orderhistory.Hooks(f(g(h())))`.
+func (c *OrderHistoryClient) Use(hooks ...Hook) {
+	c.hooks.OrderHistory = append(c.hooks.OrderHistory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `orderhistory.Intercept(f(g(h())))`.
+func (c *OrderHistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OrderHistory = append(c.inters.OrderHistory, interceptors...)
+}
+
+// Create returns a builder for creating a OrderHistory entity.
+func (c *OrderHistoryClient) Create() *OrderHistoryCreate {
+	mutation := newOrderHistoryMutation(c.config, OpCreate)
+	return &OrderHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OrderHistory entities.
+func (c *OrderHistoryClient) CreateBulk(builders ...*OrderHistoryCreate) *OrderHistoryCreateBulk {
+	return &OrderHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OrderHistoryClient) MapCreateBulk(slice any, setFunc func(*OrderHistoryCreate, int)) *OrderHistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OrderHistoryCreateBulk{err: fmt.Errorf("calling to OrderHistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OrderHistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OrderHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OrderHistory.
+func (c *OrderHistoryClient) Update() *OrderHistoryUpdate {
+	mutation := newOrderHistoryMutation(c.config, OpUpdate)
+	return &OrderHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OrderHistoryClient) UpdateOne(oh *OrderHistory) *OrderHistoryUpdateOne {
+	mutation := newOrderHistoryMutation(c.config, OpUpdateOne, withOrderHistory(oh))
+	return &OrderHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OrderHistoryClient) UpdateOneID(id uuid.UUID) *OrderHistoryUpdateOne {
+	mutation := newOrderHistoryMutation(c.config, OpUpdateOne, withOrderHistoryID(id))
+	return &OrderHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OrderHistory.
+func (c *OrderHistoryClient) Delete() *OrderHistoryDelete {
+	mutation := newOrderHistoryMutation(c.config, OpDelete)
+	return &OrderHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OrderHistoryClient) DeleteOne(oh *OrderHistory) *OrderHistoryDeleteOne {
+	return c.DeleteOneID(oh.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OrderHistoryClient) DeleteOneID(id uuid.UUID) *OrderHistoryDeleteOne {
+	builder := c.Delete().Where(orderhistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OrderHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for OrderHistory.
+func (c *OrderHistoryClient) Query() *OrderHistoryQuery {
+	return &OrderHistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrderHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OrderHistory entity by its id.
+func (c *OrderHistoryClient) Get(ctx context.Context, id uuid.UUID) (*OrderHistory, error) {
+	return c.Query().Where(orderhistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OrderHistoryClient) GetX(ctx context.Context, id uuid.UUID) *OrderHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOrder queries the order edge of a OrderHistory.
+func (c *OrderHistoryClient) QueryOrder(oh *OrderHistory) *OrderQuery {
+	query := (&OrderClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, id),
+			sqlgraph.To(order.Table, order.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.OrderTable, orderhistory.OrderColumn),
+		)
+		fromV = sqlgraph.Neighbors(oh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPerson queries the person edge of a OrderHistory.
+func (c *OrderHistoryClient) QueryPerson(oh *OrderHistory) *PersonQuery {
+	query := (&PersonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, id),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.PersonTable, orderhistory.PersonColumn),
+		)
+		fromV = sqlgraph.Neighbors(oh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrevStatus queries the prev_status edge of a OrderHistory.
+func (c *OrderHistoryClient) QueryPrevStatus(oh *OrderHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.PrevStatusTable, orderhistory.PrevStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(oh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNewStatus queries the new_status edge of a OrderHistory.
+func (c *OrderHistoryClient) QueryNewStatus(oh *OrderHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderhistory.Table, orderhistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orderhistory.NewStatusTable, orderhistory.NewStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(oh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OrderHistoryClient) Hooks() []Hook {
+	return c.hooks.OrderHistory
+}
+
+// Interceptors returns the client interceptors.
+func (c *OrderHistoryClient) Interceptors() []Interceptor {
+	return c.inters.OrderHistory
+}
+
+func (c *OrderHistoryClient) mutate(ctx context.Context, m *OrderHistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrderHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrderHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrderHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrderHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OrderHistory mutation op: %q", m.Op())
 	}
 }
 
@@ -2853,7 +3099,7 @@ func (c *ShipmentClient) UpdateOne(s *Shipment) *ShipmentUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ShipmentClient) UpdateOneID(id uuid.UUID) *ShipmentUpdateOne {
+func (c *ShipmentClient) UpdateOneID(id string) *ShipmentUpdateOne {
 	mutation := newShipmentMutation(c.config, OpUpdateOne, withShipmentID(id))
 	return &ShipmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -2870,7 +3116,7 @@ func (c *ShipmentClient) DeleteOne(s *Shipment) *ShipmentDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ShipmentClient) DeleteOneID(id uuid.UUID) *ShipmentDeleteOne {
+func (c *ShipmentClient) DeleteOneID(id string) *ShipmentDeleteOne {
 	builder := c.Delete().Where(shipment.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -2887,12 +3133,12 @@ func (c *ShipmentClient) Query() *ShipmentQuery {
 }
 
 // Get returns a Shipment entity by its id.
-func (c *ShipmentClient) Get(ctx context.Context, id uuid.UUID) (*Shipment, error) {
+func (c *ShipmentClient) Get(ctx context.Context, id string) (*Shipment, error) {
 	return c.Query().Where(shipment.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ShipmentClient) GetX(ctx context.Context, id uuid.UUID) *Shipment {
+func (c *ShipmentClient) GetX(ctx context.Context, id string) *Shipment {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2932,6 +3178,22 @@ func (c *ShipmentClient) QueryInvoice(s *Shipment) *InvoiceQuery {
 	return query
 }
 
+// QueryStaff queries the staff edge of a Shipment.
+func (c *ShipmentClient) QueryStaff(s *Shipment) *PersonQuery {
+	query := (&PersonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipment.Table, shipment.FieldID, id),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipment.StaffTable, shipment.StaffColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ShipmentClient) Hooks() []Hook {
 	hooks := c.hooks.Shipment
@@ -2955,6 +3217,203 @@ func (c *ShipmentClient) mutate(ctx context.Context, m *ShipmentMutation) (Value
 		return (&ShipmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Shipment mutation op: %q", m.Op())
+	}
+}
+
+// ShipmentHistoryClient is a client for the ShipmentHistory schema.
+type ShipmentHistoryClient struct {
+	config
+}
+
+// NewShipmentHistoryClient returns a client for the ShipmentHistory from the given config.
+func NewShipmentHistoryClient(c config) *ShipmentHistoryClient {
+	return &ShipmentHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `shipmenthistory.Hooks(f(g(h())))`.
+func (c *ShipmentHistoryClient) Use(hooks ...Hook) {
+	c.hooks.ShipmentHistory = append(c.hooks.ShipmentHistory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `shipmenthistory.Intercept(f(g(h())))`.
+func (c *ShipmentHistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ShipmentHistory = append(c.inters.ShipmentHistory, interceptors...)
+}
+
+// Create returns a builder for creating a ShipmentHistory entity.
+func (c *ShipmentHistoryClient) Create() *ShipmentHistoryCreate {
+	mutation := newShipmentHistoryMutation(c.config, OpCreate)
+	return &ShipmentHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ShipmentHistory entities.
+func (c *ShipmentHistoryClient) CreateBulk(builders ...*ShipmentHistoryCreate) *ShipmentHistoryCreateBulk {
+	return &ShipmentHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ShipmentHistoryClient) MapCreateBulk(slice any, setFunc func(*ShipmentHistoryCreate, int)) *ShipmentHistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ShipmentHistoryCreateBulk{err: fmt.Errorf("calling to ShipmentHistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ShipmentHistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ShipmentHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ShipmentHistory.
+func (c *ShipmentHistoryClient) Update() *ShipmentHistoryUpdate {
+	mutation := newShipmentHistoryMutation(c.config, OpUpdate)
+	return &ShipmentHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ShipmentHistoryClient) UpdateOne(sh *ShipmentHistory) *ShipmentHistoryUpdateOne {
+	mutation := newShipmentHistoryMutation(c.config, OpUpdateOne, withShipmentHistory(sh))
+	return &ShipmentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ShipmentHistoryClient) UpdateOneID(id uuid.UUID) *ShipmentHistoryUpdateOne {
+	mutation := newShipmentHistoryMutation(c.config, OpUpdateOne, withShipmentHistoryID(id))
+	return &ShipmentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ShipmentHistory.
+func (c *ShipmentHistoryClient) Delete() *ShipmentHistoryDelete {
+	mutation := newShipmentHistoryMutation(c.config, OpDelete)
+	return &ShipmentHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ShipmentHistoryClient) DeleteOne(sh *ShipmentHistory) *ShipmentHistoryDeleteOne {
+	return c.DeleteOneID(sh.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ShipmentHistoryClient) DeleteOneID(id uuid.UUID) *ShipmentHistoryDeleteOne {
+	builder := c.Delete().Where(shipmenthistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ShipmentHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for ShipmentHistory.
+func (c *ShipmentHistoryClient) Query() *ShipmentHistoryQuery {
+	return &ShipmentHistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeShipmentHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ShipmentHistory entity by its id.
+func (c *ShipmentHistoryClient) Get(ctx context.Context, id uuid.UUID) (*ShipmentHistory, error) {
+	return c.Query().Where(shipmenthistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ShipmentHistoryClient) GetX(ctx context.Context, id uuid.UUID) *ShipmentHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryShipment queries the shipment edge of a ShipmentHistory.
+func (c *ShipmentHistoryClient) QueryShipment(sh *ShipmentHistory) *ShipmentQuery {
+	query := (&ShipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
+			sqlgraph.To(shipment.Table, shipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.ShipmentTable, shipmenthistory.ShipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPerson queries the person edge of a ShipmentHistory.
+func (c *ShipmentHistoryClient) QueryPerson(sh *ShipmentHistory) *PersonQuery {
+	query := (&PersonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.PersonTable, shipmenthistory.PersonColumn),
+		)
+		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrevStatus queries the prev_status edge of a ShipmentHistory.
+func (c *ShipmentHistoryClient) QueryPrevStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.PrevStatusTable, shipmenthistory.PrevStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNewStatus queries the new_status edge of a ShipmentHistory.
+func (c *ShipmentHistoryClient) QueryNewStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
+	query := (&OrderStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
+			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.NewStatusTable, shipmenthistory.NewStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ShipmentHistoryClient) Hooks() []Hook {
+	return c.hooks.ShipmentHistory
+}
+
+// Interceptors returns the client interceptors.
+func (c *ShipmentHistoryClient) Interceptors() []Interceptor {
+	return c.inters.ShipmentHistory
+}
+
+func (c *ShipmentHistoryClient) mutate(ctx context.Context, m *ShipmentHistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ShipmentHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ShipmentHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ShipmentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ShipmentHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ShipmentHistory mutation op: %q", m.Op())
 	}
 }
 
@@ -3622,15 +4081,15 @@ func (c *WorkUnitInfoClient) mutate(ctx context.Context, m *WorkUnitInfoMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Address, Conversation, DeliveryAssignment, Invoice, Message, Order, OrderItem,
-		OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
-		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentItem, Tag,
-		WarehouseAssignment, WorkUnitInfo []ent.Hook
+		Address, Conversation, Invoice, InvoiceHistory, Message, Order, OrderHistory,
+		OrderItem, OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
+		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentHistory, ShipmentItem,
+		Tag, WarehouseAssignment, WorkUnitInfo []ent.Hook
 	}
 	inters struct {
-		Address, Conversation, DeliveryAssignment, Invoice, Message, Order, OrderItem,
-		OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
-		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentItem, Tag,
-		WarehouseAssignment, WorkUnitInfo []ent.Interceptor
+		Address, Conversation, Invoice, InvoiceHistory, Message, Order, OrderHistory,
+		OrderItem, OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
+		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentHistory, ShipmentItem,
+		Tag, WarehouseAssignment, WorkUnitInfo []ent.Interceptor
 	}
 )

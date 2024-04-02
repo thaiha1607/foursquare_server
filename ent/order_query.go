@@ -762,8 +762,8 @@ func (oq *OrderQuery) loadStaff(ctx context.Context, query *PersonQuery, nodes [
 	return nil
 }
 func (oq *OrderQuery) loadOrderAddress(ctx context.Context, query *AddressQuery, nodes []*Order, init func(*Order), assign func(*Order, *Address)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*Order)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
 		fk := nodes[i].AddressID
 		if _, ok := nodeids[fk]; !ok {

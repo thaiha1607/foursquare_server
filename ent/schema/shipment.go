@@ -1,15 +1,10 @@
 package schema
 
 import (
-	"context"
-	"fmt"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/oklog/ulid/v2"
-	"github.com/thaiha1607/foursquare_server/ent/hook"
 )
 
 // Shipment holds the schema definition for the Shipment entity.
@@ -20,19 +15,22 @@ type Shipment struct {
 // Fields of the Shipment.
 func (Shipment) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Immutable(),
 		field.UUID("order_id", uuid.UUID{}).
 			Immutable(),
 		field.UUID("invoice_id", uuid.UUID{}).
 			Immutable(),
-		field.String("shipment_tracking_number").
-			MaxLen(26).
-			NotEmpty(),
+		field.UUID("staff_id", uuid.UUID{}).
+			Immutable(),
 		field.Time("shipment_date"),
 		field.String("note").
 			Optional(),
+		field.Enum("status").
+			NamedValues(
+				"Pending", "PENDING",
+				"Accepted", "ACCEPTED",
+				"Rejected", "REJECTED",
+			).
+			Default("PENDING"),
 	}
 }
 
@@ -49,28 +47,11 @@ func (Shipment) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
-	}
-}
-
-// Hooks of the Shipment.
-func (Shipment) Hooks() []ent.Hook {
-	return []ent.Hook{
-		hook.On(func() ent.Hook {
-			type ShipmentTrackingNumberSetter interface {
-				SetShipmentTrackingNumber(string)
-			}
-			return func(next ent.Mutator) ent.Mutator {
-				return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-					is, ok := m.(ShipmentTrackingNumberSetter)
-					if !ok {
-						return nil, fmt.Errorf("unexpected mutation %T", m)
-					}
-					id := ulid.Make().String()
-					is.SetShipmentTrackingNumber(id)
-					return next.Mutate(ctx, m)
-				})
-			}
-		}(), ent.OpCreate),
+		edge.To("staff", Person.Type).
+			Field("staff_id").
+			Unique().
+			Required().
+			Immutable(),
 	}
 }
 
@@ -78,5 +59,6 @@ func (Shipment) Hooks() []ent.Hook {
 func (Shipment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		TimeMixin{},
+		ULIDMixin{},
 	}
 }

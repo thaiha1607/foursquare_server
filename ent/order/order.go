@@ -140,8 +140,6 @@ var (
 	DefaultStatusCode int
 	// DefaultIsInternal holds the default value on creation for the "is_internal" field.
 	DefaultIsInternal bool
-	// AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
-	AddressIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

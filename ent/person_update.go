@@ -185,14 +185,14 @@ func (pu *PersonUpdate) SetWorkUnit(w *WorkUnitInfo) *PersonUpdate {
 }
 
 // AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
-func (pu *PersonUpdate) AddAddressIDs(ids ...string) *PersonUpdate {
+func (pu *PersonUpdate) AddAddressIDs(ids ...uuid.UUID) *PersonUpdate {
 	pu.mutation.AddAddressIDs(ids...)
 	return pu
 }
 
 // AddAddresses adds the "addresses" edges to the Address entity.
 func (pu *PersonUpdate) AddAddresses(a ...*Address) *PersonUpdate {
-	ids := make([]string, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -217,14 +217,14 @@ func (pu *PersonUpdate) ClearAddresses() *PersonUpdate {
 }
 
 // RemoveAddressIDs removes the "addresses" edge to Address entities by IDs.
-func (pu *PersonUpdate) RemoveAddressIDs(ids ...string) *PersonUpdate {
+func (pu *PersonUpdate) RemoveAddressIDs(ids ...uuid.UUID) *PersonUpdate {
 	pu.mutation.RemoveAddressIDs(ids...)
 	return pu
 }
 
 // RemoveAddresses removes "addresses" edges to Address entities.
 func (pu *PersonUpdate) RemoveAddresses(a ...*Address) *PersonUpdate {
-	ids := make([]string, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -387,7 +387,7 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		createE := &PersonAddressCreate{config: pu.config, mutation: newPersonAddressMutation(pu.config, OpCreate)}
@@ -404,7 +404,7 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -424,7 +424,7 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -610,14 +610,14 @@ func (puo *PersonUpdateOne) SetWorkUnit(w *WorkUnitInfo) *PersonUpdateOne {
 }
 
 // AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
-func (puo *PersonUpdateOne) AddAddressIDs(ids ...string) *PersonUpdateOne {
+func (puo *PersonUpdateOne) AddAddressIDs(ids ...uuid.UUID) *PersonUpdateOne {
 	puo.mutation.AddAddressIDs(ids...)
 	return puo
 }
 
 // AddAddresses adds the "addresses" edges to the Address entity.
 func (puo *PersonUpdateOne) AddAddresses(a ...*Address) *PersonUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -642,14 +642,14 @@ func (puo *PersonUpdateOne) ClearAddresses() *PersonUpdateOne {
 }
 
 // RemoveAddressIDs removes the "addresses" edge to Address entities by IDs.
-func (puo *PersonUpdateOne) RemoveAddressIDs(ids ...string) *PersonUpdateOne {
+func (puo *PersonUpdateOne) RemoveAddressIDs(ids ...uuid.UUID) *PersonUpdateOne {
 	puo.mutation.RemoveAddressIDs(ids...)
 	return puo
 }
 
 // RemoveAddresses removes "addresses" edges to Address entities.
 func (puo *PersonUpdateOne) RemoveAddresses(a ...*Address) *PersonUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -842,7 +842,7 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		createE := &PersonAddressCreate{config: puo.config, mutation: newPersonAddressMutation(puo.config, OpCreate)}
@@ -859,7 +859,7 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -879,7 +879,7 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

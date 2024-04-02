@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/thaiha1607/foursquare_server/ent/hook"
+	"github.com/google/uuid"
 )
 
 // Address holds the schema definition for the Address entity.
@@ -15,9 +15,8 @@ type Address struct {
 // Fields of the Address.
 func (Address) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").
-			Unique().
-			MinLen(8).
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
 			Immutable(),
 		field.String("line1").
 			NotEmpty(),
@@ -27,7 +26,7 @@ func (Address) Fields() []ent.Field {
 		field.String("city").
 			NotEmpty(),
 		field.String("state_or_province").
-			Optional(),
+			NotEmpty(),
 		field.String("zip_or_postcode").
 			NotEmpty(),
 		field.String("country").
@@ -44,13 +43,6 @@ func (Address) Edges() []ent.Edge {
 		edge.From("persons", Person.Type).
 			Ref("addresses").
 			Through("person_addresses", PersonAddress.Type),
-	}
-}
-
-// Hooks of the Address.
-func (Address) Hooks() []ent.Hook {
-	return []ent.Hook{
-		hook.On(NanoIDHook(8), ent.OpCreate),
 	}
 }
 

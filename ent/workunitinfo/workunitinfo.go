@@ -21,6 +21,8 @@ const (
 	FieldAddressID = "address_id"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldImageURL holds the string denoting the image_url field in the database.
+	FieldImageURL = "image_url"
 	// EdgeAddress holds the string denoting the address edge name in mutations.
 	EdgeAddress = "address"
 	// Table holds the table name of the workunitinfo in the database.
@@ -40,6 +42,7 @@ var Columns = []string{
 	FieldName,
 	FieldAddressID,
 	FieldType,
+	FieldImageURL,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -55,6 +58,8 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	ImageURLValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -107,6 +112,11 @@ func ByAddressID(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// ByImageURL orders the results by the image_url field.
+func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }
 
 // ByAddressField orders the results by address field.

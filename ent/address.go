@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/address"
 )
 
@@ -16,7 +17,7 @@ import (
 type Address struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -75,10 +76,12 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case address.FieldID, address.FieldLine1, address.FieldLine2, address.FieldCity, address.FieldStateOrProvince, address.FieldZipOrPostcode, address.FieldCountry, address.FieldOtherAddressDetails:
+		case address.FieldLine1, address.FieldLine2, address.FieldCity, address.FieldStateOrProvince, address.FieldZipOrPostcode, address.FieldCountry, address.FieldOtherAddressDetails:
 			values[i] = new(sql.NullString)
 		case address.FieldCreatedAt, address.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case address.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -95,10 +98,10 @@ func (a *Address) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case address.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				a.ID = value.String
+			} else if value != nil {
+				a.ID = *value
 			}
 		case address.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

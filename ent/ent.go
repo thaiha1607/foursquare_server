@@ -14,10 +14,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/deliveryassignment"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
+	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
 	"github.com/thaiha1607/foursquare_server/ent/orderitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -28,6 +29,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/productqty"
 	"github.com/thaiha1607/foursquare_server/ent/producttag"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
@@ -94,10 +96,11 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			address.Table:             address.ValidColumn,
 			conversation.Table:        conversation.ValidColumn,
-			deliveryassignment.Table:  deliveryassignment.ValidColumn,
 			invoice.Table:             invoice.ValidColumn,
+			invoicehistory.Table:      invoicehistory.ValidColumn,
 			message.Table:             message.ValidColumn,
 			order.Table:               order.ValidColumn,
+			orderhistory.Table:        orderhistory.ValidColumn,
 			orderitem.Table:           orderitem.ValidColumn,
 			orderstatuscode.Table:     orderstatuscode.ValidColumn,
 			person.Table:              person.ValidColumn,
@@ -108,6 +111,7 @@ func checkColumn(table, column string) error {
 			productqty.Table:          productqty.ValidColumn,
 			producttag.Table:          producttag.ValidColumn,
 			shipment.Table:            shipment.ValidColumn,
+			shipmenthistory.Table:     shipmenthistory.ValidColumn,
 			shipmentitem.Table:        shipmentitem.ValidColumn,
 			tag.Table:                 tag.ValidColumn,
 			warehouseassignment.Table: warehouseassignment.ValidColumn,

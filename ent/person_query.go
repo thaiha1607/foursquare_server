@@ -525,7 +525,7 @@ func (pq *PersonQuery) loadWorkUnit(ctx context.Context, query *WorkUnitInfoQuer
 func (pq *PersonQuery) loadAddresses(ctx context.Context, query *AddressQuery, nodes []*Person, init func(*Person), assign func(*Person, *Address)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Person)
-	nids := make(map[string]map[*Person]struct{})
+	nids := make(map[uuid.UUID]map[*Person]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -558,7 +558,7 @@ func (pq *PersonQuery) loadAddresses(ctx context.Context, query *AddressQuery, n
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*uuid.UUID)
-				inValue := values[1].(*sql.NullString).String
+				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Person]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

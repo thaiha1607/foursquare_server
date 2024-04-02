@@ -16,14 +16,16 @@ type Tx struct {
 	Address *AddressClient
 	// Conversation is the client for interacting with the Conversation builders.
 	Conversation *ConversationClient
-	// DeliveryAssignment is the client for interacting with the DeliveryAssignment builders.
-	DeliveryAssignment *DeliveryAssignmentClient
 	// Invoice is the client for interacting with the Invoice builders.
 	Invoice *InvoiceClient
+	// InvoiceHistory is the client for interacting with the InvoiceHistory builders.
+	InvoiceHistory *InvoiceHistoryClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
+	// OrderHistory is the client for interacting with the OrderHistory builders.
+	OrderHistory *OrderHistoryClient
 	// OrderItem is the client for interacting with the OrderItem builders.
 	OrderItem *OrderItemClient
 	// OrderStatusCode is the client for interacting with the OrderStatusCode builders.
@@ -44,6 +46,8 @@ type Tx struct {
 	ProductTag *ProductTagClient
 	// Shipment is the client for interacting with the Shipment builders.
 	Shipment *ShipmentClient
+	// ShipmentHistory is the client for interacting with the ShipmentHistory builders.
+	ShipmentHistory *ShipmentHistoryClient
 	// ShipmentItem is the client for interacting with the ShipmentItem builders.
 	ShipmentItem *ShipmentItemClient
 	// Tag is the client for interacting with the Tag builders.
@@ -185,10 +189,11 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Address = NewAddressClient(tx.config)
 	tx.Conversation = NewConversationClient(tx.config)
-	tx.DeliveryAssignment = NewDeliveryAssignmentClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
+	tx.InvoiceHistory = NewInvoiceHistoryClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
+	tx.OrderHistory = NewOrderHistoryClient(tx.config)
 	tx.OrderItem = NewOrderItemClient(tx.config)
 	tx.OrderStatusCode = NewOrderStatusCodeClient(tx.config)
 	tx.Person = NewPersonClient(tx.config)
@@ -199,6 +204,7 @@ func (tx *Tx) init() {
 	tx.ProductQty = NewProductQtyClient(tx.config)
 	tx.ProductTag = NewProductTagClient(tx.config)
 	tx.Shipment = NewShipmentClient(tx.config)
+	tx.ShipmentHistory = NewShipmentHistoryClient(tx.config)
 	tx.ShipmentItem = NewShipmentItemClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.WarehouseAssignment = NewWarehouseAssignmentClient(tx.config)

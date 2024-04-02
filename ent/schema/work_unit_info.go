@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"net/url"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -28,7 +30,7 @@ func (WorkUnitInfo) Fields() []ent.Field {
 			Default(uuid.New),
 		field.String("name").
 			NotEmpty(),
-		field.String("address_id").
+		field.UUID("address_id", uuid.UUID{}).
 			Optional().
 			Nillable(),
 		field.Enum("type").
@@ -38,6 +40,15 @@ func (WorkUnitInfo) Fields() []ent.Field {
 				"Delivery", "DELIVERY",
 			).
 			Default("WAREHOUSE"),
+		field.String("image_url").
+			Validate(
+				func(s string) error {
+					_, err := url.Parse(s)
+					return err
+				},
+			).
+			Optional().
+			Nillable(),
 	}
 }
 

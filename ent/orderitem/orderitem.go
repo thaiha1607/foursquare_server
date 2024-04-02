@@ -129,10 +129,11 @@ const DefaultStatus = StatusInStock
 
 // Status values.
 const (
-	StatusDelivered  Status = "DELIVERED"
-	StatusOutOfStock Status = "OUT_OF_STOCK"
-	StatusInTransit  Status = "IN_TRANSIT"
-	StatusInStock    Status = "IN_STOCK"
+	StatusDelivered          Status = "DELIVERED"
+	StatusOutOfStock         Status = "OUT_OF_STOCK"
+	StatusInTransit          Status = "IN_TRANSIT"
+	StatusInStock            Status = "IN_STOCK"
+	StatusPartiallyDelivered Status = "PARTIALLY_DELIVERED"
 )
 
 func (s Status) String() string {
@@ -142,7 +143,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusDelivered, StatusOutOfStock, StatusInTransit, StatusInStock:
+	case StatusDelivered, StatusOutOfStock, StatusInTransit, StatusInStock, StatusPartiallyDelivered:
 		return nil
 	default:
 		return fmt.Errorf("orderitem: invalid enum value for status field: %q", s)

@@ -82,14 +82,6 @@ func (ac *AddressCreate) SetStateOrProvince(s string) *AddressCreate {
 	return ac
 }
 
-// SetNillableStateOrProvince sets the "state_or_province" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableStateOrProvince(s *string) *AddressCreate {
-	if s != nil {
-		ac.SetStateOrProvince(*s)
-	}
-	return ac
-}
-
 // SetZipOrPostcode sets the "zip_or_postcode" field.
 func (ac *AddressCreate) SetZipOrPostcode(s string) *AddressCreate {
 	ac.mutation.SetZipOrPostcode(s)
@@ -117,8 +109,16 @@ func (ac *AddressCreate) SetNillableOtherAddressDetails(s *string) *AddressCreat
 }
 
 // SetID sets the "id" field.
-func (ac *AddressCreate) SetID(s string) *AddressCreate {
-	ac.mutation.SetID(s)
+func (ac *AddressCreate) SetID(u uuid.UUID) *AddressCreate {
+	ac.mutation.SetID(u)
+	return ac
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (ac *AddressCreate) SetNillableID(u *uuid.UUID) *AddressCreate {
+	if u != nil {
+		ac.SetID(*u)
+	}
 	return ac
 }
 
@@ -144,9 +144,7 @@ func (ac *AddressCreate) Mutation() *AddressMutation {
 
 // Save creates the Address in the database.
 func (ac *AddressCreate) Save(ctx context.Context) (*Address, error) {
-	if err := ac.defaults(); err != nil {
-		return nil, err
-	}
+	ac.defaults()
 	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
@@ -173,22 +171,19 @@ func (ac *AddressCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (ac *AddressCreate) defaults() error {
+func (ac *AddressCreate) defaults() {
 	if _, ok := ac.mutation.CreatedAt(); !ok {
-		if address.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized address.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
 		v := address.DefaultCreatedAt()
 		ac.mutation.SetCreatedAt(v)
 	}
 	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		if address.DefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized address.DefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := address.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
 	}
-	return nil
+	if _, ok := ac.mutation.ID(); !ok {
+		v := address.DefaultID()
+		ac.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -215,6 +210,14 @@ func (ac *AddressCreate) check() error {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
 		}
 	}
+	if _, ok := ac.mutation.StateOrProvince(); !ok {
+		return &ValidationError{Name: "state_or_province", err: errors.New(`ent: missing required field "Address.state_or_province"`)}
+	}
+	if v, ok := ac.mutation.StateOrProvince(); ok {
+		if err := address.StateOrProvinceValidator(v); err != nil {
+			return &ValidationError{Name: "state_or_province", err: fmt.Errorf(`ent: validator failed for field "Address.state_or_province": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.ZipOrPostcode(); !ok {
 		return &ValidationError{Name: "zip_or_postcode", err: errors.New(`ent: missing required field "Address.zip_or_postcode"`)}
 	}
@@ -229,11 +232,6 @@ func (ac *AddressCreate) check() error {
 	if v, ok := ac.mutation.Country(); ok {
 		if err := address.CountryValidator(v); err != nil {
 			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
-		}
-	}
-	if v, ok := ac.mutation.ID(); ok {
-		if err := address.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Address.id": %w`, err)}
 		}
 	}
 	return nil
@@ -251,10 +249,10 @@ func (ac *AddressCreate) sqlSave(ctx context.Context) (*Address, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Address.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	ac.mutation.id = &_node.ID
@@ -265,11 +263,11 @@ func (ac *AddressCreate) sqlSave(ctx context.Context) (*Address, error) {
 func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Address{config: ac.config}
-		_spec = sqlgraph.NewCreateSpec(address.Table, sqlgraph.NewFieldSpec(address.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(address.Table, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	)
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(address.FieldCreatedAt, field.TypeTime, value)

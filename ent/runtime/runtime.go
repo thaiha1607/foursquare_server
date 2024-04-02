@@ -8,10 +8,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/address"
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
-	"github.com/thaiha1607/foursquare_server/ent/deliveryassignment"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
+	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
 	"github.com/thaiha1607/foursquare_server/ent/orderitem"
 	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
@@ -22,6 +23,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/productqty"
 	"github.com/thaiha1607/foursquare_server/ent/schema"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
@@ -33,8 +35,6 @@ import (
 // to their package variables.
 func init() {
 	addressMixin := schema.Address{}.Mixin()
-	addressHooks := schema.Address{}.Hooks()
-	address.Hooks[0] = addressHooks[0]
 	addressMixinFields0 := addressMixin[0].Fields()
 	_ = addressMixinFields0
 	addressFields := schema.Address{}.Fields()
@@ -57,6 +57,10 @@ func init() {
 	addressDescCity := addressFields[3].Descriptor()
 	// address.CityValidator is a validator for the "city" field. It is called by the builders before save.
 	address.CityValidator = addressDescCity.Validators[0].(func(string) error)
+	// addressDescStateOrProvince is the schema descriptor for state_or_province field.
+	addressDescStateOrProvince := addressFields[4].Descriptor()
+	// address.StateOrProvinceValidator is a validator for the "state_or_province" field. It is called by the builders before save.
+	address.StateOrProvinceValidator = addressDescStateOrProvince.Validators[0].(func(string) error)
 	// addressDescZipOrPostcode is the schema descriptor for zip_or_postcode field.
 	addressDescZipOrPostcode := addressFields[5].Descriptor()
 	// address.ZipOrPostcodeValidator is a validator for the "zip_or_postcode" field. It is called by the builders before save.
@@ -67,8 +71,8 @@ func init() {
 	address.CountryValidator = addressDescCountry.Validators[0].(func(string) error)
 	// addressDescID is the schema descriptor for id field.
 	addressDescID := addressFields[0].Descriptor()
-	// address.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	address.IDValidator = addressDescID.Validators[0].(func(string) error)
+	// address.DefaultID holds the default value on creation for the id field.
+	address.DefaultID = addressDescID.Default.(func() uuid.UUID)
 	conversationMixin := schema.Conversation{}.Mixin()
 	conversationMixinFields0 := conversationMixin[0].Fields()
 	_ = conversationMixinFields0
@@ -88,25 +92,6 @@ func init() {
 	conversationDescID := conversationFields[0].Descriptor()
 	// conversation.DefaultID holds the default value on creation for the id field.
 	conversation.DefaultID = conversationDescID.Default.(func() uuid.UUID)
-	deliveryassignmentMixin := schema.DeliveryAssignment{}.Mixin()
-	deliveryassignmentMixinFields0 := deliveryassignmentMixin[0].Fields()
-	_ = deliveryassignmentMixinFields0
-	deliveryassignmentFields := schema.DeliveryAssignment{}.Fields()
-	_ = deliveryassignmentFields
-	// deliveryassignmentDescCreatedAt is the schema descriptor for created_at field.
-	deliveryassignmentDescCreatedAt := deliveryassignmentMixinFields0[0].Descriptor()
-	// deliveryassignment.DefaultCreatedAt holds the default value on creation for the created_at field.
-	deliveryassignment.DefaultCreatedAt = deliveryassignmentDescCreatedAt.Default.(func() time.Time)
-	// deliveryassignmentDescUpdatedAt is the schema descriptor for updated_at field.
-	deliveryassignmentDescUpdatedAt := deliveryassignmentMixinFields0[1].Descriptor()
-	// deliveryassignment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	deliveryassignment.DefaultUpdatedAt = deliveryassignmentDescUpdatedAt.Default.(func() time.Time)
-	// deliveryassignment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	deliveryassignment.UpdateDefaultUpdatedAt = deliveryassignmentDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// deliveryassignmentDescID is the schema descriptor for id field.
-	deliveryassignmentDescID := deliveryassignmentFields[0].Descriptor()
-	// deliveryassignment.DefaultID holds the default value on creation for the id field.
-	deliveryassignment.DefaultID = deliveryassignmentDescID.Default.(func() uuid.UUID)
 	invoiceMixin := schema.Invoice{}.Mixin()
 	invoiceMixinFields0 := invoiceMixin[0].Fields()
 	_ = invoiceMixinFields0
@@ -126,6 +111,25 @@ func init() {
 	invoiceDescID := invoiceFields[0].Descriptor()
 	// invoice.DefaultID holds the default value on creation for the id field.
 	invoice.DefaultID = invoiceDescID.Default.(func() uuid.UUID)
+	invoicehistoryMixin := schema.InvoiceHistory{}.Mixin()
+	invoicehistoryMixinFields0 := invoicehistoryMixin[0].Fields()
+	_ = invoicehistoryMixinFields0
+	invoicehistoryFields := schema.InvoiceHistory{}.Fields()
+	_ = invoicehistoryFields
+	// invoicehistoryDescCreatedAt is the schema descriptor for created_at field.
+	invoicehistoryDescCreatedAt := invoicehistoryMixinFields0[0].Descriptor()
+	// invoicehistory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	invoicehistory.DefaultCreatedAt = invoicehistoryDescCreatedAt.Default.(func() time.Time)
+	// invoicehistoryDescUpdatedAt is the schema descriptor for updated_at field.
+	invoicehistoryDescUpdatedAt := invoicehistoryMixinFields0[1].Descriptor()
+	// invoicehistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	invoicehistory.DefaultUpdatedAt = invoicehistoryDescUpdatedAt.Default.(func() time.Time)
+	// invoicehistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	invoicehistory.UpdateDefaultUpdatedAt = invoicehistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// invoicehistoryDescID is the schema descriptor for id field.
+	invoicehistoryDescID := invoicehistoryFields[0].Descriptor()
+	// invoicehistory.DefaultID holds the default value on creation for the id field.
+	invoicehistory.DefaultID = invoicehistoryDescID.Default.(func() uuid.UUID)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
@@ -182,14 +186,29 @@ func init() {
 	orderDescIsInternal := orderFields[10].Descriptor()
 	// order.DefaultIsInternal holds the default value on creation for the is_internal field.
 	order.DefaultIsInternal = orderDescIsInternal.Default.(bool)
-	// orderDescAddressID is the schema descriptor for address_id field.
-	orderDescAddressID := orderFields[11].Descriptor()
-	// order.AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
-	order.AddressIDValidator = orderDescAddressID.Validators[0].(func(string) error)
 	// orderDescID is the schema descriptor for id field.
 	orderDescID := orderFields[0].Descriptor()
 	// order.DefaultID holds the default value on creation for the id field.
 	order.DefaultID = orderDescID.Default.(func() uuid.UUID)
+	orderhistoryMixin := schema.OrderHistory{}.Mixin()
+	orderhistoryMixinFields0 := orderhistoryMixin[0].Fields()
+	_ = orderhistoryMixinFields0
+	orderhistoryFields := schema.OrderHistory{}.Fields()
+	_ = orderhistoryFields
+	// orderhistoryDescCreatedAt is the schema descriptor for created_at field.
+	orderhistoryDescCreatedAt := orderhistoryMixinFields0[0].Descriptor()
+	// orderhistory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	orderhistory.DefaultCreatedAt = orderhistoryDescCreatedAt.Default.(func() time.Time)
+	// orderhistoryDescUpdatedAt is the schema descriptor for updated_at field.
+	orderhistoryDescUpdatedAt := orderhistoryMixinFields0[1].Descriptor()
+	// orderhistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	orderhistory.DefaultUpdatedAt = orderhistoryDescUpdatedAt.Default.(func() time.Time)
+	// orderhistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	orderhistory.UpdateDefaultUpdatedAt = orderhistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// orderhistoryDescID is the schema descriptor for id field.
+	orderhistoryDescID := orderhistoryFields[0].Descriptor()
+	// orderhistory.DefaultID holds the default value on creation for the id field.
+	orderhistory.DefaultID = orderhistoryDescID.Default.(func() uuid.UUID)
 	orderitemMixin := schema.OrderItem{}.Mixin()
 	orderitemMixinFields0 := orderitemMixin[0].Fields()
 	_ = orderitemMixinFields0
@@ -322,10 +341,6 @@ func init() {
 	personaddress.DefaultUpdatedAt = personaddressDescUpdatedAt.Default.(func() time.Time)
 	// personaddress.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	personaddress.UpdateDefaultUpdatedAt = personaddressDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// personaddressDescAddressID is the schema descriptor for address_id field.
-	personaddressDescAddressID := personaddressFields[1].Descriptor()
-	// personaddress.AddressIDValidator is a validator for the "address_id" field. It is called by the builders before save.
-	personaddress.AddressIDValidator = personaddressDescAddressID.Validators[0].(func(string) error)
 	productcolorMixin := schema.ProductColor{}.Mixin()
 	productcolorHooks := schema.ProductColor{}.Hooks()
 	productcolor.Hooks[0] = productcolorHooks[0]
@@ -481,10 +496,12 @@ func init() {
 	// productqty.DefaultID holds the default value on creation for the id field.
 	productqty.DefaultID = productqtyDescID.Default.(func() uuid.UUID)
 	shipmentMixin := schema.Shipment{}.Mixin()
-	shipmentHooks := schema.Shipment{}.Hooks()
-	shipment.Hooks[0] = shipmentHooks[0]
+	shipmentMixinHooks1 := shipmentMixin[1].Hooks()
+	shipment.Hooks[0] = shipmentMixinHooks1[0]
 	shipmentMixinFields0 := shipmentMixin[0].Fields()
 	_ = shipmentMixinFields0
+	shipmentMixinFields1 := shipmentMixin[1].Fields()
+	_ = shipmentMixinFields1
 	shipmentFields := schema.Shipment{}.Fields()
 	_ = shipmentFields
 	// shipmentDescCreatedAt is the schema descriptor for created_at field.
@@ -497,28 +514,34 @@ func init() {
 	shipment.DefaultUpdatedAt = shipmentDescUpdatedAt.Default.(func() time.Time)
 	// shipment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	shipment.UpdateDefaultUpdatedAt = shipmentDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// shipmentDescShipmentTrackingNumber is the schema descriptor for shipment_tracking_number field.
-	shipmentDescShipmentTrackingNumber := shipmentFields[3].Descriptor()
-	// shipment.ShipmentTrackingNumberValidator is a validator for the "shipment_tracking_number" field. It is called by the builders before save.
-	shipment.ShipmentTrackingNumberValidator = func() func(string) error {
-		validators := shipmentDescShipmentTrackingNumber.Validators
+	// shipmentDescID is the schema descriptor for id field.
+	shipmentDescID := shipmentMixinFields1[0].Descriptor()
+	// shipment.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	shipment.IDValidator = func() func(string) error {
+		validators := shipmentDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(shipment_tracking_number string) error {
+		return func(id string) error {
 			for _, fn := range fns {
-				if err := fn(shipment_tracking_number); err != nil {
+				if err := fn(id); err != nil {
 					return err
 				}
 			}
 			return nil
 		}
 	}()
-	// shipmentDescID is the schema descriptor for id field.
-	shipmentDescID := shipmentFields[0].Descriptor()
-	// shipment.DefaultID holds the default value on creation for the id field.
-	shipment.DefaultID = shipmentDescID.Default.(func() uuid.UUID)
+	shipmenthistoryFields := schema.ShipmentHistory{}.Fields()
+	_ = shipmenthistoryFields
+	// shipmenthistoryDescShipmentID is the schema descriptor for shipment_id field.
+	shipmenthistoryDescShipmentID := shipmenthistoryFields[1].Descriptor()
+	// shipmenthistory.ShipmentIDValidator is a validator for the "shipment_id" field. It is called by the builders before save.
+	shipmenthistory.ShipmentIDValidator = shipmenthistoryDescShipmentID.Validators[0].(func(string) error)
+	// shipmenthistoryDescID is the schema descriptor for id field.
+	shipmenthistoryDescID := shipmenthistoryFields[0].Descriptor()
+	// shipmenthistory.DefaultID holds the default value on creation for the id field.
+	shipmenthistory.DefaultID = shipmenthistoryDescID.Default.(func() uuid.UUID)
 	shipmentitemMixin := schema.ShipmentItem{}.Mixin()
 	shipmentitemMixinFields0 := shipmentitemMixin[0].Fields()
 	_ = shipmentitemMixinFields0
@@ -534,6 +557,10 @@ func init() {
 	shipmentitem.DefaultUpdatedAt = shipmentitemDescUpdatedAt.Default.(func() time.Time)
 	// shipmentitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	shipmentitem.UpdateDefaultUpdatedAt = shipmentitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// shipmentitemDescShipmentID is the schema descriptor for shipment_id field.
+	shipmentitemDescShipmentID := shipmentitemFields[1].Descriptor()
+	// shipmentitem.ShipmentIDValidator is a validator for the "shipment_id" field. It is called by the builders before save.
+	shipmentitem.ShipmentIDValidator = shipmentitemDescShipmentID.Validators[0].(func(string) error)
 	// shipmentitemDescID is the schema descriptor for id field.
 	shipmentitemDescID := shipmentitemFields[0].Descriptor()
 	// shipmentitem.DefaultID holds the default value on creation for the id field.
@@ -602,6 +629,10 @@ func init() {
 	workunitinfoDescName := workunitinfoFields[1].Descriptor()
 	// workunitinfo.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	workunitinfo.NameValidator = workunitinfoDescName.Validators[0].(func(string) error)
+	// workunitinfoDescImageURL is the schema descriptor for image_url field.
+	workunitinfoDescImageURL := workunitinfoFields[4].Descriptor()
+	// workunitinfo.ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	workunitinfo.ImageURLValidator = workunitinfoDescImageURL.Validators[0].(func(string) error)
 	// workunitinfoDescID is the schema descriptor for id field.
 	workunitinfoDescID := workunitinfoFields[0].Descriptor()
 	// workunitinfo.DefaultID holds the default value on creation for the id field.

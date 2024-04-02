@@ -445,8 +445,8 @@ func (siq *ShipmentItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 }
 
 func (siq *ShipmentItemQuery) loadShipment(ctx context.Context, query *ShipmentQuery, nodes []*ShipmentItem, init func(*ShipmentItem), assign func(*ShipmentItem, *Shipment)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*ShipmentItem)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*ShipmentItem)
 	for i := range nodes {
 		fk := nodes[i].ShipmentID
 		if _, ok := nodeids[fk]; !ok {

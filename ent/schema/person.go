@@ -51,7 +51,7 @@ func (Person) Fields() []ent.Field {
 					re := regexp.MustCompile(e164Regex)
 					s = strings.ReplaceAll(s, " ", "")
 					if re.Find([]byte(s)) == nil {
-						return errors.New("invalid phone number. Phone number must be in E.164 format")
+						return errors.New("invalid phone number (phone number must be in E.164 format)")
 					}
 					return nil
 				},

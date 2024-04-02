@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/oklog/ulid/v2"
 	"github.com/thaiha1607/foursquare_server/ent"
 )
 
@@ -25,6 +26,25 @@ func NanoIDHook(l ...int) ent.Hook {
 			if err != nil {
 				return nil, err
 			}
+			is.SetID(id)
+			return next.Mutate(ctx, m)
+		})
+	}
+}
+
+// ULIDHook is a hook that generates a ULID for the entity.
+// Length of the generated ID is always 26.
+func ULIDHook() ent.Hook {
+	type IDSetter interface {
+		SetID(string)
+	}
+	return func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			is, ok := m.(IDSetter)
+			if !ok {
+				return nil, fmt.Errorf("unexpected mutation %T", m)
+			}
+			id := ulid.Make().String()
 			is.SetID(id)
 			return next.Mutate(ctx, m)
 		})

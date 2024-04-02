@@ -26,7 +26,7 @@ type ShipmentItem struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ShipmentID holds the value of the "shipment_id" field.
-	ShipmentID uuid.UUID `json:"shipment_id,omitempty"`
+	ShipmentID string `json:"shipment_id,omitempty"`
 	// OrderItemID holds the value of the "order_item_id" field.
 	OrderItemID uuid.UUID `json:"order_item_id,omitempty"`
 	// Qty holds the value of the "qty" field.
@@ -79,9 +79,11 @@ func (*ShipmentItem) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case shipmentitem.FieldQty, shipmentitem.FieldTotal:
 			values[i] = new(decimal.Decimal)
+		case shipmentitem.FieldShipmentID:
+			values[i] = new(sql.NullString)
 		case shipmentitem.FieldCreatedAt, shipmentitem.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case shipmentitem.FieldID, shipmentitem.FieldShipmentID, shipmentitem.FieldOrderItemID:
+		case shipmentitem.FieldID, shipmentitem.FieldOrderItemID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -117,10 +119,10 @@ func (si *ShipmentItem) assignValues(columns []string, values []any) error {
 				si.UpdatedAt = value.Time
 			}
 		case shipmentitem.FieldShipmentID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field shipment_id", values[i])
-			} else if value != nil {
-				si.ShipmentID = *value
+			} else if value.Valid {
+				si.ShipmentID = value.String
 			}
 		case shipmentitem.FieldOrderItemID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -193,7 +195,7 @@ func (si *ShipmentItem) String() string {
 	builder.WriteString(si.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("shipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", si.ShipmentID))
+	builder.WriteString(si.ShipmentID)
 	builder.WriteString(", ")
 	builder.WriteString("order_item_id=")
 	builder.WriteString(fmt.Sprintf("%v", si.OrderItemID))

@@ -131,8 +131,8 @@ func (aq *AddressQuery) FirstX(ctx context.Context) *Address {
 
 // FirstID returns the first Address ID from the query.
 // Returns a *NotFoundError when no Address ID was found.
-func (aq *AddressQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (aq *AddressQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -144,7 +144,7 @@ func (aq *AddressQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AddressQuery) FirstIDX(ctx context.Context) string {
+func (aq *AddressQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +182,8 @@ func (aq *AddressQuery) OnlyX(ctx context.Context) *Address {
 // OnlyID is like Only, but returns the only Address ID in the query.
 // Returns a *NotSingularError when more than one Address ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AddressQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (aq *AddressQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -199,7 +199,7 @@ func (aq *AddressQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AddressQuery) OnlyIDX(ctx context.Context) string {
+func (aq *AddressQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +227,7 @@ func (aq *AddressQuery) AllX(ctx context.Context) []*Address {
 }
 
 // IDs executes the query and returns a list of Address IDs.
-func (aq *AddressQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (aq *AddressQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
@@ -239,7 +239,7 @@ func (aq *AddressQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AddressQuery) IDsX(ctx context.Context) []string {
+func (aq *AddressQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -449,7 +449,7 @@ func (aq *AddressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Addr
 
 func (aq *AddressQuery) loadPersons(ctx context.Context, query *PersonQuery, nodes []*Address, init func(*Address), assign func(*Address, *Person)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Address)
+	byID := make(map[uuid.UUID]*Address)
 	nids := make(map[uuid.UUID]map[*Address]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -479,10 +479,10 @@ func (aq *AddressQuery) loadPersons(ctx context.Context, query *PersonQuery, nod
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(uuid.UUID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
+				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Address]struct{}{byID[outValue]: {}}
@@ -510,7 +510,7 @@ func (aq *AddressQuery) loadPersons(ctx context.Context, query *PersonQuery, nod
 }
 func (aq *AddressQuery) loadPersonAddresses(ctx context.Context, query *PersonAddressQuery, nodes []*Address, init func(*Address), assign func(*Address, *PersonAddress)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Address)
+	nodeids := make(map[uuid.UUID]*Address)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -549,7 +549,7 @@ func (aq *AddressQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (aq *AddressQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	_spec.From = aq.sql
 	if unique := aq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

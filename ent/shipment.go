@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 )
 
@@ -19,7 +20,7 @@ import (
 type Shipment struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -28,12 +29,14 @@ type Shipment struct {
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// InvoiceID holds the value of the "invoice_id" field.
 	InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
-	// ShipmentTrackingNumber holds the value of the "shipment_tracking_number" field.
-	ShipmentTrackingNumber string `json:"shipment_tracking_number,omitempty"`
+	// StaffID holds the value of the "staff_id" field.
+	StaffID uuid.UUID `json:"staff_id,omitempty"`
 	// ShipmentDate holds the value of the "shipment_date" field.
 	ShipmentDate time.Time `json:"shipment_date,omitempty"`
 	// Note holds the value of the "note" field.
 	Note string `json:"note,omitempty"`
+	// Status holds the value of the "status" field.
+	Status shipment.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ShipmentQuery when eager-loading is set.
 	Edges        ShipmentEdges `json:"edges"`
@@ -46,9 +49,11 @@ type ShipmentEdges struct {
 	Order *Order `json:"order,omitempty"`
 	// Invoice holds the value of the invoice edge.
 	Invoice *Invoice `json:"invoice,omitempty"`
+	// Staff holds the value of the staff edge.
+	Staff *Person `json:"staff,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
@@ -73,16 +78,27 @@ func (e ShipmentEdges) InvoiceOrErr() (*Invoice, error) {
 	return nil, &NotLoadedError{edge: "invoice"}
 }
 
+// StaffOrErr returns the Staff value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ShipmentEdges) StaffOrErr() (*Person, error) {
+	if e.Staff != nil {
+		return e.Staff, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: person.Label}
+	}
+	return nil, &NotLoadedError{edge: "staff"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Shipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case shipment.FieldShipmentTrackingNumber, shipment.FieldNote:
+		case shipment.FieldID, shipment.FieldNote, shipment.FieldStatus:
 			values[i] = new(sql.NullString)
 		case shipment.FieldCreatedAt, shipment.FieldUpdatedAt, shipment.FieldShipmentDate:
 			values[i] = new(sql.NullTime)
-		case shipment.FieldID, shipment.FieldOrderID, shipment.FieldInvoiceID:
+		case shipment.FieldOrderID, shipment.FieldInvoiceID, shipment.FieldStaffID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -100,10 +116,10 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case shipment.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				s.ID = *value
+			} else if value.Valid {
+				s.ID = value.String
 			}
 		case shipment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -129,11 +145,11 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				s.InvoiceID = *value
 			}
-		case shipment.FieldShipmentTrackingNumber:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field shipment_tracking_number", values[i])
-			} else if value.Valid {
-				s.ShipmentTrackingNumber = value.String
+		case shipment.FieldStaffID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field staff_id", values[i])
+			} else if value != nil {
+				s.StaffID = *value
 			}
 		case shipment.FieldShipmentDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -146,6 +162,12 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field note", values[i])
 			} else if value.Valid {
 				s.Note = value.String
+			}
+		case shipment.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				s.Status = shipment.Status(value.String)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -168,6 +190,11 @@ func (s *Shipment) QueryOrder() *OrderQuery {
 // QueryInvoice queries the "invoice" edge of the Shipment entity.
 func (s *Shipment) QueryInvoice() *InvoiceQuery {
 	return NewShipmentClient(s.config).QueryInvoice(s)
+}
+
+// QueryStaff queries the "staff" edge of the Shipment entity.
+func (s *Shipment) QueryStaff() *PersonQuery {
+	return NewShipmentClient(s.config).QueryStaff(s)
 }
 
 // Update returns a builder for updating this Shipment.
@@ -205,14 +232,17 @@ func (s *Shipment) String() string {
 	builder.WriteString("invoice_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.InvoiceID))
 	builder.WriteString(", ")
-	builder.WriteString("shipment_tracking_number=")
-	builder.WriteString(s.ShipmentTrackingNumber)
+	builder.WriteString("staff_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.StaffID))
 	builder.WriteString(", ")
 	builder.WriteString("shipment_date=")
 	builder.WriteString(s.ShipmentDate.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("note=")
 	builder.WriteString(s.Note)
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", s.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

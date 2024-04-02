@@ -28,15 +28,15 @@ func (wuic *WorkUnitInfoCreate) SetName(s string) *WorkUnitInfoCreate {
 }
 
 // SetAddressID sets the "address_id" field.
-func (wuic *WorkUnitInfoCreate) SetAddressID(s string) *WorkUnitInfoCreate {
-	wuic.mutation.SetAddressID(s)
+func (wuic *WorkUnitInfoCreate) SetAddressID(u uuid.UUID) *WorkUnitInfoCreate {
+	wuic.mutation.SetAddressID(u)
 	return wuic
 }
 
 // SetNillableAddressID sets the "address_id" field if the given value is not nil.
-func (wuic *WorkUnitInfoCreate) SetNillableAddressID(s *string) *WorkUnitInfoCreate {
-	if s != nil {
-		wuic.SetAddressID(*s)
+func (wuic *WorkUnitInfoCreate) SetNillableAddressID(u *uuid.UUID) *WorkUnitInfoCreate {
+	if u != nil {
+		wuic.SetAddressID(*u)
 	}
 	return wuic
 }
@@ -51,6 +51,20 @@ func (wuic *WorkUnitInfoCreate) SetType(w workunitinfo.Type) *WorkUnitInfoCreate
 func (wuic *WorkUnitInfoCreate) SetNillableType(w *workunitinfo.Type) *WorkUnitInfoCreate {
 	if w != nil {
 		wuic.SetType(*w)
+	}
+	return wuic
+}
+
+// SetImageURL sets the "image_url" field.
+func (wuic *WorkUnitInfoCreate) SetImageURL(s string) *WorkUnitInfoCreate {
+	wuic.mutation.SetImageURL(s)
+	return wuic
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (wuic *WorkUnitInfoCreate) SetNillableImageURL(s *string) *WorkUnitInfoCreate {
+	if s != nil {
+		wuic.SetImageURL(*s)
 	}
 	return wuic
 }
@@ -137,6 +151,11 @@ func (wuic *WorkUnitInfoCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.type": %w`, err)}
 		}
 	}
+	if v, ok := wuic.mutation.ImageURL(); ok {
+		if err := workunitinfo.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "WorkUnitInfo.image_url": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -180,6 +199,10 @@ func (wuic *WorkUnitInfoCreate) createSpec() (*WorkUnitInfo, *sqlgraph.CreateSpe
 		_spec.SetField(workunitinfo.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
+	if value, ok := wuic.mutation.ImageURL(); ok {
+		_spec.SetField(workunitinfo.FieldImageURL, field.TypeString, value)
+		_node.ImageURL = &value
+	}
 	if nodes := wuic.mutation.AddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -188,7 +211,7 @@ func (wuic *WorkUnitInfoCreate) createSpec() (*WorkUnitInfo, *sqlgraph.CreateSpe
 			Columns: []string{workunitinfo.AddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

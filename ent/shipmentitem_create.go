@@ -53,8 +53,8 @@ func (sic *ShipmentItemCreate) SetNillableUpdatedAt(t *time.Time) *ShipmentItemC
 }
 
 // SetShipmentID sets the "shipment_id" field.
-func (sic *ShipmentItemCreate) SetShipmentID(u uuid.UUID) *ShipmentItemCreate {
-	sic.mutation.SetShipmentID(u)
+func (sic *ShipmentItemCreate) SetShipmentID(s string) *ShipmentItemCreate {
+	sic.mutation.SetShipmentID(s)
 	return sic
 }
 
@@ -160,6 +160,11 @@ func (sic *ShipmentItemCreate) check() error {
 	if _, ok := sic.mutation.ShipmentID(); !ok {
 		return &ValidationError{Name: "shipment_id", err: errors.New(`ent: missing required field "ShipmentItem.shipment_id"`)}
 	}
+	if v, ok := sic.mutation.ShipmentID(); ok {
+		if err := shipmentitem.ShipmentIDValidator(v); err != nil {
+			return &ValidationError{Name: "shipment_id", err: fmt.Errorf(`ent: validator failed for field "ShipmentItem.shipment_id": %w`, err)}
+		}
+	}
 	if _, ok := sic.mutation.OrderItemID(); !ok {
 		return &ValidationError{Name: "order_item_id", err: errors.New(`ent: missing required field "ShipmentItem.order_item_id"`)}
 	}
@@ -234,7 +239,7 @@ func (sic *ShipmentItemCreate) createSpec() (*ShipmentItem, *sqlgraph.CreateSpec
 			Columns: []string{shipmentitem.ShipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

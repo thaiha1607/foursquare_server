@@ -401,8 +401,8 @@ func (paq *PersonAddressQuery) loadPersons(ctx context.Context, query *PersonQue
 	return nil
 }
 func (paq *PersonAddressQuery) loadAddresses(ctx context.Context, query *AddressQuery, nodes []*PersonAddress, init func(*PersonAddress), assign func(*PersonAddress, *Address)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*PersonAddress)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*PersonAddress)
 	for i := range nodes {
 		fk := nodes[i].AddressID
 		if _, ok := nodeids[fk]; !ok {

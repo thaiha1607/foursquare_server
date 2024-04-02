@@ -60,8 +60,13 @@ func Name(v string) predicate.WorkUnitInfo {
 }
 
 // AddressID applies equality check predicate on the "address_id" field. It's identical to AddressIDEQ.
-func AddressID(v string) predicate.WorkUnitInfo {
+func AddressID(v uuid.UUID) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldEQ(FieldAddressID, v))
+}
+
+// ImageURL applies equality check predicate on the "image_url" field. It's identical to ImageURLEQ.
+func ImageURL(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldEQ(FieldImageURL, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -130,58 +135,23 @@ func NameContainsFold(v string) predicate.WorkUnitInfo {
 }
 
 // AddressIDEQ applies the EQ predicate on the "address_id" field.
-func AddressIDEQ(v string) predicate.WorkUnitInfo {
+func AddressIDEQ(v uuid.UUID) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldEQ(FieldAddressID, v))
 }
 
 // AddressIDNEQ applies the NEQ predicate on the "address_id" field.
-func AddressIDNEQ(v string) predicate.WorkUnitInfo {
+func AddressIDNEQ(v uuid.UUID) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldNEQ(FieldAddressID, v))
 }
 
 // AddressIDIn applies the In predicate on the "address_id" field.
-func AddressIDIn(vs ...string) predicate.WorkUnitInfo {
+func AddressIDIn(vs ...uuid.UUID) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldIn(FieldAddressID, vs...))
 }
 
 // AddressIDNotIn applies the NotIn predicate on the "address_id" field.
-func AddressIDNotIn(vs ...string) predicate.WorkUnitInfo {
+func AddressIDNotIn(vs ...uuid.UUID) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldNotIn(FieldAddressID, vs...))
-}
-
-// AddressIDGT applies the GT predicate on the "address_id" field.
-func AddressIDGT(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldGT(FieldAddressID, v))
-}
-
-// AddressIDGTE applies the GTE predicate on the "address_id" field.
-func AddressIDGTE(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldGTE(FieldAddressID, v))
-}
-
-// AddressIDLT applies the LT predicate on the "address_id" field.
-func AddressIDLT(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldLT(FieldAddressID, v))
-}
-
-// AddressIDLTE applies the LTE predicate on the "address_id" field.
-func AddressIDLTE(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldLTE(FieldAddressID, v))
-}
-
-// AddressIDContains applies the Contains predicate on the "address_id" field.
-func AddressIDContains(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldContains(FieldAddressID, v))
-}
-
-// AddressIDHasPrefix applies the HasPrefix predicate on the "address_id" field.
-func AddressIDHasPrefix(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldHasPrefix(FieldAddressID, v))
-}
-
-// AddressIDHasSuffix applies the HasSuffix predicate on the "address_id" field.
-func AddressIDHasSuffix(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldHasSuffix(FieldAddressID, v))
 }
 
 // AddressIDIsNil applies the IsNil predicate on the "address_id" field.
@@ -192,16 +162,6 @@ func AddressIDIsNil() predicate.WorkUnitInfo {
 // AddressIDNotNil applies the NotNil predicate on the "address_id" field.
 func AddressIDNotNil() predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldNotNull(FieldAddressID))
-}
-
-// AddressIDEqualFold applies the EqualFold predicate on the "address_id" field.
-func AddressIDEqualFold(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldEqualFold(FieldAddressID, v))
-}
-
-// AddressIDContainsFold applies the ContainsFold predicate on the "address_id" field.
-func AddressIDContainsFold(v string) predicate.WorkUnitInfo {
-	return predicate.WorkUnitInfo(sql.FieldContainsFold(FieldAddressID, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
@@ -222,6 +182,81 @@ func TypeIn(vs ...Type) predicate.WorkUnitInfo {
 // TypeNotIn applies the NotIn predicate on the "type" field.
 func TypeNotIn(vs ...Type) predicate.WorkUnitInfo {
 	return predicate.WorkUnitInfo(sql.FieldNotIn(FieldType, vs...))
+}
+
+// ImageURLEQ applies the EQ predicate on the "image_url" field.
+func ImageURLEQ(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldEQ(FieldImageURL, v))
+}
+
+// ImageURLNEQ applies the NEQ predicate on the "image_url" field.
+func ImageURLNEQ(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldNEQ(FieldImageURL, v))
+}
+
+// ImageURLIn applies the In predicate on the "image_url" field.
+func ImageURLIn(vs ...string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldIn(FieldImageURL, vs...))
+}
+
+// ImageURLNotIn applies the NotIn predicate on the "image_url" field.
+func ImageURLNotIn(vs ...string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldNotIn(FieldImageURL, vs...))
+}
+
+// ImageURLGT applies the GT predicate on the "image_url" field.
+func ImageURLGT(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldGT(FieldImageURL, v))
+}
+
+// ImageURLGTE applies the GTE predicate on the "image_url" field.
+func ImageURLGTE(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldGTE(FieldImageURL, v))
+}
+
+// ImageURLLT applies the LT predicate on the "image_url" field.
+func ImageURLLT(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldLT(FieldImageURL, v))
+}
+
+// ImageURLLTE applies the LTE predicate on the "image_url" field.
+func ImageURLLTE(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldLTE(FieldImageURL, v))
+}
+
+// ImageURLContains applies the Contains predicate on the "image_url" field.
+func ImageURLContains(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldContains(FieldImageURL, v))
+}
+
+// ImageURLHasPrefix applies the HasPrefix predicate on the "image_url" field.
+func ImageURLHasPrefix(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldHasPrefix(FieldImageURL, v))
+}
+
+// ImageURLHasSuffix applies the HasSuffix predicate on the "image_url" field.
+func ImageURLHasSuffix(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldHasSuffix(FieldImageURL, v))
+}
+
+// ImageURLIsNil applies the IsNil predicate on the "image_url" field.
+func ImageURLIsNil() predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldIsNull(FieldImageURL))
+}
+
+// ImageURLNotNil applies the NotNil predicate on the "image_url" field.
+func ImageURLNotNil() predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldNotNull(FieldImageURL))
+}
+
+// ImageURLEqualFold applies the EqualFold predicate on the "image_url" field.
+func ImageURLEqualFold(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldEqualFold(FieldImageURL, v))
+}
+
+// ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
+func ImageURLContainsFold(v string) predicate.WorkUnitInfo {
+	return predicate.WorkUnitInfo(sql.FieldContainsFold(FieldImageURL, v))
 }
 
 // HasAddress applies the HasEdge predicate on the "address" edge.

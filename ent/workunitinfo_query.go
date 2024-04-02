@@ -402,8 +402,8 @@ func (wuiq *WorkUnitInfoQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 }
 
 func (wuiq *WorkUnitInfoQuery) loadAddress(ctx context.Context, query *AddressQuery, nodes []*WorkUnitInfo, init func(*WorkUnitInfo), assign func(*WorkUnitInfo, *Address)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*WorkUnitInfo)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*WorkUnitInfo)
 	for i := range nodes {
 		if nodes[i].AddressID == nil {
 			continue

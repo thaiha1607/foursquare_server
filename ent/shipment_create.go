@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 )
 
@@ -63,9 +64,9 @@ func (sc *ShipmentCreate) SetInvoiceID(u uuid.UUID) *ShipmentCreate {
 	return sc
 }
 
-// SetShipmentTrackingNumber sets the "shipment_tracking_number" field.
-func (sc *ShipmentCreate) SetShipmentTrackingNumber(s string) *ShipmentCreate {
-	sc.mutation.SetShipmentTrackingNumber(s)
+// SetStaffID sets the "staff_id" field.
+func (sc *ShipmentCreate) SetStaffID(u uuid.UUID) *ShipmentCreate {
+	sc.mutation.SetStaffID(u)
 	return sc
 }
 
@@ -89,17 +90,23 @@ func (sc *ShipmentCreate) SetNillableNote(s *string) *ShipmentCreate {
 	return sc
 }
 
-// SetID sets the "id" field.
-func (sc *ShipmentCreate) SetID(u uuid.UUID) *ShipmentCreate {
-	sc.mutation.SetID(u)
+// SetStatus sets the "status" field.
+func (sc *ShipmentCreate) SetStatus(s shipment.Status) *ShipmentCreate {
+	sc.mutation.SetStatus(s)
 	return sc
 }
 
-// SetNillableID sets the "id" field if the given value is not nil.
-func (sc *ShipmentCreate) SetNillableID(u *uuid.UUID) *ShipmentCreate {
-	if u != nil {
-		sc.SetID(*u)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (sc *ShipmentCreate) SetNillableStatus(s *shipment.Status) *ShipmentCreate {
+	if s != nil {
+		sc.SetStatus(*s)
 	}
+	return sc
+}
+
+// SetID sets the "id" field.
+func (sc *ShipmentCreate) SetID(s string) *ShipmentCreate {
+	sc.mutation.SetID(s)
 	return sc
 }
 
@@ -111,6 +118,11 @@ func (sc *ShipmentCreate) SetOrder(o *Order) *ShipmentCreate {
 // SetInvoice sets the "invoice" edge to the Invoice entity.
 func (sc *ShipmentCreate) SetInvoice(i *Invoice) *ShipmentCreate {
 	return sc.SetInvoiceID(i.ID)
+}
+
+// SetStaff sets the "staff" edge to the Person entity.
+func (sc *ShipmentCreate) SetStaff(p *Person) *ShipmentCreate {
+	return sc.SetStaffID(p.ID)
 }
 
 // Mutation returns the ShipmentMutation object of the builder.
@@ -164,12 +176,9 @@ func (sc *ShipmentCreate) defaults() error {
 		v := shipment.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := sc.mutation.ID(); !ok {
-		if shipment.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized shipment.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := shipment.DefaultID()
-		sc.mutation.SetID(v)
+	if _, ok := sc.mutation.Status(); !ok {
+		v := shipment.DefaultStatus
+		sc.mutation.SetStatus(v)
 	}
 	return nil
 }
@@ -188,22 +197,33 @@ func (sc *ShipmentCreate) check() error {
 	if _, ok := sc.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice_id", err: errors.New(`ent: missing required field "Shipment.invoice_id"`)}
 	}
-	if _, ok := sc.mutation.ShipmentTrackingNumber(); !ok {
-		return &ValidationError{Name: "shipment_tracking_number", err: errors.New(`ent: missing required field "Shipment.shipment_tracking_number"`)}
-	}
-	if v, ok := sc.mutation.ShipmentTrackingNumber(); ok {
-		if err := shipment.ShipmentTrackingNumberValidator(v); err != nil {
-			return &ValidationError{Name: "shipment_tracking_number", err: fmt.Errorf(`ent: validator failed for field "Shipment.shipment_tracking_number": %w`, err)}
-		}
+	if _, ok := sc.mutation.StaffID(); !ok {
+		return &ValidationError{Name: "staff_id", err: errors.New(`ent: missing required field "Shipment.staff_id"`)}
 	}
 	if _, ok := sc.mutation.ShipmentDate(); !ok {
 		return &ValidationError{Name: "shipment_date", err: errors.New(`ent: missing required field "Shipment.shipment_date"`)}
+	}
+	if _, ok := sc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Shipment.status"`)}
+	}
+	if v, ok := sc.mutation.Status(); ok {
+		if err := shipment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
+		}
+	}
+	if v, ok := sc.mutation.ID(); ok {
+		if err := shipment.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Shipment.id": %w`, err)}
+		}
 	}
 	if _, ok := sc.mutation.OrderID(); !ok {
 		return &ValidationError{Name: "order", err: errors.New(`ent: missing required edge "Shipment.order"`)}
 	}
 	if _, ok := sc.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice", err: errors.New(`ent: missing required edge "Shipment.invoice"`)}
+	}
+	if _, ok := sc.mutation.StaffID(); !ok {
+		return &ValidationError{Name: "staff", err: errors.New(`ent: missing required edge "Shipment.staff"`)}
 	}
 	return nil
 }
@@ -220,10 +240,10 @@ func (sc *ShipmentCreate) sqlSave(ctx context.Context) (*Shipment, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Shipment.ID type: %T", _spec.ID.Value)
 		}
 	}
 	sc.mutation.id = &_node.ID
@@ -234,11 +254,11 @@ func (sc *ShipmentCreate) sqlSave(ctx context.Context) (*Shipment, error) {
 func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Shipment{config: sc.config}
-		_spec = sqlgraph.NewCreateSpec(shipment.Table, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(shipment.Table, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeString))
 	)
 	if id, ok := sc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(shipment.FieldCreatedAt, field.TypeTime, value)
@@ -248,10 +268,6 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(shipment.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := sc.mutation.ShipmentTrackingNumber(); ok {
-		_spec.SetField(shipment.FieldShipmentTrackingNumber, field.TypeString, value)
-		_node.ShipmentTrackingNumber = value
-	}
 	if value, ok := sc.mutation.ShipmentDate(); ok {
 		_spec.SetField(shipment.FieldShipmentDate, field.TypeTime, value)
 		_node.ShipmentDate = value
@@ -259,6 +275,10 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Note(); ok {
 		_spec.SetField(shipment.FieldNote, field.TypeString, value)
 		_node.Note = value
+	}
+	if value, ok := sc.mutation.Status(); ok {
+		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if nodes := sc.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -292,6 +312,23 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.InvoiceID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.StaffIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.StaffTable,
+			Columns: []string{shipment.StaffColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.StaffID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

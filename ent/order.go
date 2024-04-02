@@ -46,7 +46,7 @@ type Order struct {
 	// IsInternal holds the value of the "is_internal" field.
 	IsInternal bool `json:"is_internal,omitempty"`
 	// AddressID holds the value of the "address_id" field.
-	AddressID string `json:"address_id,omitempty"`
+	AddressID uuid.UUID `json:"address_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
@@ -149,11 +149,11 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case order.FieldPriority, order.FieldStatusCode:
 			values[i] = new(sql.NullInt64)
-		case order.FieldNote, order.FieldType, order.FieldInternalNote, order.FieldAddressID:
+		case order.FieldNote, order.FieldType, order.FieldInternalNote:
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldStaffID:
+		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldStaffID, order.FieldAddressID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -252,10 +252,10 @@ func (o *Order) assignValues(columns []string, values []any) error {
 				o.IsInternal = value.Bool
 			}
 		case order.FieldAddressID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field address_id", values[i])
-			} else if value.Valid {
-				o.AddressID = value.String
+			} else if value != nil {
+				o.AddressID = *value
 			}
 		default:
 			o.selectValues.Set(columns[i], values[i])
@@ -366,7 +366,7 @@ func (o *Order) String() string {
 	builder.WriteString(fmt.Sprintf("%v", o.IsInternal))
 	builder.WriteString(", ")
 	builder.WriteString("address_id=")
-	builder.WriteString(o.AddressID)
+	builder.WriteString(fmt.Sprintf("%v", o.AddressID))
 	builder.WriteByte(')')
 	return builder.String()
 }

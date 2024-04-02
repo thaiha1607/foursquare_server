@@ -30,7 +30,8 @@ func (ShipmentItem) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Immutable(),
-		field.UUID("shipment_id", uuid.UUID{}).
+		field.String("shipment_id").
+			NotEmpty().
 			Immutable(),
 		field.UUID("order_item_id", uuid.UUID{}).
 			Immutable(),

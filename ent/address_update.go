@@ -98,12 +98,6 @@ func (au *AddressUpdate) SetNillableStateOrProvince(s *string) *AddressUpdate {
 	return au
 }
 
-// ClearStateOrProvince clears the value of the "state_or_province" field.
-func (au *AddressUpdate) ClearStateOrProvince() *AddressUpdate {
-	au.mutation.ClearStateOrProvince()
-	return au
-}
-
 // SetZipOrPostcode sets the "zip_or_postcode" field.
 func (au *AddressUpdate) SetZipOrPostcode(s string) *AddressUpdate {
 	au.mutation.SetZipOrPostcode(s)
@@ -195,9 +189,7 @@ func (au *AddressUpdate) RemovePersons(p ...*Person) *AddressUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AddressUpdate) Save(ctx context.Context) (int, error) {
-	if err := au.defaults(); err != nil {
-		return 0, err
-	}
+	au.defaults()
 	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
@@ -224,15 +216,11 @@ func (au *AddressUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (au *AddressUpdate) defaults() error {
+func (au *AddressUpdate) defaults() {
 	if _, ok := au.mutation.UpdatedAt(); !ok {
-		if address.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized address.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := address.UpdateDefaultUpdatedAt()
 		au.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -245,6 +233,11 @@ func (au *AddressUpdate) check() error {
 	if v, ok := au.mutation.City(); ok {
 		if err := address.CityValidator(v); err != nil {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
+		}
+	}
+	if v, ok := au.mutation.StateOrProvince(); ok {
+		if err := address.StateOrProvinceValidator(v); err != nil {
+			return &ValidationError{Name: "state_or_province", err: fmt.Errorf(`ent: validator failed for field "Address.state_or_province": %w`, err)}
 		}
 	}
 	if v, ok := au.mutation.ZipOrPostcode(); ok {
@@ -264,7 +257,7 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := au.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -289,9 +282,6 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.StateOrProvince(); ok {
 		_spec.SetField(address.FieldStateOrProvince, field.TypeString, value)
-	}
-	if au.mutation.StateOrProvinceCleared() {
-		_spec.ClearField(address.FieldStateOrProvince, field.TypeString)
 	}
 	if value, ok := au.mutation.ZipOrPostcode(); ok {
 		_spec.SetField(address.FieldZipOrPostcode, field.TypeString, value)
@@ -450,12 +440,6 @@ func (auo *AddressUpdateOne) SetNillableStateOrProvince(s *string) *AddressUpdat
 	return auo
 }
 
-// ClearStateOrProvince clears the value of the "state_or_province" field.
-func (auo *AddressUpdateOne) ClearStateOrProvince() *AddressUpdateOne {
-	auo.mutation.ClearStateOrProvince()
-	return auo
-}
-
 // SetZipOrPostcode sets the "zip_or_postcode" field.
 func (auo *AddressUpdateOne) SetZipOrPostcode(s string) *AddressUpdateOne {
 	auo.mutation.SetZipOrPostcode(s)
@@ -560,9 +544,7 @@ func (auo *AddressUpdateOne) Select(field string, fields ...string) *AddressUpda
 
 // Save executes the query and returns the updated Address entity.
 func (auo *AddressUpdateOne) Save(ctx context.Context) (*Address, error) {
-	if err := auo.defaults(); err != nil {
-		return nil, err
-	}
+	auo.defaults()
 	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
@@ -589,15 +571,11 @@ func (auo *AddressUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (auo *AddressUpdateOne) defaults() error {
+func (auo *AddressUpdateOne) defaults() {
 	if _, ok := auo.mutation.UpdatedAt(); !ok {
-		if address.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized address.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := address.UpdateDefaultUpdatedAt()
 		auo.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -610,6 +588,11 @@ func (auo *AddressUpdateOne) check() error {
 	if v, ok := auo.mutation.City(); ok {
 		if err := address.CityValidator(v); err != nil {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
+		}
+	}
+	if v, ok := auo.mutation.StateOrProvince(); ok {
+		if err := address.StateOrProvinceValidator(v); err != nil {
+			return &ValidationError{Name: "state_or_province", err: fmt.Errorf(`ent: validator failed for field "Address.state_or_province": %w`, err)}
 		}
 	}
 	if v, ok := auo.mutation.ZipOrPostcode(); ok {
@@ -629,7 +612,7 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 	if err := auo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	id, ok := auo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Address.id" for update`)}
@@ -671,9 +654,6 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 	}
 	if value, ok := auo.mutation.StateOrProvince(); ok {
 		_spec.SetField(address.FieldStateOrProvince, field.TypeString, value)
-	}
-	if auo.mutation.StateOrProvinceCleared() {
-		_spec.ClearField(address.FieldStateOrProvince, field.TypeString)
 	}
 	if value, ok := auo.mutation.ZipOrPostcode(); ok {
 		_spec.SetField(address.FieldZipOrPostcode, field.TypeString, value)

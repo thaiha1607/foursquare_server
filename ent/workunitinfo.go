@@ -21,9 +21,11 @@ type WorkUnitInfo struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// AddressID holds the value of the "address_id" field.
-	AddressID *string `json:"address_id,omitempty"`
+	AddressID *uuid.UUID `json:"address_id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type workunitinfo.Type `json:"type,omitempty"`
+	// ImageURL holds the value of the "image_url" field.
+	ImageURL *string `json:"image_url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkUnitInfoQuery when eager-loading is set.
 	Edges        WorkUnitInfoEdges `json:"edges"`
@@ -55,7 +57,9 @@ func (*WorkUnitInfo) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case workunitinfo.FieldName, workunitinfo.FieldAddressID, workunitinfo.FieldType:
+		case workunitinfo.FieldAddressID:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case workunitinfo.FieldName, workunitinfo.FieldType, workunitinfo.FieldImageURL:
 			values[i] = new(sql.NullString)
 		case workunitinfo.FieldID:
 			values[i] = new(uuid.UUID)
@@ -87,17 +91,24 @@ func (wui *WorkUnitInfo) assignValues(columns []string, values []any) error {
 				wui.Name = value.String
 			}
 		case workunitinfo.FieldAddressID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field address_id", values[i])
 			} else if value.Valid {
-				wui.AddressID = new(string)
-				*wui.AddressID = value.String
+				wui.AddressID = new(uuid.UUID)
+				*wui.AddressID = *value.S.(*uuid.UUID)
 			}
 		case workunitinfo.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				wui.Type = workunitinfo.Type(value.String)
+			}
+		case workunitinfo.FieldImageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field image_url", values[i])
+			} else if value.Valid {
+				wui.ImageURL = new(string)
+				*wui.ImageURL = value.String
 			}
 		default:
 			wui.selectValues.Set(columns[i], values[i])
@@ -145,11 +156,16 @@ func (wui *WorkUnitInfo) String() string {
 	builder.WriteString(", ")
 	if v := wui.AddressID; v != nil {
 		builder.WriteString("address_id=")
-		builder.WriteString(*v)
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", wui.Type))
+	builder.WriteString(", ")
+	if v := wui.ImageURL; v != nil {
+		builder.WriteString("image_url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

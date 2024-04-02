@@ -68,7 +68,7 @@ func UpdatedAt(v time.Time) predicate.ShipmentItem {
 }
 
 // ShipmentID applies equality check predicate on the "shipment_id" field. It's identical to ShipmentIDEQ.
-func ShipmentID(v uuid.UUID) predicate.ShipmentItem {
+func ShipmentID(v string) predicate.ShipmentItem {
 	return predicate.ShipmentItem(sql.FieldEQ(FieldShipmentID, v))
 }
 
@@ -168,23 +168,68 @@ func UpdatedAtLTE(v time.Time) predicate.ShipmentItem {
 }
 
 // ShipmentIDEQ applies the EQ predicate on the "shipment_id" field.
-func ShipmentIDEQ(v uuid.UUID) predicate.ShipmentItem {
+func ShipmentIDEQ(v string) predicate.ShipmentItem {
 	return predicate.ShipmentItem(sql.FieldEQ(FieldShipmentID, v))
 }
 
 // ShipmentIDNEQ applies the NEQ predicate on the "shipment_id" field.
-func ShipmentIDNEQ(v uuid.UUID) predicate.ShipmentItem {
+func ShipmentIDNEQ(v string) predicate.ShipmentItem {
 	return predicate.ShipmentItem(sql.FieldNEQ(FieldShipmentID, v))
 }
 
 // ShipmentIDIn applies the In predicate on the "shipment_id" field.
-func ShipmentIDIn(vs ...uuid.UUID) predicate.ShipmentItem {
+func ShipmentIDIn(vs ...string) predicate.ShipmentItem {
 	return predicate.ShipmentItem(sql.FieldIn(FieldShipmentID, vs...))
 }
 
 // ShipmentIDNotIn applies the NotIn predicate on the "shipment_id" field.
-func ShipmentIDNotIn(vs ...uuid.UUID) predicate.ShipmentItem {
+func ShipmentIDNotIn(vs ...string) predicate.ShipmentItem {
 	return predicate.ShipmentItem(sql.FieldNotIn(FieldShipmentID, vs...))
+}
+
+// ShipmentIDGT applies the GT predicate on the "shipment_id" field.
+func ShipmentIDGT(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldGT(FieldShipmentID, v))
+}
+
+// ShipmentIDGTE applies the GTE predicate on the "shipment_id" field.
+func ShipmentIDGTE(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldGTE(FieldShipmentID, v))
+}
+
+// ShipmentIDLT applies the LT predicate on the "shipment_id" field.
+func ShipmentIDLT(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldLT(FieldShipmentID, v))
+}
+
+// ShipmentIDLTE applies the LTE predicate on the "shipment_id" field.
+func ShipmentIDLTE(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldLTE(FieldShipmentID, v))
+}
+
+// ShipmentIDContains applies the Contains predicate on the "shipment_id" field.
+func ShipmentIDContains(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldContains(FieldShipmentID, v))
+}
+
+// ShipmentIDHasPrefix applies the HasPrefix predicate on the "shipment_id" field.
+func ShipmentIDHasPrefix(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldHasPrefix(FieldShipmentID, v))
+}
+
+// ShipmentIDHasSuffix applies the HasSuffix predicate on the "shipment_id" field.
+func ShipmentIDHasSuffix(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldHasSuffix(FieldShipmentID, v))
+}
+
+// ShipmentIDEqualFold applies the EqualFold predicate on the "shipment_id" field.
+func ShipmentIDEqualFold(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldEqualFold(FieldShipmentID, v))
+}
+
+// ShipmentIDContainsFold applies the ContainsFold predicate on the "shipment_id" field.
+func ShipmentIDContainsFold(v string) predicate.ShipmentItem {
+	return predicate.ShipmentItem(sql.FieldContainsFold(FieldShipmentID, v))
 }
 
 // OrderItemIDEQ applies the EQ predicate on the "order_item_id" field.

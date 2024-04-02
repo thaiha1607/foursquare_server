@@ -49,8 +49,7 @@ func (Order) Fields() []ent.Field {
 			Nillable(),
 		field.Bool("is_internal").
 			Default(false),
-		field.String("address_id").
-			NotEmpty(),
+		field.UUID("address_id", uuid.UUID{}),
 	}
 }
 

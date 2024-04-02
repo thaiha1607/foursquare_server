@@ -58,8 +58,8 @@ func (pac *PersonAddressCreate) SetPersonID(u uuid.UUID) *PersonAddressCreate {
 }
 
 // SetAddressID sets the "address_id" field.
-func (pac *PersonAddressCreate) SetAddressID(s string) *PersonAddressCreate {
-	pac.mutation.SetAddressID(s)
+func (pac *PersonAddressCreate) SetAddressID(u uuid.UUID) *PersonAddressCreate {
+	pac.mutation.SetAddressID(u)
 	return pac
 }
 
@@ -75,7 +75,7 @@ func (pac *PersonAddressCreate) SetPersons(p *Person) *PersonAddressCreate {
 }
 
 // SetAddressesID sets the "addresses" edge to the Address entity by ID.
-func (pac *PersonAddressCreate) SetAddressesID(id string) *PersonAddressCreate {
+func (pac *PersonAddressCreate) SetAddressesID(id uuid.UUID) *PersonAddressCreate {
 	pac.mutation.SetAddressesID(id)
 	return pac
 }
@@ -144,11 +144,6 @@ func (pac *PersonAddressCreate) check() error {
 	if _, ok := pac.mutation.AddressID(); !ok {
 		return &ValidationError{Name: "address_id", err: errors.New(`ent: missing required field "PersonAddress.address_id"`)}
 	}
-	if v, ok := pac.mutation.AddressID(); ok {
-		if err := personaddress.AddressIDValidator(v); err != nil {
-			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "PersonAddress.address_id": %w`, err)}
-		}
-	}
 	if _, ok := pac.mutation.PersonsID(); !ok {
 		return &ValidationError{Name: "persons", err: errors.New(`ent: missing required edge "PersonAddress.persons"`)}
 	}
@@ -210,7 +205,7 @@ func (pac *PersonAddressCreate) createSpec() (*PersonAddress, *sqlgraph.CreateSp
 			Columns: []string{personaddress.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

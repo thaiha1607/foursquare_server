@@ -112,7 +112,7 @@ func IsInternal(v bool) predicate.Order {
 }
 
 // AddressID applies equality check predicate on the "address_id" field. It's identical to AddressIDEQ.
-func AddressID(v string) predicate.Order {
+func AddressID(v uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldAddressID, v))
 }
 
@@ -527,68 +527,23 @@ func IsInternalNEQ(v bool) predicate.Order {
 }
 
 // AddressIDEQ applies the EQ predicate on the "address_id" field.
-func AddressIDEQ(v string) predicate.Order {
+func AddressIDEQ(v uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldAddressID, v))
 }
 
 // AddressIDNEQ applies the NEQ predicate on the "address_id" field.
-func AddressIDNEQ(v string) predicate.Order {
+func AddressIDNEQ(v uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldNEQ(FieldAddressID, v))
 }
 
 // AddressIDIn applies the In predicate on the "address_id" field.
-func AddressIDIn(vs ...string) predicate.Order {
+func AddressIDIn(vs ...uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldIn(FieldAddressID, vs...))
 }
 
 // AddressIDNotIn applies the NotIn predicate on the "address_id" field.
-func AddressIDNotIn(vs ...string) predicate.Order {
+func AddressIDNotIn(vs ...uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldAddressID, vs...))
-}
-
-// AddressIDGT applies the GT predicate on the "address_id" field.
-func AddressIDGT(v string) predicate.Order {
-	return predicate.Order(sql.FieldGT(FieldAddressID, v))
-}
-
-// AddressIDGTE applies the GTE predicate on the "address_id" field.
-func AddressIDGTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldGTE(FieldAddressID, v))
-}
-
-// AddressIDLT applies the LT predicate on the "address_id" field.
-func AddressIDLT(v string) predicate.Order {
-	return predicate.Order(sql.FieldLT(FieldAddressID, v))
-}
-
-// AddressIDLTE applies the LTE predicate on the "address_id" field.
-func AddressIDLTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldLTE(FieldAddressID, v))
-}
-
-// AddressIDContains applies the Contains predicate on the "address_id" field.
-func AddressIDContains(v string) predicate.Order {
-	return predicate.Order(sql.FieldContains(FieldAddressID, v))
-}
-
-// AddressIDHasPrefix applies the HasPrefix predicate on the "address_id" field.
-func AddressIDHasPrefix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasPrefix(FieldAddressID, v))
-}
-
-// AddressIDHasSuffix applies the HasSuffix predicate on the "address_id" field.
-func AddressIDHasSuffix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasSuffix(FieldAddressID, v))
-}
-
-// AddressIDEqualFold applies the EqualFold predicate on the "address_id" field.
-func AddressIDEqualFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldEqualFold(FieldAddressID, v))
-}
-
-// AddressIDContainsFold applies the ContainsFold predicate on the "address_id" field.
-func AddressIDContainsFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldContainsFold(FieldAddressID, v))
 }
 
 // HasCustomer applies the HasEdge predicate on the "customer" edge.

@@ -25,7 +25,7 @@ type PersonAddress struct {
 	// PersonID holds the value of the "person_id" field.
 	PersonID uuid.UUID `json:"person_id,omitempty"`
 	// AddressID holds the value of the "address_id" field.
-	AddressID string `json:"address_id,omitempty"`
+	AddressID uuid.UUID `json:"address_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PersonAddressQuery when eager-loading is set.
 	Edges        PersonAddressEdges `json:"edges"`
@@ -70,11 +70,9 @@ func (*PersonAddress) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case personaddress.FieldAddressID:
-			values[i] = new(sql.NullString)
 		case personaddress.FieldCreatedAt, personaddress.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case personaddress.FieldPersonID:
+		case personaddress.FieldPersonID, personaddress.FieldAddressID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -110,10 +108,10 @@ func (pa *PersonAddress) assignValues(columns []string, values []any) error {
 				pa.PersonID = *value
 			}
 		case personaddress.FieldAddressID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field address_id", values[i])
-			} else if value.Valid {
-				pa.AddressID = value.String
+			} else if value != nil {
+				pa.AddressID = *value
 			}
 		default:
 			pa.selectValues.Set(columns[i], values[i])
@@ -170,7 +168,7 @@ func (pa *PersonAddress) String() string {
 	builder.WriteString(fmt.Sprintf("%v", pa.PersonID))
 	builder.WriteString(", ")
 	builder.WriteString("address_id=")
-	builder.WriteString(pa.AddressID)
+	builder.WriteString(fmt.Sprintf("%v", pa.AddressID))
 	builder.WriteByte(')')
 	return builder.String()
 }

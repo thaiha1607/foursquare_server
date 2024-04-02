@@ -7,62 +7,53 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Address {
+func ID(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Address {
+func IDEQ(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Address {
+func IDNEQ(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Address {
+func IDIn(ids ...uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Address {
+func IDNotIn(ids ...uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Address {
+func IDGT(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Address {
+func IDGTE(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Address {
+func IDLT(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Address {
+func IDLTE(id uuid.UUID) predicate.Address {
 	return predicate.Address(sql.FieldLTE(FieldID, id))
-}
-
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.Address {
-	return predicate.Address(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.Address {
-	return predicate.Address(sql.FieldContainsFold(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -448,16 +439,6 @@ func StateOrProvinceHasPrefix(v string) predicate.Address {
 // StateOrProvinceHasSuffix applies the HasSuffix predicate on the "state_or_province" field.
 func StateOrProvinceHasSuffix(v string) predicate.Address {
 	return predicate.Address(sql.FieldHasSuffix(FieldStateOrProvince, v))
-}
-
-// StateOrProvinceIsNil applies the IsNil predicate on the "state_or_province" field.
-func StateOrProvinceIsNil() predicate.Address {
-	return predicate.Address(sql.FieldIsNull(FieldStateOrProvince))
-}
-
-// StateOrProvinceNotNil applies the NotNil predicate on the "state_or_province" field.
-func StateOrProvinceNotNil() predicate.Address {
-	return predicate.Address(sql.FieldNotNull(FieldStateOrProvince))
 }
 
 // StateOrProvinceEqualFold applies the EqualFold predicate on the "state_or_province" field.

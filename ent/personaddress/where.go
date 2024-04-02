@@ -27,7 +27,7 @@ func PersonID(v uuid.UUID) predicate.PersonAddress {
 }
 
 // AddressID applies equality check predicate on the "address_id" field. It's identical to AddressIDEQ.
-func AddressID(v string) predicate.PersonAddress {
+func AddressID(v uuid.UUID) predicate.PersonAddress {
 	return predicate.PersonAddress(sql.FieldEQ(FieldAddressID, v))
 }
 
@@ -132,68 +132,23 @@ func PersonIDNotIn(vs ...uuid.UUID) predicate.PersonAddress {
 }
 
 // AddressIDEQ applies the EQ predicate on the "address_id" field.
-func AddressIDEQ(v string) predicate.PersonAddress {
+func AddressIDEQ(v uuid.UUID) predicate.PersonAddress {
 	return predicate.PersonAddress(sql.FieldEQ(FieldAddressID, v))
 }
 
 // AddressIDNEQ applies the NEQ predicate on the "address_id" field.
-func AddressIDNEQ(v string) predicate.PersonAddress {
+func AddressIDNEQ(v uuid.UUID) predicate.PersonAddress {
 	return predicate.PersonAddress(sql.FieldNEQ(FieldAddressID, v))
 }
 
 // AddressIDIn applies the In predicate on the "address_id" field.
-func AddressIDIn(vs ...string) predicate.PersonAddress {
+func AddressIDIn(vs ...uuid.UUID) predicate.PersonAddress {
 	return predicate.PersonAddress(sql.FieldIn(FieldAddressID, vs...))
 }
 
 // AddressIDNotIn applies the NotIn predicate on the "address_id" field.
-func AddressIDNotIn(vs ...string) predicate.PersonAddress {
+func AddressIDNotIn(vs ...uuid.UUID) predicate.PersonAddress {
 	return predicate.PersonAddress(sql.FieldNotIn(FieldAddressID, vs...))
-}
-
-// AddressIDGT applies the GT predicate on the "address_id" field.
-func AddressIDGT(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldGT(FieldAddressID, v))
-}
-
-// AddressIDGTE applies the GTE predicate on the "address_id" field.
-func AddressIDGTE(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldGTE(FieldAddressID, v))
-}
-
-// AddressIDLT applies the LT predicate on the "address_id" field.
-func AddressIDLT(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldLT(FieldAddressID, v))
-}
-
-// AddressIDLTE applies the LTE predicate on the "address_id" field.
-func AddressIDLTE(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldLTE(FieldAddressID, v))
-}
-
-// AddressIDContains applies the Contains predicate on the "address_id" field.
-func AddressIDContains(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldContains(FieldAddressID, v))
-}
-
-// AddressIDHasPrefix applies the HasPrefix predicate on the "address_id" field.
-func AddressIDHasPrefix(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldHasPrefix(FieldAddressID, v))
-}
-
-// AddressIDHasSuffix applies the HasSuffix predicate on the "address_id" field.
-func AddressIDHasSuffix(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldHasSuffix(FieldAddressID, v))
-}
-
-// AddressIDEqualFold applies the EqualFold predicate on the "address_id" field.
-func AddressIDEqualFold(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldEqualFold(FieldAddressID, v))
-}
-
-// AddressIDContainsFold applies the ContainsFold predicate on the "address_id" field.
-func AddressIDContainsFold(v string) predicate.PersonAddress {
-	return predicate.PersonAddress(sql.FieldContainsFold(FieldAddressID, v))
 }
 
 // HasPersons applies the HasEdge predicate on the "persons" edge.

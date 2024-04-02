@@ -27,9 +27,8 @@ func (PersonAddress) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("person_id", uuid.UUID{}).
 			Immutable(),
-		field.String("address_id").
-			Immutable().
-			NotEmpty(),
+		field.UUID("address_id", uuid.UUID{}).
+			Immutable(),
 	}
 }
 

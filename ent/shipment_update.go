@@ -34,20 +34,6 @@ func (su *ShipmentUpdate) SetUpdatedAt(t time.Time) *ShipmentUpdate {
 	return su
 }
 
-// SetShipmentTrackingNumber sets the "shipment_tracking_number" field.
-func (su *ShipmentUpdate) SetShipmentTrackingNumber(s string) *ShipmentUpdate {
-	su.mutation.SetShipmentTrackingNumber(s)
-	return su
-}
-
-// SetNillableShipmentTrackingNumber sets the "shipment_tracking_number" field if the given value is not nil.
-func (su *ShipmentUpdate) SetNillableShipmentTrackingNumber(s *string) *ShipmentUpdate {
-	if s != nil {
-		su.SetShipmentTrackingNumber(*s)
-	}
-	return su
-}
-
 // SetShipmentDate sets the "shipment_date" field.
 func (su *ShipmentUpdate) SetShipmentDate(t time.Time) *ShipmentUpdate {
 	su.mutation.SetShipmentDate(t)
@@ -79,6 +65,20 @@ func (su *ShipmentUpdate) SetNillableNote(s *string) *ShipmentUpdate {
 // ClearNote clears the value of the "note" field.
 func (su *ShipmentUpdate) ClearNote() *ShipmentUpdate {
 	su.mutation.ClearNote()
+	return su
+}
+
+// SetStatus sets the "status" field.
+func (su *ShipmentUpdate) SetStatus(s shipment.Status) *ShipmentUpdate {
+	su.mutation.SetStatus(s)
+	return su
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (su *ShipmentUpdate) SetNillableStatus(s *shipment.Status) *ShipmentUpdate {
+	if s != nil {
+		su.SetStatus(*s)
+	}
 	return su
 }
 
@@ -131,9 +131,9 @@ func (su *ShipmentUpdate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *ShipmentUpdate) check() error {
-	if v, ok := su.mutation.ShipmentTrackingNumber(); ok {
-		if err := shipment.ShipmentTrackingNumberValidator(v); err != nil {
-			return &ValidationError{Name: "shipment_tracking_number", err: fmt.Errorf(`ent: validator failed for field "Shipment.shipment_tracking_number": %w`, err)}
+	if v, ok := su.mutation.Status(); ok {
+		if err := shipment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
 		}
 	}
 	if _, ok := su.mutation.OrderID(); su.mutation.OrderCleared() && !ok {
@@ -142,6 +142,9 @@ func (su *ShipmentUpdate) check() error {
 	if _, ok := su.mutation.InvoiceID(); su.mutation.InvoiceCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.invoice"`)
 	}
+	if _, ok := su.mutation.StaffID(); su.mutation.StaffCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Shipment.staff"`)
+	}
 	return nil
 }
 
@@ -149,7 +152,7 @@ func (su *ShipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := su.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeString))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -160,9 +163,6 @@ func (su *ShipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipment.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.ShipmentTrackingNumber(); ok {
-		_spec.SetField(shipment.FieldShipmentTrackingNumber, field.TypeString, value)
-	}
 	if value, ok := su.mutation.ShipmentDate(); ok {
 		_spec.SetField(shipment.FieldShipmentDate, field.TypeTime, value)
 	}
@@ -171,6 +171,9 @@ func (su *ShipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.NoteCleared() {
 		_spec.ClearField(shipment.FieldNote, field.TypeString)
+	}
+	if value, ok := su.mutation.Status(); ok {
+		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -195,20 +198,6 @@ type ShipmentUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (suo *ShipmentUpdateOne) SetUpdatedAt(t time.Time) *ShipmentUpdateOne {
 	suo.mutation.SetUpdatedAt(t)
-	return suo
-}
-
-// SetShipmentTrackingNumber sets the "shipment_tracking_number" field.
-func (suo *ShipmentUpdateOne) SetShipmentTrackingNumber(s string) *ShipmentUpdateOne {
-	suo.mutation.SetShipmentTrackingNumber(s)
-	return suo
-}
-
-// SetNillableShipmentTrackingNumber sets the "shipment_tracking_number" field if the given value is not nil.
-func (suo *ShipmentUpdateOne) SetNillableShipmentTrackingNumber(s *string) *ShipmentUpdateOne {
-	if s != nil {
-		suo.SetShipmentTrackingNumber(*s)
-	}
 	return suo
 }
 
@@ -243,6 +232,20 @@ func (suo *ShipmentUpdateOne) SetNillableNote(s *string) *ShipmentUpdateOne {
 // ClearNote clears the value of the "note" field.
 func (suo *ShipmentUpdateOne) ClearNote() *ShipmentUpdateOne {
 	suo.mutation.ClearNote()
+	return suo
+}
+
+// SetStatus sets the "status" field.
+func (suo *ShipmentUpdateOne) SetStatus(s shipment.Status) *ShipmentUpdateOne {
+	suo.mutation.SetStatus(s)
+	return suo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (suo *ShipmentUpdateOne) SetNillableStatus(s *shipment.Status) *ShipmentUpdateOne {
+	if s != nil {
+		suo.SetStatus(*s)
+	}
 	return suo
 }
 
@@ -308,9 +311,9 @@ func (suo *ShipmentUpdateOne) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *ShipmentUpdateOne) check() error {
-	if v, ok := suo.mutation.ShipmentTrackingNumber(); ok {
-		if err := shipment.ShipmentTrackingNumberValidator(v); err != nil {
-			return &ValidationError{Name: "shipment_tracking_number", err: fmt.Errorf(`ent: validator failed for field "Shipment.shipment_tracking_number": %w`, err)}
+	if v, ok := suo.mutation.Status(); ok {
+		if err := shipment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
 		}
 	}
 	if _, ok := suo.mutation.OrderID(); suo.mutation.OrderCleared() && !ok {
@@ -319,6 +322,9 @@ func (suo *ShipmentUpdateOne) check() error {
 	if _, ok := suo.mutation.InvoiceID(); suo.mutation.InvoiceCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.invoice"`)
 	}
+	if _, ok := suo.mutation.StaffID(); suo.mutation.StaffCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Shipment.staff"`)
+	}
 	return nil
 }
 
@@ -326,7 +332,7 @@ func (suo *ShipmentUpdateOne) sqlSave(ctx context.Context) (_node *Shipment, err
 	if err := suo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeString))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Shipment.id" for update`)}
@@ -354,9 +360,6 @@ func (suo *ShipmentUpdateOne) sqlSave(ctx context.Context) (_node *Shipment, err
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipment.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.ShipmentTrackingNumber(); ok {
-		_spec.SetField(shipment.FieldShipmentTrackingNumber, field.TypeString, value)
-	}
 	if value, ok := suo.mutation.ShipmentDate(); ok {
 		_spec.SetField(shipment.FieldShipmentDate, field.TypeTime, value)
 	}
@@ -365,6 +368,9 @@ func (suo *ShipmentUpdateOne) sqlSave(ctx context.Context) (_node *Shipment, err
 	}
 	if suo.mutation.NoteCleared() {
 		_spec.ClearField(shipment.FieldNote, field.TypeString)
+	}
+	if value, ok := suo.mutation.Status(); ok {
+		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
 	}
 	_node = &Shipment{config: suo.config}
 	_spec.Assign = _node.assignValues

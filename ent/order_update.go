@@ -162,15 +162,15 @@ func (ou *OrderUpdate) SetNillableIsInternal(b *bool) *OrderUpdate {
 }
 
 // SetAddressID sets the "address_id" field.
-func (ou *OrderUpdate) SetAddressID(s string) *OrderUpdate {
-	ou.mutation.SetAddressID(s)
+func (ou *OrderUpdate) SetAddressID(u uuid.UUID) *OrderUpdate {
+	ou.mutation.SetAddressID(u)
 	return ou
 }
 
 // SetNillableAddressID sets the "address_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableAddressID(s *string) *OrderUpdate {
-	if s != nil {
-		ou.SetAddressID(*s)
+func (ou *OrderUpdate) SetNillableAddressID(u *uuid.UUID) *OrderUpdate {
+	if u != nil {
+		ou.SetAddressID(*u)
 	}
 	return ou
 }
@@ -197,7 +197,7 @@ func (ou *OrderUpdate) SetStaff(p *Person) *OrderUpdate {
 }
 
 // SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
-func (ou *OrderUpdate) SetOrderAddressID(id string) *OrderUpdate {
+func (ou *OrderUpdate) SetOrderAddressID(id uuid.UUID) *OrderUpdate {
 	ou.mutation.SetOrderAddressID(id)
 	return ou
 }
@@ -277,11 +277,6 @@ func (ou *OrderUpdate) check() error {
 	if v, ok := ou.mutation.Priority(); ok {
 		if err := order.PriorityValidator(v); err != nil {
 			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Order.priority": %w`, err)}
-		}
-	}
-	if v, ok := ou.mutation.AddressID(); ok {
-		if err := order.AddressIDValidator(v); err != nil {
-			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
 		}
 	}
 	if _, ok := ou.mutation.CustomerID(); ou.mutation.CustomerCleared() && !ok {
@@ -433,7 +428,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -446,7 +441,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -604,15 +599,15 @@ func (ouo *OrderUpdateOne) SetNillableIsInternal(b *bool) *OrderUpdateOne {
 }
 
 // SetAddressID sets the "address_id" field.
-func (ouo *OrderUpdateOne) SetAddressID(s string) *OrderUpdateOne {
-	ouo.mutation.SetAddressID(s)
+func (ouo *OrderUpdateOne) SetAddressID(u uuid.UUID) *OrderUpdateOne {
+	ouo.mutation.SetAddressID(u)
 	return ouo
 }
 
 // SetNillableAddressID sets the "address_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableAddressID(s *string) *OrderUpdateOne {
-	if s != nil {
-		ouo.SetAddressID(*s)
+func (ouo *OrderUpdateOne) SetNillableAddressID(u *uuid.UUID) *OrderUpdateOne {
+	if u != nil {
+		ouo.SetAddressID(*u)
 	}
 	return ouo
 }
@@ -639,7 +634,7 @@ func (ouo *OrderUpdateOne) SetStaff(p *Person) *OrderUpdateOne {
 }
 
 // SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
-func (ouo *OrderUpdateOne) SetOrderAddressID(id string) *OrderUpdateOne {
+func (ouo *OrderUpdateOne) SetOrderAddressID(id uuid.UUID) *OrderUpdateOne {
 	ouo.mutation.SetOrderAddressID(id)
 	return ouo
 }
@@ -732,11 +727,6 @@ func (ouo *OrderUpdateOne) check() error {
 	if v, ok := ouo.mutation.Priority(); ok {
 		if err := order.PriorityValidator(v); err != nil {
 			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Order.priority": %w`, err)}
-		}
-	}
-	if v, ok := ouo.mutation.AddressID(); ok {
-		if err := order.AddressIDValidator(v); err != nil {
-			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
 		}
 	}
 	if _, ok := ouo.mutation.CustomerID(); ouo.mutation.CustomerCleared() && !ok {
@@ -905,7 +895,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -918,7 +908,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

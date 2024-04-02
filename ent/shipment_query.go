@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/order"
+	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 )
@@ -26,6 +27,7 @@ type ShipmentQuery struct {
 	predicates  []predicate.Shipment
 	withOrder   *OrderQuery
 	withInvoice *InvoiceQuery
+	withStaff   *PersonQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -106,6 +108,28 @@ func (sq *ShipmentQuery) QueryInvoice() *InvoiceQuery {
 	return query
 }
 
+// QueryStaff chains the current query on the "staff" edge.
+func (sq *ShipmentQuery) QueryStaff() *PersonQuery {
+	query := (&PersonClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipment.Table, shipment.FieldID, selector),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipment.StaffTable, shipment.StaffColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Shipment entity from the query.
 // Returns a *NotFoundError when no Shipment was found.
 func (sq *ShipmentQuery) First(ctx context.Context) (*Shipment, error) {
@@ -130,8 +154,8 @@ func (sq *ShipmentQuery) FirstX(ctx context.Context) *Shipment {
 
 // FirstID returns the first Shipment ID from the query.
 // Returns a *NotFoundError when no Shipment ID was found.
-func (sq *ShipmentQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (sq *ShipmentQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -143,7 +167,7 @@ func (sq *ShipmentQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *ShipmentQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (sq *ShipmentQuery) FirstIDX(ctx context.Context) string {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -181,8 +205,8 @@ func (sq *ShipmentQuery) OnlyX(ctx context.Context) *Shipment {
 // OnlyID is like Only, but returns the only Shipment ID in the query.
 // Returns a *NotSingularError when more than one Shipment ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *ShipmentQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (sq *ShipmentQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -198,7 +222,7 @@ func (sq *ShipmentQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *ShipmentQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (sq *ShipmentQuery) OnlyIDX(ctx context.Context) string {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -226,7 +250,7 @@ func (sq *ShipmentQuery) AllX(ctx context.Context) []*Shipment {
 }
 
 // IDs executes the query and returns a list of Shipment IDs.
-func (sq *ShipmentQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (sq *ShipmentQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if sq.ctx.Unique == nil && sq.path != nil {
 		sq.Unique(true)
 	}
@@ -238,7 +262,7 @@ func (sq *ShipmentQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *ShipmentQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (sq *ShipmentQuery) IDsX(ctx context.Context) []string {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -300,6 +324,7 @@ func (sq *ShipmentQuery) Clone() *ShipmentQuery {
 		predicates:  append([]predicate.Shipment{}, sq.predicates...),
 		withOrder:   sq.withOrder.Clone(),
 		withInvoice: sq.withInvoice.Clone(),
+		withStaff:   sq.withStaff.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -325,6 +350,17 @@ func (sq *ShipmentQuery) WithInvoice(opts ...func(*InvoiceQuery)) *ShipmentQuery
 		opt(query)
 	}
 	sq.withInvoice = query
+	return sq
+}
+
+// WithStaff tells the query-builder to eager-load the nodes that are connected to
+// the "staff" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ShipmentQuery) WithStaff(opts ...func(*PersonQuery)) *ShipmentQuery {
+	query := (&PersonClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withStaff = query
 	return sq
 }
 
@@ -406,9 +442,10 @@ func (sq *ShipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Shi
 	var (
 		nodes       = []*Shipment{}
 		_spec       = sq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			sq.withOrder != nil,
 			sq.withInvoice != nil,
+			sq.withStaff != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -438,6 +475,12 @@ func (sq *ShipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Shi
 	if query := sq.withInvoice; query != nil {
 		if err := sq.loadInvoice(ctx, query, nodes, nil,
 			func(n *Shipment, e *Invoice) { n.Edges.Invoice = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withStaff; query != nil {
+		if err := sq.loadStaff(ctx, query, nodes, nil,
+			func(n *Shipment, e *Person) { n.Edges.Staff = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -502,6 +545,35 @@ func (sq *ShipmentQuery) loadInvoice(ctx context.Context, query *InvoiceQuery, n
 	}
 	return nil
 }
+func (sq *ShipmentQuery) loadStaff(ctx context.Context, query *PersonQuery, nodes []*Shipment, init func(*Shipment), assign func(*Shipment, *Person)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Shipment)
+	for i := range nodes {
+		fk := nodes[i].StaffID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(person.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "staff_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (sq *ShipmentQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
@@ -513,7 +585,7 @@ func (sq *ShipmentQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (sq *ShipmentQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(shipment.Table, shipment.Columns, sqlgraph.NewFieldSpec(shipment.FieldID, field.TypeString))
 	_spec.From = sq.sql
 	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -533,6 +605,9 @@ func (sq *ShipmentQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if sq.withInvoice != nil {
 			_spec.Node.AddColumnOnce(shipment.FieldInvoiceID)
+		}
+		if sq.withStaff != nil {
+			_spec.Node.AddColumnOnce(shipment.FieldStaffID)
 		}
 	}
 	if ps := sq.predicates; len(ps) > 0 {

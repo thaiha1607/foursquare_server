@@ -12,17 +12,20 @@ type Address func(*sql.Selector)
 // Conversation is the predicate function for conversation builders.
 type Conversation func(*sql.Selector)
 
-// DeliveryAssignment is the predicate function for deliveryassignment builders.
-type DeliveryAssignment func(*sql.Selector)
-
 // Invoice is the predicate function for invoice builders.
 type Invoice func(*sql.Selector)
+
+// InvoiceHistory is the predicate function for invoicehistory builders.
+type InvoiceHistory func(*sql.Selector)
 
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
 
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
+
+// OrderHistory is the predicate function for orderhistory builders.
+type OrderHistory func(*sql.Selector)
 
 // OrderItem is the predicate function for orderitem builders.
 type OrderItem func(*sql.Selector)
@@ -53,6 +56,9 @@ type ProductTag func(*sql.Selector)
 
 // Shipment is the predicate function for shipment builders.
 type Shipment func(*sql.Selector)
+
+// ShipmentHistory is the predicate function for shipmenthistory builders.
+type ShipmentHistory func(*sql.Selector)
 
 // ShipmentItem is the predicate function for shipmentitem builders.
 type ShipmentItem func(*sql.Selector)

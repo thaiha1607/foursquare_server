@@ -90,7 +90,7 @@ func (pau *PersonAddressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if err := pau.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(personaddress.Table, personaddress.Columns, sqlgraph.NewFieldSpec(personaddress.FieldPersonID, field.TypeUUID), sqlgraph.NewFieldSpec(personaddress.FieldAddressID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(personaddress.Table, personaddress.Columns, sqlgraph.NewFieldSpec(personaddress.FieldPersonID, field.TypeUUID), sqlgraph.NewFieldSpec(personaddress.FieldAddressID, field.TypeUUID))
 	if ps := pau.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -196,7 +196,7 @@ func (pauo *PersonAddressUpdateOne) sqlSave(ctx context.Context) (_node *PersonA
 	if err := pauo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(personaddress.Table, personaddress.Columns, sqlgraph.NewFieldSpec(personaddress.FieldPersonID, field.TypeUUID), sqlgraph.NewFieldSpec(personaddress.FieldAddressID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(personaddress.Table, personaddress.Columns, sqlgraph.NewFieldSpec(personaddress.FieldPersonID, field.TypeUUID), sqlgraph.NewFieldSpec(personaddress.FieldAddressID, field.TypeUUID))
 	if id, ok := pauo.mutation.PersonID(); !ok {
 		return nil, &ValidationError{Name: "person_id", err: errors.New(`ent: missing "PersonAddress.person_id" for update`)}
 	} else {

@@ -169,8 +169,8 @@ func (oc *OrderCreate) SetNillableIsInternal(b *bool) *OrderCreate {
 }
 
 // SetAddressID sets the "address_id" field.
-func (oc *OrderCreate) SetAddressID(s string) *OrderCreate {
-	oc.mutation.SetAddressID(s)
+func (oc *OrderCreate) SetAddressID(u uuid.UUID) *OrderCreate {
+	oc.mutation.SetAddressID(u)
 	return oc
 }
 
@@ -226,7 +226,7 @@ func (oc *OrderCreate) SetStaff(p *Person) *OrderCreate {
 }
 
 // SetOrderAddressID sets the "order_address" edge to the Address entity by ID.
-func (oc *OrderCreate) SetOrderAddressID(id string) *OrderCreate {
+func (oc *OrderCreate) SetOrderAddressID(id uuid.UUID) *OrderCreate {
 	oc.mutation.SetOrderAddressID(id)
 	return oc
 }
@@ -342,11 +342,6 @@ func (oc *OrderCreate) check() error {
 	}
 	if _, ok := oc.mutation.AddressID(); !ok {
 		return &ValidationError{Name: "address_id", err: errors.New(`ent: missing required field "Order.address_id"`)}
-	}
-	if v, ok := oc.mutation.AddressID(); ok {
-		if err := order.AddressIDValidator(v); err != nil {
-			return &ValidationError{Name: "address_id", err: fmt.Errorf(`ent: validator failed for field "Order.address_id": %w`, err)}
-		}
 	}
 	if _, ok := oc.mutation.CustomerID(); !ok {
 		return &ValidationError{Name: "customer", err: errors.New(`ent: missing required edge "Order.customer"`)}
@@ -519,7 +514,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.OrderAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

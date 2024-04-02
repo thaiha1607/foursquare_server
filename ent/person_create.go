@@ -173,14 +173,14 @@ func (pc *PersonCreate) SetWorkUnit(w *WorkUnitInfo) *PersonCreate {
 }
 
 // AddAddressIDs adds the "addresses" edge to the Address entity by IDs.
-func (pc *PersonCreate) AddAddressIDs(ids ...string) *PersonCreate {
+func (pc *PersonCreate) AddAddressIDs(ids ...uuid.UUID) *PersonCreate {
 	pc.mutation.AddAddressIDs(ids...)
 	return pc
 }
 
 // AddAddresses adds the "addresses" edges to the Address entity.
 func (pc *PersonCreate) AddAddresses(a ...*Address) *PersonCreate {
-	ids := make([]string, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -401,7 +401,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 			Columns: person.AddressesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
