@@ -14,6 +14,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // Shipment is the model entity for the Shipment schema.
@@ -35,8 +36,8 @@ type Shipment struct {
 	ShipmentDate time.Time `json:"shipment_date,omitempty"`
 	// Note holds the value of the "note" field.
 	Note string `json:"note,omitempty"`
-	// Status holds the value of the "status" field.
-	Status shipment.Status `json:"status,omitempty"`
+	// StatusCode holds the value of the "status_code" field.
+	StatusCode int `json:"status_code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ShipmentQuery when eager-loading is set.
 	Edges        ShipmentEdges `json:"edges"`
@@ -51,9 +52,11 @@ type ShipmentEdges struct {
 	Invoice *Invoice `json:"invoice,omitempty"`
 	// Staff holds the value of the staff edge.
 	Staff *Person `json:"staff,omitempty"`
+	// ShipmentStatus holds the value of the shipment_status edge.
+	ShipmentStatus *ShipmentStatusCode `json:"shipment_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
@@ -89,12 +92,25 @@ func (e ShipmentEdges) StaffOrErr() (*Person, error) {
 	return nil, &NotLoadedError{edge: "staff"}
 }
 
+// ShipmentStatusOrErr returns the ShipmentStatus value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ShipmentEdges) ShipmentStatusOrErr() (*ShipmentStatusCode, error) {
+	if e.ShipmentStatus != nil {
+		return e.ShipmentStatus, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: shipmentstatuscode.Label}
+	}
+	return nil, &NotLoadedError{edge: "shipment_status"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Shipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case shipment.FieldID, shipment.FieldNote, shipment.FieldStatus:
+		case shipment.FieldStatusCode:
+			values[i] = new(sql.NullInt64)
+		case shipment.FieldID, shipment.FieldNote:
 			values[i] = new(sql.NullString)
 		case shipment.FieldCreatedAt, shipment.FieldUpdatedAt, shipment.FieldShipmentDate:
 			values[i] = new(sql.NullTime)
@@ -163,11 +179,11 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Note = value.String
 			}
-		case shipment.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case shipment.FieldStatusCode:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status_code", values[i])
 			} else if value.Valid {
-				s.Status = shipment.Status(value.String)
+				s.StatusCode = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -195,6 +211,11 @@ func (s *Shipment) QueryInvoice() *InvoiceQuery {
 // QueryStaff queries the "staff" edge of the Shipment entity.
 func (s *Shipment) QueryStaff() *PersonQuery {
 	return NewShipmentClient(s.config).QueryStaff(s)
+}
+
+// QueryShipmentStatus queries the "shipment_status" edge of the Shipment entity.
+func (s *Shipment) QueryShipmentStatus() *ShipmentStatusCodeQuery {
+	return NewShipmentClient(s.config).QueryShipmentStatus(s)
 }
 
 // Update returns a builder for updating this Shipment.
@@ -241,8 +262,8 @@ func (s *Shipment) String() string {
 	builder.WriteString("note=")
 	builder.WriteString(s.Note)
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", s.Status))
+	builder.WriteString("status_code=")
+	builder.WriteString(fmt.Sprintf("%v", s.StatusCode))
 	builder.WriteByte(')')
 	return builder.String()
 }

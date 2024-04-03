@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
@@ -130,13 +130,13 @@ func (ihc *InvoiceHistoryCreate) SetPerson(p *Person) *InvoiceHistoryCreate {
 	return ihc.SetPersonID(p.ID)
 }
 
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+// SetOldStatusID sets the "old_status" edge to the InvoiceStatusCode entity by ID.
 func (ihc *InvoiceHistoryCreate) SetOldStatusID(id int) *InvoiceHistoryCreate {
 	ihc.mutation.SetOldStatusID(id)
 	return ihc
 }
 
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+// SetNillableOldStatusID sets the "old_status" edge to the InvoiceStatusCode entity by ID if the given value is not nil.
 func (ihc *InvoiceHistoryCreate) SetNillableOldStatusID(id *int) *InvoiceHistoryCreate {
 	if id != nil {
 		ihc = ihc.SetOldStatusID(*id)
@@ -144,18 +144,18 @@ func (ihc *InvoiceHistoryCreate) SetNillableOldStatusID(id *int) *InvoiceHistory
 	return ihc
 }
 
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (ihc *InvoiceHistoryCreate) SetOldStatus(o *OrderStatusCode) *InvoiceHistoryCreate {
-	return ihc.SetOldStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the InvoiceStatusCode entity.
+func (ihc *InvoiceHistoryCreate) SetOldStatus(i *InvoiceStatusCode) *InvoiceHistoryCreate {
+	return ihc.SetOldStatusID(i.ID)
 }
 
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
+// SetNewStatusID sets the "new_status" edge to the InvoiceStatusCode entity by ID.
 func (ihc *InvoiceHistoryCreate) SetNewStatusID(id int) *InvoiceHistoryCreate {
 	ihc.mutation.SetNewStatusID(id)
 	return ihc
 }
 
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+// SetNillableNewStatusID sets the "new_status" edge to the InvoiceStatusCode entity by ID if the given value is not nil.
 func (ihc *InvoiceHistoryCreate) SetNillableNewStatusID(id *int) *InvoiceHistoryCreate {
 	if id != nil {
 		ihc = ihc.SetNewStatusID(*id)
@@ -163,9 +163,9 @@ func (ihc *InvoiceHistoryCreate) SetNillableNewStatusID(id *int) *InvoiceHistory
 	return ihc
 }
 
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (ihc *InvoiceHistoryCreate) SetNewStatus(o *OrderStatusCode) *InvoiceHistoryCreate {
-	return ihc.SetNewStatusID(o.ID)
+// SetNewStatus sets the "new_status" edge to the InvoiceStatusCode entity.
+func (ihc *InvoiceHistoryCreate) SetNewStatus(i *InvoiceStatusCode) *InvoiceHistoryCreate {
+	return ihc.SetNewStatusID(i.ID)
 }
 
 // Mutation returns the InvoiceHistoryMutation object of the builder.
@@ -326,7 +326,7 @@ func (ihc *InvoiceHistoryCreate) createSpec() (*InvoiceHistory, *sqlgraph.Create
 			Columns: []string{invoicehistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -343,7 +343,7 @@ func (ihc *InvoiceHistoryCreate) createSpec() (*InvoiceHistory, *sqlgraph.Create
 			Columns: []string{invoicehistory.NewStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(invoicestatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

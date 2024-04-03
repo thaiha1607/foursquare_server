@@ -16,6 +16,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
@@ -31,6 +32,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
 	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
@@ -98,6 +100,7 @@ func checkColumn(table, column string) error {
 			conversation.Table:        conversation.ValidColumn,
 			invoice.Table:             invoice.ValidColumn,
 			invoicehistory.Table:      invoicehistory.ValidColumn,
+			invoicestatuscode.Table:   invoicestatuscode.ValidColumn,
 			message.Table:             message.ValidColumn,
 			order.Table:               order.ValidColumn,
 			orderhistory.Table:        orderhistory.ValidColumn,
@@ -113,6 +116,7 @@ func checkColumn(table, column string) error {
 			shipment.Table:            shipment.ValidColumn,
 			shipmenthistory.Table:     shipmenthistory.ValidColumn,
 			shipmentitem.Table:        shipmentitem.ValidColumn,
+			shipmentstatuscode.Table:  shipmentstatuscode.ValidColumn,
 			tag.Table:                 tag.ValidColumn,
 			warehouseassignment.Table: warehouseassignment.ValidColumn,
 			workunitinfo.Table:        workunitinfo.ValidColumn,

@@ -15,6 +15,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentCreate is the builder for creating a Shipment entity.
@@ -90,16 +91,16 @@ func (sc *ShipmentCreate) SetNillableNote(s *string) *ShipmentCreate {
 	return sc
 }
 
-// SetStatus sets the "status" field.
-func (sc *ShipmentCreate) SetStatus(s shipment.Status) *ShipmentCreate {
-	sc.mutation.SetStatus(s)
+// SetStatusCode sets the "status_code" field.
+func (sc *ShipmentCreate) SetStatusCode(i int) *ShipmentCreate {
+	sc.mutation.SetStatusCode(i)
 	return sc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (sc *ShipmentCreate) SetNillableStatus(s *shipment.Status) *ShipmentCreate {
-	if s != nil {
-		sc.SetStatus(*s)
+// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
+func (sc *ShipmentCreate) SetNillableStatusCode(i *int) *ShipmentCreate {
+	if i != nil {
+		sc.SetStatusCode(*i)
 	}
 	return sc
 }
@@ -123,6 +124,17 @@ func (sc *ShipmentCreate) SetInvoice(i *Invoice) *ShipmentCreate {
 // SetStaff sets the "staff" edge to the Person entity.
 func (sc *ShipmentCreate) SetStaff(p *Person) *ShipmentCreate {
 	return sc.SetStaffID(p.ID)
+}
+
+// SetShipmentStatusID sets the "shipment_status" edge to the ShipmentStatusCode entity by ID.
+func (sc *ShipmentCreate) SetShipmentStatusID(id int) *ShipmentCreate {
+	sc.mutation.SetShipmentStatusID(id)
+	return sc
+}
+
+// SetShipmentStatus sets the "shipment_status" edge to the ShipmentStatusCode entity.
+func (sc *ShipmentCreate) SetShipmentStatus(s *ShipmentStatusCode) *ShipmentCreate {
+	return sc.SetShipmentStatusID(s.ID)
 }
 
 // Mutation returns the ShipmentMutation object of the builder.
@@ -176,9 +188,9 @@ func (sc *ShipmentCreate) defaults() error {
 		v := shipment.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := sc.mutation.Status(); !ok {
-		v := shipment.DefaultStatus
-		sc.mutation.SetStatus(v)
+	if _, ok := sc.mutation.StatusCode(); !ok {
+		v := shipment.DefaultStatusCode
+		sc.mutation.SetStatusCode(v)
 	}
 	return nil
 }
@@ -203,13 +215,8 @@ func (sc *ShipmentCreate) check() error {
 	if _, ok := sc.mutation.ShipmentDate(); !ok {
 		return &ValidationError{Name: "shipment_date", err: errors.New(`ent: missing required field "Shipment.shipment_date"`)}
 	}
-	if _, ok := sc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Shipment.status"`)}
-	}
-	if v, ok := sc.mutation.Status(); ok {
-		if err := shipment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
-		}
+	if _, ok := sc.mutation.StatusCode(); !ok {
+		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Shipment.status_code"`)}
 	}
 	if v, ok := sc.mutation.ID(); ok {
 		if err := shipment.IDValidator(v); err != nil {
@@ -224,6 +231,9 @@ func (sc *ShipmentCreate) check() error {
 	}
 	if _, ok := sc.mutation.StaffID(); !ok {
 		return &ValidationError{Name: "staff", err: errors.New(`ent: missing required edge "Shipment.staff"`)}
+	}
+	if _, ok := sc.mutation.ShipmentStatusID(); !ok {
+		return &ValidationError{Name: "shipment_status", err: errors.New(`ent: missing required edge "Shipment.shipment_status"`)}
 	}
 	return nil
 }
@@ -276,10 +286,6 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(shipment.FieldNote, field.TypeString, value)
 		_node.Note = value
 	}
-	if value, ok := sc.mutation.Status(); ok {
-		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
-		_node.Status = value
-	}
 	if nodes := sc.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -329,6 +335,23 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.StaffID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ShipmentStatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.ShipmentStatusTable,
+			Columns: []string{shipment.ShipmentStatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.StatusCode = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -16,18 +16,20 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentQuery is the builder for querying Shipment entities.
 type ShipmentQuery struct {
 	config
-	ctx         *QueryContext
-	order       []shipment.OrderOption
-	inters      []Interceptor
-	predicates  []predicate.Shipment
-	withOrder   *OrderQuery
-	withInvoice *InvoiceQuery
-	withStaff   *PersonQuery
+	ctx                *QueryContext
+	order              []shipment.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Shipment
+	withOrder          *OrderQuery
+	withInvoice        *InvoiceQuery
+	withStaff          *PersonQuery
+	withShipmentStatus *ShipmentStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -123,6 +125,28 @@ func (sq *ShipmentQuery) QueryStaff() *PersonQuery {
 			sqlgraph.From(shipment.Table, shipment.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, shipment.StaffTable, shipment.StaffColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryShipmentStatus chains the current query on the "shipment_status" edge.
+func (sq *ShipmentQuery) QueryShipmentStatus() *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipment.Table, shipment.FieldID, selector),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipment.ShipmentStatusTable, shipment.ShipmentStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -317,14 +341,15 @@ func (sq *ShipmentQuery) Clone() *ShipmentQuery {
 		return nil
 	}
 	return &ShipmentQuery{
-		config:      sq.config,
-		ctx:         sq.ctx.Clone(),
-		order:       append([]shipment.OrderOption{}, sq.order...),
-		inters:      append([]Interceptor{}, sq.inters...),
-		predicates:  append([]predicate.Shipment{}, sq.predicates...),
-		withOrder:   sq.withOrder.Clone(),
-		withInvoice: sq.withInvoice.Clone(),
-		withStaff:   sq.withStaff.Clone(),
+		config:             sq.config,
+		ctx:                sq.ctx.Clone(),
+		order:              append([]shipment.OrderOption{}, sq.order...),
+		inters:             append([]Interceptor{}, sq.inters...),
+		predicates:         append([]predicate.Shipment{}, sq.predicates...),
+		withOrder:          sq.withOrder.Clone(),
+		withInvoice:        sq.withInvoice.Clone(),
+		withStaff:          sq.withStaff.Clone(),
+		withShipmentStatus: sq.withShipmentStatus.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -361,6 +386,17 @@ func (sq *ShipmentQuery) WithStaff(opts ...func(*PersonQuery)) *ShipmentQuery {
 		opt(query)
 	}
 	sq.withStaff = query
+	return sq
+}
+
+// WithShipmentStatus tells the query-builder to eager-load the nodes that are connected to
+// the "shipment_status" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ShipmentQuery) WithShipmentStatus(opts ...func(*ShipmentStatusCodeQuery)) *ShipmentQuery {
+	query := (&ShipmentStatusCodeClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withShipmentStatus = query
 	return sq
 }
 
@@ -442,10 +478,11 @@ func (sq *ShipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Shi
 	var (
 		nodes       = []*Shipment{}
 		_spec       = sq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			sq.withOrder != nil,
 			sq.withInvoice != nil,
 			sq.withStaff != nil,
+			sq.withShipmentStatus != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -481,6 +518,12 @@ func (sq *ShipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Shi
 	if query := sq.withStaff; query != nil {
 		if err := sq.loadStaff(ctx, query, nodes, nil,
 			func(n *Shipment, e *Person) { n.Edges.Staff = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withShipmentStatus; query != nil {
+		if err := sq.loadShipmentStatus(ctx, query, nodes, nil,
+			func(n *Shipment, e *ShipmentStatusCode) { n.Edges.ShipmentStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -574,6 +617,35 @@ func (sq *ShipmentQuery) loadStaff(ctx context.Context, query *PersonQuery, node
 	}
 	return nil
 }
+func (sq *ShipmentQuery) loadShipmentStatus(ctx context.Context, query *ShipmentStatusCodeQuery, nodes []*Shipment, init func(*Shipment), assign func(*Shipment, *ShipmentStatusCode)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Shipment)
+	for i := range nodes {
+		fk := nodes[i].StatusCode
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(shipmentstatuscode.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "status_code" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (sq *ShipmentQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
@@ -608,6 +680,9 @@ func (sq *ShipmentQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if sq.withStaff != nil {
 			_spec.Node.AddColumnOnce(shipment.FieldStaffID)
+		}
+		if sq.withShipmentStatus != nil {
+			_spec.Node.AddColumnOnce(shipment.FieldStatusCode)
 		}
 	}
 	if ps := sq.predicates; len(ps) > 0 {

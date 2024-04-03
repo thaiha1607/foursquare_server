@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 )
 
@@ -48,9 +48,9 @@ type InvoiceHistoryEdges struct {
 	// Person holds the value of the person edge.
 	Person *Person `json:"person,omitempty"`
 	// OldStatus holds the value of the old_status edge.
-	OldStatus *OrderStatusCode `json:"old_status,omitempty"`
+	OldStatus *InvoiceStatusCode `json:"old_status,omitempty"`
 	// NewStatus holds the value of the new_status edge.
-	NewStatus *OrderStatusCode `json:"new_status,omitempty"`
+	NewStatus *InvoiceStatusCode `json:"new_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
@@ -80,22 +80,22 @@ func (e InvoiceHistoryEdges) PersonOrErr() (*Person, error) {
 
 // OldStatusOrErr returns the OldStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e InvoiceHistoryEdges) OldStatusOrErr() (*OrderStatusCode, error) {
+func (e InvoiceHistoryEdges) OldStatusOrErr() (*InvoiceStatusCode, error) {
 	if e.OldStatus != nil {
 		return e.OldStatus, nil
 	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: orderstatuscode.Label}
+		return nil, &NotFoundError{label: invoicestatuscode.Label}
 	}
 	return nil, &NotLoadedError{edge: "old_status"}
 }
 
 // NewStatusOrErr returns the NewStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e InvoiceHistoryEdges) NewStatusOrErr() (*OrderStatusCode, error) {
+func (e InvoiceHistoryEdges) NewStatusOrErr() (*InvoiceStatusCode, error) {
 	if e.NewStatus != nil {
 		return e.NewStatus, nil
 	} else if e.loadedTypes[3] {
-		return nil, &NotFoundError{label: orderstatuscode.Label}
+		return nil, &NotFoundError{label: invoicestatuscode.Label}
 	}
 	return nil, &NotLoadedError{edge: "new_status"}
 }
@@ -203,12 +203,12 @@ func (ih *InvoiceHistory) QueryPerson() *PersonQuery {
 }
 
 // QueryOldStatus queries the "old_status" edge of the InvoiceHistory entity.
-func (ih *InvoiceHistory) QueryOldStatus() *OrderStatusCodeQuery {
+func (ih *InvoiceHistory) QueryOldStatus() *InvoiceStatusCodeQuery {
 	return NewInvoiceHistoryClient(ih.config).QueryOldStatus(ih)
 }
 
 // QueryNewStatus queries the "new_status" edge of the InvoiceHistory entity.
-func (ih *InvoiceHistory) QueryNewStatus() *OrderStatusCodeQuery {
+func (ih *InvoiceHistory) QueryNewStatus() *InvoiceStatusCodeQuery {
 	return NewInvoiceHistoryClient(ih.config).QueryNewStatus(ih)
 }
 

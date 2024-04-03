@@ -48,19 +48,21 @@ func (Invoice) Fields() []ent.Field {
 				"Other", "OTHER",
 			).Default("PRO_FORMA").
 			Immutable(),
-		field.Enum("status").
-			NamedValues(
-				"Draft", "DRAFT",
-				"Active", "ACTIVE",
-				"Sent", "SENT",
-				"Disputed", "DISPUTED",
-				"Overdue", "OVERDUE",
-				"Partial", "PARTIAL",
-				"Paid", "PAID",
-				"Void", "VOID",
-				"Debt", "DEBT",
-				"Other", "OTHER",
-			).Default("DRAFT"),
+		/*
+			Status we might want to consider:
+			- Draft
+			- Active
+			- Sent
+			- Disputed
+			- Overdue
+			- Partial
+			- Paid
+			- Void
+			- Debt
+			- Other
+		*/
+		field.Int("status_code").
+			Default(1),
 		field.Enum("payment_method").
 			NamedValues(
 				"Cash", "CASH",
@@ -85,6 +87,10 @@ func (Invoice) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
+		edge.To("invoice_status", InvoiceStatusCode.Type).
+			Field("status_code").
+			Unique().
+			Required(),
 	}
 }
 

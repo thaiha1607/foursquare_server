@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 )
 
@@ -32,8 +33,8 @@ type Invoice struct {
 	Note *string `json:"note,omitempty"`
 	// Type holds the value of the "type" field.
 	Type invoice.Type `json:"type,omitempty"`
-	// Status holds the value of the "status" field.
-	Status invoice.Status `json:"status,omitempty"`
+	// StatusCode holds the value of the "status_code" field.
+	StatusCode int `json:"status_code,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
 	PaymentMethod *invoice.PaymentMethod `json:"payment_method,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -46,9 +47,11 @@ type Invoice struct {
 type InvoiceEdges struct {
 	// Order holds the value of the order edge.
 	Order *Order `json:"order,omitempty"`
+	// InvoiceStatus holds the value of the invoice_status edge.
+	InvoiceStatus *InvoiceStatusCode `json:"invoice_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
@@ -62,6 +65,17 @@ func (e InvoiceEdges) OrderOrErr() (*Order, error) {
 	return nil, &NotLoadedError{edge: "order"}
 }
 
+// InvoiceStatusOrErr returns the InvoiceStatus value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvoiceEdges) InvoiceStatusOrErr() (*InvoiceStatusCode, error) {
+	if e.InvoiceStatus != nil {
+		return e.InvoiceStatus, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: invoicestatuscode.Label}
+	}
+	return nil, &NotLoadedError{edge: "invoice_status"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Invoice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -69,7 +83,9 @@ func (*Invoice) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case invoice.FieldTotal:
 			values[i] = new(decimal.Decimal)
-		case invoice.FieldNote, invoice.FieldType, invoice.FieldStatus, invoice.FieldPaymentMethod:
+		case invoice.FieldStatusCode:
+			values[i] = new(sql.NullInt64)
+		case invoice.FieldNote, invoice.FieldType, invoice.FieldPaymentMethod:
 			values[i] = new(sql.NullString)
 		case invoice.FieldCreatedAt, invoice.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -133,11 +149,11 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Type = invoice.Type(value.String)
 			}
-		case invoice.FieldStatus:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[j])
+		case invoice.FieldStatusCode:
+			if value, ok := values[j].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status_code", values[j])
 			} else if value.Valid {
-				i.Status = invoice.Status(value.String)
+				i.StatusCode = int(value.Int64)
 			}
 		case invoice.FieldPaymentMethod:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -162,6 +178,11 @@ func (i *Invoice) Value(name string) (ent.Value, error) {
 // QueryOrder queries the "order" edge of the Invoice entity.
 func (i *Invoice) QueryOrder() *OrderQuery {
 	return NewInvoiceClient(i.config).QueryOrder(i)
+}
+
+// QueryInvoiceStatus queries the "invoice_status" edge of the Invoice entity.
+func (i *Invoice) QueryInvoiceStatus() *InvoiceStatusCodeQuery {
+	return NewInvoiceClient(i.config).QueryInvoiceStatus(i)
 }
 
 // Update returns a builder for updating this Invoice.
@@ -207,8 +228,8 @@ func (i *Invoice) String() string {
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", i.Type))
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", i.Status))
+	builder.WriteString("status_code=")
+	builder.WriteString(fmt.Sprintf("%v", i.StatusCode))
 	builder.WriteString(", ")
 	if v := i.PaymentMethod; v != nil {
 		builder.WriteString("payment_method=")

@@ -3,7 +3,6 @@
 package shipment
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent"
@@ -30,14 +29,16 @@ const (
 	FieldShipmentDate = "shipment_date"
 	// FieldNote holds the string denoting the note field in the database.
 	FieldNote = "note"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldStatusCode holds the string denoting the status_code field in the database.
+	FieldStatusCode = "status_code"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
 	// EdgeInvoice holds the string denoting the invoice edge name in mutations.
 	EdgeInvoice = "invoice"
 	// EdgeStaff holds the string denoting the staff edge name in mutations.
 	EdgeStaff = "staff"
+	// EdgeShipmentStatus holds the string denoting the shipment_status edge name in mutations.
+	EdgeShipmentStatus = "shipment_status"
 	// Table holds the table name of the shipment in the database.
 	Table = "shipments"
 	// OrderTable is the table that holds the order relation/edge.
@@ -61,6 +62,13 @@ const (
 	StaffInverseTable = "persons"
 	// StaffColumn is the table column denoting the staff relation/edge.
 	StaffColumn = "staff_id"
+	// ShipmentStatusTable is the table that holds the shipment_status relation/edge.
+	ShipmentStatusTable = "shipments"
+	// ShipmentStatusInverseTable is the table name for the ShipmentStatusCode entity.
+	// It exists in this package in order to avoid circular dependency with the "shipmentstatuscode" package.
+	ShipmentStatusInverseTable = "shipment_status_codes"
+	// ShipmentStatusColumn is the table column denoting the shipment_status relation/edge.
+	ShipmentStatusColumn = "status_code"
 )
 
 // Columns holds all SQL columns for shipment fields.
@@ -73,7 +81,7 @@ var Columns = []string{
 	FieldStaffID,
 	FieldShipmentDate,
 	FieldNote,
-	FieldStatus,
+	FieldStatusCode,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -99,36 +107,11 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultStatusCode holds the default value on creation for the "status_code" field.
+	DefaultStatusCode int
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusPending is the default value of the Status enum.
-const DefaultStatus = StatusPending
-
-// Status values.
-const (
-	StatusPending  Status = "PENDING"
-	StatusAccepted Status = "ACCEPTED"
-	StatusRejected Status = "REJECTED"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusPending, StatusAccepted, StatusRejected:
-		return nil
-	default:
-		return fmt.Errorf("shipment: invalid enum value for status field: %q", s)
-	}
-}
 
 // OrderOption defines the ordering options for the Shipment queries.
 type OrderOption func(*sql.Selector)
@@ -173,9 +156,9 @@ func ByNote(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNote, opts...).ToFunc()
 }
 
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+// ByStatusCode orders the results by the status_code field.
+func ByStatusCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatusCode, opts...).ToFunc()
 }
 
 // ByOrderField orders the results by order field.
@@ -198,6 +181,13 @@ func ByStaffField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newStaffStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByShipmentStatusField orders the results by shipment_status field.
+func ByShipmentStatusField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newShipmentStatusStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -217,5 +207,12 @@ func newStaffStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StaffInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, StaffTable, StaffColumn),
+	)
+}
+func newShipmentStatusStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ShipmentStatusInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ShipmentStatusTable, ShipmentStatusColumn),
 	)
 }

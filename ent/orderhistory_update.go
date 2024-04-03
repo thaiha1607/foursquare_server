@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
 
@@ -35,119 +34,9 @@ func (ohu *OrderHistoryUpdate) SetUpdatedAt(t time.Time) *OrderHistoryUpdate {
 	return ohu
 }
 
-// SetOldStatusCode sets the "old_status_code" field.
-func (ohu *OrderHistoryUpdate) SetOldStatusCode(i int) *OrderHistoryUpdate {
-	ohu.mutation.SetOldStatusCode(i)
-	return ohu
-}
-
-// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
-func (ohu *OrderHistoryUpdate) SetNillableOldStatusCode(i *int) *OrderHistoryUpdate {
-	if i != nil {
-		ohu.SetOldStatusCode(*i)
-	}
-	return ohu
-}
-
-// ClearOldStatusCode clears the value of the "old_status_code" field.
-func (ohu *OrderHistoryUpdate) ClearOldStatusCode() *OrderHistoryUpdate {
-	ohu.mutation.ClearOldStatusCode()
-	return ohu
-}
-
-// SetNewStatusCode sets the "new_status_code" field.
-func (ohu *OrderHistoryUpdate) SetNewStatusCode(i int) *OrderHistoryUpdate {
-	ohu.mutation.SetNewStatusCode(i)
-	return ohu
-}
-
-// SetNillableNewStatusCode sets the "new_status_code" field if the given value is not nil.
-func (ohu *OrderHistoryUpdate) SetNillableNewStatusCode(i *int) *OrderHistoryUpdate {
-	if i != nil {
-		ohu.SetNewStatusCode(*i)
-	}
-	return ohu
-}
-
-// ClearNewStatusCode clears the value of the "new_status_code" field.
-func (ohu *OrderHistoryUpdate) ClearNewStatusCode() *OrderHistoryUpdate {
-	ohu.mutation.ClearNewStatusCode()
-	return ohu
-}
-
-// SetDescription sets the "description" field.
-func (ohu *OrderHistoryUpdate) SetDescription(s string) *OrderHistoryUpdate {
-	ohu.mutation.SetDescription(s)
-	return ohu
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (ohu *OrderHistoryUpdate) SetNillableDescription(s *string) *OrderHistoryUpdate {
-	if s != nil {
-		ohu.SetDescription(*s)
-	}
-	return ohu
-}
-
-// ClearDescription clears the value of the "description" field.
-func (ohu *OrderHistoryUpdate) ClearDescription() *OrderHistoryUpdate {
-	ohu.mutation.ClearDescription()
-	return ohu
-}
-
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
-func (ohu *OrderHistoryUpdate) SetOldStatusID(id int) *OrderHistoryUpdate {
-	ohu.mutation.SetOldStatusID(id)
-	return ohu
-}
-
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ohu *OrderHistoryUpdate) SetNillableOldStatusID(id *int) *OrderHistoryUpdate {
-	if id != nil {
-		ohu = ohu.SetOldStatusID(*id)
-	}
-	return ohu
-}
-
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (ohu *OrderHistoryUpdate) SetOldStatus(o *OrderStatusCode) *OrderHistoryUpdate {
-	return ohu.SetOldStatusID(o.ID)
-}
-
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
-func (ohu *OrderHistoryUpdate) SetNewStatusID(id int) *OrderHistoryUpdate {
-	ohu.mutation.SetNewStatusID(id)
-	return ohu
-}
-
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ohu *OrderHistoryUpdate) SetNillableNewStatusID(id *int) *OrderHistoryUpdate {
-	if id != nil {
-		ohu = ohu.SetNewStatusID(*id)
-	}
-	return ohu
-}
-
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (ohu *OrderHistoryUpdate) SetNewStatus(o *OrderStatusCode) *OrderHistoryUpdate {
-	return ohu.SetNewStatusID(o.ID)
-}
-
 // Mutation returns the OrderHistoryMutation object of the builder.
 func (ohu *OrderHistoryUpdate) Mutation() *OrderHistoryMutation {
 	return ohu.mutation
-}
-
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
-func (ohu *OrderHistoryUpdate) ClearOldStatus() *OrderHistoryUpdate {
-	ohu.mutation.ClearOldStatus()
-	return ohu
-}
-
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
-func (ohu *OrderHistoryUpdate) ClearNewStatus() *OrderHistoryUpdate {
-	ohu.mutation.ClearNewStatus()
-	return ohu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -212,69 +101,8 @@ func (ohu *OrderHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ohu.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderhistory.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := ohu.mutation.Description(); ok {
-		_spec.SetField(orderhistory.FieldDescription, field.TypeString, value)
-	}
 	if ohu.mutation.DescriptionCleared() {
 		_spec.ClearField(orderhistory.FieldDescription, field.TypeString)
-	}
-	if ohu.mutation.OldStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.OldStatusTable,
-			Columns: []string{orderhistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ohu.mutation.OldStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.OldStatusTable,
-			Columns: []string{orderhistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ohu.mutation.NewStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.NewStatusTable,
-			Columns: []string{orderhistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ohu.mutation.NewStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.NewStatusTable,
-			Columns: []string{orderhistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ohu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -302,119 +130,9 @@ func (ohuo *OrderHistoryUpdateOne) SetUpdatedAt(t time.Time) *OrderHistoryUpdate
 	return ohuo
 }
 
-// SetOldStatusCode sets the "old_status_code" field.
-func (ohuo *OrderHistoryUpdateOne) SetOldStatusCode(i int) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetOldStatusCode(i)
-	return ohuo
-}
-
-// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
-func (ohuo *OrderHistoryUpdateOne) SetNillableOldStatusCode(i *int) *OrderHistoryUpdateOne {
-	if i != nil {
-		ohuo.SetOldStatusCode(*i)
-	}
-	return ohuo
-}
-
-// ClearOldStatusCode clears the value of the "old_status_code" field.
-func (ohuo *OrderHistoryUpdateOne) ClearOldStatusCode() *OrderHistoryUpdateOne {
-	ohuo.mutation.ClearOldStatusCode()
-	return ohuo
-}
-
-// SetNewStatusCode sets the "new_status_code" field.
-func (ohuo *OrderHistoryUpdateOne) SetNewStatusCode(i int) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetNewStatusCode(i)
-	return ohuo
-}
-
-// SetNillableNewStatusCode sets the "new_status_code" field if the given value is not nil.
-func (ohuo *OrderHistoryUpdateOne) SetNillableNewStatusCode(i *int) *OrderHistoryUpdateOne {
-	if i != nil {
-		ohuo.SetNewStatusCode(*i)
-	}
-	return ohuo
-}
-
-// ClearNewStatusCode clears the value of the "new_status_code" field.
-func (ohuo *OrderHistoryUpdateOne) ClearNewStatusCode() *OrderHistoryUpdateOne {
-	ohuo.mutation.ClearNewStatusCode()
-	return ohuo
-}
-
-// SetDescription sets the "description" field.
-func (ohuo *OrderHistoryUpdateOne) SetDescription(s string) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetDescription(s)
-	return ohuo
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (ohuo *OrderHistoryUpdateOne) SetNillableDescription(s *string) *OrderHistoryUpdateOne {
-	if s != nil {
-		ohuo.SetDescription(*s)
-	}
-	return ohuo
-}
-
-// ClearDescription clears the value of the "description" field.
-func (ohuo *OrderHistoryUpdateOne) ClearDescription() *OrderHistoryUpdateOne {
-	ohuo.mutation.ClearDescription()
-	return ohuo
-}
-
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
-func (ohuo *OrderHistoryUpdateOne) SetOldStatusID(id int) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetOldStatusID(id)
-	return ohuo
-}
-
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ohuo *OrderHistoryUpdateOne) SetNillableOldStatusID(id *int) *OrderHistoryUpdateOne {
-	if id != nil {
-		ohuo = ohuo.SetOldStatusID(*id)
-	}
-	return ohuo
-}
-
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (ohuo *OrderHistoryUpdateOne) SetOldStatus(o *OrderStatusCode) *OrderHistoryUpdateOne {
-	return ohuo.SetOldStatusID(o.ID)
-}
-
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
-func (ohuo *OrderHistoryUpdateOne) SetNewStatusID(id int) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetNewStatusID(id)
-	return ohuo
-}
-
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (ohuo *OrderHistoryUpdateOne) SetNillableNewStatusID(id *int) *OrderHistoryUpdateOne {
-	if id != nil {
-		ohuo = ohuo.SetNewStatusID(*id)
-	}
-	return ohuo
-}
-
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (ohuo *OrderHistoryUpdateOne) SetNewStatus(o *OrderStatusCode) *OrderHistoryUpdateOne {
-	return ohuo.SetNewStatusID(o.ID)
-}
-
 // Mutation returns the OrderHistoryMutation object of the builder.
 func (ohuo *OrderHistoryUpdateOne) Mutation() *OrderHistoryMutation {
 	return ohuo.mutation
-}
-
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
-func (ohuo *OrderHistoryUpdateOne) ClearOldStatus() *OrderHistoryUpdateOne {
-	ohuo.mutation.ClearOldStatus()
-	return ohuo
-}
-
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
-func (ohuo *OrderHistoryUpdateOne) ClearNewStatus() *OrderHistoryUpdateOne {
-	ohuo.mutation.ClearNewStatus()
-	return ohuo
 }
 
 // Where appends a list predicates to the OrderHistoryUpdate builder.
@@ -509,69 +227,8 @@ func (ohuo *OrderHistoryUpdateOne) sqlSave(ctx context.Context) (_node *OrderHis
 	if value, ok := ohuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderhistory.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := ohuo.mutation.Description(); ok {
-		_spec.SetField(orderhistory.FieldDescription, field.TypeString, value)
-	}
 	if ohuo.mutation.DescriptionCleared() {
 		_spec.ClearField(orderhistory.FieldDescription, field.TypeString)
-	}
-	if ohuo.mutation.OldStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.OldStatusTable,
-			Columns: []string{orderhistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ohuo.mutation.OldStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.OldStatusTable,
-			Columns: []string{orderhistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ohuo.mutation.NewStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.NewStatusTable,
-			Columns: []string{orderhistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ohuo.mutation.NewStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   orderhistory.NewStatusTable,
-			Columns: []string{orderhistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &OrderHistory{config: ohuo.config}
 	_spec.Assign = _node.assignValues

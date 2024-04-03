@@ -10,6 +10,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
@@ -25,6 +26,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
 	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
@@ -107,6 +109,10 @@ func init() {
 	invoice.DefaultUpdatedAt = invoiceDescUpdatedAt.Default.(func() time.Time)
 	// invoice.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	invoice.UpdateDefaultUpdatedAt = invoiceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// invoiceDescStatusCode is the schema descriptor for status_code field.
+	invoiceDescStatusCode := invoiceFields[5].Descriptor()
+	// invoice.DefaultStatusCode holds the default value on creation for the status_code field.
+	invoice.DefaultStatusCode = invoiceDescStatusCode.Default.(int)
 	// invoiceDescID is the schema descriptor for id field.
 	invoiceDescID := invoiceFields[0].Descriptor()
 	// invoice.DefaultID holds the default value on creation for the id field.
@@ -130,6 +136,43 @@ func init() {
 	invoicehistoryDescID := invoicehistoryFields[0].Descriptor()
 	// invoicehistory.DefaultID holds the default value on creation for the id field.
 	invoicehistory.DefaultID = invoicehistoryDescID.Default.(func() uuid.UUID)
+	invoicestatuscodeMixin := schema.InvoiceStatusCode{}.Mixin()
+	invoicestatuscodeMixinFields0 := invoicestatuscodeMixin[0].Fields()
+	_ = invoicestatuscodeMixinFields0
+	invoicestatuscodeFields := schema.InvoiceStatusCode{}.Fields()
+	_ = invoicestatuscodeFields
+	// invoicestatuscodeDescCreatedAt is the schema descriptor for created_at field.
+	invoicestatuscodeDescCreatedAt := invoicestatuscodeMixinFields0[0].Descriptor()
+	// invoicestatuscode.DefaultCreatedAt holds the default value on creation for the created_at field.
+	invoicestatuscode.DefaultCreatedAt = invoicestatuscodeDescCreatedAt.Default.(func() time.Time)
+	// invoicestatuscodeDescUpdatedAt is the schema descriptor for updated_at field.
+	invoicestatuscodeDescUpdatedAt := invoicestatuscodeMixinFields0[1].Descriptor()
+	// invoicestatuscode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	invoicestatuscode.DefaultUpdatedAt = invoicestatuscodeDescUpdatedAt.Default.(func() time.Time)
+	// invoicestatuscode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	invoicestatuscode.UpdateDefaultUpdatedAt = invoicestatuscodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// invoicestatuscodeDescInvoiceStatus is the schema descriptor for invoice_status field.
+	invoicestatuscodeDescInvoiceStatus := invoicestatuscodeFields[1].Descriptor()
+	// invoicestatuscode.InvoiceStatusValidator is a validator for the "invoice_status" field. It is called by the builders before save.
+	invoicestatuscode.InvoiceStatusValidator = invoicestatuscodeDescInvoiceStatus.Validators[0].(func(string) error)
+	// invoicestatuscodeDescID is the schema descriptor for id field.
+	invoicestatuscodeDescID := invoicestatuscodeFields[0].Descriptor()
+	// invoicestatuscode.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	invoicestatuscode.IDValidator = func() func(int) error {
+		validators := invoicestatuscodeDescID.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(id int) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
@@ -514,6 +557,10 @@ func init() {
 	shipment.DefaultUpdatedAt = shipmentDescUpdatedAt.Default.(func() time.Time)
 	// shipment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	shipment.UpdateDefaultUpdatedAt = shipmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// shipmentDescStatusCode is the schema descriptor for status_code field.
+	shipmentDescStatusCode := shipmentFields[5].Descriptor()
+	// shipment.DefaultStatusCode holds the default value on creation for the status_code field.
+	shipment.DefaultStatusCode = shipmentDescStatusCode.Default.(int)
 	// shipmentDescID is the schema descriptor for id field.
 	shipmentDescID := shipmentMixinFields1[0].Descriptor()
 	// shipment.IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -578,6 +625,43 @@ func init() {
 	shipmentitemDescID := shipmentitemFields[0].Descriptor()
 	// shipmentitem.DefaultID holds the default value on creation for the id field.
 	shipmentitem.DefaultID = shipmentitemDescID.Default.(func() uuid.UUID)
+	shipmentstatuscodeMixin := schema.ShipmentStatusCode{}.Mixin()
+	shipmentstatuscodeMixinFields0 := shipmentstatuscodeMixin[0].Fields()
+	_ = shipmentstatuscodeMixinFields0
+	shipmentstatuscodeFields := schema.ShipmentStatusCode{}.Fields()
+	_ = shipmentstatuscodeFields
+	// shipmentstatuscodeDescCreatedAt is the schema descriptor for created_at field.
+	shipmentstatuscodeDescCreatedAt := shipmentstatuscodeMixinFields0[0].Descriptor()
+	// shipmentstatuscode.DefaultCreatedAt holds the default value on creation for the created_at field.
+	shipmentstatuscode.DefaultCreatedAt = shipmentstatuscodeDescCreatedAt.Default.(func() time.Time)
+	// shipmentstatuscodeDescUpdatedAt is the schema descriptor for updated_at field.
+	shipmentstatuscodeDescUpdatedAt := shipmentstatuscodeMixinFields0[1].Descriptor()
+	// shipmentstatuscode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	shipmentstatuscode.DefaultUpdatedAt = shipmentstatuscodeDescUpdatedAt.Default.(func() time.Time)
+	// shipmentstatuscode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	shipmentstatuscode.UpdateDefaultUpdatedAt = shipmentstatuscodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// shipmentstatuscodeDescShipmentStatus is the schema descriptor for shipment_status field.
+	shipmentstatuscodeDescShipmentStatus := shipmentstatuscodeFields[1].Descriptor()
+	// shipmentstatuscode.ShipmentStatusValidator is a validator for the "shipment_status" field. It is called by the builders before save.
+	shipmentstatuscode.ShipmentStatusValidator = shipmentstatuscodeDescShipmentStatus.Validators[0].(func(string) error)
+	// shipmentstatuscodeDescID is the schema descriptor for id field.
+	shipmentstatuscodeDescID := shipmentstatuscodeFields[0].Descriptor()
+	// shipmentstatuscode.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	shipmentstatuscode.IDValidator = func() func(int) error {
+		validators := shipmentstatuscodeDescID.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(id int) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	tagMixin := schema.Tag{}.Mixin()
 	tagHooks := schema.Tag{}.Hooks()
 	tag.Hooks[0] = tagHooks[0]

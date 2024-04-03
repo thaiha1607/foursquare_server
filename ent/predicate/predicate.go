@@ -18,6 +18,9 @@ type Invoice func(*sql.Selector)
 // InvoiceHistory is the predicate function for invoicehistory builders.
 type InvoiceHistory func(*sql.Selector)
 
+// InvoiceStatusCode is the predicate function for invoicestatuscode builders.
+type InvoiceStatusCode func(*sql.Selector)
+
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
 
@@ -62,6 +65,9 @@ type ShipmentHistory func(*sql.Selector)
 
 // ShipmentItem is the predicate function for shipmentitem builders.
 type ShipmentItem func(*sql.Selector)
+
+// ShipmentStatusCode is the predicate function for shipmentstatuscode builders.
+type ShipmentStatusCode func(*sql.Selector)
 
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)

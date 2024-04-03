@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 )
@@ -27,8 +27,8 @@ type InvoiceHistoryQuery struct {
 	predicates    []predicate.InvoiceHistory
 	withInvoice   *InvoiceQuery
 	withPerson    *PersonQuery
-	withOldStatus *OrderStatusCodeQuery
-	withNewStatus *OrderStatusCodeQuery
+	withOldStatus *InvoiceStatusCodeQuery
+	withNewStatus *InvoiceStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -110,8 +110,8 @@ func (ihq *InvoiceHistoryQuery) QueryPerson() *PersonQuery {
 }
 
 // QueryOldStatus chains the current query on the "old_status" edge.
-func (ihq *InvoiceHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
+func (ihq *InvoiceHistoryQuery) QueryOldStatus() *InvoiceStatusCodeQuery {
+	query := (&InvoiceStatusCodeClient{config: ihq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ihq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -122,7 +122,7 @@ func (ihq *InvoiceHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, selector),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.OldStatusTable, invoicehistory.OldStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ihq.driver.Dialect(), step)
@@ -132,8 +132,8 @@ func (ihq *InvoiceHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 }
 
 // QueryNewStatus chains the current query on the "new_status" edge.
-func (ihq *InvoiceHistoryQuery) QueryNewStatus() *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
+func (ihq *InvoiceHistoryQuery) QueryNewStatus() *InvoiceStatusCodeQuery {
+	query := (&InvoiceStatusCodeClient{config: ihq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ihq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -144,7 +144,7 @@ func (ihq *InvoiceHistoryQuery) QueryNewStatus() *OrderStatusCodeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, selector),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.NewStatusTable, invoicehistory.NewStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ihq.driver.Dialect(), step)
@@ -379,8 +379,8 @@ func (ihq *InvoiceHistoryQuery) WithPerson(opts ...func(*PersonQuery)) *InvoiceH
 
 // WithOldStatus tells the query-builder to eager-load the nodes that are connected to
 // the "old_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (ihq *InvoiceHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery)) *InvoiceHistoryQuery {
-	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
+func (ihq *InvoiceHistoryQuery) WithOldStatus(opts ...func(*InvoiceStatusCodeQuery)) *InvoiceHistoryQuery {
+	query := (&InvoiceStatusCodeClient{config: ihq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -390,8 +390,8 @@ func (ihq *InvoiceHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery
 
 // WithNewStatus tells the query-builder to eager-load the nodes that are connected to
 // the "new_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (ihq *InvoiceHistoryQuery) WithNewStatus(opts ...func(*OrderStatusCodeQuery)) *InvoiceHistoryQuery {
-	query := (&OrderStatusCodeClient{config: ihq.config}).Query()
+func (ihq *InvoiceHistoryQuery) WithNewStatus(opts ...func(*InvoiceStatusCodeQuery)) *InvoiceHistoryQuery {
+	query := (&InvoiceStatusCodeClient{config: ihq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -516,13 +516,13 @@ func (ihq *InvoiceHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	}
 	if query := ihq.withOldStatus; query != nil {
 		if err := ihq.loadOldStatus(ctx, query, nodes, nil,
-			func(n *InvoiceHistory, e *OrderStatusCode) { n.Edges.OldStatus = e }); err != nil {
+			func(n *InvoiceHistory, e *InvoiceStatusCode) { n.Edges.OldStatus = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := ihq.withNewStatus; query != nil {
 		if err := ihq.loadNewStatus(ctx, query, nodes, nil,
-			func(n *InvoiceHistory, e *OrderStatusCode) { n.Edges.NewStatus = e }); err != nil {
+			func(n *InvoiceHistory, e *InvoiceStatusCode) { n.Edges.NewStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,7 +587,7 @@ func (ihq *InvoiceHistoryQuery) loadPerson(ctx context.Context, query *PersonQue
 	}
 	return nil
 }
-func (ihq *InvoiceHistoryQuery) loadOldStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *OrderStatusCode)) error {
+func (ihq *InvoiceHistoryQuery) loadOldStatus(ctx context.Context, query *InvoiceStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *InvoiceStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*InvoiceHistory)
 	for i := range nodes {
@@ -603,7 +603,7 @@ func (ihq *InvoiceHistoryQuery) loadOldStatus(ctx context.Context, query *OrderS
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(orderstatuscode.IDIn(ids...))
+	query.Where(invoicestatuscode.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -619,7 +619,7 @@ func (ihq *InvoiceHistoryQuery) loadOldStatus(ctx context.Context, query *OrderS
 	}
 	return nil
 }
-func (ihq *InvoiceHistoryQuery) loadNewStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *OrderStatusCode)) error {
+func (ihq *InvoiceHistoryQuery) loadNewStatus(ctx context.Context, query *InvoiceStatusCodeQuery, nodes []*InvoiceHistory, init func(*InvoiceHistory), assign func(*InvoiceHistory, *InvoiceStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*InvoiceHistory)
 	for i := range nodes {
@@ -635,7 +635,7 @@ func (ihq *InvoiceHistoryQuery) loadNewStatus(ctx context.Context, query *OrderS
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(orderstatuscode.IDIn(ids...))
+	query.Where(invoicestatuscode.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

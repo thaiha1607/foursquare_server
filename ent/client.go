@@ -20,6 +20,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
@@ -35,6 +36,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
 	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
@@ -53,6 +55,8 @@ type Client struct {
 	Invoice *InvoiceClient
 	// InvoiceHistory is the client for interacting with the InvoiceHistory builders.
 	InvoiceHistory *InvoiceHistoryClient
+	// InvoiceStatusCode is the client for interacting with the InvoiceStatusCode builders.
+	InvoiceStatusCode *InvoiceStatusCodeClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
@@ -83,6 +87,8 @@ type Client struct {
 	ShipmentHistory *ShipmentHistoryClient
 	// ShipmentItem is the client for interacting with the ShipmentItem builders.
 	ShipmentItem *ShipmentItemClient
+	// ShipmentStatusCode is the client for interacting with the ShipmentStatusCode builders.
+	ShipmentStatusCode *ShipmentStatusCodeClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// WarehouseAssignment is the client for interacting with the WarehouseAssignment builders.
@@ -104,6 +110,7 @@ func (c *Client) init() {
 	c.Conversation = NewConversationClient(c.config)
 	c.Invoice = NewInvoiceClient(c.config)
 	c.InvoiceHistory = NewInvoiceHistoryClient(c.config)
+	c.InvoiceStatusCode = NewInvoiceStatusCodeClient(c.config)
 	c.Message = NewMessageClient(c.config)
 	c.Order = NewOrderClient(c.config)
 	c.OrderHistory = NewOrderHistoryClient(c.config)
@@ -119,6 +126,7 @@ func (c *Client) init() {
 	c.Shipment = NewShipmentClient(c.config)
 	c.ShipmentHistory = NewShipmentHistoryClient(c.config)
 	c.ShipmentItem = NewShipmentItemClient(c.config)
+	c.ShipmentStatusCode = NewShipmentStatusCodeClient(c.config)
 	c.Tag = NewTagClient(c.config)
 	c.WarehouseAssignment = NewWarehouseAssignmentClient(c.config)
 	c.WorkUnitInfo = NewWorkUnitInfoClient(c.config)
@@ -218,6 +226,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Conversation:        NewConversationClient(cfg),
 		Invoice:             NewInvoiceClient(cfg),
 		InvoiceHistory:      NewInvoiceHistoryClient(cfg),
+		InvoiceStatusCode:   NewInvoiceStatusCodeClient(cfg),
 		Message:             NewMessageClient(cfg),
 		Order:               NewOrderClient(cfg),
 		OrderHistory:        NewOrderHistoryClient(cfg),
@@ -233,6 +242,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Shipment:            NewShipmentClient(cfg),
 		ShipmentHistory:     NewShipmentHistoryClient(cfg),
 		ShipmentItem:        NewShipmentItemClient(cfg),
+		ShipmentStatusCode:  NewShipmentStatusCodeClient(cfg),
 		Tag:                 NewTagClient(cfg),
 		WarehouseAssignment: NewWarehouseAssignmentClient(cfg),
 		WorkUnitInfo:        NewWorkUnitInfoClient(cfg),
@@ -259,6 +269,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Conversation:        NewConversationClient(cfg),
 		Invoice:             NewInvoiceClient(cfg),
 		InvoiceHistory:      NewInvoiceHistoryClient(cfg),
+		InvoiceStatusCode:   NewInvoiceStatusCodeClient(cfg),
 		Message:             NewMessageClient(cfg),
 		Order:               NewOrderClient(cfg),
 		OrderHistory:        NewOrderHistoryClient(cfg),
@@ -274,6 +285,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Shipment:            NewShipmentClient(cfg),
 		ShipmentHistory:     NewShipmentHistoryClient(cfg),
 		ShipmentItem:        NewShipmentItemClient(cfg),
+		ShipmentStatusCode:  NewShipmentStatusCodeClient(cfg),
 		Tag:                 NewTagClient(cfg),
 		WarehouseAssignment: NewWarehouseAssignmentClient(cfg),
 		WorkUnitInfo:        NewWorkUnitInfoClient(cfg),
@@ -306,11 +318,11 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.Message, c.Order,
-		c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress,
-		c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag,
-		c.Shipment, c.ShipmentHistory, c.ShipmentItem, c.Tag, c.WarehouseAssignment,
-		c.WorkUnitInfo,
+		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.InvoiceStatusCode,
+		c.Message, c.Order, c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person,
+		c.PersonAddress, c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty,
+		c.ProductTag, c.Shipment, c.ShipmentHistory, c.ShipmentItem,
+		c.ShipmentStatusCode, c.Tag, c.WarehouseAssignment, c.WorkUnitInfo,
 	} {
 		n.Use(hooks...)
 	}
@@ -320,11 +332,11 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.Message, c.Order,
-		c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person, c.PersonAddress,
-		c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty, c.ProductTag,
-		c.Shipment, c.ShipmentHistory, c.ShipmentItem, c.Tag, c.WarehouseAssignment,
-		c.WorkUnitInfo,
+		c.Address, c.Conversation, c.Invoice, c.InvoiceHistory, c.InvoiceStatusCode,
+		c.Message, c.Order, c.OrderHistory, c.OrderItem, c.OrderStatusCode, c.Person,
+		c.PersonAddress, c.ProductColor, c.ProductImage, c.ProductInfo, c.ProductQty,
+		c.ProductTag, c.Shipment, c.ShipmentHistory, c.ShipmentItem,
+		c.ShipmentStatusCode, c.Tag, c.WarehouseAssignment, c.WorkUnitInfo,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -341,6 +353,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Invoice.mutate(ctx, m)
 	case *InvoiceHistoryMutation:
 		return c.InvoiceHistory.mutate(ctx, m)
+	case *InvoiceStatusCodeMutation:
+		return c.InvoiceStatusCode.mutate(ctx, m)
 	case *MessageMutation:
 		return c.Message.mutate(ctx, m)
 	case *OrderMutation:
@@ -371,6 +385,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ShipmentHistory.mutate(ctx, m)
 	case *ShipmentItemMutation:
 		return c.ShipmentItem.mutate(ctx, m)
+	case *ShipmentStatusCodeMutation:
+		return c.ShipmentStatusCode.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
 	case *WarehouseAssignmentMutation:
@@ -836,6 +852,22 @@ func (c *InvoiceClient) QueryOrder(i *Invoice) *OrderQuery {
 	return query
 }
 
+// QueryInvoiceStatus queries the invoice_status edge of a Invoice.
+func (c *InvoiceClient) QueryInvoiceStatus(i *Invoice) *InvoiceStatusCodeQuery {
+	query := (&InvoiceStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invoice.Table, invoice.FieldID, id),
+			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, invoice.InvoiceStatusTable, invoice.InvoiceStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *InvoiceClient) Hooks() []Hook {
 	return c.hooks.Invoice
@@ -1002,13 +1034,13 @@ func (c *InvoiceHistoryClient) QueryPerson(ih *InvoiceHistory) *PersonQuery {
 }
 
 // QueryOldStatus queries the old_status edge of a InvoiceHistory.
-func (c *InvoiceHistoryClient) QueryOldStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: c.config}).Query()
+func (c *InvoiceHistoryClient) QueryOldStatus(ih *InvoiceHistory) *InvoiceStatusCodeQuery {
+	query := (&InvoiceStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ih.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.OldStatusTable, invoicehistory.OldStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
@@ -1018,13 +1050,13 @@ func (c *InvoiceHistoryClient) QueryOldStatus(ih *InvoiceHistory) *OrderStatusCo
 }
 
 // QueryNewStatus queries the new_status edge of a InvoiceHistory.
-func (c *InvoiceHistoryClient) QueryNewStatus(ih *InvoiceHistory) *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: c.config}).Query()
+func (c *InvoiceHistoryClient) QueryNewStatus(ih *InvoiceHistory) *InvoiceStatusCodeQuery {
+	query := (&InvoiceStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ih.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(invoicehistory.Table, invoicehistory.FieldID, id),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(invoicestatuscode.Table, invoicestatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, invoicehistory.NewStatusTable, invoicehistory.NewStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(ih.driver.Dialect(), step)
@@ -1055,6 +1087,139 @@ func (c *InvoiceHistoryClient) mutate(ctx context.Context, m *InvoiceHistoryMuta
 		return (&InvoiceHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown InvoiceHistory mutation op: %q", m.Op())
+	}
+}
+
+// InvoiceStatusCodeClient is a client for the InvoiceStatusCode schema.
+type InvoiceStatusCodeClient struct {
+	config
+}
+
+// NewInvoiceStatusCodeClient returns a client for the InvoiceStatusCode from the given config.
+func NewInvoiceStatusCodeClient(c config) *InvoiceStatusCodeClient {
+	return &InvoiceStatusCodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `invoicestatuscode.Hooks(f(g(h())))`.
+func (c *InvoiceStatusCodeClient) Use(hooks ...Hook) {
+	c.hooks.InvoiceStatusCode = append(c.hooks.InvoiceStatusCode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `invoicestatuscode.Intercept(f(g(h())))`.
+func (c *InvoiceStatusCodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.InvoiceStatusCode = append(c.inters.InvoiceStatusCode, interceptors...)
+}
+
+// Create returns a builder for creating a InvoiceStatusCode entity.
+func (c *InvoiceStatusCodeClient) Create() *InvoiceStatusCodeCreate {
+	mutation := newInvoiceStatusCodeMutation(c.config, OpCreate)
+	return &InvoiceStatusCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvoiceStatusCode entities.
+func (c *InvoiceStatusCodeClient) CreateBulk(builders ...*InvoiceStatusCodeCreate) *InvoiceStatusCodeCreateBulk {
+	return &InvoiceStatusCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *InvoiceStatusCodeClient) MapCreateBulk(slice any, setFunc func(*InvoiceStatusCodeCreate, int)) *InvoiceStatusCodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &InvoiceStatusCodeCreateBulk{err: fmt.Errorf("calling to InvoiceStatusCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*InvoiceStatusCodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &InvoiceStatusCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvoiceStatusCode.
+func (c *InvoiceStatusCodeClient) Update() *InvoiceStatusCodeUpdate {
+	mutation := newInvoiceStatusCodeMutation(c.config, OpUpdate)
+	return &InvoiceStatusCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvoiceStatusCodeClient) UpdateOne(isc *InvoiceStatusCode) *InvoiceStatusCodeUpdateOne {
+	mutation := newInvoiceStatusCodeMutation(c.config, OpUpdateOne, withInvoiceStatusCode(isc))
+	return &InvoiceStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvoiceStatusCodeClient) UpdateOneID(id int) *InvoiceStatusCodeUpdateOne {
+	mutation := newInvoiceStatusCodeMutation(c.config, OpUpdateOne, withInvoiceStatusCodeID(id))
+	return &InvoiceStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvoiceStatusCode.
+func (c *InvoiceStatusCodeClient) Delete() *InvoiceStatusCodeDelete {
+	mutation := newInvoiceStatusCodeMutation(c.config, OpDelete)
+	return &InvoiceStatusCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *InvoiceStatusCodeClient) DeleteOne(isc *InvoiceStatusCode) *InvoiceStatusCodeDeleteOne {
+	return c.DeleteOneID(isc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *InvoiceStatusCodeClient) DeleteOneID(id int) *InvoiceStatusCodeDeleteOne {
+	builder := c.Delete().Where(invoicestatuscode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvoiceStatusCodeDeleteOne{builder}
+}
+
+// Query returns a query builder for InvoiceStatusCode.
+func (c *InvoiceStatusCodeClient) Query() *InvoiceStatusCodeQuery {
+	return &InvoiceStatusCodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeInvoiceStatusCode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a InvoiceStatusCode entity by its id.
+func (c *InvoiceStatusCodeClient) Get(ctx context.Context, id int) (*InvoiceStatusCode, error) {
+	return c.Query().Where(invoicestatuscode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvoiceStatusCodeClient) GetX(ctx context.Context, id int) *InvoiceStatusCode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *InvoiceStatusCodeClient) Hooks() []Hook {
+	return c.hooks.InvoiceStatusCode
+}
+
+// Interceptors returns the client interceptors.
+func (c *InvoiceStatusCodeClient) Interceptors() []Interceptor {
+	return c.inters.InvoiceStatusCode
+}
+
+func (c *InvoiceStatusCodeClient) mutate(ctx context.Context, m *InvoiceStatusCodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&InvoiceStatusCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&InvoiceStatusCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&InvoiceStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&InvoiceStatusCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown InvoiceStatusCode mutation op: %q", m.Op())
 	}
 }
 
@@ -3194,6 +3359,22 @@ func (c *ShipmentClient) QueryStaff(s *Shipment) *PersonQuery {
 	return query
 }
 
+// QueryShipmentStatus queries the shipment_status edge of a Shipment.
+func (c *ShipmentClient) QueryShipmentStatus(s *Shipment) *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(shipment.Table, shipment.FieldID, id),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, shipment.ShipmentStatusTable, shipment.ShipmentStatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ShipmentClient) Hooks() []Hook {
 	hooks := c.hooks.Shipment
@@ -3361,13 +3542,13 @@ func (c *ShipmentHistoryClient) QueryPerson(sh *ShipmentHistory) *PersonQuery {
 }
 
 // QueryOldStatus queries the old_status edge of a ShipmentHistory.
-func (c *ShipmentHistoryClient) QueryOldStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: c.config}).Query()
+func (c *ShipmentHistoryClient) QueryOldStatus(sh *ShipmentHistory) *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := sh.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.OldStatusTable, shipmenthistory.OldStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
@@ -3377,13 +3558,13 @@ func (c *ShipmentHistoryClient) QueryOldStatus(sh *ShipmentHistory) *OrderStatus
 }
 
 // QueryNewStatus queries the new_status edge of a ShipmentHistory.
-func (c *ShipmentHistoryClient) QueryNewStatus(sh *ShipmentHistory) *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: c.config}).Query()
+func (c *ShipmentHistoryClient) QueryNewStatus(sh *ShipmentHistory) *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := sh.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, id),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.NewStatusTable, shipmenthistory.NewStatusColumn),
 		)
 		fromV = sqlgraph.Neighbors(sh.driver.Dialect(), step)
@@ -3579,6 +3760,139 @@ func (c *ShipmentItemClient) mutate(ctx context.Context, m *ShipmentItemMutation
 		return (&ShipmentItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ShipmentItem mutation op: %q", m.Op())
+	}
+}
+
+// ShipmentStatusCodeClient is a client for the ShipmentStatusCode schema.
+type ShipmentStatusCodeClient struct {
+	config
+}
+
+// NewShipmentStatusCodeClient returns a client for the ShipmentStatusCode from the given config.
+func NewShipmentStatusCodeClient(c config) *ShipmentStatusCodeClient {
+	return &ShipmentStatusCodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `shipmentstatuscode.Hooks(f(g(h())))`.
+func (c *ShipmentStatusCodeClient) Use(hooks ...Hook) {
+	c.hooks.ShipmentStatusCode = append(c.hooks.ShipmentStatusCode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `shipmentstatuscode.Intercept(f(g(h())))`.
+func (c *ShipmentStatusCodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ShipmentStatusCode = append(c.inters.ShipmentStatusCode, interceptors...)
+}
+
+// Create returns a builder for creating a ShipmentStatusCode entity.
+func (c *ShipmentStatusCodeClient) Create() *ShipmentStatusCodeCreate {
+	mutation := newShipmentStatusCodeMutation(c.config, OpCreate)
+	return &ShipmentStatusCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ShipmentStatusCode entities.
+func (c *ShipmentStatusCodeClient) CreateBulk(builders ...*ShipmentStatusCodeCreate) *ShipmentStatusCodeCreateBulk {
+	return &ShipmentStatusCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ShipmentStatusCodeClient) MapCreateBulk(slice any, setFunc func(*ShipmentStatusCodeCreate, int)) *ShipmentStatusCodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ShipmentStatusCodeCreateBulk{err: fmt.Errorf("calling to ShipmentStatusCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ShipmentStatusCodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ShipmentStatusCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ShipmentStatusCode.
+func (c *ShipmentStatusCodeClient) Update() *ShipmentStatusCodeUpdate {
+	mutation := newShipmentStatusCodeMutation(c.config, OpUpdate)
+	return &ShipmentStatusCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ShipmentStatusCodeClient) UpdateOne(ssc *ShipmentStatusCode) *ShipmentStatusCodeUpdateOne {
+	mutation := newShipmentStatusCodeMutation(c.config, OpUpdateOne, withShipmentStatusCode(ssc))
+	return &ShipmentStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ShipmentStatusCodeClient) UpdateOneID(id int) *ShipmentStatusCodeUpdateOne {
+	mutation := newShipmentStatusCodeMutation(c.config, OpUpdateOne, withShipmentStatusCodeID(id))
+	return &ShipmentStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ShipmentStatusCode.
+func (c *ShipmentStatusCodeClient) Delete() *ShipmentStatusCodeDelete {
+	mutation := newShipmentStatusCodeMutation(c.config, OpDelete)
+	return &ShipmentStatusCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ShipmentStatusCodeClient) DeleteOne(ssc *ShipmentStatusCode) *ShipmentStatusCodeDeleteOne {
+	return c.DeleteOneID(ssc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ShipmentStatusCodeClient) DeleteOneID(id int) *ShipmentStatusCodeDeleteOne {
+	builder := c.Delete().Where(shipmentstatuscode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ShipmentStatusCodeDeleteOne{builder}
+}
+
+// Query returns a query builder for ShipmentStatusCode.
+func (c *ShipmentStatusCodeClient) Query() *ShipmentStatusCodeQuery {
+	return &ShipmentStatusCodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeShipmentStatusCode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ShipmentStatusCode entity by its id.
+func (c *ShipmentStatusCodeClient) Get(ctx context.Context, id int) (*ShipmentStatusCode, error) {
+	return c.Query().Where(shipmentstatuscode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ShipmentStatusCodeClient) GetX(ctx context.Context, id int) *ShipmentStatusCode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ShipmentStatusCodeClient) Hooks() []Hook {
+	return c.hooks.ShipmentStatusCode
+}
+
+// Interceptors returns the client interceptors.
+func (c *ShipmentStatusCodeClient) Interceptors() []Interceptor {
+	return c.inters.ShipmentStatusCode
+}
+
+func (c *ShipmentStatusCodeClient) mutate(ctx context.Context, m *ShipmentStatusCodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ShipmentStatusCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ShipmentStatusCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ShipmentStatusCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ShipmentStatusCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ShipmentStatusCode mutation op: %q", m.Op())
 	}
 }
 
@@ -4081,15 +4395,17 @@ func (c *WorkUnitInfoClient) mutate(ctx context.Context, m *WorkUnitInfoMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Address, Conversation, Invoice, InvoiceHistory, Message, Order, OrderHistory,
-		OrderItem, OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
-		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentHistory, ShipmentItem,
-		Tag, WarehouseAssignment, WorkUnitInfo []ent.Hook
+		Address, Conversation, Invoice, InvoiceHistory, InvoiceStatusCode, Message,
+		Order, OrderHistory, OrderItem, OrderStatusCode, Person, PersonAddress,
+		ProductColor, ProductImage, ProductInfo, ProductQty, ProductTag, Shipment,
+		ShipmentHistory, ShipmentItem, ShipmentStatusCode, Tag, WarehouseAssignment,
+		WorkUnitInfo []ent.Hook
 	}
 	inters struct {
-		Address, Conversation, Invoice, InvoiceHistory, Message, Order, OrderHistory,
-		OrderItem, OrderStatusCode, Person, PersonAddress, ProductColor, ProductImage,
-		ProductInfo, ProductQty, ProductTag, Shipment, ShipmentHistory, ShipmentItem,
-		Tag, WarehouseAssignment, WorkUnitInfo []ent.Interceptor
+		Address, Conversation, Invoice, InvoiceHistory, InvoiceStatusCode, Message,
+		Order, OrderHistory, OrderItem, OrderStatusCode, Person, PersonAddress,
+		ProductColor, ProductImage, ProductInfo, ProductQty, ProductTag, Shipment,
+		ShipmentHistory, ShipmentItem, ShipmentStatusCode, Tag, WarehouseAssignment,
+		WorkUnitInfo []ent.Interceptor
 	}
 )

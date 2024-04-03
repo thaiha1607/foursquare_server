@@ -82,6 +82,11 @@ func Note(v string) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldNote, v))
 }
 
+// StatusCode applies equality check predicate on the "status_code" field. It's identical to StatusCodeEQ.
+func StatusCode(v int) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldStatusCode, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldCreatedAt, v))
@@ -317,24 +322,24 @@ func TypeNotIn(vs ...Type) predicate.Invoice {
 	return predicate.Invoice(sql.FieldNotIn(FieldType, vs...))
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Invoice {
-	return predicate.Invoice(sql.FieldEQ(FieldStatus, v))
+// StatusCodeEQ applies the EQ predicate on the "status_code" field.
+func StatusCodeEQ(v int) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldStatusCode, v))
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Invoice {
-	return predicate.Invoice(sql.FieldNEQ(FieldStatus, v))
+// StatusCodeNEQ applies the NEQ predicate on the "status_code" field.
+func StatusCodeNEQ(v int) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNEQ(FieldStatusCode, v))
 }
 
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Invoice {
-	return predicate.Invoice(sql.FieldIn(FieldStatus, vs...))
+// StatusCodeIn applies the In predicate on the "status_code" field.
+func StatusCodeIn(vs ...int) predicate.Invoice {
+	return predicate.Invoice(sql.FieldIn(FieldStatusCode, vs...))
 }
 
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Invoice {
-	return predicate.Invoice(sql.FieldNotIn(FieldStatus, vs...))
+// StatusCodeNotIn applies the NotIn predicate on the "status_code" field.
+func StatusCodeNotIn(vs ...int) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotIn(FieldStatusCode, vs...))
 }
 
 // PaymentMethodEQ applies the EQ predicate on the "payment_method" field.
@@ -382,6 +387,29 @@ func HasOrder() predicate.Invoice {
 func HasOrderWith(preds ...predicate.Order) predicate.Invoice {
 	return predicate.Invoice(func(s *sql.Selector) {
 		step := newOrderStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInvoiceStatus applies the HasEdge predicate on the "invoice_status" edge.
+func HasInvoiceStatus() predicate.Invoice {
+	return predicate.Invoice(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, InvoiceStatusTable, InvoiceStatusColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvoiceStatusWith applies the HasEdge predicate on the "invoice_status" edge with a given conditions (other predicates).
+func HasInvoiceStatusWith(preds ...predicate.InvoiceStatusCode) predicate.Invoice {
+	return predicate.Invoice(func(s *sql.Selector) {
+		step := newInvoiceStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

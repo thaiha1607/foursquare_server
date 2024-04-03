@@ -57,6 +57,18 @@ func (f InvoiceHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceHistoryMutation", m)
 }
 
+// The InvoiceStatusCodeFunc type is an adapter to allow the use of ordinary
+// function as InvoiceStatusCode mutator.
+type InvoiceStatusCodeFunc func(context.Context, *ent.InvoiceStatusCodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvoiceStatusCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.InvoiceStatusCodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvoiceStatusCodeMutation", m)
+}
+
 // The MessageFunc type is an adapter to allow the use of ordinary
 // function as Message mutator.
 type MessageFunc func(context.Context, *ent.MessageMutation) (ent.Value, error)
@@ -235,6 +247,18 @@ func (f ShipmentItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ShipmentItemMutation", m)
+}
+
+// The ShipmentStatusCodeFunc type is an adapter to allow the use of ordinary
+// function as ShipmentStatusCode mutator.
+type ShipmentStatusCodeFunc func(context.Context, *ent.ShipmentStatusCodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ShipmentStatusCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ShipmentStatusCodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ShipmentStatusCodeMutation", m)
 }
 
 // The TagFunc type is an adapter to allow the use of ordinary

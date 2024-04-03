@@ -55,16 +55,16 @@ const (
 	PersonColumn = "person_id"
 	// OldStatusTable is the table that holds the old_status relation/edge.
 	OldStatusTable = "invoice_history"
-	// OldStatusInverseTable is the table name for the OrderStatusCode entity.
-	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
-	OldStatusInverseTable = "order_status_codes"
+	// OldStatusInverseTable is the table name for the InvoiceStatusCode entity.
+	// It exists in this package in order to avoid circular dependency with the "invoicestatuscode" package.
+	OldStatusInverseTable = "invoice_status_codes"
 	// OldStatusColumn is the table column denoting the old_status relation/edge.
 	OldStatusColumn = "old_status_code"
 	// NewStatusTable is the table that holds the new_status relation/edge.
 	NewStatusTable = "invoice_history"
-	// NewStatusInverseTable is the table name for the OrderStatusCode entity.
-	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
-	NewStatusInverseTable = "order_status_codes"
+	// NewStatusInverseTable is the table name for the InvoiceStatusCode entity.
+	// It exists in this package in order to avoid circular dependency with the "invoicestatuscode" package.
+	NewStatusInverseTable = "invoice_status_codes"
 	// NewStatusColumn is the table column denoting the new_status relation/edge.
 	NewStatusColumn = "new_status_code"
 )

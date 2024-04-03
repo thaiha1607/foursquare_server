@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 )
@@ -35,119 +34,9 @@ func (shu *ShipmentHistoryUpdate) SetUpdatedAt(t time.Time) *ShipmentHistoryUpda
 	return shu
 }
 
-// SetOldStatusCode sets the "old_status_code" field.
-func (shu *ShipmentHistoryUpdate) SetOldStatusCode(i int) *ShipmentHistoryUpdate {
-	shu.mutation.SetOldStatusCode(i)
-	return shu
-}
-
-// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillableOldStatusCode(i *int) *ShipmentHistoryUpdate {
-	if i != nil {
-		shu.SetOldStatusCode(*i)
-	}
-	return shu
-}
-
-// ClearOldStatusCode clears the value of the "old_status_code" field.
-func (shu *ShipmentHistoryUpdate) ClearOldStatusCode() *ShipmentHistoryUpdate {
-	shu.mutation.ClearOldStatusCode()
-	return shu
-}
-
-// SetNewStatusCode sets the "new_status_code" field.
-func (shu *ShipmentHistoryUpdate) SetNewStatusCode(i int) *ShipmentHistoryUpdate {
-	shu.mutation.SetNewStatusCode(i)
-	return shu
-}
-
-// SetNillableNewStatusCode sets the "new_status_code" field if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillableNewStatusCode(i *int) *ShipmentHistoryUpdate {
-	if i != nil {
-		shu.SetNewStatusCode(*i)
-	}
-	return shu
-}
-
-// ClearNewStatusCode clears the value of the "new_status_code" field.
-func (shu *ShipmentHistoryUpdate) ClearNewStatusCode() *ShipmentHistoryUpdate {
-	shu.mutation.ClearNewStatusCode()
-	return shu
-}
-
-// SetDescription sets the "description" field.
-func (shu *ShipmentHistoryUpdate) SetDescription(s string) *ShipmentHistoryUpdate {
-	shu.mutation.SetDescription(s)
-	return shu
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillableDescription(s *string) *ShipmentHistoryUpdate {
-	if s != nil {
-		shu.SetDescription(*s)
-	}
-	return shu
-}
-
-// ClearDescription clears the value of the "description" field.
-func (shu *ShipmentHistoryUpdate) ClearDescription() *ShipmentHistoryUpdate {
-	shu.mutation.ClearDescription()
-	return shu
-}
-
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
-func (shu *ShipmentHistoryUpdate) SetOldStatusID(id int) *ShipmentHistoryUpdate {
-	shu.mutation.SetOldStatusID(id)
-	return shu
-}
-
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillableOldStatusID(id *int) *ShipmentHistoryUpdate {
-	if id != nil {
-		shu = shu.SetOldStatusID(*id)
-	}
-	return shu
-}
-
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryUpdate {
-	return shu.SetOldStatusID(o.ID)
-}
-
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
-func (shu *ShipmentHistoryUpdate) SetNewStatusID(id int) *ShipmentHistoryUpdate {
-	shu.mutation.SetNewStatusID(id)
-	return shu
-}
-
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shu *ShipmentHistoryUpdate) SetNillableNewStatusID(id *int) *ShipmentHistoryUpdate {
-	if id != nil {
-		shu = shu.SetNewStatusID(*id)
-	}
-	return shu
-}
-
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) SetNewStatus(o *OrderStatusCode) *ShipmentHistoryUpdate {
-	return shu.SetNewStatusID(o.ID)
-}
-
 // Mutation returns the ShipmentHistoryMutation object of the builder.
 func (shu *ShipmentHistoryUpdate) Mutation() *ShipmentHistoryMutation {
 	return shu.mutation
-}
-
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) ClearOldStatus() *ShipmentHistoryUpdate {
-	shu.mutation.ClearOldStatus()
-	return shu
-}
-
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
-func (shu *ShipmentHistoryUpdate) ClearNewStatus() *ShipmentHistoryUpdate {
-	shu.mutation.ClearNewStatus()
-	return shu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -212,69 +101,8 @@ func (shu *ShipmentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error
 	if value, ok := shu.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := shu.mutation.Description(); ok {
-		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)
-	}
 	if shu.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)
-	}
-	if shu.mutation.OldStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.OldStatusTable,
-			Columns: []string{shipmenthistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := shu.mutation.OldStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.OldStatusTable,
-			Columns: []string{shipmenthistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if shu.mutation.NewStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.NewStatusTable,
-			Columns: []string{shipmenthistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := shu.mutation.NewStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.NewStatusTable,
-			Columns: []string{shipmenthistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, shu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -302,119 +130,9 @@ func (shuo *ShipmentHistoryUpdateOne) SetUpdatedAt(t time.Time) *ShipmentHistory
 	return shuo
 }
 
-// SetOldStatusCode sets the "old_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) SetOldStatusCode(i int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetOldStatusCode(i)
-	return shuo
-}
-
-// SetNillableOldStatusCode sets the "old_status_code" field if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillableOldStatusCode(i *int) *ShipmentHistoryUpdateOne {
-	if i != nil {
-		shuo.SetOldStatusCode(*i)
-	}
-	return shuo
-}
-
-// ClearOldStatusCode clears the value of the "old_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) ClearOldStatusCode() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearOldStatusCode()
-	return shuo
-}
-
-// SetNewStatusCode sets the "new_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) SetNewStatusCode(i int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetNewStatusCode(i)
-	return shuo
-}
-
-// SetNillableNewStatusCode sets the "new_status_code" field if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillableNewStatusCode(i *int) *ShipmentHistoryUpdateOne {
-	if i != nil {
-		shuo.SetNewStatusCode(*i)
-	}
-	return shuo
-}
-
-// ClearNewStatusCode clears the value of the "new_status_code" field.
-func (shuo *ShipmentHistoryUpdateOne) ClearNewStatusCode() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearNewStatusCode()
-	return shuo
-}
-
-// SetDescription sets the "description" field.
-func (shuo *ShipmentHistoryUpdateOne) SetDescription(s string) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetDescription(s)
-	return shuo
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillableDescription(s *string) *ShipmentHistoryUpdateOne {
-	if s != nil {
-		shuo.SetDescription(*s)
-	}
-	return shuo
-}
-
-// ClearDescription clears the value of the "description" field.
-func (shuo *ShipmentHistoryUpdateOne) ClearDescription() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearDescription()
-	return shuo
-}
-
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
-func (shuo *ShipmentHistoryUpdateOne) SetOldStatusID(id int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetOldStatusID(id)
-	return shuo
-}
-
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillableOldStatusID(id *int) *ShipmentHistoryUpdateOne {
-	if id != nil {
-		shuo = shuo.SetOldStatusID(*id)
-	}
-	return shuo
-}
-
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryUpdateOne {
-	return shuo.SetOldStatusID(o.ID)
-}
-
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
-func (shuo *ShipmentHistoryUpdateOne) SetNewStatusID(id int) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetNewStatusID(id)
-	return shuo
-}
-
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
-func (shuo *ShipmentHistoryUpdateOne) SetNillableNewStatusID(id *int) *ShipmentHistoryUpdateOne {
-	if id != nil {
-		shuo = shuo.SetNewStatusID(*id)
-	}
-	return shuo
-}
-
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) SetNewStatus(o *OrderStatusCode) *ShipmentHistoryUpdateOne {
-	return shuo.SetNewStatusID(o.ID)
-}
-
 // Mutation returns the ShipmentHistoryMutation object of the builder.
 func (shuo *ShipmentHistoryUpdateOne) Mutation() *ShipmentHistoryMutation {
 	return shuo.mutation
-}
-
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) ClearOldStatus() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearOldStatus()
-	return shuo
-}
-
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
-func (shuo *ShipmentHistoryUpdateOne) ClearNewStatus() *ShipmentHistoryUpdateOne {
-	shuo.mutation.ClearNewStatus()
-	return shuo
 }
 
 // Where appends a list predicates to the ShipmentHistoryUpdate builder.
@@ -509,69 +227,8 @@ func (shuo *ShipmentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Shipm
 	if value, ok := shuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := shuo.mutation.Description(); ok {
-		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)
-	}
 	if shuo.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)
-	}
-	if shuo.mutation.OldStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.OldStatusTable,
-			Columns: []string{shipmenthistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := shuo.mutation.OldStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.OldStatusTable,
-			Columns: []string{shipmenthistory.OldStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if shuo.mutation.NewStatusCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.NewStatusTable,
-			Columns: []string{shipmenthistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := shuo.mutation.NewStatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   shipmenthistory.NewStatusTable,
-			Columns: []string{shipmenthistory.NewStatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ShipmentHistory{config: shuo.config}
 	_spec.Assign = _node.assignValues

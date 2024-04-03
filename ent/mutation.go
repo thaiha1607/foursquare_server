@@ -17,6 +17,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/conversation"
 	"github.com/thaiha1607/foursquare_server/ent/invoice"
 	"github.com/thaiha1607/foursquare_server/ent/invoicehistory"
+	"github.com/thaiha1607/foursquare_server/ent/invoicestatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/message"
 	"github.com/thaiha1607/foursquare_server/ent/order"
 	"github.com/thaiha1607/foursquare_server/ent/orderhistory"
@@ -33,6 +34,7 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
 	"github.com/thaiha1607/foursquare_server/ent/shipmentitem"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/tag"
 	"github.com/thaiha1607/foursquare_server/ent/warehouseassignment"
 	"github.com/thaiha1607/foursquare_server/ent/workunitinfo"
@@ -51,6 +53,7 @@ const (
 	TypeConversation        = "Conversation"
 	TypeInvoice             = "Invoice"
 	TypeInvoiceHistory      = "InvoiceHistory"
+	TypeInvoiceStatusCode   = "InvoiceStatusCode"
 	TypeMessage             = "Message"
 	TypeOrder               = "Order"
 	TypeOrderHistory        = "OrderHistory"
@@ -66,6 +69,7 @@ const (
 	TypeShipment            = "Shipment"
 	TypeShipmentHistory     = "ShipmentHistory"
 	TypeShipmentItem        = "ShipmentItem"
+	TypeShipmentStatusCode  = "ShipmentStatusCode"
 	TypeTag                 = "Tag"
 	TypeWarehouseAssignment = "WarehouseAssignment"
 	TypeWorkUnitInfo        = "WorkUnitInfo"
@@ -1642,23 +1646,24 @@ func (m *ConversationMutation) ResetEdge(name string) error {
 // InvoiceMutation represents an operation that mutates the Invoice nodes in the graph.
 type InvoiceMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uuid.UUID
-	created_at     *time.Time
-	updated_at     *time.Time
-	total          *decimal.Decimal
-	addtotal       *decimal.Decimal
-	note           *string
-	_type          *invoice.Type
-	status         *invoice.Status
-	payment_method *invoice.PaymentMethod
-	clearedFields  map[string]struct{}
-	_order         *uuid.UUID
-	cleared_order  bool
-	done           bool
-	oldValue       func(context.Context) (*Invoice, error)
-	predicates     []predicate.Invoice
+	op                    Op
+	typ                   string
+	id                    *uuid.UUID
+	created_at            *time.Time
+	updated_at            *time.Time
+	total                 *decimal.Decimal
+	addtotal              *decimal.Decimal
+	note                  *string
+	_type                 *invoice.Type
+	payment_method        *invoice.PaymentMethod
+	clearedFields         map[string]struct{}
+	_order                *uuid.UUID
+	cleared_order         bool
+	invoice_status        *int
+	clearedinvoice_status bool
+	done                  bool
+	oldValue              func(context.Context) (*Invoice, error)
+	predicates            []predicate.Invoice
 }
 
 var _ ent.Mutation = (*InvoiceMutation)(nil)
@@ -2014,40 +2019,40 @@ func (m *InvoiceMutation) ResetType() {
 	m._type = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *InvoiceMutation) SetStatus(i invoice.Status) {
-	m.status = &i
+// SetStatusCode sets the "status_code" field.
+func (m *InvoiceMutation) SetStatusCode(i int) {
+	m.invoice_status = &i
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *InvoiceMutation) Status() (r invoice.Status, exists bool) {
-	v := m.status
+// StatusCode returns the value of the "status_code" field in the mutation.
+func (m *InvoiceMutation) StatusCode() (r int, exists bool) {
+	v := m.invoice_status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Invoice entity.
+// OldStatusCode returns the old "status_code" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldStatus(ctx context.Context) (v invoice.Status, err error) {
+func (m *InvoiceMutation) OldStatusCode(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatusCode is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
+		return v, errors.New("OldStatusCode requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatusCode: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.StatusCode, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *InvoiceMutation) ResetStatus() {
-	m.status = nil
+// ResetStatusCode resets all changes to the "status_code" field.
+func (m *InvoiceMutation) ResetStatusCode() {
+	m.invoice_status = nil
 }
 
 // SetPaymentMethod sets the "payment_method" field.
@@ -2126,6 +2131,46 @@ func (m *InvoiceMutation) ResetOrder() {
 	m.cleared_order = false
 }
 
+// SetInvoiceStatusID sets the "invoice_status" edge to the InvoiceStatusCode entity by id.
+func (m *InvoiceMutation) SetInvoiceStatusID(id int) {
+	m.invoice_status = &id
+}
+
+// ClearInvoiceStatus clears the "invoice_status" edge to the InvoiceStatusCode entity.
+func (m *InvoiceMutation) ClearInvoiceStatus() {
+	m.clearedinvoice_status = true
+	m.clearedFields[invoice.FieldStatusCode] = struct{}{}
+}
+
+// InvoiceStatusCleared reports if the "invoice_status" edge to the InvoiceStatusCode entity was cleared.
+func (m *InvoiceMutation) InvoiceStatusCleared() bool {
+	return m.clearedinvoice_status
+}
+
+// InvoiceStatusID returns the "invoice_status" edge ID in the mutation.
+func (m *InvoiceMutation) InvoiceStatusID() (id int, exists bool) {
+	if m.invoice_status != nil {
+		return *m.invoice_status, true
+	}
+	return
+}
+
+// InvoiceStatusIDs returns the "invoice_status" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// InvoiceStatusID instead. It exists only for internal usage by the builders.
+func (m *InvoiceMutation) InvoiceStatusIDs() (ids []int) {
+	if id := m.invoice_status; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetInvoiceStatus resets all changes to the "invoice_status" edge.
+func (m *InvoiceMutation) ResetInvoiceStatus() {
+	m.invoice_status = nil
+	m.clearedinvoice_status = false
+}
+
 // Where appends a list predicates to the InvoiceMutation builder.
 func (m *InvoiceMutation) Where(ps ...predicate.Invoice) {
 	m.predicates = append(m.predicates, ps...)
@@ -2179,8 +2224,8 @@ func (m *InvoiceMutation) Fields() []string {
 	if m._type != nil {
 		fields = append(fields, invoice.FieldType)
 	}
-	if m.status != nil {
-		fields = append(fields, invoice.FieldStatus)
+	if m.invoice_status != nil {
+		fields = append(fields, invoice.FieldStatusCode)
 	}
 	if m.payment_method != nil {
 		fields = append(fields, invoice.FieldPaymentMethod)
@@ -2205,8 +2250,8 @@ func (m *InvoiceMutation) Field(name string) (ent.Value, bool) {
 		return m.Note()
 	case invoice.FieldType:
 		return m.GetType()
-	case invoice.FieldStatus:
-		return m.Status()
+	case invoice.FieldStatusCode:
+		return m.StatusCode()
 	case invoice.FieldPaymentMethod:
 		return m.PaymentMethod()
 	}
@@ -2230,8 +2275,8 @@ func (m *InvoiceMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldNote(ctx)
 	case invoice.FieldType:
 		return m.OldType(ctx)
-	case invoice.FieldStatus:
-		return m.OldStatus(ctx)
+	case invoice.FieldStatusCode:
+		return m.OldStatusCode(ctx)
 	case invoice.FieldPaymentMethod:
 		return m.OldPaymentMethod(ctx)
 	}
@@ -2285,12 +2330,12 @@ func (m *InvoiceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
-	case invoice.FieldStatus:
-		v, ok := value.(invoice.Status)
+	case invoice.FieldStatusCode:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetStatusCode(v)
 		return nil
 	case invoice.FieldPaymentMethod:
 		v, ok := value.(invoice.PaymentMethod)
@@ -2396,8 +2441,8 @@ func (m *InvoiceMutation) ResetField(name string) error {
 	case invoice.FieldType:
 		m.ResetType()
 		return nil
-	case invoice.FieldStatus:
-		m.ResetStatus()
+	case invoice.FieldStatusCode:
+		m.ResetStatusCode()
 		return nil
 	case invoice.FieldPaymentMethod:
 		m.ResetPaymentMethod()
@@ -2408,9 +2453,12 @@ func (m *InvoiceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvoiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m._order != nil {
 		edges = append(edges, invoice.EdgeOrder)
+	}
+	if m.invoice_status != nil {
+		edges = append(edges, invoice.EdgeInvoiceStatus)
 	}
 	return edges
 }
@@ -2423,13 +2471,17 @@ func (m *InvoiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m._order; id != nil {
 			return []ent.Value{*id}
 		}
+	case invoice.EdgeInvoiceStatus:
+		if id := m.invoice_status; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvoiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -2441,9 +2493,12 @@ func (m *InvoiceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvoiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleared_order {
 		edges = append(edges, invoice.EdgeOrder)
+	}
+	if m.clearedinvoice_status {
+		edges = append(edges, invoice.EdgeInvoiceStatus)
 	}
 	return edges
 }
@@ -2454,6 +2509,8 @@ func (m *InvoiceMutation) EdgeCleared(name string) bool {
 	switch name {
 	case invoice.EdgeOrder:
 		return m.cleared_order
+	case invoice.EdgeInvoiceStatus:
+		return m.clearedinvoice_status
 	}
 	return false
 }
@@ -2465,6 +2522,9 @@ func (m *InvoiceMutation) ClearEdge(name string) error {
 	case invoice.EdgeOrder:
 		m.ClearOrder()
 		return nil
+	case invoice.EdgeInvoiceStatus:
+		m.ClearInvoiceStatus()
+		return nil
 	}
 	return fmt.Errorf("unknown Invoice unique edge %s", name)
 }
@@ -2475,6 +2535,9 @@ func (m *InvoiceMutation) ResetEdge(name string) error {
 	switch name {
 	case invoice.EdgeOrder:
 		m.ResetOrder()
+		return nil
+	case invoice.EdgeInvoiceStatus:
+		m.ResetInvoiceStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Invoice edge %s", name)
@@ -2952,18 +3015,18 @@ func (m *InvoiceHistoryMutation) ResetPerson() {
 	m.clearedperson = false
 }
 
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by id.
+// SetOldStatusID sets the "old_status" edge to the InvoiceStatusCode entity by id.
 func (m *InvoiceHistoryMutation) SetOldStatusID(id int) {
 	m.old_status = &id
 }
 
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+// ClearOldStatus clears the "old_status" edge to the InvoiceStatusCode entity.
 func (m *InvoiceHistoryMutation) ClearOldStatus() {
 	m.clearedold_status = true
 	m.clearedFields[invoicehistory.FieldOldStatusCode] = struct{}{}
 }
 
-// OldStatusCleared reports if the "old_status" edge to the OrderStatusCode entity was cleared.
+// OldStatusCleared reports if the "old_status" edge to the InvoiceStatusCode entity was cleared.
 func (m *InvoiceHistoryMutation) OldStatusCleared() bool {
 	return m.OldStatusCodeCleared() || m.clearedold_status
 }
@@ -2992,18 +3055,18 @@ func (m *InvoiceHistoryMutation) ResetOldStatus() {
 	m.clearedold_status = false
 }
 
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by id.
+// SetNewStatusID sets the "new_status" edge to the InvoiceStatusCode entity by id.
 func (m *InvoiceHistoryMutation) SetNewStatusID(id int) {
 	m.new_status = &id
 }
 
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
+// ClearNewStatus clears the "new_status" edge to the InvoiceStatusCode entity.
 func (m *InvoiceHistoryMutation) ClearNewStatus() {
 	m.clearednew_status = true
 	m.clearedFields[invoicehistory.FieldNewStatusCode] = struct{}{}
 }
 
-// NewStatusCleared reports if the "new_status" edge to the OrderStatusCode entity was cleared.
+// NewStatusCleared reports if the "new_status" edge to the InvoiceStatusCode entity was cleared.
 func (m *InvoiceHistoryMutation) NewStatusCleared() bool {
 	return m.NewStatusCodeCleared() || m.clearednew_status
 }
@@ -3415,6 +3478,446 @@ func (m *InvoiceHistoryMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown InvoiceHistory edge %s", name)
+}
+
+// InvoiceStatusCodeMutation represents an operation that mutates the InvoiceStatusCode nodes in the graph.
+type InvoiceStatusCodeMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	updated_at     *time.Time
+	invoice_status *string
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*InvoiceStatusCode, error)
+	predicates     []predicate.InvoiceStatusCode
+}
+
+var _ ent.Mutation = (*InvoiceStatusCodeMutation)(nil)
+
+// invoicestatuscodeOption allows management of the mutation configuration using functional options.
+type invoicestatuscodeOption func(*InvoiceStatusCodeMutation)
+
+// newInvoiceStatusCodeMutation creates new mutation for the InvoiceStatusCode entity.
+func newInvoiceStatusCodeMutation(c config, op Op, opts ...invoicestatuscodeOption) *InvoiceStatusCodeMutation {
+	m := &InvoiceStatusCodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeInvoiceStatusCode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withInvoiceStatusCodeID sets the ID field of the mutation.
+func withInvoiceStatusCodeID(id int) invoicestatuscodeOption {
+	return func(m *InvoiceStatusCodeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *InvoiceStatusCode
+		)
+		m.oldValue = func(ctx context.Context) (*InvoiceStatusCode, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().InvoiceStatusCode.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withInvoiceStatusCode sets the old InvoiceStatusCode of the mutation.
+func withInvoiceStatusCode(node *InvoiceStatusCode) invoicestatuscodeOption {
+	return func(m *InvoiceStatusCodeMutation) {
+		m.oldValue = func(context.Context) (*InvoiceStatusCode, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m InvoiceStatusCodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m InvoiceStatusCodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of InvoiceStatusCode entities.
+func (m *InvoiceStatusCodeMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *InvoiceStatusCodeMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *InvoiceStatusCodeMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().InvoiceStatusCode.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *InvoiceStatusCodeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *InvoiceStatusCodeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the InvoiceStatusCode entity.
+// If the InvoiceStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvoiceStatusCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *InvoiceStatusCodeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *InvoiceStatusCodeMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *InvoiceStatusCodeMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the InvoiceStatusCode entity.
+// If the InvoiceStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvoiceStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *InvoiceStatusCodeMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetInvoiceStatus sets the "invoice_status" field.
+func (m *InvoiceStatusCodeMutation) SetInvoiceStatus(s string) {
+	m.invoice_status = &s
+}
+
+// InvoiceStatus returns the value of the "invoice_status" field in the mutation.
+func (m *InvoiceStatusCodeMutation) InvoiceStatus() (r string, exists bool) {
+	v := m.invoice_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvoiceStatus returns the old "invoice_status" field's value of the InvoiceStatusCode entity.
+// If the InvoiceStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvoiceStatusCodeMutation) OldInvoiceStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvoiceStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvoiceStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvoiceStatus: %w", err)
+	}
+	return oldValue.InvoiceStatus, nil
+}
+
+// ResetInvoiceStatus resets all changes to the "invoice_status" field.
+func (m *InvoiceStatusCodeMutation) ResetInvoiceStatus() {
+	m.invoice_status = nil
+}
+
+// Where appends a list predicates to the InvoiceStatusCodeMutation builder.
+func (m *InvoiceStatusCodeMutation) Where(ps ...predicate.InvoiceStatusCode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the InvoiceStatusCodeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *InvoiceStatusCodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.InvoiceStatusCode, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *InvoiceStatusCodeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *InvoiceStatusCodeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (InvoiceStatusCode).
+func (m *InvoiceStatusCodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *InvoiceStatusCodeMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.created_at != nil {
+		fields = append(fields, invoicestatuscode.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, invoicestatuscode.FieldUpdatedAt)
+	}
+	if m.invoice_status != nil {
+		fields = append(fields, invoicestatuscode.FieldInvoiceStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *InvoiceStatusCodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case invoicestatuscode.FieldCreatedAt:
+		return m.CreatedAt()
+	case invoicestatuscode.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case invoicestatuscode.FieldInvoiceStatus:
+		return m.InvoiceStatus()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *InvoiceStatusCodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case invoicestatuscode.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case invoicestatuscode.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case invoicestatuscode.FieldInvoiceStatus:
+		return m.OldInvoiceStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown InvoiceStatusCode field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvoiceStatusCodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case invoicestatuscode.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case invoicestatuscode.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case invoicestatuscode.FieldInvoiceStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvoiceStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvoiceStatusCode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *InvoiceStatusCodeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *InvoiceStatusCodeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvoiceStatusCodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown InvoiceStatusCode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *InvoiceStatusCodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *InvoiceStatusCodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *InvoiceStatusCodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown InvoiceStatusCode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *InvoiceStatusCodeMutation) ResetField(name string) error {
+	switch name {
+	case invoicestatuscode.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case invoicestatuscode.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case invoicestatuscode.FieldInvoiceStatus:
+		m.ResetInvoiceStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown InvoiceStatusCode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *InvoiceStatusCodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *InvoiceStatusCodeMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *InvoiceStatusCodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *InvoiceStatusCodeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *InvoiceStatusCodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *InvoiceStatusCodeMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *InvoiceStatusCodeMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown InvoiceStatusCode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *InvoiceStatusCodeMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown InvoiceStatusCode edge %s", name)
 }
 
 // MessageMutation represents an operation that mutates the Message nodes in the graph.
@@ -12819,24 +13322,25 @@ func (m *ProductTagMutation) ResetEdge(name string) error {
 // ShipmentMutation represents an operation that mutates the Shipment nodes in the graph.
 type ShipmentMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *string
-	created_at     *time.Time
-	updated_at     *time.Time
-	shipment_date  *time.Time
-	note           *string
-	status         *shipment.Status
-	clearedFields  map[string]struct{}
-	_order         *uuid.UUID
-	cleared_order  bool
-	invoice        *uuid.UUID
-	clearedinvoice bool
-	staff          *uuid.UUID
-	clearedstaff   bool
-	done           bool
-	oldValue       func(context.Context) (*Shipment, error)
-	predicates     []predicate.Shipment
+	op                     Op
+	typ                    string
+	id                     *string
+	created_at             *time.Time
+	updated_at             *time.Time
+	shipment_date          *time.Time
+	note                   *string
+	clearedFields          map[string]struct{}
+	_order                 *uuid.UUID
+	cleared_order          bool
+	invoice                *uuid.UUID
+	clearedinvoice         bool
+	staff                  *uuid.UUID
+	clearedstaff           bool
+	shipment_status        *int
+	clearedshipment_status bool
+	done                   bool
+	oldValue               func(context.Context) (*Shipment, error)
+	predicates             []predicate.Shipment
 }
 
 var _ ent.Mutation = (*ShipmentMutation)(nil)
@@ -13208,40 +13712,40 @@ func (m *ShipmentMutation) ResetNote() {
 	delete(m.clearedFields, shipment.FieldNote)
 }
 
-// SetStatus sets the "status" field.
-func (m *ShipmentMutation) SetStatus(s shipment.Status) {
-	m.status = &s
+// SetStatusCode sets the "status_code" field.
+func (m *ShipmentMutation) SetStatusCode(i int) {
+	m.shipment_status = &i
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *ShipmentMutation) Status() (r shipment.Status, exists bool) {
-	v := m.status
+// StatusCode returns the value of the "status_code" field in the mutation.
+func (m *ShipmentMutation) StatusCode() (r int, exists bool) {
+	v := m.shipment_status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Shipment entity.
+// OldStatusCode returns the old "status_code" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldStatus(ctx context.Context) (v shipment.Status, err error) {
+func (m *ShipmentMutation) OldStatusCode(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatusCode is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
+		return v, errors.New("OldStatusCode requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatusCode: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.StatusCode, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *ShipmentMutation) ResetStatus() {
-	m.status = nil
+// ResetStatusCode resets all changes to the "status_code" field.
+func (m *ShipmentMutation) ResetStatusCode() {
+	m.shipment_status = nil
 }
 
 // ClearOrder clears the "order" edge to the Order entity.
@@ -13325,6 +13829,46 @@ func (m *ShipmentMutation) ResetStaff() {
 	m.clearedstaff = false
 }
 
+// SetShipmentStatusID sets the "shipment_status" edge to the ShipmentStatusCode entity by id.
+func (m *ShipmentMutation) SetShipmentStatusID(id int) {
+	m.shipment_status = &id
+}
+
+// ClearShipmentStatus clears the "shipment_status" edge to the ShipmentStatusCode entity.
+func (m *ShipmentMutation) ClearShipmentStatus() {
+	m.clearedshipment_status = true
+	m.clearedFields[shipment.FieldStatusCode] = struct{}{}
+}
+
+// ShipmentStatusCleared reports if the "shipment_status" edge to the ShipmentStatusCode entity was cleared.
+func (m *ShipmentMutation) ShipmentStatusCleared() bool {
+	return m.clearedshipment_status
+}
+
+// ShipmentStatusID returns the "shipment_status" edge ID in the mutation.
+func (m *ShipmentMutation) ShipmentStatusID() (id int, exists bool) {
+	if m.shipment_status != nil {
+		return *m.shipment_status, true
+	}
+	return
+}
+
+// ShipmentStatusIDs returns the "shipment_status" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ShipmentStatusID instead. It exists only for internal usage by the builders.
+func (m *ShipmentMutation) ShipmentStatusIDs() (ids []int) {
+	if id := m.shipment_status; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetShipmentStatus resets all changes to the "shipment_status" edge.
+func (m *ShipmentMutation) ResetShipmentStatus() {
+	m.shipment_status = nil
+	m.clearedshipment_status = false
+}
+
 // Where appends a list predicates to the ShipmentMutation builder.
 func (m *ShipmentMutation) Where(ps ...predicate.Shipment) {
 	m.predicates = append(m.predicates, ps...)
@@ -13381,8 +13925,8 @@ func (m *ShipmentMutation) Fields() []string {
 	if m.note != nil {
 		fields = append(fields, shipment.FieldNote)
 	}
-	if m.status != nil {
-		fields = append(fields, shipment.FieldStatus)
+	if m.shipment_status != nil {
+		fields = append(fields, shipment.FieldStatusCode)
 	}
 	return fields
 }
@@ -13406,8 +13950,8 @@ func (m *ShipmentMutation) Field(name string) (ent.Value, bool) {
 		return m.ShipmentDate()
 	case shipment.FieldNote:
 		return m.Note()
-	case shipment.FieldStatus:
-		return m.Status()
+	case shipment.FieldStatusCode:
+		return m.StatusCode()
 	}
 	return nil, false
 }
@@ -13431,8 +13975,8 @@ func (m *ShipmentMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldShipmentDate(ctx)
 	case shipment.FieldNote:
 		return m.OldNote(ctx)
-	case shipment.FieldStatus:
-		return m.OldStatus(ctx)
+	case shipment.FieldStatusCode:
+		return m.OldStatusCode(ctx)
 	}
 	return nil, fmt.Errorf("unknown Shipment field %s", name)
 }
@@ -13491,12 +14035,12 @@ func (m *ShipmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetNote(v)
 		return nil
-	case shipment.FieldStatus:
-		v, ok := value.(shipment.Status)
+	case shipment.FieldStatusCode:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetStatusCode(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Shipment field %s", name)
@@ -13505,13 +14049,16 @@ func (m *ShipmentMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ShipmentMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ShipmentMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -13577,8 +14124,8 @@ func (m *ShipmentMutation) ResetField(name string) error {
 	case shipment.FieldNote:
 		m.ResetNote()
 		return nil
-	case shipment.FieldStatus:
-		m.ResetStatus()
+	case shipment.FieldStatusCode:
+		m.ResetStatusCode()
 		return nil
 	}
 	return fmt.Errorf("unknown Shipment field %s", name)
@@ -13586,7 +14133,7 @@ func (m *ShipmentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ShipmentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m._order != nil {
 		edges = append(edges, shipment.EdgeOrder)
 	}
@@ -13595,6 +14142,9 @@ func (m *ShipmentMutation) AddedEdges() []string {
 	}
 	if m.staff != nil {
 		edges = append(edges, shipment.EdgeStaff)
+	}
+	if m.shipment_status != nil {
+		edges = append(edges, shipment.EdgeShipmentStatus)
 	}
 	return edges
 }
@@ -13615,13 +14165,17 @@ func (m *ShipmentMutation) AddedIDs(name string) []ent.Value {
 		if id := m.staff; id != nil {
 			return []ent.Value{*id}
 		}
+	case shipment.EdgeShipmentStatus:
+		if id := m.shipment_status; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ShipmentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	return edges
 }
 
@@ -13633,7 +14187,7 @@ func (m *ShipmentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ShipmentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleared_order {
 		edges = append(edges, shipment.EdgeOrder)
 	}
@@ -13642,6 +14196,9 @@ func (m *ShipmentMutation) ClearedEdges() []string {
 	}
 	if m.clearedstaff {
 		edges = append(edges, shipment.EdgeStaff)
+	}
+	if m.clearedshipment_status {
+		edges = append(edges, shipment.EdgeShipmentStatus)
 	}
 	return edges
 }
@@ -13656,6 +14213,8 @@ func (m *ShipmentMutation) EdgeCleared(name string) bool {
 		return m.clearedinvoice
 	case shipment.EdgeStaff:
 		return m.clearedstaff
+	case shipment.EdgeShipmentStatus:
+		return m.clearedshipment_status
 	}
 	return false
 }
@@ -13673,6 +14232,9 @@ func (m *ShipmentMutation) ClearEdge(name string) error {
 	case shipment.EdgeStaff:
 		m.ClearStaff()
 		return nil
+	case shipment.EdgeShipmentStatus:
+		m.ClearShipmentStatus()
+		return nil
 	}
 	return fmt.Errorf("unknown Shipment unique edge %s", name)
 }
@@ -13689,6 +14251,9 @@ func (m *ShipmentMutation) ResetEdge(name string) error {
 		return nil
 	case shipment.EdgeStaff:
 		m.ResetStaff()
+		return nil
+	case shipment.EdgeShipmentStatus:
+		m.ResetShipmentStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Shipment edge %s", name)
@@ -14166,18 +14731,18 @@ func (m *ShipmentHistoryMutation) ResetPerson() {
 	m.clearedperson = false
 }
 
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by id.
+// SetOldStatusID sets the "old_status" edge to the ShipmentStatusCode entity by id.
 func (m *ShipmentHistoryMutation) SetOldStatusID(id int) {
 	m.old_status = &id
 }
 
-// ClearOldStatus clears the "old_status" edge to the OrderStatusCode entity.
+// ClearOldStatus clears the "old_status" edge to the ShipmentStatusCode entity.
 func (m *ShipmentHistoryMutation) ClearOldStatus() {
 	m.clearedold_status = true
 	m.clearedFields[shipmenthistory.FieldOldStatusCode] = struct{}{}
 }
 
-// OldStatusCleared reports if the "old_status" edge to the OrderStatusCode entity was cleared.
+// OldStatusCleared reports if the "old_status" edge to the ShipmentStatusCode entity was cleared.
 func (m *ShipmentHistoryMutation) OldStatusCleared() bool {
 	return m.OldStatusCodeCleared() || m.clearedold_status
 }
@@ -14206,18 +14771,18 @@ func (m *ShipmentHistoryMutation) ResetOldStatus() {
 	m.clearedold_status = false
 }
 
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by id.
+// SetNewStatusID sets the "new_status" edge to the ShipmentStatusCode entity by id.
 func (m *ShipmentHistoryMutation) SetNewStatusID(id int) {
 	m.new_status = &id
 }
 
-// ClearNewStatus clears the "new_status" edge to the OrderStatusCode entity.
+// ClearNewStatus clears the "new_status" edge to the ShipmentStatusCode entity.
 func (m *ShipmentHistoryMutation) ClearNewStatus() {
 	m.clearednew_status = true
 	m.clearedFields[shipmenthistory.FieldNewStatusCode] = struct{}{}
 }
 
-// NewStatusCleared reports if the "new_status" edge to the OrderStatusCode entity was cleared.
+// NewStatusCleared reports if the "new_status" edge to the ShipmentStatusCode entity was cleared.
 func (m *ShipmentHistoryMutation) NewStatusCleared() bool {
 	return m.NewStatusCodeCleared() || m.clearednew_status
 }
@@ -15400,6 +15965,446 @@ func (m *ShipmentItemMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown ShipmentItem edge %s", name)
+}
+
+// ShipmentStatusCodeMutation represents an operation that mutates the ShipmentStatusCode nodes in the graph.
+type ShipmentStatusCodeMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	created_at      *time.Time
+	updated_at      *time.Time
+	shipment_status *string
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*ShipmentStatusCode, error)
+	predicates      []predicate.ShipmentStatusCode
+}
+
+var _ ent.Mutation = (*ShipmentStatusCodeMutation)(nil)
+
+// shipmentstatuscodeOption allows management of the mutation configuration using functional options.
+type shipmentstatuscodeOption func(*ShipmentStatusCodeMutation)
+
+// newShipmentStatusCodeMutation creates new mutation for the ShipmentStatusCode entity.
+func newShipmentStatusCodeMutation(c config, op Op, opts ...shipmentstatuscodeOption) *ShipmentStatusCodeMutation {
+	m := &ShipmentStatusCodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeShipmentStatusCode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withShipmentStatusCodeID sets the ID field of the mutation.
+func withShipmentStatusCodeID(id int) shipmentstatuscodeOption {
+	return func(m *ShipmentStatusCodeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ShipmentStatusCode
+		)
+		m.oldValue = func(ctx context.Context) (*ShipmentStatusCode, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ShipmentStatusCode.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withShipmentStatusCode sets the old ShipmentStatusCode of the mutation.
+func withShipmentStatusCode(node *ShipmentStatusCode) shipmentstatuscodeOption {
+	return func(m *ShipmentStatusCodeMutation) {
+		m.oldValue = func(context.Context) (*ShipmentStatusCode, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ShipmentStatusCodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ShipmentStatusCodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ShipmentStatusCode entities.
+func (m *ShipmentStatusCodeMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ShipmentStatusCodeMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ShipmentStatusCodeMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ShipmentStatusCode.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ShipmentStatusCodeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ShipmentStatusCodeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ShipmentStatusCode entity.
+// If the ShipmentStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ShipmentStatusCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ShipmentStatusCodeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ShipmentStatusCodeMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ShipmentStatusCodeMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ShipmentStatusCode entity.
+// If the ShipmentStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ShipmentStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ShipmentStatusCodeMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetShipmentStatus sets the "shipment_status" field.
+func (m *ShipmentStatusCodeMutation) SetShipmentStatus(s string) {
+	m.shipment_status = &s
+}
+
+// ShipmentStatus returns the value of the "shipment_status" field in the mutation.
+func (m *ShipmentStatusCodeMutation) ShipmentStatus() (r string, exists bool) {
+	v := m.shipment_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldShipmentStatus returns the old "shipment_status" field's value of the ShipmentStatusCode entity.
+// If the ShipmentStatusCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ShipmentStatusCodeMutation) OldShipmentStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldShipmentStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldShipmentStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldShipmentStatus: %w", err)
+	}
+	return oldValue.ShipmentStatus, nil
+}
+
+// ResetShipmentStatus resets all changes to the "shipment_status" field.
+func (m *ShipmentStatusCodeMutation) ResetShipmentStatus() {
+	m.shipment_status = nil
+}
+
+// Where appends a list predicates to the ShipmentStatusCodeMutation builder.
+func (m *ShipmentStatusCodeMutation) Where(ps ...predicate.ShipmentStatusCode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ShipmentStatusCodeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ShipmentStatusCodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ShipmentStatusCode, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ShipmentStatusCodeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ShipmentStatusCodeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ShipmentStatusCode).
+func (m *ShipmentStatusCodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ShipmentStatusCodeMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.created_at != nil {
+		fields = append(fields, shipmentstatuscode.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, shipmentstatuscode.FieldUpdatedAt)
+	}
+	if m.shipment_status != nil {
+		fields = append(fields, shipmentstatuscode.FieldShipmentStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ShipmentStatusCodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case shipmentstatuscode.FieldCreatedAt:
+		return m.CreatedAt()
+	case shipmentstatuscode.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case shipmentstatuscode.FieldShipmentStatus:
+		return m.ShipmentStatus()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ShipmentStatusCodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case shipmentstatuscode.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case shipmentstatuscode.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case shipmentstatuscode.FieldShipmentStatus:
+		return m.OldShipmentStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown ShipmentStatusCode field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ShipmentStatusCodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case shipmentstatuscode.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case shipmentstatuscode.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case shipmentstatuscode.FieldShipmentStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetShipmentStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ShipmentStatusCode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ShipmentStatusCodeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ShipmentStatusCodeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ShipmentStatusCodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ShipmentStatusCode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ShipmentStatusCodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ShipmentStatusCodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ShipmentStatusCodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ShipmentStatusCode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ShipmentStatusCodeMutation) ResetField(name string) error {
+	switch name {
+	case shipmentstatuscode.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case shipmentstatuscode.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case shipmentstatuscode.FieldShipmentStatus:
+		m.ResetShipmentStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown ShipmentStatusCode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ShipmentStatusCodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ShipmentStatusCodeMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ShipmentStatusCodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ShipmentStatusCodeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ShipmentStatusCodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ShipmentStatusCodeMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ShipmentStatusCodeMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ShipmentStatusCode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ShipmentStatusCodeMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ShipmentStatusCode edge %s", name)
 }
 
 // TagMutation represents an operation that mutates the Tag nodes in the graph.

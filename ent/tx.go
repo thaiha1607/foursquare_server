@@ -20,6 +20,8 @@ type Tx struct {
 	Invoice *InvoiceClient
 	// InvoiceHistory is the client for interacting with the InvoiceHistory builders.
 	InvoiceHistory *InvoiceHistoryClient
+	// InvoiceStatusCode is the client for interacting with the InvoiceStatusCode builders.
+	InvoiceStatusCode *InvoiceStatusCodeClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
 	// Order is the client for interacting with the Order builders.
@@ -50,6 +52,8 @@ type Tx struct {
 	ShipmentHistory *ShipmentHistoryClient
 	// ShipmentItem is the client for interacting with the ShipmentItem builders.
 	ShipmentItem *ShipmentItemClient
+	// ShipmentStatusCode is the client for interacting with the ShipmentStatusCode builders.
+	ShipmentStatusCode *ShipmentStatusCodeClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// WarehouseAssignment is the client for interacting with the WarehouseAssignment builders.
@@ -191,6 +195,7 @@ func (tx *Tx) init() {
 	tx.Conversation = NewConversationClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
 	tx.InvoiceHistory = NewInvoiceHistoryClient(tx.config)
+	tx.InvoiceStatusCode = NewInvoiceStatusCodeClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderHistory = NewOrderHistoryClient(tx.config)
@@ -206,6 +211,7 @@ func (tx *Tx) init() {
 	tx.Shipment = NewShipmentClient(tx.config)
 	tx.ShipmentHistory = NewShipmentHistoryClient(tx.config)
 	tx.ShipmentItem = NewShipmentItemClient(tx.config)
+	tx.ShipmentStatusCode = NewShipmentStatusCodeClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.WarehouseAssignment = NewWarehouseAssignmentClient(tx.config)
 	tx.WorkUnitInfo = NewWorkUnitInfoClient(tx.config)

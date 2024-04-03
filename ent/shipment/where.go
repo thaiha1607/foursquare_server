@@ -101,6 +101,11 @@ func Note(v string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldEQ(FieldNote, v))
 }
 
+// StatusCode applies equality check predicate on the "status_code" field. It's identical to StatusCodeEQ.
+func StatusCode(v int) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEQ(FieldStatusCode, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Shipment {
 	return predicate.Shipment(sql.FieldEQ(FieldCreatedAt, v))
@@ -356,24 +361,24 @@ func NoteContainsFold(v string) predicate.Shipment {
 	return predicate.Shipment(sql.FieldContainsFold(FieldNote, v))
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Shipment {
-	return predicate.Shipment(sql.FieldEQ(FieldStatus, v))
+// StatusCodeEQ applies the EQ predicate on the "status_code" field.
+func StatusCodeEQ(v int) predicate.Shipment {
+	return predicate.Shipment(sql.FieldEQ(FieldStatusCode, v))
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Shipment {
-	return predicate.Shipment(sql.FieldNEQ(FieldStatus, v))
+// StatusCodeNEQ applies the NEQ predicate on the "status_code" field.
+func StatusCodeNEQ(v int) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNEQ(FieldStatusCode, v))
 }
 
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Shipment {
-	return predicate.Shipment(sql.FieldIn(FieldStatus, vs...))
+// StatusCodeIn applies the In predicate on the "status_code" field.
+func StatusCodeIn(vs ...int) predicate.Shipment {
+	return predicate.Shipment(sql.FieldIn(FieldStatusCode, vs...))
 }
 
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Shipment {
-	return predicate.Shipment(sql.FieldNotIn(FieldStatus, vs...))
+// StatusCodeNotIn applies the NotIn predicate on the "status_code" field.
+func StatusCodeNotIn(vs ...int) predicate.Shipment {
+	return predicate.Shipment(sql.FieldNotIn(FieldStatusCode, vs...))
 }
 
 // HasOrder applies the HasEdge predicate on the "order" edge.
@@ -437,6 +442,29 @@ func HasStaff() predicate.Shipment {
 func HasStaffWith(preds ...predicate.Person) predicate.Shipment {
 	return predicate.Shipment(func(s *sql.Selector) {
 		step := newStaffStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasShipmentStatus applies the HasEdge predicate on the "shipment_status" edge.
+func HasShipmentStatus() predicate.Shipment {
+	return predicate.Shipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, ShipmentStatusTable, ShipmentStatusColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasShipmentStatusWith applies the HasEdge predicate on the "shipment_status" edge with a given conditions (other predicates).
+func HasShipmentStatusWith(preds ...predicate.ShipmentStatusCode) predicate.Shipment {
+	return predicate.Shipment(func(s *sql.Selector) {
+		step := newShipmentStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

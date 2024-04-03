@@ -11,11 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentHistoryQuery is the builder for querying ShipmentHistory entities.
@@ -27,8 +27,8 @@ type ShipmentHistoryQuery struct {
 	predicates    []predicate.ShipmentHistory
 	withShipment  *ShipmentQuery
 	withPerson    *PersonQuery
-	withOldStatus *OrderStatusCodeQuery
-	withNewStatus *OrderStatusCodeQuery
+	withOldStatus *ShipmentStatusCodeQuery
+	withNewStatus *ShipmentStatusCodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -110,8 +110,8 @@ func (shq *ShipmentHistoryQuery) QueryPerson() *PersonQuery {
 }
 
 // QueryOldStatus chains the current query on the "old_status" edge.
-func (shq *ShipmentHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: shq.config}).Query()
+func (shq *ShipmentHistoryQuery) QueryOldStatus() *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: shq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := shq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -122,7 +122,7 @@ func (shq *ShipmentHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, selector),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.OldStatusTable, shipmenthistory.OldStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(shq.driver.Dialect(), step)
@@ -132,8 +132,8 @@ func (shq *ShipmentHistoryQuery) QueryOldStatus() *OrderStatusCodeQuery {
 }
 
 // QueryNewStatus chains the current query on the "new_status" edge.
-func (shq *ShipmentHistoryQuery) QueryNewStatus() *OrderStatusCodeQuery {
-	query := (&OrderStatusCodeClient{config: shq.config}).Query()
+func (shq *ShipmentHistoryQuery) QueryNewStatus() *ShipmentStatusCodeQuery {
+	query := (&ShipmentStatusCodeClient{config: shq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := shq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -144,7 +144,7 @@ func (shq *ShipmentHistoryQuery) QueryNewStatus() *OrderStatusCodeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(shipmenthistory.Table, shipmenthistory.FieldID, selector),
-			sqlgraph.To(orderstatuscode.Table, orderstatuscode.FieldID),
+			sqlgraph.To(shipmentstatuscode.Table, shipmentstatuscode.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, shipmenthistory.NewStatusTable, shipmenthistory.NewStatusColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(shq.driver.Dialect(), step)
@@ -379,8 +379,8 @@ func (shq *ShipmentHistoryQuery) WithPerson(opts ...func(*PersonQuery)) *Shipmen
 
 // WithOldStatus tells the query-builder to eager-load the nodes that are connected to
 // the "old_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (shq *ShipmentHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuery)) *ShipmentHistoryQuery {
-	query := (&OrderStatusCodeClient{config: shq.config}).Query()
+func (shq *ShipmentHistoryQuery) WithOldStatus(opts ...func(*ShipmentStatusCodeQuery)) *ShipmentHistoryQuery {
+	query := (&ShipmentStatusCodeClient{config: shq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -390,8 +390,8 @@ func (shq *ShipmentHistoryQuery) WithOldStatus(opts ...func(*OrderStatusCodeQuer
 
 // WithNewStatus tells the query-builder to eager-load the nodes that are connected to
 // the "new_status" edge. The optional arguments are used to configure the query builder of the edge.
-func (shq *ShipmentHistoryQuery) WithNewStatus(opts ...func(*OrderStatusCodeQuery)) *ShipmentHistoryQuery {
-	query := (&OrderStatusCodeClient{config: shq.config}).Query()
+func (shq *ShipmentHistoryQuery) WithNewStatus(opts ...func(*ShipmentStatusCodeQuery)) *ShipmentHistoryQuery {
+	query := (&ShipmentStatusCodeClient{config: shq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -516,13 +516,13 @@ func (shq *ShipmentHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	}
 	if query := shq.withOldStatus; query != nil {
 		if err := shq.loadOldStatus(ctx, query, nodes, nil,
-			func(n *ShipmentHistory, e *OrderStatusCode) { n.Edges.OldStatus = e }); err != nil {
+			func(n *ShipmentHistory, e *ShipmentStatusCode) { n.Edges.OldStatus = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := shq.withNewStatus; query != nil {
 		if err := shq.loadNewStatus(ctx, query, nodes, nil,
-			func(n *ShipmentHistory, e *OrderStatusCode) { n.Edges.NewStatus = e }); err != nil {
+			func(n *ShipmentHistory, e *ShipmentStatusCode) { n.Edges.NewStatus = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,7 +587,7 @@ func (shq *ShipmentHistoryQuery) loadPerson(ctx context.Context, query *PersonQu
 	}
 	return nil
 }
-func (shq *ShipmentHistoryQuery) loadOldStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *OrderStatusCode)) error {
+func (shq *ShipmentHistoryQuery) loadOldStatus(ctx context.Context, query *ShipmentStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *ShipmentStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ShipmentHistory)
 	for i := range nodes {
@@ -603,7 +603,7 @@ func (shq *ShipmentHistoryQuery) loadOldStatus(ctx context.Context, query *Order
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(orderstatuscode.IDIn(ids...))
+	query.Where(shipmentstatuscode.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -619,7 +619,7 @@ func (shq *ShipmentHistoryQuery) loadOldStatus(ctx context.Context, query *Order
 	}
 	return nil
 }
-func (shq *ShipmentHistoryQuery) loadNewStatus(ctx context.Context, query *OrderStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *OrderStatusCode)) error {
+func (shq *ShipmentHistoryQuery) loadNewStatus(ctx context.Context, query *ShipmentStatusCodeQuery, nodes []*ShipmentHistory, init func(*ShipmentHistory), assign func(*ShipmentHistory, *ShipmentStatusCode)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ShipmentHistory)
 	for i := range nodes {
@@ -635,7 +635,7 @@ func (shq *ShipmentHistoryQuery) loadNewStatus(ctx context.Context, query *Order
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(orderstatuscode.IDIn(ids...))
+	query.Where(shipmentstatuscode.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

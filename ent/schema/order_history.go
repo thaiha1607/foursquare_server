@@ -33,13 +33,16 @@ func (OrderHistory) Fields() []ent.Field {
 			Immutable(),
 		field.Int("old_status_code").
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 		field.Int("new_status_code").
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 		field.String("description").
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 	}
 }
 
@@ -58,10 +61,12 @@ func (OrderHistory) Edges() []ent.Edge {
 			Immutable(),
 		edge.To("old_status", OrderStatusCode.Type).
 			Field("old_status_code").
-			Unique(),
+			Unique().
+			Immutable(),
 		edge.To("new_status", OrderStatusCode.Type).
 			Field("new_status_code").
-			Unique(),
+			Unique().
+			Immutable(),
 	}
 }
 

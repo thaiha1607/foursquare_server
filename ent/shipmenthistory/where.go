@@ -449,7 +449,7 @@ func HasOldStatus() predicate.ShipmentHistory {
 }
 
 // HasOldStatusWith applies the HasEdge predicate on the "old_status" edge with a given conditions (other predicates).
-func HasOldStatusWith(preds ...predicate.OrderStatusCode) predicate.ShipmentHistory {
+func HasOldStatusWith(preds ...predicate.ShipmentStatusCode) predicate.ShipmentHistory {
 	return predicate.ShipmentHistory(func(s *sql.Selector) {
 		step := newOldStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -472,7 +472,7 @@ func HasNewStatus() predicate.ShipmentHistory {
 }
 
 // HasNewStatusWith applies the HasEdge predicate on the "new_status" edge with a given conditions (other predicates).
-func HasNewStatusWith(preds ...predicate.OrderStatusCode) predicate.ShipmentHistory {
+func HasNewStatusWith(preds ...predicate.ShipmentStatusCode) predicate.ShipmentHistory {
 	return predicate.ShipmentHistory(func(s *sql.Selector) {
 		step := newNewStatusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

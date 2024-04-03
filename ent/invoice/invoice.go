@@ -28,12 +28,14 @@ const (
 	FieldNote = "note"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldStatusCode holds the string denoting the status_code field in the database.
+	FieldStatusCode = "status_code"
 	// FieldPaymentMethod holds the string denoting the payment_method field in the database.
 	FieldPaymentMethod = "payment_method"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
+	// EdgeInvoiceStatus holds the string denoting the invoice_status edge name in mutations.
+	EdgeInvoiceStatus = "invoice_status"
 	// Table holds the table name of the invoice in the database.
 	Table = "invoices"
 	// OrderTable is the table that holds the order relation/edge.
@@ -43,6 +45,13 @@ const (
 	OrderInverseTable = "orders"
 	// OrderColumn is the table column denoting the order relation/edge.
 	OrderColumn = "order_id"
+	// InvoiceStatusTable is the table that holds the invoice_status relation/edge.
+	InvoiceStatusTable = "invoices"
+	// InvoiceStatusInverseTable is the table name for the InvoiceStatusCode entity.
+	// It exists in this package in order to avoid circular dependency with the "invoicestatuscode" package.
+	InvoiceStatusInverseTable = "invoice_status_codes"
+	// InvoiceStatusColumn is the table column denoting the invoice_status relation/edge.
+	InvoiceStatusColumn = "status_code"
 )
 
 // Columns holds all SQL columns for invoice fields.
@@ -54,7 +63,7 @@ var Columns = []string{
 	FieldTotal,
 	FieldNote,
 	FieldType,
-	FieldStatus,
+	FieldStatusCode,
 	FieldPaymentMethod,
 }
 
@@ -75,6 +84,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultStatusCode holds the default value on creation for the "status_code" field.
+	DefaultStatusCode int
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -112,40 +123,6 @@ func TypeValidator(_type Type) error {
 		return nil
 	default:
 		return fmt.Errorf("invoice: invalid enum value for type field: %q", _type)
-	}
-}
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusDraft is the default value of the Status enum.
-const DefaultStatus = StatusDraft
-
-// Status values.
-const (
-	StatusDraft    Status = "DRAFT"
-	StatusActive   Status = "ACTIVE"
-	StatusSent     Status = "SENT"
-	StatusDisputed Status = "DISPUTED"
-	StatusOverdue  Status = "OVERDUE"
-	StatusPartial  Status = "PARTIAL"
-	StatusPaid     Status = "PAID"
-	StatusVoid     Status = "VOID"
-	StatusDebt     Status = "DEBT"
-	StatusOther    Status = "OTHER"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusDraft, StatusActive, StatusSent, StatusDisputed, StatusOverdue, StatusPartial, StatusPaid, StatusVoid, StatusDebt, StatusOther:
-		return nil
-	default:
-		return fmt.Errorf("invoice: invalid enum value for status field: %q", s)
 	}
 }
 
@@ -219,9 +196,9 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+// ByStatusCode orders the results by the status_code field.
+func ByStatusCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatusCode, opts...).ToFunc()
 }
 
 // ByPaymentMethod orders the results by the payment_method field.
@@ -235,10 +212,24 @@ func ByOrderField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOrderStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByInvoiceStatusField orders the results by invoice_status field.
+func ByInvoiceStatusField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvoiceStatusStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, OrderTable, OrderColumn),
+	)
+}
+func newInvoiceStatusStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvoiceStatusInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, InvoiceStatusTable, InvoiceStatusColumn),
 	)
 }

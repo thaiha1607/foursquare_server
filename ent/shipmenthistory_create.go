@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentHistoryCreate is the builder for creating a ShipmentHistory entity.
@@ -130,13 +130,13 @@ func (shc *ShipmentHistoryCreate) SetPerson(p *Person) *ShipmentHistoryCreate {
 	return shc.SetPersonID(p.ID)
 }
 
-// SetOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID.
+// SetOldStatusID sets the "old_status" edge to the ShipmentStatusCode entity by ID.
 func (shc *ShipmentHistoryCreate) SetOldStatusID(id int) *ShipmentHistoryCreate {
 	shc.mutation.SetOldStatusID(id)
 	return shc
 }
 
-// SetNillableOldStatusID sets the "old_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+// SetNillableOldStatusID sets the "old_status" edge to the ShipmentStatusCode entity by ID if the given value is not nil.
 func (shc *ShipmentHistoryCreate) SetNillableOldStatusID(id *int) *ShipmentHistoryCreate {
 	if id != nil {
 		shc = shc.SetOldStatusID(*id)
@@ -144,18 +144,18 @@ func (shc *ShipmentHistoryCreate) SetNillableOldStatusID(id *int) *ShipmentHisto
 	return shc
 }
 
-// SetOldStatus sets the "old_status" edge to the OrderStatusCode entity.
-func (shc *ShipmentHistoryCreate) SetOldStatus(o *OrderStatusCode) *ShipmentHistoryCreate {
-	return shc.SetOldStatusID(o.ID)
+// SetOldStatus sets the "old_status" edge to the ShipmentStatusCode entity.
+func (shc *ShipmentHistoryCreate) SetOldStatus(s *ShipmentStatusCode) *ShipmentHistoryCreate {
+	return shc.SetOldStatusID(s.ID)
 }
 
-// SetNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID.
+// SetNewStatusID sets the "new_status" edge to the ShipmentStatusCode entity by ID.
 func (shc *ShipmentHistoryCreate) SetNewStatusID(id int) *ShipmentHistoryCreate {
 	shc.mutation.SetNewStatusID(id)
 	return shc
 }
 
-// SetNillableNewStatusID sets the "new_status" edge to the OrderStatusCode entity by ID if the given value is not nil.
+// SetNillableNewStatusID sets the "new_status" edge to the ShipmentStatusCode entity by ID if the given value is not nil.
 func (shc *ShipmentHistoryCreate) SetNillableNewStatusID(id *int) *ShipmentHistoryCreate {
 	if id != nil {
 		shc = shc.SetNewStatusID(*id)
@@ -163,9 +163,9 @@ func (shc *ShipmentHistoryCreate) SetNillableNewStatusID(id *int) *ShipmentHisto
 	return shc
 }
 
-// SetNewStatus sets the "new_status" edge to the OrderStatusCode entity.
-func (shc *ShipmentHistoryCreate) SetNewStatus(o *OrderStatusCode) *ShipmentHistoryCreate {
-	return shc.SetNewStatusID(o.ID)
+// SetNewStatus sets the "new_status" edge to the ShipmentStatusCode entity.
+func (shc *ShipmentHistoryCreate) SetNewStatus(s *ShipmentStatusCode) *ShipmentHistoryCreate {
+	return shc.SetNewStatusID(s.ID)
 }
 
 // Mutation returns the ShipmentHistoryMutation object of the builder.
@@ -331,7 +331,7 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 			Columns: []string{shipmenthistory.OldStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -348,7 +348,7 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 			Columns: []string{shipmenthistory.NewStatusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderstatuscode.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

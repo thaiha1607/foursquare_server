@@ -24,13 +24,14 @@ func (Shipment) Fields() []ent.Field {
 		field.Time("shipment_date"),
 		field.String("note").
 			Optional(),
-		field.Enum("status").
-			NamedValues(
-				"Pending", "PENDING",
-				"Accepted", "ACCEPTED",
-				"Rejected", "REJECTED",
-			).
-			Default("PENDING"),
+		/*
+			Status we might have:
+			- Pending
+			- Approved
+			- Rejected
+		*/
+		field.Int("status_code").
+			Default(1),
 	}
 }
 
@@ -52,6 +53,10 @@ func (Shipment) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Immutable(),
+		edge.To("shipment_status", ShipmentStatusCode.Type).
+			Field("status_code").
+			Unique().
+			Required(),
 	}
 }
 

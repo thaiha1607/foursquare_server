@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/thaiha1607/foursquare_server/ent/predicate"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentUpdate is the builder for updating Shipment entities.
@@ -68,23 +69,40 @@ func (su *ShipmentUpdate) ClearNote() *ShipmentUpdate {
 	return su
 }
 
-// SetStatus sets the "status" field.
-func (su *ShipmentUpdate) SetStatus(s shipment.Status) *ShipmentUpdate {
-	su.mutation.SetStatus(s)
+// SetStatusCode sets the "status_code" field.
+func (su *ShipmentUpdate) SetStatusCode(i int) *ShipmentUpdate {
+	su.mutation.SetStatusCode(i)
 	return su
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (su *ShipmentUpdate) SetNillableStatus(s *shipment.Status) *ShipmentUpdate {
-	if s != nil {
-		su.SetStatus(*s)
+// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
+func (su *ShipmentUpdate) SetNillableStatusCode(i *int) *ShipmentUpdate {
+	if i != nil {
+		su.SetStatusCode(*i)
 	}
 	return su
+}
+
+// SetShipmentStatusID sets the "shipment_status" edge to the ShipmentStatusCode entity by ID.
+func (su *ShipmentUpdate) SetShipmentStatusID(id int) *ShipmentUpdate {
+	su.mutation.SetShipmentStatusID(id)
+	return su
+}
+
+// SetShipmentStatus sets the "shipment_status" edge to the ShipmentStatusCode entity.
+func (su *ShipmentUpdate) SetShipmentStatus(s *ShipmentStatusCode) *ShipmentUpdate {
+	return su.SetShipmentStatusID(s.ID)
 }
 
 // Mutation returns the ShipmentMutation object of the builder.
 func (su *ShipmentUpdate) Mutation() *ShipmentMutation {
 	return su.mutation
+}
+
+// ClearShipmentStatus clears the "shipment_status" edge to the ShipmentStatusCode entity.
+func (su *ShipmentUpdate) ClearShipmentStatus() *ShipmentUpdate {
+	su.mutation.ClearShipmentStatus()
+	return su
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -131,11 +149,6 @@ func (su *ShipmentUpdate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *ShipmentUpdate) check() error {
-	if v, ok := su.mutation.Status(); ok {
-		if err := shipment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
-		}
-	}
 	if _, ok := su.mutation.OrderID(); su.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.order"`)
 	}
@@ -144,6 +157,9 @@ func (su *ShipmentUpdate) check() error {
 	}
 	if _, ok := su.mutation.StaffID(); su.mutation.StaffCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.staff"`)
+	}
+	if _, ok := su.mutation.ShipmentStatusID(); su.mutation.ShipmentStatusCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Shipment.shipment_status"`)
 	}
 	return nil
 }
@@ -172,8 +188,34 @@ func (su *ShipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.NoteCleared() {
 		_spec.ClearField(shipment.FieldNote, field.TypeString)
 	}
-	if value, ok := su.mutation.Status(); ok {
-		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
+	if su.mutation.ShipmentStatusCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.ShipmentStatusTable,
+			Columns: []string{shipment.ShipmentStatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ShipmentStatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.ShipmentStatusTable,
+			Columns: []string{shipment.ShipmentStatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -235,23 +277,40 @@ func (suo *ShipmentUpdateOne) ClearNote() *ShipmentUpdateOne {
 	return suo
 }
 
-// SetStatus sets the "status" field.
-func (suo *ShipmentUpdateOne) SetStatus(s shipment.Status) *ShipmentUpdateOne {
-	suo.mutation.SetStatus(s)
+// SetStatusCode sets the "status_code" field.
+func (suo *ShipmentUpdateOne) SetStatusCode(i int) *ShipmentUpdateOne {
+	suo.mutation.SetStatusCode(i)
 	return suo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (suo *ShipmentUpdateOne) SetNillableStatus(s *shipment.Status) *ShipmentUpdateOne {
-	if s != nil {
-		suo.SetStatus(*s)
+// SetNillableStatusCode sets the "status_code" field if the given value is not nil.
+func (suo *ShipmentUpdateOne) SetNillableStatusCode(i *int) *ShipmentUpdateOne {
+	if i != nil {
+		suo.SetStatusCode(*i)
 	}
 	return suo
+}
+
+// SetShipmentStatusID sets the "shipment_status" edge to the ShipmentStatusCode entity by ID.
+func (suo *ShipmentUpdateOne) SetShipmentStatusID(id int) *ShipmentUpdateOne {
+	suo.mutation.SetShipmentStatusID(id)
+	return suo
+}
+
+// SetShipmentStatus sets the "shipment_status" edge to the ShipmentStatusCode entity.
+func (suo *ShipmentUpdateOne) SetShipmentStatus(s *ShipmentStatusCode) *ShipmentUpdateOne {
+	return suo.SetShipmentStatusID(s.ID)
 }
 
 // Mutation returns the ShipmentMutation object of the builder.
 func (suo *ShipmentUpdateOne) Mutation() *ShipmentMutation {
 	return suo.mutation
+}
+
+// ClearShipmentStatus clears the "shipment_status" edge to the ShipmentStatusCode entity.
+func (suo *ShipmentUpdateOne) ClearShipmentStatus() *ShipmentUpdateOne {
+	suo.mutation.ClearShipmentStatus()
+	return suo
 }
 
 // Where appends a list predicates to the ShipmentUpdate builder.
@@ -311,11 +370,6 @@ func (suo *ShipmentUpdateOne) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *ShipmentUpdateOne) check() error {
-	if v, ok := suo.mutation.Status(); ok {
-		if err := shipment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Shipment.status": %w`, err)}
-		}
-	}
 	if _, ok := suo.mutation.OrderID(); suo.mutation.OrderCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.order"`)
 	}
@@ -324,6 +378,9 @@ func (suo *ShipmentUpdateOne) check() error {
 	}
 	if _, ok := suo.mutation.StaffID(); suo.mutation.StaffCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Shipment.staff"`)
+	}
+	if _, ok := suo.mutation.ShipmentStatusID(); suo.mutation.ShipmentStatusCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Shipment.shipment_status"`)
 	}
 	return nil
 }
@@ -369,8 +426,34 @@ func (suo *ShipmentUpdateOne) sqlSave(ctx context.Context) (_node *Shipment, err
 	if suo.mutation.NoteCleared() {
 		_spec.ClearField(shipment.FieldNote, field.TypeString)
 	}
-	if value, ok := suo.mutation.Status(); ok {
-		_spec.SetField(shipment.FieldStatus, field.TypeEnum, value)
+	if suo.mutation.ShipmentStatusCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.ShipmentStatusTable,
+			Columns: []string{shipment.ShipmentStatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ShipmentStatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   shipment.ShipmentStatusTable,
+			Columns: []string{shipment.ShipmentStatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(shipmentstatuscode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Shipment{config: suo.config}
 	_spec.Assign = _node.assignValues

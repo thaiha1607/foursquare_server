@@ -10,10 +10,10 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/thaiha1607/foursquare_server/ent/orderstatuscode"
 	"github.com/thaiha1607/foursquare_server/ent/person"
 	"github.com/thaiha1607/foursquare_server/ent/shipment"
 	"github.com/thaiha1607/foursquare_server/ent/shipmenthistory"
+	"github.com/thaiha1607/foursquare_server/ent/shipmentstatuscode"
 )
 
 // ShipmentHistory is the model entity for the ShipmentHistory schema.
@@ -48,9 +48,9 @@ type ShipmentHistoryEdges struct {
 	// Person holds the value of the person edge.
 	Person *Person `json:"person,omitempty"`
 	// OldStatus holds the value of the old_status edge.
-	OldStatus *OrderStatusCode `json:"old_status,omitempty"`
+	OldStatus *ShipmentStatusCode `json:"old_status,omitempty"`
 	// NewStatus holds the value of the new_status edge.
-	NewStatus *OrderStatusCode `json:"new_status,omitempty"`
+	NewStatus *ShipmentStatusCode `json:"new_status,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
@@ -80,22 +80,22 @@ func (e ShipmentHistoryEdges) PersonOrErr() (*Person, error) {
 
 // OldStatusOrErr returns the OldStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ShipmentHistoryEdges) OldStatusOrErr() (*OrderStatusCode, error) {
+func (e ShipmentHistoryEdges) OldStatusOrErr() (*ShipmentStatusCode, error) {
 	if e.OldStatus != nil {
 		return e.OldStatus, nil
 	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: orderstatuscode.Label}
+		return nil, &NotFoundError{label: shipmentstatuscode.Label}
 	}
 	return nil, &NotLoadedError{edge: "old_status"}
 }
 
 // NewStatusOrErr returns the NewStatus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ShipmentHistoryEdges) NewStatusOrErr() (*OrderStatusCode, error) {
+func (e ShipmentHistoryEdges) NewStatusOrErr() (*ShipmentStatusCode, error) {
 	if e.NewStatus != nil {
 		return e.NewStatus, nil
 	} else if e.loadedTypes[3] {
-		return nil, &NotFoundError{label: orderstatuscode.Label}
+		return nil, &NotFoundError{label: shipmentstatuscode.Label}
 	}
 	return nil, &NotLoadedError{edge: "new_status"}
 }
@@ -203,12 +203,12 @@ func (sh *ShipmentHistory) QueryPerson() *PersonQuery {
 }
 
 // QueryOldStatus queries the "old_status" edge of the ShipmentHistory entity.
-func (sh *ShipmentHistory) QueryOldStatus() *OrderStatusCodeQuery {
+func (sh *ShipmentHistory) QueryOldStatus() *ShipmentStatusCodeQuery {
 	return NewShipmentHistoryClient(sh.config).QueryOldStatus(sh)
 }
 
 // QueryNewStatus queries the "new_status" edge of the ShipmentHistory entity.
-func (sh *ShipmentHistory) QueryNewStatus() *OrderStatusCodeQuery {
+func (sh *ShipmentHistory) QueryNewStatus() *ShipmentStatusCodeQuery {
 	return NewShipmentHistoryClient(sh.config).QueryNewStatus(sh)
 }
 
