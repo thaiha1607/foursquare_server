@@ -17,7 +17,7 @@ type InvoiceHistory struct {
 // Annotations of the InvoiceHistory.
 func (InvoiceHistory) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "invoice_histories"},
+		entsql.Annotation{Table: "invoice_history"},
 	}
 }
 

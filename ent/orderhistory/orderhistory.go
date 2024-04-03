@@ -38,30 +38,30 @@ const (
 	// EdgeNewStatus holds the string denoting the new_status edge name in mutations.
 	EdgeNewStatus = "new_status"
 	// Table holds the table name of the orderhistory in the database.
-	Table = "order_histories"
+	Table = "order_history"
 	// OrderTable is the table that holds the order relation/edge.
-	OrderTable = "order_histories"
+	OrderTable = "order_history"
 	// OrderInverseTable is the table name for the Order entity.
 	// It exists in this package in order to avoid circular dependency with the "order" package.
 	OrderInverseTable = "orders"
 	// OrderColumn is the table column denoting the order relation/edge.
 	OrderColumn = "order_id"
 	// PersonTable is the table that holds the person relation/edge.
-	PersonTable = "order_histories"
+	PersonTable = "order_history"
 	// PersonInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
 	PersonInverseTable = "persons"
 	// PersonColumn is the table column denoting the person relation/edge.
 	PersonColumn = "person_id"
 	// OldStatusTable is the table that holds the old_status relation/edge.
-	OldStatusTable = "order_histories"
+	OldStatusTable = "order_history"
 	// OldStatusInverseTable is the table name for the OrderStatusCode entity.
 	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
 	OldStatusInverseTable = "order_status_codes"
 	// OldStatusColumn is the table column denoting the old_status relation/edge.
 	OldStatusColumn = "old_status_code"
 	// NewStatusTable is the table that holds the new_status relation/edge.
-	NewStatusTable = "order_histories"
+	NewStatusTable = "order_history"
 	// NewStatusInverseTable is the table name for the OrderStatusCode entity.
 	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
 	NewStatusInverseTable = "order_status_codes"

@@ -17,7 +17,7 @@ type ShipmentHistory struct {
 // Annotations of the ShipmentHistory.
 func (ShipmentHistory) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "shipment_histories"},
+		entsql.Annotation{Table: "shipment_history"},
 	}
 }
 

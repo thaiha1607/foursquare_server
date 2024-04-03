@@ -90,8 +90,8 @@ var (
 			},
 		},
 	}
-	// InvoiceHistoriesColumns holds the columns for the "invoice_histories" table.
-	InvoiceHistoriesColumns = []*schema.Column{
+	// InvoiceHistoryColumns holds the columns for the "invoice_history" table.
+	InvoiceHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -101,33 +101,33 @@ var (
 		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
-	// InvoiceHistoriesTable holds the schema information for the "invoice_histories" table.
-	InvoiceHistoriesTable = &schema.Table{
-		Name:       "invoice_histories",
-		Columns:    InvoiceHistoriesColumns,
-		PrimaryKey: []*schema.Column{InvoiceHistoriesColumns[0]},
+	// InvoiceHistoryTable holds the schema information for the "invoice_history" table.
+	InvoiceHistoryTable = &schema.Table{
+		Name:       "invoice_history",
+		Columns:    InvoiceHistoryColumns,
+		PrimaryKey: []*schema.Column{InvoiceHistoryColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "invoice_histories_invoices_invoice",
-				Columns:    []*schema.Column{InvoiceHistoriesColumns[4]},
+				Symbol:     "invoice_history_invoices_invoice",
+				Columns:    []*schema.Column{InvoiceHistoryColumns[4]},
 				RefColumns: []*schema.Column{InvoicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "invoice_histories_persons_person",
-				Columns:    []*schema.Column{InvoiceHistoriesColumns[5]},
+				Symbol:     "invoice_history_persons_person",
+				Columns:    []*schema.Column{InvoiceHistoryColumns[5]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "invoice_histories_order_status_codes_old_status",
-				Columns:    []*schema.Column{InvoiceHistoriesColumns[6]},
+				Symbol:     "invoice_history_order_status_codes_old_status",
+				Columns:    []*schema.Column{InvoiceHistoryColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "invoice_histories_order_status_codes_new_status",
-				Columns:    []*schema.Column{InvoiceHistoriesColumns[7]},
+				Symbol:     "invoice_history_order_status_codes_new_status",
+				Columns:    []*schema.Column{InvoiceHistoryColumns[7]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -225,8 +225,8 @@ var (
 			},
 		},
 	}
-	// OrderHistoriesColumns holds the columns for the "order_histories" table.
-	OrderHistoriesColumns = []*schema.Column{
+	// OrderHistoryColumns holds the columns for the "order_history" table.
+	OrderHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -236,33 +236,33 @@ var (
 		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
-	// OrderHistoriesTable holds the schema information for the "order_histories" table.
-	OrderHistoriesTable = &schema.Table{
-		Name:       "order_histories",
-		Columns:    OrderHistoriesColumns,
-		PrimaryKey: []*schema.Column{OrderHistoriesColumns[0]},
+	// OrderHistoryTable holds the schema information for the "order_history" table.
+	OrderHistoryTable = &schema.Table{
+		Name:       "order_history",
+		Columns:    OrderHistoryColumns,
+		PrimaryKey: []*schema.Column{OrderHistoryColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "order_histories_orders_order",
-				Columns:    []*schema.Column{OrderHistoriesColumns[4]},
+				Symbol:     "order_history_orders_order",
+				Columns:    []*schema.Column{OrderHistoryColumns[4]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "order_histories_persons_person",
-				Columns:    []*schema.Column{OrderHistoriesColumns[5]},
+				Symbol:     "order_history_persons_person",
+				Columns:    []*schema.Column{OrderHistoryColumns[5]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "order_histories_order_status_codes_old_status",
-				Columns:    []*schema.Column{OrderHistoriesColumns[6]},
+				Symbol:     "order_history_order_status_codes_old_status",
+				Columns:    []*schema.Column{OrderHistoryColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "order_histories_order_status_codes_new_status",
-				Columns:    []*schema.Column{OrderHistoriesColumns[7]},
+				Symbol:     "order_history_order_status_codes_new_status",
+				Columns:    []*schema.Column{OrderHistoryColumns[7]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -555,8 +555,8 @@ var (
 			},
 		},
 	}
-	// ShipmentHistoriesColumns holds the columns for the "shipment_histories" table.
-	ShipmentHistoriesColumns = []*schema.Column{
+	// ShipmentHistoryColumns holds the columns for the "shipment_history" table.
+	ShipmentHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -566,33 +566,33 @@ var (
 		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
 	}
-	// ShipmentHistoriesTable holds the schema information for the "shipment_histories" table.
-	ShipmentHistoriesTable = &schema.Table{
-		Name:       "shipment_histories",
-		Columns:    ShipmentHistoriesColumns,
-		PrimaryKey: []*schema.Column{ShipmentHistoriesColumns[0]},
+	// ShipmentHistoryTable holds the schema information for the "shipment_history" table.
+	ShipmentHistoryTable = &schema.Table{
+		Name:       "shipment_history",
+		Columns:    ShipmentHistoryColumns,
+		PrimaryKey: []*schema.Column{ShipmentHistoryColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "shipment_histories_shipments_shipment",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[4]},
+				Symbol:     "shipment_history_shipments_shipment",
+				Columns:    []*schema.Column{ShipmentHistoryColumns[4]},
 				RefColumns: []*schema.Column{ShipmentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "shipment_histories_persons_person",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[5]},
+				Symbol:     "shipment_history_persons_person",
+				Columns:    []*schema.Column{ShipmentHistoryColumns[5]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "shipment_histories_order_status_codes_old_status",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[6]},
+				Symbol:     "shipment_history_order_status_codes_old_status",
+				Columns:    []*schema.Column{ShipmentHistoryColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "shipment_histories_order_status_codes_new_status",
-				Columns:    []*schema.Column{ShipmentHistoriesColumns[7]},
+				Symbol:     "shipment_history_order_status_codes_new_status",
+				Columns:    []*schema.Column{ShipmentHistoryColumns[7]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -714,10 +714,10 @@ var (
 		AddressesTable,
 		ConversationsTable,
 		InvoicesTable,
-		InvoiceHistoriesTable,
+		InvoiceHistoryTable,
 		MessagesTable,
 		OrdersTable,
-		OrderHistoriesTable,
+		OrderHistoryTable,
 		OrderItemsTable,
 		OrderStatusCodesTable,
 		PersonsTable,
@@ -728,7 +728,7 @@ var (
 		ProductQtyTable,
 		ProductTagsTable,
 		ShipmentsTable,
-		ShipmentHistoriesTable,
+		ShipmentHistoryTable,
 		InvoiceLineItemsTable,
 		TagsTable,
 		WarehouseAssignmentsTable,
@@ -740,12 +740,12 @@ func init() {
 	ConversationsTable.ForeignKeys[0].RefTable = PersonsTable
 	ConversationsTable.ForeignKeys[1].RefTable = PersonsTable
 	InvoicesTable.ForeignKeys[0].RefTable = OrdersTable
-	InvoiceHistoriesTable.ForeignKeys[0].RefTable = InvoicesTable
-	InvoiceHistoriesTable.ForeignKeys[1].RefTable = PersonsTable
-	InvoiceHistoriesTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
-	InvoiceHistoriesTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
-	InvoiceHistoriesTable.Annotation = &entsql.Annotation{
-		Table: "invoice_histories",
+	InvoiceHistoryTable.ForeignKeys[0].RefTable = InvoicesTable
+	InvoiceHistoryTable.ForeignKeys[1].RefTable = PersonsTable
+	InvoiceHistoryTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
+	InvoiceHistoryTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
+	InvoiceHistoryTable.Annotation = &entsql.Annotation{
+		Table: "invoice_history",
 	}
 	MessagesTable.ForeignKeys[0].RefTable = ConversationsTable
 	MessagesTable.ForeignKeys[1].RefTable = PersonsTable
@@ -755,12 +755,12 @@ func init() {
 	OrdersTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
 	OrdersTable.ForeignKeys[4].RefTable = PersonsTable
 	OrdersTable.ForeignKeys[5].RefTable = AddressesTable
-	OrderHistoriesTable.ForeignKeys[0].RefTable = OrdersTable
-	OrderHistoriesTable.ForeignKeys[1].RefTable = PersonsTable
-	OrderHistoriesTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
-	OrderHistoriesTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
-	OrderHistoriesTable.Annotation = &entsql.Annotation{
-		Table: "order_histories",
+	OrderHistoryTable.ForeignKeys[0].RefTable = OrdersTable
+	OrderHistoryTable.ForeignKeys[1].RefTable = PersonsTable
+	OrderHistoryTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
+	OrderHistoryTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
+	OrderHistoryTable.Annotation = &entsql.Annotation{
+		Table: "order_history",
 	}
 	OrderItemsTable.ForeignKeys[0].RefTable = OrdersTable
 	OrderItemsTable.ForeignKeys[1].RefTable = ProductInfoTable
@@ -803,12 +803,12 @@ func init() {
 	ShipmentsTable.ForeignKeys[0].RefTable = OrdersTable
 	ShipmentsTable.ForeignKeys[1].RefTable = InvoicesTable
 	ShipmentsTable.ForeignKeys[2].RefTable = PersonsTable
-	ShipmentHistoriesTable.ForeignKeys[0].RefTable = ShipmentsTable
-	ShipmentHistoriesTable.ForeignKeys[1].RefTable = PersonsTable
-	ShipmentHistoriesTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
-	ShipmentHistoriesTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
-	ShipmentHistoriesTable.Annotation = &entsql.Annotation{
-		Table: "shipment_histories",
+	ShipmentHistoryTable.ForeignKeys[0].RefTable = ShipmentsTable
+	ShipmentHistoryTable.ForeignKeys[1].RefTable = PersonsTable
+	ShipmentHistoryTable.ForeignKeys[2].RefTable = OrderStatusCodesTable
+	ShipmentHistoryTable.ForeignKeys[3].RefTable = OrderStatusCodesTable
+	ShipmentHistoryTable.Annotation = &entsql.Annotation{
+		Table: "shipment_history",
 	}
 	InvoiceLineItemsTable.ForeignKeys[0].RefTable = ShipmentsTable
 	InvoiceLineItemsTable.ForeignKeys[1].RefTable = OrderItemsTable

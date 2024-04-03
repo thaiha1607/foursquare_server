@@ -38,30 +38,30 @@ const (
 	// EdgeNewStatus holds the string denoting the new_status edge name in mutations.
 	EdgeNewStatus = "new_status"
 	// Table holds the table name of the shipmenthistory in the database.
-	Table = "shipment_histories"
+	Table = "shipment_history"
 	// ShipmentTable is the table that holds the shipment relation/edge.
-	ShipmentTable = "shipment_histories"
+	ShipmentTable = "shipment_history"
 	// ShipmentInverseTable is the table name for the Shipment entity.
 	// It exists in this package in order to avoid circular dependency with the "shipment" package.
 	ShipmentInverseTable = "shipments"
 	// ShipmentColumn is the table column denoting the shipment relation/edge.
 	ShipmentColumn = "shipment_id"
 	// PersonTable is the table that holds the person relation/edge.
-	PersonTable = "shipment_histories"
+	PersonTable = "shipment_history"
 	// PersonInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
 	PersonInverseTable = "persons"
 	// PersonColumn is the table column denoting the person relation/edge.
 	PersonColumn = "person_id"
 	// OldStatusTable is the table that holds the old_status relation/edge.
-	OldStatusTable = "shipment_histories"
+	OldStatusTable = "shipment_history"
 	// OldStatusInverseTable is the table name for the OrderStatusCode entity.
 	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
 	OldStatusInverseTable = "order_status_codes"
 	// OldStatusColumn is the table column denoting the old_status relation/edge.
 	OldStatusColumn = "old_status_code"
 	// NewStatusTable is the table that holds the new_status relation/edge.
-	NewStatusTable = "shipment_histories"
+	NewStatusTable = "shipment_history"
 	// NewStatusInverseTable is the table name for the OrderStatusCode entity.
 	// It exists in this package in order to avoid circular dependency with the "orderstatuscode" package.
 	NewStatusInverseTable = "order_status_codes"

@@ -17,7 +17,7 @@ type OrderHistory struct {
 // Annotations of the OrderHistory.
 func (OrderHistory) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "order_histories"},
+		entsql.Annotation{Table: "order_history"},
 	}
 }
 
