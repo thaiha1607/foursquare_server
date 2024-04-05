@@ -23,7 +23,8 @@ func (Shipment) Fields() []ent.Field {
 			Immutable(),
 		field.Time("shipment_date"),
 		field.String("note").
-			Optional(),
+			Optional().
+			Nillable(),
 		/*
 			Status we might have:
 			- Pending

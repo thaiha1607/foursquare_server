@@ -441,6 +441,16 @@ func StaffIDNotIn(vs ...uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldStaffID, vs...))
 }
 
+// StaffIDIsNil applies the IsNil predicate on the "staff_id" field.
+func StaffIDIsNil() predicate.Order {
+	return predicate.Order(sql.FieldIsNull(FieldStaffID))
+}
+
+// StaffIDNotNil applies the NotNil predicate on the "staff_id" field.
+func StaffIDNotNil() predicate.Order {
+	return predicate.Order(sql.FieldNotNull(FieldStaffID))
+}
+
 // InternalNoteEQ applies the EQ predicate on the "internal_note" field.
 func InternalNoteEQ(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldInternalNote, v))

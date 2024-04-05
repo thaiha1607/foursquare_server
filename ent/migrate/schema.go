@@ -197,7 +197,7 @@ var (
 		{Name: "created_by", Type: field.TypeUUID},
 		{Name: "parent_order_id", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "status_code", Type: field.TypeInt, Default: 1},
-		{Name: "staff_id", Type: field.TypeUUID},
+		{Name: "staff_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "address_id", Type: field.TypeUUID},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
@@ -234,7 +234,7 @@ var (
 				Symbol:     "orders_persons_staff",
 				Columns:    []*schema.Column{OrdersColumns[12]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "orders_addresses_order_address",
@@ -538,7 +538,7 @@ var (
 	}
 	// ShipmentsColumns holds the columns for the "shipments" table.
 	ShipmentsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true, Size: 26},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "shipment_date", Type: field.TypeTime},
@@ -586,7 +586,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "shipment_id", Type: field.TypeString, Size: 26},
+		{Name: "shipment_id", Type: field.TypeString},
 		{Name: "person_id", Type: field.TypeUUID},
 		{Name: "old_status_code", Type: field.TypeInt, Nullable: true},
 		{Name: "new_status_code", Type: field.TypeInt, Nullable: true},
@@ -630,7 +630,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
-		{Name: "shipment_id", Type: field.TypeString, Size: 26},
+		{Name: "shipment_id", Type: field.TypeString},
 		{Name: "order_item_id", Type: field.TypeUUID},
 	}
 	// InvoiceLineItemsTable holds the schema information for the "invoice_line_items" table.

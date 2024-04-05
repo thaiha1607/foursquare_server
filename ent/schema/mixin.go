@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
+	"github.com/oklog/ulid/v2"
 	"github.com/thaiha1607/foursquare_server/ent/hook"
 )
 
@@ -31,9 +32,12 @@ type ULIDMixin struct {
 func (ULIDMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").
-			MaxLen(26).
 			Unique().
-			NotEmpty(),
+			NotEmpty().
+			Validate(func(s string) (err error) {
+				_, err = ulid.ParseStrict(s)
+				return
+			}),
 	}
 }
 

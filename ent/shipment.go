@@ -35,7 +35,7 @@ type Shipment struct {
 	// ShipmentDate holds the value of the "shipment_date" field.
 	ShipmentDate time.Time `json:"shipment_date,omitempty"`
 	// Note holds the value of the "note" field.
-	Note string `json:"note,omitempty"`
+	Note *string `json:"note,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
 	StatusCode int `json:"status_code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -177,7 +177,8 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field note", values[i])
 			} else if value.Valid {
-				s.Note = value.String
+				s.Note = new(string)
+				*s.Note = value.String
 			}
 		case shipment.FieldStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -259,8 +260,10 @@ func (s *Shipment) String() string {
 	builder.WriteString("shipment_date=")
 	builder.WriteString(s.ShipmentDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("note=")
-	builder.WriteString(s.Note)
+	if v := s.Note; v != nil {
+		builder.WriteString("note=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status_code=")
 	builder.WriteString(fmt.Sprintf("%v", s.StatusCode))

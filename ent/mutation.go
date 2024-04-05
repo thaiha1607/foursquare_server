@@ -5199,7 +5199,7 @@ func (m *OrderMutation) StaffID() (r uuid.UUID, exists bool) {
 // OldStaffID returns the old "staff_id" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldStaffID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *OrderMutation) OldStaffID(ctx context.Context) (v *uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStaffID is only allowed on UpdateOne operations")
 	}
@@ -5213,9 +5213,22 @@ func (m *OrderMutation) OldStaffID(ctx context.Context) (v uuid.UUID, err error)
 	return oldValue.StaffID, nil
 }
 
+// ClearStaffID clears the value of the "staff_id" field.
+func (m *OrderMutation) ClearStaffID() {
+	m.staff = nil
+	m.clearedFields[order.FieldStaffID] = struct{}{}
+}
+
+// StaffIDCleared returns if the "staff_id" field was cleared in this mutation.
+func (m *OrderMutation) StaffIDCleared() bool {
+	_, ok := m.clearedFields[order.FieldStaffID]
+	return ok
+}
+
 // ResetStaffID resets all changes to the "staff_id" field.
 func (m *OrderMutation) ResetStaffID() {
 	m.staff = nil
+	delete(m.clearedFields, order.FieldStaffID)
 }
 
 // SetInternalNote sets the "internal_note" field.
@@ -5481,7 +5494,7 @@ func (m *OrderMutation) ClearStaff() {
 
 // StaffCleared reports if the "staff" edge to the Person entity was cleared.
 func (m *OrderMutation) StaffCleared() bool {
-	return m.clearedstaff
+	return m.StaffIDCleared() || m.clearedstaff
 }
 
 // StaffIDs returns the "staff" edge IDs in the mutation.
@@ -5834,6 +5847,9 @@ func (m *OrderMutation) ClearedFields() []string {
 	if m.FieldCleared(order.FieldParentOrderID) {
 		fields = append(fields, order.FieldParentOrderID)
 	}
+	if m.FieldCleared(order.FieldStaffID) {
+		fields = append(fields, order.FieldStaffID)
+	}
 	if m.FieldCleared(order.FieldInternalNote) {
 		fields = append(fields, order.FieldInternalNote)
 	}
@@ -5856,6 +5872,9 @@ func (m *OrderMutation) ClearField(name string) error {
 		return nil
 	case order.FieldParentOrderID:
 		m.ClearParentOrderID()
+		return nil
+	case order.FieldStaffID:
+		m.ClearStaffID()
 		return nil
 	case order.FieldInternalNote:
 		m.ClearInternalNote()
@@ -8864,7 +8883,7 @@ func (m *PersonMutation) AvatarURL() (r string, exists bool) {
 // OldAvatarURL returns the old "avatar_url" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldAvatarURL(ctx context.Context) (v string, err error) {
+func (m *PersonMutation) OldAvatarURL(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAvatarURL is only allowed on UpdateOne operations")
 	}
@@ -13680,7 +13699,7 @@ func (m *ShipmentMutation) Note() (r string, exists bool) {
 // OldNote returns the old "note" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldNote(ctx context.Context) (v string, err error) {
+func (m *ShipmentMutation) OldNote(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNote is only allowed on UpdateOne operations")
 	}

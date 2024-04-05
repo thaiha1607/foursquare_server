@@ -284,7 +284,7 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Note(); ok {
 		_spec.SetField(shipment.FieldNote, field.TypeString, value)
-		_node.Note = value
+		_node.Note = &value
 	}
 	if nodes := sc.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

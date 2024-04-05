@@ -736,7 +736,10 @@ func (oq *OrderQuery) loadStaff(ctx context.Context, query *PersonQuery, nodes [
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
-		fk := nodes[i].StaffID
+		if nodes[i].StaffID == nil {
+			continue
+		}
+		fk := *nodes[i].StaffID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}

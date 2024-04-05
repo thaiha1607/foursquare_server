@@ -58,26 +58,6 @@ func (ou *OrderUpdate) ClearNote() *OrderUpdate {
 	return ou
 }
 
-// SetParentOrderID sets the "parent_order_id" field.
-func (ou *OrderUpdate) SetParentOrderID(u uuid.UUID) *OrderUpdate {
-	ou.mutation.SetParentOrderID(u)
-	return ou
-}
-
-// SetNillableParentOrderID sets the "parent_order_id" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableParentOrderID(u *uuid.UUID) *OrderUpdate {
-	if u != nil {
-		ou.SetParentOrderID(*u)
-	}
-	return ou
-}
-
-// ClearParentOrderID clears the value of the "parent_order_id" field.
-func (ou *OrderUpdate) ClearParentOrderID() *OrderUpdate {
-	ou.mutation.ClearParentOrderID()
-	return ou
-}
-
 // SetPriority sets the "priority" field.
 func (ou *OrderUpdate) SetPriority(i int) *OrderUpdate {
 	ou.mutation.ResetPriority()
@@ -127,6 +107,12 @@ func (ou *OrderUpdate) SetNillableStaffID(u *uuid.UUID) *OrderUpdate {
 	return ou
 }
 
+// ClearStaffID clears the value of the "staff_id" field.
+func (ou *OrderUpdate) ClearStaffID() *OrderUpdate {
+	ou.mutation.ClearStaffID()
+	return ou
+}
+
 // SetInternalNote sets the "internal_note" field.
 func (ou *OrderUpdate) SetInternalNote(s string) *OrderUpdate {
 	ou.mutation.SetInternalNote(s)
@@ -147,20 +133,6 @@ func (ou *OrderUpdate) ClearInternalNote() *OrderUpdate {
 	return ou
 }
 
-// SetIsInternal sets the "is_internal" field.
-func (ou *OrderUpdate) SetIsInternal(b bool) *OrderUpdate {
-	ou.mutation.SetIsInternal(b)
-	return ou
-}
-
-// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
-func (ou *OrderUpdate) SetNillableIsInternal(b *bool) *OrderUpdate {
-	if b != nil {
-		ou.SetIsInternal(*b)
-	}
-	return ou
-}
-
 // SetAddressID sets the "address_id" field.
 func (ou *OrderUpdate) SetAddressID(u uuid.UUID) *OrderUpdate {
 	ou.mutation.SetAddressID(u)
@@ -173,11 +145,6 @@ func (ou *OrderUpdate) SetNillableAddressID(u *uuid.UUID) *OrderUpdate {
 		ou.SetAddressID(*u)
 	}
 	return ou
-}
-
-// SetParentOrder sets the "parent_order" edge to the Order entity.
-func (ou *OrderUpdate) SetParentOrder(o *Order) *OrderUpdate {
-	return ou.SetParentOrderID(o.ID)
 }
 
 // SetOrderStatusID sets the "order_status" edge to the OrderStatusCode entity by ID.
@@ -210,12 +177,6 @@ func (ou *OrderUpdate) SetOrderAddress(a *Address) *OrderUpdate {
 // Mutation returns the OrderMutation object of the builder.
 func (ou *OrderUpdate) Mutation() *OrderMutation {
 	return ou.mutation
-}
-
-// ClearParentOrder clears the "parent_order" edge to the Order entity.
-func (ou *OrderUpdate) ClearParentOrder() *OrderUpdate {
-	ou.mutation.ClearParentOrder()
-	return ou
 }
 
 // ClearOrderStatus clears the "order_status" edge to the OrderStatusCode entity.
@@ -288,9 +249,6 @@ func (ou *OrderUpdate) check() error {
 	if _, ok := ou.mutation.OrderStatusID(); ou.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ou.mutation.StaffID(); ou.mutation.StaffCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.staff"`)
-	}
 	if _, ok := ou.mutation.OrderAddressID(); ou.mutation.OrderAddressCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_address"`)
 	}
@@ -329,38 +287,6 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ou.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
-	}
-	if value, ok := ou.mutation.IsInternal(); ok {
-		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-	}
-	if ou.mutation.ParentOrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   order.ParentOrderTable,
-			Columns: []string{order.ParentOrderColumn},
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.ParentOrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   order.ParentOrderTable,
-			Columns: []string{order.ParentOrderColumn},
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ou.mutation.OrderStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -495,26 +421,6 @@ func (ouo *OrderUpdateOne) ClearNote() *OrderUpdateOne {
 	return ouo
 }
 
-// SetParentOrderID sets the "parent_order_id" field.
-func (ouo *OrderUpdateOne) SetParentOrderID(u uuid.UUID) *OrderUpdateOne {
-	ouo.mutation.SetParentOrderID(u)
-	return ouo
-}
-
-// SetNillableParentOrderID sets the "parent_order_id" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableParentOrderID(u *uuid.UUID) *OrderUpdateOne {
-	if u != nil {
-		ouo.SetParentOrderID(*u)
-	}
-	return ouo
-}
-
-// ClearParentOrderID clears the value of the "parent_order_id" field.
-func (ouo *OrderUpdateOne) ClearParentOrderID() *OrderUpdateOne {
-	ouo.mutation.ClearParentOrderID()
-	return ouo
-}
-
 // SetPriority sets the "priority" field.
 func (ouo *OrderUpdateOne) SetPriority(i int) *OrderUpdateOne {
 	ouo.mutation.ResetPriority()
@@ -564,6 +470,12 @@ func (ouo *OrderUpdateOne) SetNillableStaffID(u *uuid.UUID) *OrderUpdateOne {
 	return ouo
 }
 
+// ClearStaffID clears the value of the "staff_id" field.
+func (ouo *OrderUpdateOne) ClearStaffID() *OrderUpdateOne {
+	ouo.mutation.ClearStaffID()
+	return ouo
+}
+
 // SetInternalNote sets the "internal_note" field.
 func (ouo *OrderUpdateOne) SetInternalNote(s string) *OrderUpdateOne {
 	ouo.mutation.SetInternalNote(s)
@@ -584,20 +496,6 @@ func (ouo *OrderUpdateOne) ClearInternalNote() *OrderUpdateOne {
 	return ouo
 }
 
-// SetIsInternal sets the "is_internal" field.
-func (ouo *OrderUpdateOne) SetIsInternal(b bool) *OrderUpdateOne {
-	ouo.mutation.SetIsInternal(b)
-	return ouo
-}
-
-// SetNillableIsInternal sets the "is_internal" field if the given value is not nil.
-func (ouo *OrderUpdateOne) SetNillableIsInternal(b *bool) *OrderUpdateOne {
-	if b != nil {
-		ouo.SetIsInternal(*b)
-	}
-	return ouo
-}
-
 // SetAddressID sets the "address_id" field.
 func (ouo *OrderUpdateOne) SetAddressID(u uuid.UUID) *OrderUpdateOne {
 	ouo.mutation.SetAddressID(u)
@@ -610,11 +508,6 @@ func (ouo *OrderUpdateOne) SetNillableAddressID(u *uuid.UUID) *OrderUpdateOne {
 		ouo.SetAddressID(*u)
 	}
 	return ouo
-}
-
-// SetParentOrder sets the "parent_order" edge to the Order entity.
-func (ouo *OrderUpdateOne) SetParentOrder(o *Order) *OrderUpdateOne {
-	return ouo.SetParentOrderID(o.ID)
 }
 
 // SetOrderStatusID sets the "order_status" edge to the OrderStatusCode entity by ID.
@@ -647,12 +540,6 @@ func (ouo *OrderUpdateOne) SetOrderAddress(a *Address) *OrderUpdateOne {
 // Mutation returns the OrderMutation object of the builder.
 func (ouo *OrderUpdateOne) Mutation() *OrderMutation {
 	return ouo.mutation
-}
-
-// ClearParentOrder clears the "parent_order" edge to the Order entity.
-func (ouo *OrderUpdateOne) ClearParentOrder() *OrderUpdateOne {
-	ouo.mutation.ClearParentOrder()
-	return ouo
 }
 
 // ClearOrderStatus clears the "order_status" edge to the OrderStatusCode entity.
@@ -738,9 +625,6 @@ func (ouo *OrderUpdateOne) check() error {
 	if _, ok := ouo.mutation.OrderStatusID(); ouo.mutation.OrderStatusCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_status"`)
 	}
-	if _, ok := ouo.mutation.StaffID(); ouo.mutation.StaffCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Order.staff"`)
-	}
 	if _, ok := ouo.mutation.OrderAddressID(); ouo.mutation.OrderAddressCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.order_address"`)
 	}
@@ -796,38 +680,6 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 	}
 	if ouo.mutation.InternalNoteCleared() {
 		_spec.ClearField(order.FieldInternalNote, field.TypeString)
-	}
-	if value, ok := ouo.mutation.IsInternal(); ok {
-		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-	}
-	if ouo.mutation.ParentOrderCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   order.ParentOrderTable,
-			Columns: []string{order.ParentOrderColumn},
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.ParentOrderIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   order.ParentOrderTable,
-			Columns: []string{order.ParentOrderColumn},
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ouo.mutation.OrderStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{

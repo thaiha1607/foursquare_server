@@ -140,6 +140,14 @@ func (oc *OrderCreate) SetStaffID(u uuid.UUID) *OrderCreate {
 	return oc
 }
 
+// SetNillableStaffID sets the "staff_id" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableStaffID(u *uuid.UUID) *OrderCreate {
+	if u != nil {
+		oc.SetStaffID(*u)
+	}
+	return oc
+}
+
 // SetInternalNote sets the "internal_note" field.
 func (oc *OrderCreate) SetInternalNote(s string) *OrderCreate {
 	oc.mutation.SetInternalNote(s)
@@ -334,9 +342,6 @@ func (oc *OrderCreate) check() error {
 	if _, ok := oc.mutation.StatusCode(); !ok {
 		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Order.status_code"`)}
 	}
-	if _, ok := oc.mutation.StaffID(); !ok {
-		return &ValidationError{Name: "staff_id", err: errors.New(`ent: missing required field "Order.staff_id"`)}
-	}
 	if _, ok := oc.mutation.IsInternal(); !ok {
 		return &ValidationError{Name: "is_internal", err: errors.New(`ent: missing required field "Order.is_internal"`)}
 	}
@@ -351,9 +356,6 @@ func (oc *OrderCreate) check() error {
 	}
 	if _, ok := oc.mutation.OrderStatusID(); !ok {
 		return &ValidationError{Name: "order_status", err: errors.New(`ent: missing required edge "Order.order_status"`)}
-	}
-	if _, ok := oc.mutation.StaffID(); !ok {
-		return &ValidationError{Name: "staff", err: errors.New(`ent: missing required edge "Order.staff"`)}
 	}
 	if _, ok := oc.mutation.OrderAddressID(); !ok {
 		return &ValidationError{Name: "order_address", err: errors.New(`ent: missing required edge "Order.order_address"`)}
@@ -503,7 +505,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.StaffID = nodes[0]
+		_node.StaffID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := oc.mutation.OrderAddressIDs(); len(nodes) > 0 {

@@ -40,7 +40,7 @@ type Order struct {
 	// StatusCode holds the value of the "status_code" field.
 	StatusCode int `json:"status_code,omitempty"`
 	// StaffID holds the value of the "staff_id" field.
-	StaffID uuid.UUID `json:"staff_id,omitempty"`
+	StaffID *uuid.UUID `json:"staff_id,omitempty"`
 	// InternalNote holds the value of the "internal_note" field.
 	InternalNote *string `json:"internal_note,omitempty"`
 	// IsInternal holds the value of the "is_internal" field.
@@ -143,7 +143,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case order.FieldParentOrderID:
+		case order.FieldParentOrderID, order.FieldStaffID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case order.FieldIsInternal:
 			values[i] = new(sql.NullBool)
@@ -153,7 +153,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldStaffID, order.FieldAddressID:
+		case order.FieldID, order.FieldCustomerID, order.FieldCreatedBy, order.FieldAddressID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -233,10 +233,11 @@ func (o *Order) assignValues(columns []string, values []any) error {
 				o.StatusCode = int(value.Int64)
 			}
 		case order.FieldStaffID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field staff_id", values[i])
-			} else if value != nil {
-				o.StaffID = *value
+			} else if value.Valid {
+				o.StaffID = new(uuid.UUID)
+				*o.StaffID = *value.S.(*uuid.UUID)
 			}
 		case order.FieldInternalNote:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -354,8 +355,10 @@ func (o *Order) String() string {
 	builder.WriteString("status_code=")
 	builder.WriteString(fmt.Sprintf("%v", o.StatusCode))
 	builder.WriteString(", ")
-	builder.WriteString("staff_id=")
-	builder.WriteString(fmt.Sprintf("%v", o.StaffID))
+	if v := o.StaffID; v != nil {
+		builder.WriteString("staff_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := o.InternalNote; v != nil {
 		builder.WriteString("internal_note=")

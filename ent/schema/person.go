@@ -28,7 +28,8 @@ func (Person) Fields() []ent.Field {
 					return err
 				},
 			).
-			Optional(),
+			Optional().
+			Nillable(),
 		field.String("email").
 			Validate(
 				func(s string) error {

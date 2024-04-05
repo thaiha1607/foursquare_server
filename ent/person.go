@@ -24,7 +24,7 @@ type Person struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
-	AvatarURL string `json:"avatar_url,omitempty"`
+	AvatarURL *string `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Name holds the value of the "name" field.
@@ -143,7 +143,8 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field avatar_url", values[i])
 			} else if value.Valid {
-				pe.AvatarURL = value.String
+				pe.AvatarURL = new(string)
+				*pe.AvatarURL = value.String
 			}
 		case person.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -252,8 +253,10 @@ func (pe *Person) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(pe.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("avatar_url=")
-	builder.WriteString(pe.AvatarURL)
+	if v := pe.AvatarURL; v != nil {
+		builder.WriteString("avatar_url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(pe.Email)

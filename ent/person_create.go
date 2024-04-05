@@ -346,7 +346,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.AvatarURL(); ok {
 		_spec.SetField(person.FieldAvatarURL, field.TypeString, value)
-		_node.AvatarURL = value
+		_node.AvatarURL = &value
 	}
 	if value, ok := pc.mutation.Email(); ok {
 		_spec.SetField(person.FieldEmail, field.TypeString, value)

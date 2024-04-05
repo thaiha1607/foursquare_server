@@ -27,7 +27,8 @@ func (Order) Fields() []ent.Field {
 			Immutable(),
 		field.UUID("parent_order_id", uuid.UUID{}).
 			Optional().
-			Nillable(),
+			Nillable().
+			Immutable(),
 		field.Int("priority").
 			Default(0).
 			Range(0, 100),
@@ -43,12 +44,15 @@ func (Order) Fields() []ent.Field {
 			Immutable(),
 		field.Int("status_code").
 			Default(1),
-		field.UUID("staff_id", uuid.UUID{}),
+		field.UUID("staff_id", uuid.UUID{}).
+			Optional().
+			Nillable(),
 		field.String("internal_note").
 			Optional().
 			Nillable(),
 		field.Bool("is_internal").
-			Default(false),
+			Default(false).
+			Immutable(),
 		field.UUID("address_id", uuid.UUID{}),
 	}
 }
@@ -68,15 +72,15 @@ func (Order) Edges() []ent.Edge {
 			Immutable(),
 		edge.To("parent_order", Order.Type).
 			Field("parent_order_id").
-			Unique(),
+			Unique().
+			Immutable(),
 		edge.To("order_status", OrderStatusCode.Type).
 			Field("status_code").
 			Unique().
 			Required(),
 		edge.To("staff", Person.Type).
 			Field("staff_id").
-			Unique().
-			Required(),
+			Unique(),
 		edge.To("order_address", Address.Type).
 			Field("address_id").
 			Unique().
