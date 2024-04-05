@@ -34,7 +34,6 @@ func (e *entOrderStatusCodeRepository) GetByID(ctx context.Context, id int) (*en
 func (e *entOrderStatusCodeRepository) Store(ctx context.Context, obj *ent.OrderStatusCode) (res *ent.OrderStatusCode, err error) {
 	res, err = e.Client.OrderStatusCode.
 		Create().
-		SetID(obj.ID).
 		SetOrderStatus(obj.OrderStatus).
 		Save(ctx)
 	return

@@ -18,22 +18,11 @@ func NewOrderItemHandler(e *echo.Echo, srvc interfaces.OrderItemService) error {
 	handler := &OrderItemHandler{
 		Service: srvc,
 	}
-	e.GET("/order-line-items", handler.Fetch)
-	e.GET("/order-line-items/:id", handler.GetByID)
-	e.POST("/order-line-items", handler.Store)
-	e.PUT("/order-line-items/:id", handler.Update)
-	e.DELETE("/order-line-items/:id", handler.Delete)
+	e.GET("/order-items/:id", handler.GetByID)
+	e.POST("/order-items", handler.Store)
+	e.PUT("/order-items/:id", handler.Update)
+	e.DELETE("/order-items/:id", handler.Delete)
 	return nil
-}
-
-func (h *OrderItemHandler) Fetch(c echo.Context) error {
-	ctx := context.Background()
-	orderItems, err := h.Service.Fetch(ctx)
-	if err != nil {
-		err_rsp := handleError(err)
-		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
-	}
-	return c.JSON(http.StatusOK, orderItems)
 }
 
 func (h *OrderItemHandler) GetByID(c echo.Context) error {
@@ -42,21 +31,21 @@ func (h *OrderItemHandler) GetByID(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	orderItem, err := h.Service.GetByID(ctx, id)
+	order_item, err := h.Service.GetByID(ctx, id)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, orderItem)
+	return c.JSON(http.StatusOK, order_item)
 }
 
 func (h *OrderItemHandler) Store(c echo.Context) error {
 	ctx := context.Background()
-	var order_line_item *ent.OrderItem
-	if err := c.Bind(&order_line_item); err != nil {
+	var order_item *ent.OrderItem
+	if err := c.Bind(&order_item); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	resp_obj, err := h.Service.Store(ctx, order_line_item)
+	resp_obj, err := h.Service.Store(ctx, order_item)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
@@ -66,15 +55,15 @@ func (h *OrderItemHandler) Store(c echo.Context) error {
 
 func (h *OrderItemHandler) Update(c echo.Context) error {
 	ctx := context.Background()
-	var order_line_item *ent.OrderItem
+	var order_item *ent.OrderItem
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	if err := c.Bind(&order_line_item); err != nil {
+	if err := c.Bind(&order_item); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	resp_obj, err := h.Service.Update(ctx, id, order_line_item)
+	resp_obj, err := h.Service.Update(ctx, id, order_item)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)

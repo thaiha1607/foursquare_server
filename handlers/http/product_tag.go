@@ -25,12 +25,12 @@ func NewProductTagHandler(e *echo.Echo, srvc interfaces.ProductTagService) error
 
 func (h *ProductTagHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
-	productTags, err := h.Service.Fetch(ctx)
+	product_tags, err := h.Service.Fetch(ctx)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, productTags)
+	return c.JSON(http.StatusOK, product_tags)
 }
 
 func (h *ProductTagHandler) Store(c echo.Context) error {

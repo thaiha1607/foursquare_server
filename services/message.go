@@ -12,28 +12,28 @@ type messageService struct {
 	messageRepo interfaces.MessageRepository
 }
 
-func NewMessageService(m interfaces.MessageRepository) interfaces.MessageService {
+func NewMessageService(r interfaces.MessageRepository) interfaces.MessageService {
 	return &messageService{
-		messageRepo: m,
+		messageRepo: r,
 	}
 }
 
-func (m *messageService) Fetch(ctx context.Context) ([]*ent.Message, error) {
-	return m.messageRepo.Fetch(ctx)
+func (s *messageService) Fetch(ctx context.Context) ([]*ent.Message, error) {
+	return s.messageRepo.Fetch(ctx)
 }
 
-func (m *messageService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error) {
-	return m.messageRepo.GetByID(ctx, id)
+func (s *messageService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Message, error) {
+	return s.messageRepo.GetByID(ctx, id)
 }
 
-func (m *messageService) Store(ctx context.Context, obj *ent.Message) (*ent.Message, error) {
-	return m.messageRepo.Store(ctx, obj)
+func (s *messageService) Store(ctx context.Context, obj *ent.Message) (*ent.Message, error) {
+	return s.messageRepo.Store(ctx, obj)
 }
 
-func (m *messageService) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) (*ent.Message, error) {
-	return m.messageRepo.Update(ctx, id, obj)
+func (s *messageService) Update(ctx context.Context, id uuid.UUID, obj *ent.Message) (*ent.Message, error) {
+	return s.messageRepo.Update(ctx, id, obj)
 }
 
-func (m *messageService) Delete(ctx context.Context, id uuid.UUID) error {
-	return m.messageRepo.Delete(ctx, id)
+func (s *messageService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.messageRepo.Delete(ctx, id)
 }

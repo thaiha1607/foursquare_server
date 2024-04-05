@@ -12,28 +12,28 @@ type conversationService struct {
 	conversationRepo interfaces.ConversationRepository
 }
 
-func NewConversationService(c interfaces.ConversationRepository) interfaces.ConversationService {
+func NewConversationService(r interfaces.ConversationRepository) interfaces.ConversationService {
 	return &conversationService{
-		conversationRepo: c,
+		conversationRepo: r,
 	}
 }
 
-func (c *conversationService) Fetch(ctx context.Context) ([]*ent.Conversation, error) {
-	return c.conversationRepo.Fetch(ctx)
+func (s *conversationService) Fetch(ctx context.Context) ([]*ent.Conversation, error) {
+	return s.conversationRepo.Fetch(ctx)
 }
 
-func (c *conversationService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error) {
-	return c.conversationRepo.GetByID(ctx, id)
+func (s *conversationService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Conversation, error) {
+	return s.conversationRepo.GetByID(ctx, id)
 }
 
-func (c *conversationService) Store(ctx context.Context, obj *ent.Conversation) (*ent.Conversation, error) {
-	return c.conversationRepo.Store(ctx, obj)
+func (s *conversationService) Store(ctx context.Context, obj *ent.Conversation) (*ent.Conversation, error) {
+	return s.conversationRepo.Store(ctx, obj)
 }
 
-func (c *conversationService) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (*ent.Conversation, error) {
-	return c.conversationRepo.Update(ctx, id, obj)
+func (s *conversationService) Update(ctx context.Context, id uuid.UUID, obj *ent.Conversation) (*ent.Conversation, error) {
+	return s.conversationRepo.Update(ctx, id, obj)
 }
 
-func (c *conversationService) Delete(ctx context.Context, id uuid.UUID) error {
-	return c.conversationRepo.Delete(ctx, id)
+func (s *conversationService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.conversationRepo.Delete(ctx, id)
 }

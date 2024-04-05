@@ -23,10 +23,45 @@ func initializeOrderHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
+func initializeInvoiceStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
+	invoiceStatusCodeRepository := repositories.NewEntInvoiceStatusCodeRepository(db)
+	invoiceStatusCodeService := services.NewInvoiceStatusCodeService(invoiceStatusCodeRepository)
+	error2 := http.NewInvoiceStatusCodeHandler(e, invoiceStatusCodeService)
+	return error2
+}
+
 func initializeOrderStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
 	orderStatusCodeRepository := repositories.NewEntOrderStatusCodeRepository(db)
 	orderStatusCodeService := services.NewOrderStatusCodeService(orderStatusCodeRepository)
 	error2 := http.NewOrderStatusCodeHandler(e, orderStatusCodeService)
+	return error2
+}
+
+func initializeAddressHandler(e *echo.Echo, db *ent.Client) error {
+	addressRepository := repositories.NewEntAddressRepository(db)
+	addressService := services.NewAddressService(addressRepository)
+	error2 := http.NewAddressHandler(e, addressService)
+	return error2
+}
+
+func initializeShipmentHistoryHandler(e *echo.Echo, db *ent.Client) error {
+	shipmentHistoryRepository := repositories.NewEntShipmentHistoryRepository(db)
+	shipmentHistoryService := services.NewShipmentHistoryService(shipmentHistoryRepository)
+	error2 := http.NewShipmentHistoryHandler(e, shipmentHistoryService)
+	return error2
+}
+
+func initializeWarehouseAssignmentHandler(e *echo.Echo, db *ent.Client) error {
+	warehouseAssignmentRepository := repositories.NewEntWarehouseAssignmentRepository(db)
+	warehouseAssignmentService := services.NewWarehouseAssignmentService(warehouseAssignmentRepository)
+	error2 := http.NewWarehouseAssignmentHandler(e, warehouseAssignmentService)
+	return error2
+}
+
+func initializeShipmentHandler(e *echo.Echo, db *ent.Client) error {
+	shipmentRepository := repositories.NewEntShipmentRepository(db)
+	shipmentService := services.NewShipmentService(shipmentRepository)
+	error2 := http.NewShipmentHandler(e, shipmentService)
 	return error2
 }
 
@@ -37,10 +72,38 @@ func initializeProductImageHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
-func initializeOrderItemHandler(e *echo.Echo, db *ent.Client) error {
-	orderItemRepository := repositories.NewEntOrderItemRepository(db)
-	orderItemService := services.NewOrderItemService(orderItemRepository)
-	error2 := http.NewOrderItemHandler(e, orderItemService)
+func initializeShipmentItemHandler(e *echo.Echo, db *ent.Client) error {
+	shipmentItemRepository := repositories.NewEntShipmentItemRepository(db)
+	shipmentItemService := services.NewShipmentItemService(shipmentItemRepository)
+	error2 := http.NewShipmentItemHandler(e, shipmentItemService)
+	return error2
+}
+
+func initializeInvoiceHistoryHandler(e *echo.Echo, db *ent.Client) error {
+	invoiceHistoryRepository := repositories.NewEntInvoiceHistoryRepository(db)
+	invoiceHistoryService := services.NewInvoiceHistoryService(invoiceHistoryRepository)
+	error2 := http.NewInvoiceHistoryHandler(e, invoiceHistoryService)
+	return error2
+}
+
+func initializeShipmentStatusCodeHandler(e *echo.Echo, db *ent.Client) error {
+	shipmentStatusCodeRepository := repositories.NewEntShipmentStatusCodeRepository(db)
+	shipmentStatusCodeService := services.NewShipmentStatusCodeService(shipmentStatusCodeRepository)
+	error2 := http.NewShipmentStatusCodeHandler(e, shipmentStatusCodeService)
+	return error2
+}
+
+func initializeOrderHistoryHandler(e *echo.Echo, db *ent.Client) error {
+	orderHistoryRepository := repositories.NewEntOrderHistoryRepository(db)
+	orderHistoryService := services.NewOrderHistoryService(orderHistoryRepository)
+	error2 := http.NewOrderHistoryHandler(e, orderHistoryService)
+	return error2
+}
+
+func initializeProductColorHandler(e *echo.Echo, db *ent.Client) error {
+	productColorRepository := repositories.NewEntProductColorRepository(db)
+	productColorService := services.NewProductColorService(productColorRepository)
+	error2 := http.NewProductColorHandler(e, productColorService)
 	return error2
 }
 
@@ -72,6 +135,13 @@ func initializeTagHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
+func initializeWorkUnitInfoHandler(e *echo.Echo, db *ent.Client) error {
+	workUnitInfoRepository := repositories.NewEntWorkUnitInfoRepository(db)
+	workUnitInfoService := services.NewWorkUnitInfoService(workUnitInfoRepository)
+	error2 := http.NewWorkUnitInfoHandler(e, workUnitInfoService)
+	return error2
+}
+
 func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) error {
 	invoiceRepository := repositories.NewEntInvoiceRepository(db)
 	invoiceService := services.NewInvoiceService(invoiceRepository)
@@ -79,9 +149,37 @@ func initializeInvoiceHandler(e *echo.Echo, db *ent.Client) error {
 	return error2
 }
 
+func initializeOrderItemHandler(e *echo.Echo, db *ent.Client) error {
+	orderItemRepository := repositories.NewEntOrderItemRepository(db)
+	orderItemService := services.NewOrderItemService(orderItemRepository)
+	error2 := http.NewOrderItemHandler(e, orderItemService)
+	return error2
+}
+
 func initializeConversationHandler(e *echo.Echo, db *ent.Client) error {
 	conversationRepository := repositories.NewEntConversationRepository(db)
 	conversationService := services.NewConversationService(conversationRepository)
 	error2 := http.NewConversationHandler(e, conversationService)
+	return error2
+}
+
+func initializeProductInfoHandler(e *echo.Echo, db *ent.Client) error {
+	productInfoRepository := repositories.NewEntProductInfoRepository(db)
+	productInfoService := services.NewProductInfoService(productInfoRepository)
+	error2 := http.NewProductInfoHandler(e, productInfoService)
+	return error2
+}
+
+func initializeProductQtyHandler(e *echo.Echo, db *ent.Client) error {
+	productQtyRepository := repositories.NewEntProductQtyRepository(db)
+	productQtyService := services.NewProductQtyService(productQtyRepository)
+	error2 := http.NewProductQtyHandler(e, productQtyService)
+	return error2
+}
+
+func initializePersonAddressHandler(e *echo.Echo, db *ent.Client) error {
+	personAddressRepository := repositories.NewEntPersonAddressRepository(db)
+	personAddressService := services.NewPersonAddressService(personAddressRepository)
+	error2 := http.NewPersonAddressHandler(e, personAddressService)
 	return error2
 }

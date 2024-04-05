@@ -39,7 +39,8 @@ func (e *entInvoiceRepository) Store(ctx context.Context, obj *ent.Invoice) (res
 		SetTotal(obj.Total).
 		SetNillableNote(obj.Note).
 		SetNillableType(&obj.Type).
-		SetNillableStatus(&obj.Status).
+		SetNillableStatusCode(&obj.StatusCode).
+		SetNillablePaymentMethod(obj.PaymentMethod).
 		Save(ctx)
 	return
 }
@@ -48,7 +49,8 @@ func (e *entInvoiceRepository) Update(ctx context.Context, id uuid.UUID, obj *en
 	res, err = e.Client.Invoice.
 		UpdateOneID(id).
 		SetNillableNote(obj.Note).
-		SetNillableStatus(&obj.Status).
+		SetNillableStatusCode(&obj.StatusCode).
+		SetNillablePaymentMethod(obj.PaymentMethod).
 		Save(ctx)
 	return
 }

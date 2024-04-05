@@ -42,7 +42,10 @@ func (e *entOrderRepository) Store(ctx context.Context, obj *ent.Order) (res *en
 		SetNillablePriority(&obj.Priority).
 		SetNillableType(&obj.Type).
 		SetNillableStatusCode(&obj.StatusCode).
+		SetNillableStaffID(obj.StaffID).
 		SetNillableInternalNote(obj.InternalNote).
+		SetNillableIsInternal(&obj.IsInternal).
+		SetAddressID(obj.AddressID).
 		Save(ctx)
 	return
 }
@@ -51,10 +54,11 @@ func (e *entOrderRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.
 	res, err = e.Client.Order.
 		UpdateOneID(id).
 		SetNillableNote(obj.Note).
-		SetNillableParentOrderID(obj.ParentOrderID).
 		SetNillablePriority(&obj.Priority).
 		SetNillableStatusCode(&obj.StatusCode).
+		SetNillableStaffID(obj.StaffID).
 		SetNillableInternalNote(obj.InternalNote).
+		SetNillableAddressID(&obj.AddressID).
 		Save(ctx)
 	return
 }

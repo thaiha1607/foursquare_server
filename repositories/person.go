@@ -33,22 +33,13 @@ func (e *entPersonRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.P
 }
 
 func (e *entPersonRepository) Store(ctx context.Context, obj *ent.Person) (res *ent.Person, err error) {
-	res, err = e.Client.Person.
-		Create().
-		SetAvatarURL(obj.AvatarURL).
-		SetName(obj.Name).
-		Save(ctx)
-	return
-
+	// TODO: Write the logic to store the object in the database
+	panic("unimplemented")
 }
 
 func (e *entPersonRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.Person) (res *ent.Person, err error) {
-	res, err = e.Client.Person.
-		UpdateOneID(id).
-		SetAvatarURL(obj.AvatarURL).
-		SetNillableName(&obj.Name).
-		Save(ctx)
-	return
+	// TODO: Write the logic to update the object in the database
+	panic("unimplemented")
 }
 
 func (e *entPersonRepository) Delete(ctx context.Context, id uuid.UUID) error {

@@ -11,28 +11,28 @@ type orderStatusCodeService struct {
 	orderStatusCodeRepo interfaces.OrderStatusCodeRepository
 }
 
-func NewOrderStatusCodeService(o interfaces.OrderStatusCodeRepository) interfaces.OrderStatusCodeService {
+func NewOrderStatusCodeService(r interfaces.OrderStatusCodeRepository) interfaces.OrderStatusCodeService {
 	return &orderStatusCodeService{
-		orderStatusCodeRepo: o,
+		orderStatusCodeRepo: r,
 	}
 }
 
-func (o *orderStatusCodeService) Fetch(ctx context.Context) ([]*ent.OrderStatusCode, error) {
-	return o.orderStatusCodeRepo.Fetch(ctx)
+func (s *orderStatusCodeService) Fetch(ctx context.Context) ([]*ent.OrderStatusCode, error) {
+	return s.orderStatusCodeRepo.Fetch(ctx)
 }
 
-func (o *orderStatusCodeService) GetByID(ctx context.Context, id int) (*ent.OrderStatusCode, error) {
-	return o.orderStatusCodeRepo.GetByID(ctx, id)
+func (s *orderStatusCodeService) GetByID(ctx context.Context, id int) (*ent.OrderStatusCode, error) {
+	return s.orderStatusCodeRepo.GetByID(ctx, id)
 }
 
-func (o *orderStatusCodeService) Store(ctx context.Context, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
-	return o.orderStatusCodeRepo.Store(ctx, obj)
+func (s *orderStatusCodeService) Store(ctx context.Context, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
+	return s.orderStatusCodeRepo.Store(ctx, obj)
 }
 
-func (o *orderStatusCodeService) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
-	return o.orderStatusCodeRepo.Update(ctx, id, obj)
+func (s *orderStatusCodeService) Update(ctx context.Context, id int, obj *ent.OrderStatusCode) (*ent.OrderStatusCode, error) {
+	return s.orderStatusCodeRepo.Update(ctx, id, obj)
 }
 
-func (o *orderStatusCodeService) Delete(ctx context.Context, id int) error {
-	return o.orderStatusCodeRepo.Delete(ctx, id)
+func (s *orderStatusCodeService) Delete(ctx context.Context, id int) error {
+	return s.orderStatusCodeRepo.Delete(ctx, id)
 }

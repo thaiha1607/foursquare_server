@@ -28,12 +28,12 @@ func NewOrderStatusCodeHandler(e *echo.Echo, srvc interfaces.OrderStatusCodeServ
 
 func (h *OrderStatusCodeHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
-	orderStatusCodes, err := h.Service.Fetch(ctx)
+	order_status_codes, err := h.Service.Fetch(ctx)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, orderStatusCodes)
+	return c.JSON(http.StatusOK, order_status_codes)
 }
 
 func (h *OrderStatusCodeHandler) GetByID(c echo.Context) error {
@@ -42,12 +42,12 @@ func (h *OrderStatusCodeHandler) GetByID(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	orderStatusCode, err := h.Service.GetByID(ctx, id)
+	order_status_code, err := h.Service.GetByID(ctx, id)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, orderStatusCode)
+	return c.JSON(http.StatusOK, order_status_code)
 }
 
 func (h *OrderStatusCodeHandler) Store(c echo.Context) error {

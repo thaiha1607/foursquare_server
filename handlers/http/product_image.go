@@ -27,12 +27,12 @@ func NewProductImageHandler(e *echo.Echo, srvc interfaces.ProductImageService) e
 
 func (h *ProductImageHandler) Fetch(c echo.Context) error {
 	ctx := context.Background()
-	productImages, err := h.Service.Fetch(ctx)
+	product_images, err := h.Service.Fetch(ctx)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, productImages)
+	return c.JSON(http.StatusOK, product_images)
 }
 
 func (h *ProductImageHandler) GetByID(c echo.Context) error {
@@ -41,12 +41,12 @@ func (h *ProductImageHandler) GetByID(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	productImage, err := h.Service.GetByID(ctx, id)
+	product_image, err := h.Service.GetByID(ctx, id)
 	if err != nil {
 		err_rsp := handleError(err)
 		return c.JSON(err_rsp.HttpStatusCode, err_rsp)
 	}
-	return c.JSON(http.StatusOK, productImage)
+	return c.JSON(http.StatusOK, product_image)
 }
 
 func (h *ProductImageHandler) Store(c echo.Context) error {

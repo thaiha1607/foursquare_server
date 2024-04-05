@@ -42,7 +42,7 @@ func (e *entTagRepository) Store(ctx context.Context, obj *ent.Tag) (res *ent.Ta
 func (e *entTagRepository) Update(ctx context.Context, id string, obj *ent.Tag) (res *ent.Tag, err error) {
 	res, err = e.Client.Tag.
 		UpdateOneID(id).
-		SetTitle(obj.Title).
+		SetNillableTitle(&obj.Title).
 		Save(ctx)
 	return
 }

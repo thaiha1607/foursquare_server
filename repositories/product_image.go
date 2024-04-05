@@ -14,22 +14,22 @@ type entProductImageRepository struct {
 }
 
 func (e *entProductImageRepository) Fetch(ctx context.Context) ([]*ent.ProductImage, error) {
-	orders, err := e.Client.ProductImage.
+	product_images, err := e.Client.ProductImage.
 		Query().
 		All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return orders, nil
+	return product_images, nil
 }
 
 func (e *entProductImageRepository) GetByID(ctx context.Context, id uuid.UUID) (*ent.ProductImage, error) {
-	order, err := e.Client.ProductImage.
+	product_image, err := e.Client.ProductImage.
 		Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return order, nil
+	return product_image, nil
 }
 
 func (e *entProductImageRepository) Store(ctx context.Context, obj *ent.ProductImage) (res *ent.ProductImage, err error) {

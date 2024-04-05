@@ -12,28 +12,28 @@ type orderService struct {
 	orderRepo interfaces.OrderRepository
 }
 
-func NewOrderService(o interfaces.OrderRepository) interfaces.OrderService {
+func NewOrderService(r interfaces.OrderRepository) interfaces.OrderService {
 	return &orderService{
-		orderRepo: o,
+		orderRepo: r,
 	}
 }
 
-func (o *orderService) Fetch(ctx context.Context) ([]*ent.Order, error) {
-	return o.orderRepo.Fetch(ctx)
+func (s *orderService) Fetch(ctx context.Context) ([]*ent.Order, error) {
+	return s.orderRepo.Fetch(ctx)
 }
 
-func (o *orderService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Order, error) {
-	return o.orderRepo.GetByID(ctx, id)
+func (s *orderService) GetByID(ctx context.Context, id uuid.UUID) (*ent.Order, error) {
+	return s.orderRepo.GetByID(ctx, id)
 }
 
-func (o *orderService) Store(ctx context.Context, obj *ent.Order) (*ent.Order, error) {
-	return o.orderRepo.Store(ctx, obj)
+func (s *orderService) Store(ctx context.Context, obj *ent.Order) (*ent.Order, error) {
+	return s.orderRepo.Store(ctx, obj)
 }
 
-func (o *orderService) Update(ctx context.Context, id uuid.UUID, obj *ent.Order) (*ent.Order, error) {
-	return o.orderRepo.Update(ctx, id, obj)
+func (s *orderService) Update(ctx context.Context, id uuid.UUID, obj *ent.Order) (*ent.Order, error) {
+	return s.orderRepo.Update(ctx, id, obj)
 }
 
-func (o *orderService) Delete(ctx context.Context, id uuid.UUID) error {
-	return o.orderRepo.Delete(ctx, id)
+func (s *orderService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.orderRepo.Delete(ctx, id)
 }

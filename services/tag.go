@@ -11,28 +11,28 @@ type tagService struct {
 	tagRepo interfaces.TagRepository
 }
 
-func NewTagService(t interfaces.TagRepository) interfaces.TagService {
+func NewTagService(r interfaces.TagRepository) interfaces.TagService {
 	return &tagService{
-		tagRepo: t,
+		tagRepo: r,
 	}
 }
 
-func (t *tagService) Fetch(ctx context.Context) ([]*ent.Tag, error) {
-	return t.tagRepo.Fetch(ctx)
+func (s *tagService) Fetch(ctx context.Context) ([]*ent.Tag, error) {
+	return s.tagRepo.Fetch(ctx)
 }
 
-func (t *tagService) GetByID(ctx context.Context, id string) (*ent.Tag, error) {
-	return t.tagRepo.GetByID(ctx, id)
+func (s *tagService) GetByID(ctx context.Context, id string) (*ent.Tag, error) {
+	return s.tagRepo.GetByID(ctx, id)
 }
 
-func (t *tagService) Store(ctx context.Context, obj *ent.Tag) (*ent.Tag, error) {
-	return t.tagRepo.Store(ctx, obj)
+func (s *tagService) Store(ctx context.Context, obj *ent.Tag) (*ent.Tag, error) {
+	return s.tagRepo.Store(ctx, obj)
 }
 
-func (t *tagService) Update(ctx context.Context, id string, obj *ent.Tag) (*ent.Tag, error) {
-	return t.tagRepo.Update(ctx, id, obj)
+func (s *tagService) Update(ctx context.Context, id string, obj *ent.Tag) (*ent.Tag, error) {
+	return s.tagRepo.Update(ctx, id, obj)
 }
 
-func (t *tagService) Delete(ctx context.Context, id string) error {
-	return t.tagRepo.Delete(ctx, id)
+func (s *tagService) Delete(ctx context.Context, id string) error {
+	return s.tagRepo.Delete(ctx, id)
 }

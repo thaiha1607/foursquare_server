@@ -39,7 +39,6 @@ func (e *entMessageRepository) Store(ctx context.Context, obj *ent.Message) (res
 		SetSenderID(obj.SenderID).
 		SetNillableType(&obj.Type).
 		SetContent(obj.Content).
-		SetNillableIsRead(&obj.IsRead).
 		Save(ctx)
 	return
 }

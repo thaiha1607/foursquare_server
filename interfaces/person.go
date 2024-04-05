@@ -7,6 +7,11 @@ import (
 	"github.com/thaiha1607/foursquare_server/ent"
 )
 
+/*
+TODO:
+- Add more methods for authentication, authorization, and other business logic
+*/
+
 // PersonService describes the service.
 type PersonService interface {
 	Fetch(ctx context.Context) ([]*ent.Person, error)
