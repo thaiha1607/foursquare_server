@@ -23,9 +23,9 @@ type Shipment struct {
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// InvoiceID holds the value of the "invoice_id" field.
@@ -33,11 +33,11 @@ type Shipment struct {
 	// StaffID holds the value of the "staff_id" field.
 	StaffID uuid.UUID `json:"staff_id,omitempty"`
 	// ShipmentDate holds the value of the "shipment_date" field.
-	ShipmentDate time.Time `json:"shipment_date,omitempty"`
+	ShipmentDate *time.Time `json:"shipment_date,omitempty"`
 	// Note holds the value of the "note" field.
 	Note *string `json:"note,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
-	StatusCode int `json:"status_code,omitempty"`
+	StatusCode *int `json:"status_code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ShipmentQuery when eager-loading is set.
 	Edges        ShipmentEdges `json:"edges"`
@@ -141,13 +141,15 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				s.CreatedAt = new(time.Time)
+				*s.CreatedAt = value.Time
 			}
 		case shipment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				s.UpdatedAt = value.Time
+				s.UpdatedAt = new(time.Time)
+				*s.UpdatedAt = value.Time
 			}
 		case shipment.FieldOrderID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -171,7 +173,8 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field shipment_date", values[i])
 			} else if value.Valid {
-				s.ShipmentDate = value.Time
+				s.ShipmentDate = new(time.Time)
+				*s.ShipmentDate = value.Time
 			}
 		case shipment.FieldNote:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -184,7 +187,8 @@ func (s *Shipment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status_code", values[i])
 			} else if value.Valid {
-				s.StatusCode = int(value.Int64)
+				s.StatusCode = new(int)
+				*s.StatusCode = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -242,11 +246,15 @@ func (s *Shipment) String() string {
 	var builder strings.Builder
 	builder.WriteString("Shipment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	if v := s.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(s.UpdatedAt.Format(time.ANSIC))
+	if v := s.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.OrderID))
@@ -257,16 +265,20 @@ func (s *Shipment) String() string {
 	builder.WriteString("staff_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.StaffID))
 	builder.WriteString(", ")
-	builder.WriteString("shipment_date=")
-	builder.WriteString(s.ShipmentDate.Format(time.ANSIC))
+	if v := s.ShipmentDate; v != nil {
+		builder.WriteString("shipment_date=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := s.Note; v != nil {
 		builder.WriteString("note=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("status_code=")
-	builder.WriteString(fmt.Sprintf("%v", s.StatusCode))
+	if v := s.StatusCode; v != nil {
+		builder.WriteString("status_code=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

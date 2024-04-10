@@ -38,20 +38,6 @@ func (ohc *OrderHistoryCreate) SetNillableCreatedAt(t *time.Time) *OrderHistoryC
 	return ohc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ohc *OrderHistoryCreate) SetUpdatedAt(t time.Time) *OrderHistoryCreate {
-	ohc.mutation.SetUpdatedAt(t)
-	return ohc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ohc *OrderHistoryCreate) SetNillableUpdatedAt(t *time.Time) *OrderHistoryCreate {
-	if t != nil {
-		ohc.SetUpdatedAt(*t)
-	}
-	return ohc
-}
-
 // SetOrderID sets the "order_id" field.
 func (ohc *OrderHistoryCreate) SetOrderID(u uuid.UUID) *OrderHistoryCreate {
 	ohc.mutation.SetOrderID(u)
@@ -207,10 +193,6 @@ func (ohc *OrderHistoryCreate) defaults() {
 		v := orderhistory.DefaultCreatedAt()
 		ohc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ohc.mutation.UpdatedAt(); !ok {
-		v := orderhistory.DefaultUpdatedAt()
-		ohc.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := ohc.mutation.ID(); !ok {
 		v := orderhistory.DefaultID()
 		ohc.mutation.SetID(v)
@@ -221,9 +203,6 @@ func (ohc *OrderHistoryCreate) defaults() {
 func (ohc *OrderHistoryCreate) check() error {
 	if _, ok := ohc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "OrderHistory.created_at"`)}
-	}
-	if _, ok := ohc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "OrderHistory.updated_at"`)}
 	}
 	if _, ok := ohc.mutation.OrderID(); !ok {
 		return &ValidationError{Name: "order_id", err: errors.New(`ent: missing required field "OrderHistory.order_id"`)}
@@ -274,11 +253,7 @@ func (ohc *OrderHistoryCreate) createSpec() (*OrderHistory, *sqlgraph.CreateSpec
 	}
 	if value, ok := ohc.mutation.CreatedAt(); ok {
 		_spec.SetField(orderhistory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := ohc.mutation.UpdatedAt(); ok {
-		_spec.SetField(orderhistory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := ohc.mutation.Description(); ok {
 		_spec.SetField(orderhistory.FieldDescription, field.TypeString, value)

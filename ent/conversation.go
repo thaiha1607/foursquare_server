@@ -20,9 +20,9 @@ type Conversation struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Title holds the value of the "title" field.
 	Title *string `json:"title,omitempty"`
 	// PersonOneID holds the value of the "person_one_id" field.
@@ -104,13 +104,15 @@ func (c *Conversation) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				c.CreatedAt = new(time.Time)
+				*c.CreatedAt = value.Time
 			}
 		case conversation.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				c.UpdatedAt = new(time.Time)
+				*c.UpdatedAt = value.Time
 			}
 		case conversation.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -177,11 +179,15 @@ func (c *Conversation) String() string {
 	var builder strings.Builder
 	builder.WriteString("Conversation(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	if v := c.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	if v := c.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := c.Title; v != nil {
 		builder.WriteString("title=")

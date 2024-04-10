@@ -338,11 +338,11 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(person.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := pc.mutation.UpdatedAt(); ok {
 		_spec.SetField(person.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := pc.mutation.AvatarURL(); ok {
 		_spec.SetField(person.FieldAvatarURL, field.TypeString, value)
@@ -362,7 +362,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Role(); ok {
 		_spec.SetField(person.FieldRole, field.TypeEnum, value)
-		_node.Role = value
+		_node.Role = &value
 	}
 	if value, ok := pc.mutation.PasswordHash(); ok {
 		_spec.SetField(person.FieldPasswordHash, field.TypeBytes, value)
@@ -370,11 +370,11 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.IsEmailVerified(); ok {
 		_spec.SetField(person.FieldIsEmailVerified, field.TypeBool, value)
-		_node.IsEmailVerified = value
+		_node.IsEmailVerified = &value
 	}
 	if value, ok := pc.mutation.IsPhoneVerified(); ok {
 		_spec.SetField(person.FieldIsPhoneVerified, field.TypeBool, value)
-		_node.IsPhoneVerified = value
+		_node.IsPhoneVerified = &value
 	}
 	if nodes := pc.mutation.WorkUnitIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

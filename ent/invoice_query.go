@@ -477,7 +477,10 @@ func (iq *InvoiceQuery) loadInvoiceStatus(ctx context.Context, query *InvoiceSta
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Invoice)
 	for i := range nodes {
-		fk := nodes[i].StatusCode
+		if nodes[i].StatusCode == nil {
+			continue
+		}
+		fk := *nodes[i].StatusCode
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}

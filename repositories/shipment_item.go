@@ -27,8 +27,8 @@ func (e *entShipmentItemRepository) Store(ctx context.Context, obj *ent.Shipment
 		Create().
 		SetShipmentID(obj.ShipmentID).
 		SetOrderItemID(obj.OrderItemID).
-		SetQty(obj.Qty).
-		SetTotal(obj.Total).
+		SetQty(*obj.Qty).
+		SetTotal(*obj.Total).
 		Save(ctx)
 	return
 }

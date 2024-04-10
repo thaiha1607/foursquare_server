@@ -160,11 +160,11 @@ func (sscc *ShipmentStatusCodeCreate) createSpec() (*ShipmentStatusCode, *sqlgra
 	}
 	if value, ok := sscc.mutation.CreatedAt(); ok {
 		_spec.SetField(shipmentstatuscode.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := sscc.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipmentstatuscode.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := sscc.mutation.ShipmentStatus(); ok {
 		_spec.SetField(shipmentstatuscode.FieldShipmentStatus, field.TypeString, value)

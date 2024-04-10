@@ -44,12 +44,14 @@ func (OrderItem) Fields() []ent.Field {
 			Nillable(),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
+			Nillable().
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
 		field.Float("price_per_unit").
 			GoType(decimal.Decimal{}).
+			Nillable().
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
@@ -62,6 +64,7 @@ func (OrderItem) Fields() []ent.Field {
 				"InStock", "IN_STOCK",
 				"PartiallyDelivered", "PARTIALLY_DELIVERED",
 			).
+			Nillable().
 			Default("IN_STOCK"),
 	}
 }

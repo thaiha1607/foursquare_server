@@ -236,6 +236,9 @@ func (ic *InvoiceCreate) check() error {
 	if _, ok := ic.mutation.StatusCode(); !ok {
 		return &ValidationError{Name: "status_code", err: errors.New(`ent: missing required field "Invoice.status_code"`)}
 	}
+	if _, ok := ic.mutation.PaymentMethod(); !ok {
+		return &ValidationError{Name: "payment_method", err: errors.New(`ent: missing required field "Invoice.payment_method"`)}
+	}
 	if v, ok := ic.mutation.PaymentMethod(); ok {
 		if err := invoice.PaymentMethodValidator(v); err != nil {
 			return &ValidationError{Name: "payment_method", err: fmt.Errorf(`ent: validator failed for field "Invoice.payment_method": %w`, err)}
@@ -284,15 +287,15 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ic.mutation.CreatedAt(); ok {
 		_spec.SetField(invoice.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := ic.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoice.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := ic.mutation.Total(); ok {
 		_spec.SetField(invoice.FieldTotal, field.TypeFloat64, value)
-		_node.Total = value
+		_node.Total = &value
 	}
 	if value, ok := ic.mutation.Note(); ok {
 		_spec.SetField(invoice.FieldNote, field.TypeString, value)
@@ -300,7 +303,7 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ic.mutation.GetType(); ok {
 		_spec.SetField(invoice.FieldType, field.TypeEnum, value)
-		_node.Type = value
+		_node.Type = &value
 	}
 	if value, ok := ic.mutation.PaymentMethod(); ok {
 		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
@@ -337,7 +340,7 @@ func (ic *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.StatusCode = nodes[0]
+		_node.StatusCode = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

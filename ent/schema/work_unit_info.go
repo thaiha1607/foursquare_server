@@ -39,6 +39,7 @@ func (WorkUnitInfo) Fields() []ent.Field {
 				"Office", "OFFICE",
 				"Delivery", "DELIVERY",
 			).
+			Nillable().
 			Default("WAREHOUSE"),
 		field.String("image_url").
 			Validate(

@@ -18,9 +18,9 @@ type ShipmentStatusCode struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// ShipmentStatus holds the value of the "shipment_status" field.
 	ShipmentStatus string `json:"shipment_status,omitempty"`
 	selectValues   sql.SelectValues
@@ -62,13 +62,15 @@ func (ssc *ShipmentStatusCode) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				ssc.CreatedAt = value.Time
+				ssc.CreatedAt = new(time.Time)
+				*ssc.CreatedAt = value.Time
 			}
 		case shipmentstatuscode.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				ssc.UpdatedAt = value.Time
+				ssc.UpdatedAt = new(time.Time)
+				*ssc.UpdatedAt = value.Time
 			}
 		case shipmentstatuscode.FieldShipmentStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,11 +114,15 @@ func (ssc *ShipmentStatusCode) String() string {
 	var builder strings.Builder
 	builder.WriteString("ShipmentStatusCode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ssc.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(ssc.CreatedAt.Format(time.ANSIC))
+	if v := ssc.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(ssc.UpdatedAt.Format(time.ANSIC))
+	if v := ssc.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("shipment_status=")
 	builder.WriteString(ssc.ShipmentStatus)

@@ -18,9 +18,9 @@ type ProductColor struct {
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// ColorCode holds the value of the "color_code" field.
@@ -62,13 +62,15 @@ func (pc *ProductColor) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pc.CreatedAt = value.Time
+				pc.CreatedAt = new(time.Time)
+				*pc.CreatedAt = value.Time
 			}
 		case productcolor.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pc.UpdatedAt = value.Time
+				pc.UpdatedAt = new(time.Time)
+				*pc.UpdatedAt = value.Time
 			}
 		case productcolor.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -118,11 +120,15 @@ func (pc *ProductColor) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductColor(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pc.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pc.CreatedAt.Format(time.ANSIC))
+	if v := pc.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pc.UpdatedAt.Format(time.ANSIC))
+	if v := pc.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(pc.Name)

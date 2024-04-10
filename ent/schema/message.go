@@ -31,10 +31,12 @@ func (Message) Fields() []ent.Field {
 				"File", "FILE",
 				"Other", "OTHER",
 			).Default("TEXT").
+			Nillable().
 			Immutable(),
 		field.String("content").
 			NotEmpty(),
 		field.Bool("is_read").
+			Nillable().
 			Default(false),
 	}
 }

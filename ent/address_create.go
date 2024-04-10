@@ -36,20 +36,6 @@ func (ac *AddressCreate) SetNillableCreatedAt(t *time.Time) *AddressCreate {
 	return ac
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ac *AddressCreate) SetUpdatedAt(t time.Time) *AddressCreate {
-	ac.mutation.SetUpdatedAt(t)
-	return ac
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableUpdatedAt(t *time.Time) *AddressCreate {
-	if t != nil {
-		ac.SetUpdatedAt(*t)
-	}
-	return ac
-}
-
 // SetLine1 sets the "line1" field.
 func (ac *AddressCreate) SetLine1(s string) *AddressCreate {
 	ac.mutation.SetLine1(s)
@@ -176,10 +162,6 @@ func (ac *AddressCreate) defaults() {
 		v := address.DefaultCreatedAt()
 		ac.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		v := address.DefaultUpdatedAt()
-		ac.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := address.DefaultID()
 		ac.mutation.SetID(v)
@@ -190,9 +172,6 @@ func (ac *AddressCreate) defaults() {
 func (ac *AddressCreate) check() error {
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Address.created_at"`)}
-	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Address.updated_at"`)}
 	}
 	if _, ok := ac.mutation.Line1(); !ok {
 		return &ValidationError{Name: "line1", err: errors.New(`ent: missing required field "Address.line1"`)}
@@ -271,11 +250,7 @@ func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(address.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := ac.mutation.UpdatedAt(); ok {
-		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := ac.mutation.Line1(); ok {
 		_spec.SetField(address.FieldLine1, field.TypeString, value)

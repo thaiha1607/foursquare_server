@@ -20,9 +20,9 @@ type Person struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL *string `json:"avatar_url,omitempty"`
 	// Email holds the value of the "email" field.
@@ -32,13 +32,13 @@ type Person struct {
 	// Phone holds the value of the "phone" field.
 	Phone *string `json:"phone,omitempty"`
 	// Role holds the value of the "role" field.
-	Role person.Role `json:"role,omitempty"`
+	Role *person.Role `json:"role,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
 	PasswordHash *[]byte `json:"-"`
 	// IsEmailVerified holds the value of the "is_email_verified" field.
-	IsEmailVerified bool `json:"is_email_verified,omitempty"`
+	IsEmailVerified *bool `json:"is_email_verified,omitempty"`
 	// IsPhoneVerified holds the value of the "is_phone_verified" field.
-	IsPhoneVerified bool `json:"is_phone_verified,omitempty"`
+	IsPhoneVerified *bool `json:"is_phone_verified,omitempty"`
 	// WorkUnitID holds the value of the "work_unit_id" field.
 	WorkUnitID *uuid.UUID `json:"work_unit_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -131,13 +131,15 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pe.CreatedAt = value.Time
+				pe.CreatedAt = new(time.Time)
+				*pe.CreatedAt = value.Time
 			}
 		case person.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pe.UpdatedAt = value.Time
+				pe.UpdatedAt = new(time.Time)
+				*pe.UpdatedAt = value.Time
 			}
 		case person.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -169,7 +171,8 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				pe.Role = person.Role(value.String)
+				pe.Role = new(person.Role)
+				*pe.Role = person.Role(value.String)
 			}
 		case person.FieldPasswordHash:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -181,13 +184,15 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_email_verified", values[i])
 			} else if value.Valid {
-				pe.IsEmailVerified = value.Bool
+				pe.IsEmailVerified = new(bool)
+				*pe.IsEmailVerified = value.Bool
 			}
 		case person.FieldIsPhoneVerified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_phone_verified", values[i])
 			} else if value.Valid {
-				pe.IsPhoneVerified = value.Bool
+				pe.IsPhoneVerified = new(bool)
+				*pe.IsPhoneVerified = value.Bool
 			}
 		case person.FieldWorkUnitID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -247,11 +252,15 @@ func (pe *Person) String() string {
 	var builder strings.Builder
 	builder.WriteString("Person(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pe.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pe.CreatedAt.Format(time.ANSIC))
+	if v := pe.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pe.UpdatedAt.Format(time.ANSIC))
+	if v := pe.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := pe.AvatarURL; v != nil {
 		builder.WriteString("avatar_url=")
@@ -269,16 +278,22 @@ func (pe *Person) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("role=")
-	builder.WriteString(fmt.Sprintf("%v", pe.Role))
+	if v := pe.Role; v != nil {
+		builder.WriteString("role=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("password_hash=<sensitive>")
 	builder.WriteString(", ")
-	builder.WriteString("is_email_verified=")
-	builder.WriteString(fmt.Sprintf("%v", pe.IsEmailVerified))
+	if v := pe.IsEmailVerified; v != nil {
+		builder.WriteString("is_email_verified=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("is_phone_verified=")
-	builder.WriteString(fmt.Sprintf("%v", pe.IsPhoneVerified))
+	if v := pe.IsPhoneVerified; v != nil {
+		builder.WriteString("is_phone_verified=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := pe.WorkUnitID; v != nil {
 		builder.WriteString("work_unit_id=")

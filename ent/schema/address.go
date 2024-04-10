@@ -56,6 +56,6 @@ func (Address) Edges() []ent.Edge {
 // Mixin of the Address.
 func (Address) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		TimeMixin{},
+		CreationTimeMixin{},
 	}
 }

@@ -22,17 +22,17 @@ type ShipmentItem struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// ShipmentID holds the value of the "shipment_id" field.
 	ShipmentID string `json:"shipment_id,omitempty"`
 	// OrderItemID holds the value of the "order_item_id" field.
 	OrderItemID uuid.UUID `json:"order_item_id,omitempty"`
 	// Qty holds the value of the "qty" field.
-	Qty decimal.Decimal `json:"qty,omitempty"`
+	Qty *decimal.Decimal `json:"qty,omitempty"`
 	// Total holds the value of the "total" field.
-	Total decimal.Decimal `json:"total,omitempty"`
+	Total *decimal.Decimal `json:"total,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ShipmentItemQuery when eager-loading is set.
 	Edges        ShipmentItemEdges `json:"edges"`
@@ -78,7 +78,7 @@ func (*ShipmentItem) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case shipmentitem.FieldQty, shipmentitem.FieldTotal:
-			values[i] = new(decimal.Decimal)
+			values[i] = &sql.NullScanner{S: new(decimal.Decimal)}
 		case shipmentitem.FieldShipmentID:
 			values[i] = new(sql.NullString)
 		case shipmentitem.FieldCreatedAt, shipmentitem.FieldUpdatedAt:
@@ -110,13 +110,15 @@ func (si *ShipmentItem) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				si.CreatedAt = value.Time
+				si.CreatedAt = new(time.Time)
+				*si.CreatedAt = value.Time
 			}
 		case shipmentitem.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				si.UpdatedAt = value.Time
+				si.UpdatedAt = new(time.Time)
+				*si.UpdatedAt = value.Time
 			}
 		case shipmentitem.FieldShipmentID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -131,16 +133,18 @@ func (si *ShipmentItem) assignValues(columns []string, values []any) error {
 				si.OrderItemID = *value
 			}
 		case shipmentitem.FieldQty:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field qty", values[i])
-			} else if value != nil {
-				si.Qty = *value
+			} else if value.Valid {
+				si.Qty = new(decimal.Decimal)
+				*si.Qty = *value.S.(*decimal.Decimal)
 			}
 		case shipmentitem.FieldTotal:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field total", values[i])
-			} else if value != nil {
-				si.Total = *value
+			} else if value.Valid {
+				si.Total = new(decimal.Decimal)
+				*si.Total = *value.S.(*decimal.Decimal)
 			}
 		default:
 			si.selectValues.Set(columns[i], values[i])
@@ -188,11 +192,15 @@ func (si *ShipmentItem) String() string {
 	var builder strings.Builder
 	builder.WriteString("ShipmentItem(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", si.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(si.CreatedAt.Format(time.ANSIC))
+	if v := si.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(si.UpdatedAt.Format(time.ANSIC))
+	if v := si.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("shipment_id=")
 	builder.WriteString(si.ShipmentID)
@@ -200,11 +208,15 @@ func (si *ShipmentItem) String() string {
 	builder.WriteString("order_item_id=")
 	builder.WriteString(fmt.Sprintf("%v", si.OrderItemID))
 	builder.WriteString(", ")
-	builder.WriteString("qty=")
-	builder.WriteString(fmt.Sprintf("%v", si.Qty))
+	if v := si.Qty; v != nil {
+		builder.WriteString("qty=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("total=")
-	builder.WriteString(fmt.Sprintf("%v", si.Total))
+	if v := si.Total; v != nil {
+		builder.WriteString("total=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

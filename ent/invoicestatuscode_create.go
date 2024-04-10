@@ -160,11 +160,11 @@ func (iscc *InvoiceStatusCodeCreate) createSpec() (*InvoiceStatusCode, *sqlgraph
 	}
 	if value, ok := iscc.mutation.CreatedAt(); ok {
 		_spec.SetField(invoicestatuscode.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := iscc.mutation.UpdatedAt(); ok {
 		_spec.SetField(invoicestatuscode.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := iscc.mutation.InvoiceStatus(); ok {
 		_spec.SetField(invoicestatuscode.FieldInvoiceStatus, field.TypeString, value)

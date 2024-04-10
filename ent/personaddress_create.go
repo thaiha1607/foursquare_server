@@ -174,11 +174,11 @@ func (pac *PersonAddressCreate) createSpec() (*PersonAddress, *sqlgraph.CreateSp
 	)
 	if value, ok := pac.mutation.CreatedAt(); ok {
 		_spec.SetField(personaddress.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := pac.mutation.UpdatedAt(); ok {
 		_spec.SetField(personaddress.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if nodes := pac.mutation.PersonsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

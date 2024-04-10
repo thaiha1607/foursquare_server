@@ -30,6 +30,7 @@ func (Order) Fields() []ent.Field {
 			Nillable().
 			Immutable(),
 		field.Int("priority").
+			Nillable().
 			Default(0).
 			Range(0, 100),
 		field.Enum("type").
@@ -40,6 +41,7 @@ func (Order) Fields() []ent.Field {
 				"Transfer", "TRANSFER",
 				"Other", "OTHER",
 			).
+			Nillable().
 			Default("SALE").
 			Immutable(),
 		field.Int("status_code").
@@ -51,6 +53,7 @@ func (Order) Fields() []ent.Field {
 			Optional().
 			Nillable(),
 		field.Bool("is_internal").
+			Nillable().
 			Default(false).
 			Immutable(),
 		field.UUID("address_id", uuid.UUID{}),

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,12 +27,6 @@ func (ohu *OrderHistoryUpdate) Where(ps ...predicate.OrderHistory) *OrderHistory
 	return ohu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ohu *OrderHistoryUpdate) SetUpdatedAt(t time.Time) *OrderHistoryUpdate {
-	ohu.mutation.SetUpdatedAt(t)
-	return ohu
-}
-
 // Mutation returns the OrderHistoryMutation object of the builder.
 func (ohu *OrderHistoryUpdate) Mutation() *OrderHistoryMutation {
 	return ohu.mutation
@@ -41,7 +34,6 @@ func (ohu *OrderHistoryUpdate) Mutation() *OrderHistoryMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ohu *OrderHistoryUpdate) Save(ctx context.Context) (int, error) {
-	ohu.defaults()
 	return withHooks(ctx, ohu.sqlSave, ohu.mutation, ohu.hooks)
 }
 
@@ -64,14 +56,6 @@ func (ohu *OrderHistoryUpdate) Exec(ctx context.Context) error {
 func (ohu *OrderHistoryUpdate) ExecX(ctx context.Context) {
 	if err := ohu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ohu *OrderHistoryUpdate) defaults() {
-	if _, ok := ohu.mutation.UpdatedAt(); !ok {
-		v := orderhistory.UpdateDefaultUpdatedAt()
-		ohu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -98,9 +82,6 @@ func (ohu *OrderHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ohu.mutation.UpdatedAt(); ok {
-		_spec.SetField(orderhistory.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if ohu.mutation.DescriptionCleared() {
 		_spec.ClearField(orderhistory.FieldDescription, field.TypeString)
 	}
@@ -124,12 +105,6 @@ type OrderHistoryUpdateOne struct {
 	mutation *OrderHistoryMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ohuo *OrderHistoryUpdateOne) SetUpdatedAt(t time.Time) *OrderHistoryUpdateOne {
-	ohuo.mutation.SetUpdatedAt(t)
-	return ohuo
-}
-
 // Mutation returns the OrderHistoryMutation object of the builder.
 func (ohuo *OrderHistoryUpdateOne) Mutation() *OrderHistoryMutation {
 	return ohuo.mutation
@@ -150,7 +125,6 @@ func (ohuo *OrderHistoryUpdateOne) Select(field string, fields ...string) *Order
 
 // Save executes the query and returns the updated OrderHistory entity.
 func (ohuo *OrderHistoryUpdateOne) Save(ctx context.Context) (*OrderHistory, error) {
-	ohuo.defaults()
 	return withHooks(ctx, ohuo.sqlSave, ohuo.mutation, ohuo.hooks)
 }
 
@@ -173,14 +147,6 @@ func (ohuo *OrderHistoryUpdateOne) Exec(ctx context.Context) error {
 func (ohuo *OrderHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := ohuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ohuo *OrderHistoryUpdateOne) defaults() {
-	if _, ok := ohuo.mutation.UpdatedAt(); !ok {
-		v := orderhistory.UpdateDefaultUpdatedAt()
-		ohuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -223,9 +189,6 @@ func (ohuo *OrderHistoryUpdateOne) sqlSave(ctx context.Context) (_node *OrderHis
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := ohuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(orderhistory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if ohuo.mutation.DescriptionCleared() {
 		_spec.ClearField(orderhistory.FieldDescription, field.TypeString)

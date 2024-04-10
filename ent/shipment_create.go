@@ -272,15 +272,15 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(shipment.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := sc.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipment.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := sc.mutation.ShipmentDate(); ok {
 		_spec.SetField(shipment.FieldShipmentDate, field.TypeTime, value)
-		_node.ShipmentDate = value
+		_node.ShipmentDate = &value
 	}
 	if value, ok := sc.mutation.Note(); ok {
 		_spec.SetField(shipment.FieldNote, field.TypeString, value)
@@ -351,7 +351,7 @@ func (sc *ShipmentCreate) createSpec() (*Shipment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.StatusCode = nodes[0]
+		_node.StatusCode = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

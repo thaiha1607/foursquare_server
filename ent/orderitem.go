@@ -24,9 +24,9 @@ type OrderItem struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
@@ -38,11 +38,11 @@ type OrderItem struct {
 	// DstUnitID holds the value of the "dst_unit_id" field.
 	DstUnitID *uuid.UUID `json:"dst_unit_id,omitempty"`
 	// Qty holds the value of the "qty" field.
-	Qty decimal.Decimal `json:"qty,omitempty"`
+	Qty *decimal.Decimal `json:"qty,omitempty"`
 	// PricePerUnit holds the value of the "price_per_unit" field.
-	PricePerUnit decimal.Decimal `json:"price_per_unit,omitempty"`
+	PricePerUnit *decimal.Decimal `json:"price_per_unit,omitempty"`
 	// Status holds the value of the "status" field.
-	Status orderitem.Status `json:"status,omitempty"`
+	Status *orderitem.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderItemQuery when eager-loading is set.
 	Edges        OrderItemEdges `json:"edges"`
@@ -126,10 +126,10 @@ func (*OrderItem) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case orderitem.FieldQty, orderitem.FieldPricePerUnit:
+			values[i] = &sql.NullScanner{S: new(decimal.Decimal)}
 		case orderitem.FieldSrcUnitID, orderitem.FieldDstUnitID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case orderitem.FieldQty, orderitem.FieldPricePerUnit:
-			values[i] = new(decimal.Decimal)
 		case orderitem.FieldProductID, orderitem.FieldProductColorID, orderitem.FieldStatus:
 			values[i] = new(sql.NullString)
 		case orderitem.FieldCreatedAt, orderitem.FieldUpdatedAt:
@@ -161,13 +161,15 @@ func (oi *OrderItem) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				oi.CreatedAt = value.Time
+				oi.CreatedAt = new(time.Time)
+				*oi.CreatedAt = value.Time
 			}
 		case orderitem.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				oi.UpdatedAt = value.Time
+				oi.UpdatedAt = new(time.Time)
+				*oi.UpdatedAt = value.Time
 			}
 		case orderitem.FieldOrderID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -202,22 +204,25 @@ func (oi *OrderItem) assignValues(columns []string, values []any) error {
 				*oi.DstUnitID = *value.S.(*uuid.UUID)
 			}
 		case orderitem.FieldQty:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field qty", values[i])
-			} else if value != nil {
-				oi.Qty = *value
+			} else if value.Valid {
+				oi.Qty = new(decimal.Decimal)
+				*oi.Qty = *value.S.(*decimal.Decimal)
 			}
 		case orderitem.FieldPricePerUnit:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field price_per_unit", values[i])
-			} else if value != nil {
-				oi.PricePerUnit = *value
+			} else if value.Valid {
+				oi.PricePerUnit = new(decimal.Decimal)
+				*oi.PricePerUnit = *value.S.(*decimal.Decimal)
 			}
 		case orderitem.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				oi.Status = orderitem.Status(value.String)
+				oi.Status = new(orderitem.Status)
+				*oi.Status = orderitem.Status(value.String)
 			}
 		default:
 			oi.selectValues.Set(columns[i], values[i])
@@ -280,11 +285,15 @@ func (oi *OrderItem) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrderItem(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", oi.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(oi.CreatedAt.Format(time.ANSIC))
+	if v := oi.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(oi.UpdatedAt.Format(time.ANSIC))
+	if v := oi.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
 	builder.WriteString(fmt.Sprintf("%v", oi.OrderID))
@@ -305,14 +314,20 @@ func (oi *OrderItem) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("qty=")
-	builder.WriteString(fmt.Sprintf("%v", oi.Qty))
+	if v := oi.Qty; v != nil {
+		builder.WriteString("qty=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("price_per_unit=")
-	builder.WriteString(fmt.Sprintf("%v", oi.PricePerUnit))
+	if v := oi.PricePerUnit; v != nil {
+		builder.WriteString("price_per_unit=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", oi.Status))
+	if v := oi.Status; v != nil {
+		builder.WriteString("status=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

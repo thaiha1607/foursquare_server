@@ -160,11 +160,11 @@ func (oscc *OrderStatusCodeCreate) createSpec() (*OrderStatusCode, *sqlgraph.Cre
 	}
 	if value, ok := oscc.mutation.CreatedAt(); ok {
 		_spec.SetField(orderstatuscode.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := oscc.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderstatuscode.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := oscc.mutation.OrderStatus(); ok {
 		_spec.SetField(orderstatuscode.FieldOrderStatus, field.TypeString, value)

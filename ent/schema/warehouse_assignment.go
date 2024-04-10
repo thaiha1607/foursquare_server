@@ -39,6 +39,7 @@ func (WarehouseAssignment) Fields() []ent.Field {
 				"Accepted", "ACCEPTED",
 				"Rejected", "REJECTED",
 			).
+			Nillable().
 			Default("PENDING"),
 		field.String("note").
 			Optional().

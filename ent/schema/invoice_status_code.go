@@ -24,6 +24,7 @@ func (InvoiceStatusCode) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").
 			Unique().
+			Nillable().
 			Immutable().
 			Positive().
 			Min(1),

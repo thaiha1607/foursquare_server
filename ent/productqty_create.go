@@ -240,19 +240,19 @@ func (pqc *ProductQtyCreate) createSpec() (*ProductQty, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pqc.mutation.CreatedAt(); ok {
 		_spec.SetField(productqty.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := pqc.mutation.UpdatedAt(); ok {
 		_spec.SetField(productqty.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := pqc.mutation.PricePerUnit(); ok {
 		_spec.SetField(productqty.FieldPricePerUnit, field.TypeFloat64, value)
-		_node.PricePerUnit = value
+		_node.PricePerUnit = &value
 	}
 	if value, ok := pqc.mutation.Qty(); ok {
 		_spec.SetField(productqty.FieldQty, field.TypeFloat64, value)
-		_node.Qty = value
+		_node.Qty = &value
 	}
 	if nodes := pqc.mutation.WorkUnitIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -22,9 +22,9 @@ type WarehouseAssignment struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// WorkUnitID holds the value of the "work_unit_id" field.
@@ -32,7 +32,7 @@ type WarehouseAssignment struct {
 	// StaffID holds the value of the "staff_id" field.
 	StaffID *uuid.UUID `json:"staff_id,omitempty"`
 	// Status holds the value of the "status" field.
-	Status warehouseassignment.Status `json:"status,omitempty"`
+	Status *warehouseassignment.Status `json:"status,omitempty"`
 	// Note holds the value of the "note" field.
 	Note *string `json:"note,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -125,13 +125,15 @@ func (wa *WarehouseAssignment) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				wa.CreatedAt = value.Time
+				wa.CreatedAt = new(time.Time)
+				*wa.CreatedAt = value.Time
 			}
 		case warehouseassignment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				wa.UpdatedAt = value.Time
+				wa.UpdatedAt = new(time.Time)
+				*wa.UpdatedAt = value.Time
 			}
 		case warehouseassignment.FieldOrderID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -156,7 +158,8 @@ func (wa *WarehouseAssignment) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				wa.Status = warehouseassignment.Status(value.String)
+				wa.Status = new(warehouseassignment.Status)
+				*wa.Status = warehouseassignment.Status(value.String)
 			}
 		case warehouseassignment.FieldNote:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -216,11 +219,15 @@ func (wa *WarehouseAssignment) String() string {
 	var builder strings.Builder
 	builder.WriteString("WarehouseAssignment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", wa.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(wa.CreatedAt.Format(time.ANSIC))
+	if v := wa.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(wa.UpdatedAt.Format(time.ANSIC))
+	if v := wa.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
 	builder.WriteString(fmt.Sprintf("%v", wa.OrderID))
@@ -233,8 +240,10 @@ func (wa *WarehouseAssignment) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", wa.Status))
+	if v := wa.Status; v != nil {
+		builder.WriteString("status=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := wa.Note; v != nil {
 		builder.WriteString("note=")

@@ -236,11 +236,11 @@ func (wuic *WorkUnitInfoCreate) createSpec() (*WorkUnitInfo, *sqlgraph.CreateSpe
 	}
 	if value, ok := wuic.mutation.CreatedAt(); ok {
 		_spec.SetField(workunitinfo.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := wuic.mutation.UpdatedAt(); ok {
 		_spec.SetField(workunitinfo.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := wuic.mutation.Name(); ok {
 		_spec.SetField(workunitinfo.FieldName, field.TypeString, value)
@@ -248,7 +248,7 @@ func (wuic *WorkUnitInfoCreate) createSpec() (*WorkUnitInfo, *sqlgraph.CreateSpe
 	}
 	if value, ok := wuic.mutation.GetType(); ok {
 		_spec.SetField(workunitinfo.FieldType, field.TypeEnum, value)
-		_node.Type = value
+		_node.Type = &value
 	}
 	if value, ok := wuic.mutation.ImageURL(); ok {
 		_spec.SetField(workunitinfo.FieldImageURL, field.TypeString, value)

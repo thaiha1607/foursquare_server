@@ -21,7 +21,8 @@ func (Shipment) Fields() []ent.Field {
 			Immutable(),
 		field.UUID("staff_id", uuid.UUID{}).
 			Immutable(),
-		field.Time("shipment_date"),
+		field.Time("shipment_date").
+			Nillable(),
 		field.String("note").
 			Optional().
 			Nillable(),
@@ -32,6 +33,7 @@ func (Shipment) Fields() []ent.Field {
 			- Rejected
 		*/
 		field.Int("status_code").
+			Nillable().
 			Default(1),
 	}
 }

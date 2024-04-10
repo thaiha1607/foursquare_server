@@ -82,7 +82,6 @@ type AddressMutation struct {
 	typ                   string
 	id                    *uuid.UUID
 	created_at            *time.Time
-	updated_at            *time.Time
 	line1                 *string
 	line2                 *string
 	city                  *string
@@ -220,7 +219,7 @@ func (m *AddressMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Address entity.
 // If the Address object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AddressMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *AddressMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -237,42 +236,6 @@ func (m *AddressMutation) OldCreatedAt(ctx context.Context) (v time.Time, err er
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *AddressMutation) ResetCreatedAt() {
 	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *AddressMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *AddressMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Address entity.
-// If the Address object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AddressMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *AddressMutation) ResetUpdatedAt() {
-	m.updated_at = nil
 }
 
 // SetLine1 sets the "line1" field.
@@ -641,12 +604,9 @@ func (m *AddressMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AddressMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, address.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, address.FieldUpdatedAt)
 	}
 	if m.line1 != nil {
 		fields = append(fields, address.FieldLine1)
@@ -679,8 +639,6 @@ func (m *AddressMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case address.FieldCreatedAt:
 		return m.CreatedAt()
-	case address.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case address.FieldLine1:
 		return m.Line1()
 	case address.FieldLine2:
@@ -706,8 +664,6 @@ func (m *AddressMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case address.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case address.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	case address.FieldLine1:
 		return m.OldLine1(ctx)
 	case address.FieldLine2:
@@ -737,13 +693,6 @@ func (m *AddressMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
-		return nil
-	case address.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	case address.FieldLine1:
 		v, ok := value.(string)
@@ -860,9 +809,6 @@ func (m *AddressMutation) ResetField(name string) error {
 	switch name {
 	case address.FieldCreatedAt:
 		m.ResetCreatedAt()
-		return nil
-	case address.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	case address.FieldLine1:
 		m.ResetLine1()
@@ -1113,7 +1059,7 @@ func (m *ConversationMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Conversation entity.
 // If the Conversation object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConversationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ConversationMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -1149,7 +1095,7 @@ func (m *ConversationMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Conversation entity.
 // If the Conversation object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConversationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ConversationMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -1787,7 +1733,7 @@ func (m *InvoiceMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *InvoiceMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -1823,7 +1769,7 @@ func (m *InvoiceMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *InvoiceMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -1896,7 +1842,7 @@ func (m *InvoiceMutation) Total() (r decimal.Decimal, exists bool) {
 // OldTotal returns the old "total" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldTotal(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *InvoiceMutation) OldTotal(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
 	}
@@ -2000,7 +1946,7 @@ func (m *InvoiceMutation) GetType() (r invoice.Type, exists bool) {
 // OldType returns the old "type" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldType(ctx context.Context) (v invoice.Type, err error) {
+func (m *InvoiceMutation) OldType(ctx context.Context) (v *invoice.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}
@@ -2036,7 +1982,7 @@ func (m *InvoiceMutation) StatusCode() (r int, exists bool) {
 // OldStatusCode returns the old "status_code" field's value of the Invoice entity.
 // If the Invoice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceMutation) OldStatusCode(ctx context.Context) (v int, err error) {
+func (m *InvoiceMutation) OldStatusCode(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatusCode is only allowed on UpdateOne operations")
 	}
@@ -2086,22 +2032,9 @@ func (m *InvoiceMutation) OldPaymentMethod(ctx context.Context) (v *invoice.Paym
 	return oldValue.PaymentMethod, nil
 }
 
-// ClearPaymentMethod clears the value of the "payment_method" field.
-func (m *InvoiceMutation) ClearPaymentMethod() {
-	m.payment_method = nil
-	m.clearedFields[invoice.FieldPaymentMethod] = struct{}{}
-}
-
-// PaymentMethodCleared returns if the "payment_method" field was cleared in this mutation.
-func (m *InvoiceMutation) PaymentMethodCleared() bool {
-	_, ok := m.clearedFields[invoice.FieldPaymentMethod]
-	return ok
-}
-
 // ResetPaymentMethod resets all changes to the "payment_method" field.
 func (m *InvoiceMutation) ResetPaymentMethod() {
 	m.payment_method = nil
-	delete(m.clearedFields, invoice.FieldPaymentMethod)
 }
 
 // ClearOrder clears the "order" edge to the Order entity.
@@ -2392,9 +2325,6 @@ func (m *InvoiceMutation) ClearedFields() []string {
 	if m.FieldCleared(invoice.FieldNote) {
 		fields = append(fields, invoice.FieldNote)
 	}
-	if m.FieldCleared(invoice.FieldPaymentMethod) {
-		fields = append(fields, invoice.FieldPaymentMethod)
-	}
 	return fields
 }
 
@@ -2411,9 +2341,6 @@ func (m *InvoiceMutation) ClearField(name string) error {
 	switch name {
 	case invoice.FieldNote:
 		m.ClearNote()
-		return nil
-	case invoice.FieldPaymentMethod:
-		m.ClearPaymentMethod()
 		return nil
 	}
 	return fmt.Errorf("unknown Invoice nullable field %s", name)
@@ -2550,7 +2477,6 @@ type InvoiceHistoryMutation struct {
 	typ               string
 	id                *uuid.UUID
 	created_at        *time.Time
-	updated_at        *time.Time
 	description       *string
 	clearedFields     map[string]struct{}
 	invoice           *uuid.UUID
@@ -2687,7 +2613,7 @@ func (m *InvoiceHistoryMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the InvoiceHistory entity.
 // If the InvoiceHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *InvoiceHistoryMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -2704,42 +2630,6 @@ func (m *InvoiceHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time,
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *InvoiceHistoryMutation) ResetCreatedAt() {
 	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *InvoiceHistoryMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *InvoiceHistoryMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the InvoiceHistory entity.
-// If the InvoiceHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceHistoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *InvoiceHistoryMutation) ResetUpdatedAt() {
-	m.updated_at = nil
 }
 
 // SetInvoiceID sets the "invoice_id" field.
@@ -3129,12 +3019,9 @@ func (m *InvoiceHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *InvoiceHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, invoicehistory.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, invoicehistory.FieldUpdatedAt)
 	}
 	if m.invoice != nil {
 		fields = append(fields, invoicehistory.FieldInvoiceID)
@@ -3161,8 +3048,6 @@ func (m *InvoiceHistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case invoicehistory.FieldCreatedAt:
 		return m.CreatedAt()
-	case invoicehistory.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case invoicehistory.FieldInvoiceID:
 		return m.InvoiceID()
 	case invoicehistory.FieldPersonID:
@@ -3184,8 +3069,6 @@ func (m *InvoiceHistoryMutation) OldField(ctx context.Context, name string) (ent
 	switch name {
 	case invoicehistory.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case invoicehistory.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	case invoicehistory.FieldInvoiceID:
 		return m.OldInvoiceID(ctx)
 	case invoicehistory.FieldPersonID:
@@ -3211,13 +3094,6 @@ func (m *InvoiceHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
-		return nil
-	case invoicehistory.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	case invoicehistory.FieldInvoiceID:
 		v, ok := value.(uuid.UUID)
@@ -3329,9 +3205,6 @@ func (m *InvoiceHistoryMutation) ResetField(name string) error {
 	switch name {
 	case invoicehistory.FieldCreatedAt:
 		m.ResetCreatedAt()
-		return nil
-	case invoicehistory.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	case invoicehistory.FieldInvoiceID:
 		m.ResetInvoiceID()
@@ -3616,7 +3489,7 @@ func (m *InvoiceStatusCodeMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the InvoiceStatusCode entity.
 // If the InvoiceStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceStatusCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *InvoiceStatusCodeMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -3652,7 +3525,7 @@ func (m *InvoiceStatusCodeMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the InvoiceStatusCode entity.
 // If the InvoiceStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InvoiceStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *InvoiceStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -4062,7 +3935,7 @@ func (m *MessageMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Message entity.
 // If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *MessageMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -4098,7 +3971,7 @@ func (m *MessageMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Message entity.
 // If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *MessageMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -4206,7 +4079,7 @@ func (m *MessageMutation) GetType() (r message.Type, exists bool) {
 // OldType returns the old "type" field's value of the Message entity.
 // If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldType(ctx context.Context) (v message.Type, err error) {
+func (m *MessageMutation) OldType(ctx context.Context) (v *message.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}
@@ -4278,7 +4151,7 @@ func (m *MessageMutation) IsRead() (r bool, exists bool) {
 // OldIsRead returns the old "is_read" field's value of the Message entity.
 // If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldIsRead(ctx context.Context) (v bool, err error) {
+func (m *MessageMutation) OldIsRead(ctx context.Context) (v *bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIsRead is only allowed on UpdateOne operations")
 	}
@@ -4829,7 +4702,7 @@ func (m *OrderMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -4865,7 +4738,7 @@ func (m *OrderMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -5072,7 +4945,7 @@ func (m *OrderMutation) Priority() (r int, exists bool) {
 // OldPriority returns the old "priority" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldPriority(ctx context.Context) (v int, err error) {
+func (m *OrderMutation) OldPriority(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
 	}
@@ -5127,7 +5000,7 @@ func (m *OrderMutation) GetType() (r order.Type, exists bool) {
 // OldType returns the old "type" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldType(ctx context.Context) (v order.Type, err error) {
+func (m *OrderMutation) OldType(ctx context.Context) (v *order.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}
@@ -5297,7 +5170,7 @@ func (m *OrderMutation) IsInternal() (r bool, exists bool) {
 // OldIsInternal returns the old "is_internal" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldIsInternal(ctx context.Context) (v bool, err error) {
+func (m *OrderMutation) OldIsInternal(ctx context.Context) (v *bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIsInternal is only allowed on UpdateOne operations")
 	}
@@ -6101,7 +5974,6 @@ type OrderHistoryMutation struct {
 	typ               string
 	id                *uuid.UUID
 	created_at        *time.Time
-	updated_at        *time.Time
 	description       *string
 	clearedFields     map[string]struct{}
 	_order            *uuid.UUID
@@ -6238,7 +6110,7 @@ func (m *OrderHistoryMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the OrderHistory entity.
 // If the OrderHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderHistoryMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -6255,42 +6127,6 @@ func (m *OrderHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, e
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *OrderHistoryMutation) ResetCreatedAt() {
 	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *OrderHistoryMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *OrderHistoryMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the OrderHistory entity.
-// If the OrderHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderHistoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *OrderHistoryMutation) ResetUpdatedAt() {
-	m.updated_at = nil
 }
 
 // SetOrderID sets the "order_id" field.
@@ -6680,12 +6516,9 @@ func (m *OrderHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, orderhistory.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, orderhistory.FieldUpdatedAt)
 	}
 	if m._order != nil {
 		fields = append(fields, orderhistory.FieldOrderID)
@@ -6712,8 +6545,6 @@ func (m *OrderHistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case orderhistory.FieldCreatedAt:
 		return m.CreatedAt()
-	case orderhistory.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case orderhistory.FieldOrderID:
 		return m.OrderID()
 	case orderhistory.FieldPersonID:
@@ -6735,8 +6566,6 @@ func (m *OrderHistoryMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case orderhistory.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case orderhistory.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	case orderhistory.FieldOrderID:
 		return m.OldOrderID(ctx)
 	case orderhistory.FieldPersonID:
@@ -6762,13 +6591,6 @@ func (m *OrderHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
-		return nil
-	case orderhistory.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	case orderhistory.FieldOrderID:
 		v, ok := value.(uuid.UUID)
@@ -6880,9 +6702,6 @@ func (m *OrderHistoryMutation) ResetField(name string) error {
 	switch name {
 	case orderhistory.FieldCreatedAt:
 		m.ResetCreatedAt()
-		return nil
-	case orderhistory.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	case orderhistory.FieldOrderID:
 		m.ResetOrderID()
@@ -7181,7 +7000,7 @@ func (m *OrderItemMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the OrderItem entity.
 // If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderItemMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -7217,7 +7036,7 @@ func (m *OrderItemMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the OrderItem entity.
 // If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderItemMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -7460,7 +7279,7 @@ func (m *OrderItemMutation) Qty() (r decimal.Decimal, exists bool) {
 // OldQty returns the old "qty" field's value of the OrderItem entity.
 // If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderItemMutation) OldQty(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *OrderItemMutation) OldQty(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQty is only allowed on UpdateOne operations")
 	}
@@ -7516,7 +7335,7 @@ func (m *OrderItemMutation) PricePerUnit() (r decimal.Decimal, exists bool) {
 // OldPricePerUnit returns the old "price_per_unit" field's value of the OrderItem entity.
 // If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderItemMutation) OldPricePerUnit(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *OrderItemMutation) OldPricePerUnit(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPricePerUnit is only allowed on UpdateOne operations")
 	}
@@ -7571,7 +7390,7 @@ func (m *OrderItemMutation) Status() (r orderitem.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the OrderItem entity.
 // If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderItemMutation) OldStatus(ctx context.Context) (v orderitem.Status, err error) {
+func (m *OrderItemMutation) OldStatus(ctx context.Context) (v *orderitem.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -8359,7 +8178,7 @@ func (m *OrderStatusCodeMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the OrderStatusCode entity.
 // If the OrderStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderStatusCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderStatusCodeMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -8395,7 +8214,7 @@ func (m *OrderStatusCodeMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the OrderStatusCode entity.
 // If the OrderStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *OrderStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -8811,7 +8630,7 @@ func (m *PersonMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *PersonMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -8847,7 +8666,7 @@ func (m *PersonMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *PersonMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -9053,7 +8872,7 @@ func (m *PersonMutation) Role() (r person.Role, exists bool) {
 // OldRole returns the old "role" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldRole(ctx context.Context) (v person.Role, err error) {
+func (m *PersonMutation) OldRole(ctx context.Context) (v *person.Role, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRole is only allowed on UpdateOne operations")
 	}
@@ -9138,7 +8957,7 @@ func (m *PersonMutation) IsEmailVerified() (r bool, exists bool) {
 // OldIsEmailVerified returns the old "is_email_verified" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldIsEmailVerified(ctx context.Context) (v bool, err error) {
+func (m *PersonMutation) OldIsEmailVerified(ctx context.Context) (v *bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIsEmailVerified is only allowed on UpdateOne operations")
 	}
@@ -9174,7 +8993,7 @@ func (m *PersonMutation) IsPhoneVerified() (r bool, exists bool) {
 // OldIsPhoneVerified returns the old "is_phone_verified" field's value of the Person entity.
 // If the Person object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonMutation) OldIsPhoneVerified(ctx context.Context) (v bool, err error) {
+func (m *PersonMutation) OldIsPhoneVerified(ctx context.Context) (v *bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIsPhoneVerified is only allowed on UpdateOne operations")
 	}
@@ -10365,7 +10184,7 @@ func (m *ProductColorMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ProductColor entity.
 // If the ProductColor object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductColorMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductColorMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -10401,7 +10220,7 @@ func (m *ProductColorMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ProductColor entity.
 // If the ProductColor object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductColorMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductColorMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -10860,7 +10679,7 @@ func (m *ProductImageMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ProductImage entity.
 // If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductImageMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductImageMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -10896,7 +10715,7 @@ func (m *ProductImageMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ProductImage entity.
 // If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductImageMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductImageMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -11413,7 +11232,7 @@ func (m *ProductInfoMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ProductInfo entity.
 // If the ProductInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductInfoMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductInfoMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -11449,7 +11268,7 @@ func (m *ProductInfoMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ProductInfo entity.
 // If the ProductInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductInfoMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductInfoMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -12207,7 +12026,7 @@ func (m *ProductQtyMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ProductQty entity.
 // If the ProductQty object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductQtyMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductQtyMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -12243,7 +12062,7 @@ func (m *ProductQtyMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ProductQty entity.
 // If the ProductQty object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductQtyMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ProductQtyMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -12388,7 +12207,7 @@ func (m *ProductQtyMutation) PricePerUnit() (r decimal.Decimal, exists bool) {
 // OldPricePerUnit returns the old "price_per_unit" field's value of the ProductQty entity.
 // If the ProductQty object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductQtyMutation) OldPricePerUnit(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *ProductQtyMutation) OldPricePerUnit(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPricePerUnit is only allowed on UpdateOne operations")
 	}
@@ -12444,7 +12263,7 @@ func (m *ProductQtyMutation) Qty() (r decimal.Decimal, exists bool) {
 // OldQty returns the old "qty" field's value of the ProductQty entity.
 // If the ProductQty object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductQtyMutation) OldQty(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *ProductQtyMutation) OldQty(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQty is only allowed on UpdateOne operations")
 	}
@@ -13483,7 +13302,7 @@ func (m *ShipmentMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -13519,7 +13338,7 @@ func (m *ShipmentMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -13663,7 +13482,7 @@ func (m *ShipmentMutation) ShipmentDate() (r time.Time, exists bool) {
 // OldShipmentDate returns the old "shipment_date" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldShipmentDate(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentMutation) OldShipmentDate(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldShipmentDate is only allowed on UpdateOne operations")
 	}
@@ -13748,7 +13567,7 @@ func (m *ShipmentMutation) StatusCode() (r int, exists bool) {
 // OldStatusCode returns the old "status_code" field's value of the Shipment entity.
 // If the Shipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentMutation) OldStatusCode(ctx context.Context) (v int, err error) {
+func (m *ShipmentMutation) OldStatusCode(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatusCode is only allowed on UpdateOne operations")
 	}
@@ -14285,7 +14104,6 @@ type ShipmentHistoryMutation struct {
 	typ               string
 	id                *uuid.UUID
 	created_at        *time.Time
-	updated_at        *time.Time
 	description       *string
 	clearedFields     map[string]struct{}
 	shipment          *string
@@ -14422,7 +14240,7 @@ func (m *ShipmentHistoryMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ShipmentHistory entity.
 // If the ShipmentHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentHistoryMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -14439,42 +14257,6 @@ func (m *ShipmentHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *ShipmentHistoryMutation) ResetCreatedAt() {
 	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *ShipmentHistoryMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *ShipmentHistoryMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the ShipmentHistory entity.
-// If the ShipmentHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentHistoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *ShipmentHistoryMutation) ResetUpdatedAt() {
-	m.updated_at = nil
 }
 
 // SetShipmentID sets the "shipment_id" field.
@@ -14864,12 +14646,9 @@ func (m *ShipmentHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ShipmentHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, shipmenthistory.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, shipmenthistory.FieldUpdatedAt)
 	}
 	if m.shipment != nil {
 		fields = append(fields, shipmenthistory.FieldShipmentID)
@@ -14896,8 +14675,6 @@ func (m *ShipmentHistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case shipmenthistory.FieldCreatedAt:
 		return m.CreatedAt()
-	case shipmenthistory.FieldUpdatedAt:
-		return m.UpdatedAt()
 	case shipmenthistory.FieldShipmentID:
 		return m.ShipmentID()
 	case shipmenthistory.FieldPersonID:
@@ -14919,8 +14696,6 @@ func (m *ShipmentHistoryMutation) OldField(ctx context.Context, name string) (en
 	switch name {
 	case shipmenthistory.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case shipmenthistory.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	case shipmenthistory.FieldShipmentID:
 		return m.OldShipmentID(ctx)
 	case shipmenthistory.FieldPersonID:
@@ -14946,13 +14721,6 @@ func (m *ShipmentHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
-		return nil
-	case shipmenthistory.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	case shipmenthistory.FieldShipmentID:
 		v, ok := value.(string)
@@ -15064,9 +14832,6 @@ func (m *ShipmentHistoryMutation) ResetField(name string) error {
 	switch name {
 	case shipmenthistory.FieldCreatedAt:
 		m.ResetCreatedAt()
-		return nil
-	case shipmenthistory.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	case shipmenthistory.FieldShipmentID:
 		m.ResetShipmentID()
@@ -15358,7 +15123,7 @@ func (m *ShipmentItemMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ShipmentItem entity.
 // If the ShipmentItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentItemMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -15394,7 +15159,7 @@ func (m *ShipmentItemMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ShipmentItem entity.
 // If the ShipmentItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentItemMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -15503,7 +15268,7 @@ func (m *ShipmentItemMutation) Qty() (r decimal.Decimal, exists bool) {
 // OldQty returns the old "qty" field's value of the ShipmentItem entity.
 // If the ShipmentItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentItemMutation) OldQty(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *ShipmentItemMutation) OldQty(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQty is only allowed on UpdateOne operations")
 	}
@@ -15559,7 +15324,7 @@ func (m *ShipmentItemMutation) Total() (r decimal.Decimal, exists bool) {
 // OldTotal returns the old "total" field's value of the ShipmentItem entity.
 // If the ShipmentItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentItemMutation) OldTotal(ctx context.Context) (v decimal.Decimal, err error) {
+func (m *ShipmentItemMutation) OldTotal(ctx context.Context) (v *decimal.Decimal, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
 	}
@@ -16122,7 +15887,7 @@ func (m *ShipmentStatusCodeMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the ShipmentStatusCode entity.
 // If the ShipmentStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentStatusCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentStatusCodeMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -16158,7 +15923,7 @@ func (m *ShipmentStatusCodeMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the ShipmentStatusCode entity.
 // If the ShipmentStatusCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShipmentStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ShipmentStatusCodeMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -16565,7 +16330,7 @@ func (m *TagMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the Tag entity.
 // If the Tag object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TagMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *TagMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -16601,7 +16366,7 @@ func (m *TagMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Tag entity.
 // If the Tag object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TagMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *TagMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -17102,7 +16867,7 @@ func (m *WarehouseAssignmentMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the WarehouseAssignment entity.
 // If the WarehouseAssignment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WarehouseAssignmentMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *WarehouseAssignmentMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -17138,7 +16903,7 @@ func (m *WarehouseAssignmentMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the WarehouseAssignment entity.
 // If the WarehouseAssignment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WarehouseAssignmentMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *WarehouseAssignmentMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -17295,7 +17060,7 @@ func (m *WarehouseAssignmentMutation) Status() (r warehouseassignment.Status, ex
 // OldStatus returns the old "status" field's value of the WarehouseAssignment entity.
 // If the WarehouseAssignment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WarehouseAssignmentMutation) OldStatus(ctx context.Context) (v warehouseassignment.Status, err error) {
+func (m *WarehouseAssignmentMutation) OldStatus(ctx context.Context) (v *warehouseassignment.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -17942,7 +17707,7 @@ func (m *WorkUnitInfoMutation) CreatedAt() (r time.Time, exists bool) {
 // OldCreatedAt returns the old "created_at" field's value of the WorkUnitInfo entity.
 // If the WorkUnitInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkUnitInfoMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *WorkUnitInfoMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -17978,7 +17743,7 @@ func (m *WorkUnitInfoMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the WorkUnitInfo entity.
 // If the WorkUnitInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkUnitInfoMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *WorkUnitInfoMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -18099,7 +17864,7 @@ func (m *WorkUnitInfoMutation) GetType() (r workunitinfo.Type, exists bool) {
 // OldType returns the old "type" field's value of the WorkUnitInfo entity.
 // If the WorkUnitInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkUnitInfoMutation) OldType(ctx context.Context) (v workunitinfo.Type, err error) {
+func (m *WorkUnitInfoMutation) OldType(ctx context.Context) (v *workunitinfo.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}

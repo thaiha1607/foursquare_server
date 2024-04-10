@@ -22,19 +22,19 @@ type Invoice struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// Total holds the value of the "total" field.
-	Total decimal.Decimal `json:"total,omitempty"`
+	Total *decimal.Decimal `json:"total,omitempty"`
 	// Note holds the value of the "note" field.
 	Note *string `json:"note,omitempty"`
 	// Type holds the value of the "type" field.
-	Type invoice.Type `json:"type,omitempty"`
+	Type *invoice.Type `json:"type,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
-	StatusCode int `json:"status_code,omitempty"`
+	StatusCode *int `json:"status_code,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
 	PaymentMethod *invoice.PaymentMethod `json:"payment_method,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -82,7 +82,7 @@ func (*Invoice) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case invoice.FieldTotal:
-			values[i] = new(decimal.Decimal)
+			values[i] = &sql.NullScanner{S: new(decimal.Decimal)}
 		case invoice.FieldStatusCode:
 			values[i] = new(sql.NullInt64)
 		case invoice.FieldNote, invoice.FieldType, invoice.FieldPaymentMethod:
@@ -116,13 +116,15 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 			if value, ok := values[j].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[j])
 			} else if value.Valid {
-				i.CreatedAt = value.Time
+				i.CreatedAt = new(time.Time)
+				*i.CreatedAt = value.Time
 			}
 		case invoice.FieldUpdatedAt:
 			if value, ok := values[j].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[j])
 			} else if value.Valid {
-				i.UpdatedAt = value.Time
+				i.UpdatedAt = new(time.Time)
+				*i.UpdatedAt = value.Time
 			}
 		case invoice.FieldOrderID:
 			if value, ok := values[j].(*uuid.UUID); !ok {
@@ -131,10 +133,11 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 				i.OrderID = *value
 			}
 		case invoice.FieldTotal:
-			if value, ok := values[j].(*decimal.Decimal); !ok {
+			if value, ok := values[j].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field total", values[j])
-			} else if value != nil {
-				i.Total = *value
+			} else if value.Valid {
+				i.Total = new(decimal.Decimal)
+				*i.Total = *value.S.(*decimal.Decimal)
 			}
 		case invoice.FieldNote:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -147,13 +150,15 @@ func (i *Invoice) assignValues(columns []string, values []any) error {
 			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[j])
 			} else if value.Valid {
-				i.Type = invoice.Type(value.String)
+				i.Type = new(invoice.Type)
+				*i.Type = invoice.Type(value.String)
 			}
 		case invoice.FieldStatusCode:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status_code", values[j])
 			} else if value.Valid {
-				i.StatusCode = int(value.Int64)
+				i.StatusCode = new(int)
+				*i.StatusCode = int(value.Int64)
 			}
 		case invoice.FieldPaymentMethod:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -208,28 +213,38 @@ func (i *Invoice) String() string {
 	var builder strings.Builder
 	builder.WriteString("Invoice(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", i.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(i.CreatedAt.Format(time.ANSIC))
+	if v := i.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(i.UpdatedAt.Format(time.ANSIC))
+	if v := i.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.OrderID))
 	builder.WriteString(", ")
-	builder.WriteString("total=")
-	builder.WriteString(fmt.Sprintf("%v", i.Total))
+	if v := i.Total; v != nil {
+		builder.WriteString("total=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := i.Note; v != nil {
 		builder.WriteString("note=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", i.Type))
+	if v := i.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("status_code=")
-	builder.WriteString(fmt.Sprintf("%v", i.StatusCode))
+	if v := i.StatusCode; v != nil {
+		builder.WriteString("status_code=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := i.PaymentMethod; v != nil {
 		builder.WriteString("payment_method=")

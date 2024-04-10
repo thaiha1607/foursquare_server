@@ -189,11 +189,11 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 	}
 	if value, ok := pic.mutation.CreatedAt(); ok {
 		_spec.SetField(productimage.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := pic.mutation.UpdatedAt(); ok {
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := pic.mutation.ImageURL(); ok {
 		_spec.SetField(productimage.FieldImageURL, field.TypeString, value)

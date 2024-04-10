@@ -21,19 +21,19 @@ type Message struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// ConversationID holds the value of the "conversation_id" field.
 	ConversationID uuid.UUID `json:"conversation_id,omitempty"`
 	// SenderID holds the value of the "sender_id" field.
 	SenderID uuid.UUID `json:"sender_id,omitempty"`
 	// Type holds the value of the "type" field.
-	Type message.Type `json:"type,omitempty"`
+	Type *message.Type `json:"type,omitempty"`
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// IsRead holds the value of the "is_read" field.
-	IsRead bool `json:"is_read,omitempty"`
+	IsRead *bool `json:"is_read,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MessageQuery when eager-loading is set.
 	Edges        MessageEdges `json:"edges"`
@@ -111,13 +111,15 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				m.CreatedAt = value.Time
+				m.CreatedAt = new(time.Time)
+				*m.CreatedAt = value.Time
 			}
 		case message.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				m.UpdatedAt = value.Time
+				m.UpdatedAt = new(time.Time)
+				*m.UpdatedAt = value.Time
 			}
 		case message.FieldConversationID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -135,7 +137,8 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				m.Type = message.Type(value.String)
+				m.Type = new(message.Type)
+				*m.Type = message.Type(value.String)
 			}
 		case message.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,7 +150,8 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_read", values[i])
 			} else if value.Valid {
-				m.IsRead = value.Bool
+				m.IsRead = new(bool)
+				*m.IsRead = value.Bool
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -195,11 +199,15 @@ func (m *Message) String() string {
 	var builder strings.Builder
 	builder.WriteString("Message(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(m.CreatedAt.Format(time.ANSIC))
+	if v := m.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(m.UpdatedAt.Format(time.ANSIC))
+	if v := m.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("conversation_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.ConversationID))
@@ -207,14 +215,18 @@ func (m *Message) String() string {
 	builder.WriteString("sender_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.SenderID))
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", m.Type))
+	if v := m.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("content=")
 	builder.WriteString(m.Content)
 	builder.WriteString(", ")
-	builder.WriteString("is_read=")
-	builder.WriteString(fmt.Sprintf("%v", m.IsRead))
+	if v := m.IsRead; v != nil {
+		builder.WriteString("is_read=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

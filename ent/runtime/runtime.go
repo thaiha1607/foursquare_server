@@ -45,12 +45,6 @@ func init() {
 	addressDescCreatedAt := addressMixinFields0[0].Descriptor()
 	// address.DefaultCreatedAt holds the default value on creation for the created_at field.
 	address.DefaultCreatedAt = addressDescCreatedAt.Default.(func() time.Time)
-	// addressDescUpdatedAt is the schema descriptor for updated_at field.
-	addressDescUpdatedAt := addressMixinFields0[1].Descriptor()
-	// address.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	address.DefaultUpdatedAt = addressDescUpdatedAt.Default.(func() time.Time)
-	// address.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	address.UpdateDefaultUpdatedAt = addressDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// addressDescLine1 is the schema descriptor for line1 field.
 	addressDescLine1 := addressFields[1].Descriptor()
 	// address.Line1Validator is a validator for the "line1" field. It is called by the builders before save.
@@ -126,12 +120,6 @@ func init() {
 	invoicehistoryDescCreatedAt := invoicehistoryMixinFields0[0].Descriptor()
 	// invoicehistory.DefaultCreatedAt holds the default value on creation for the created_at field.
 	invoicehistory.DefaultCreatedAt = invoicehistoryDescCreatedAt.Default.(func() time.Time)
-	// invoicehistoryDescUpdatedAt is the schema descriptor for updated_at field.
-	invoicehistoryDescUpdatedAt := invoicehistoryMixinFields0[1].Descriptor()
-	// invoicehistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	invoicehistory.DefaultUpdatedAt = invoicehistoryDescUpdatedAt.Default.(func() time.Time)
-	// invoicehistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	invoicehistory.UpdateDefaultUpdatedAt = invoicehistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// invoicehistoryDescID is the schema descriptor for id field.
 	invoicehistoryDescID := invoicehistoryFields[0].Descriptor()
 	// invoicehistory.DefaultID holds the default value on creation for the id field.
@@ -242,12 +230,6 @@ func init() {
 	orderhistoryDescCreatedAt := orderhistoryMixinFields0[0].Descriptor()
 	// orderhistory.DefaultCreatedAt holds the default value on creation for the created_at field.
 	orderhistory.DefaultCreatedAt = orderhistoryDescCreatedAt.Default.(func() time.Time)
-	// orderhistoryDescUpdatedAt is the schema descriptor for updated_at field.
-	orderhistoryDescUpdatedAt := orderhistoryMixinFields0[1].Descriptor()
-	// orderhistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	orderhistory.DefaultUpdatedAt = orderhistoryDescUpdatedAt.Default.(func() time.Time)
-	// orderhistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	orderhistory.UpdateDefaultUpdatedAt = orderhistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// orderhistoryDescID is the schema descriptor for id field.
 	orderhistoryDescID := orderhistoryFields[0].Descriptor()
 	// orderhistory.DefaultID holds the default value on creation for the id field.
@@ -564,21 +546,7 @@ func init() {
 	// shipmentDescID is the schema descriptor for id field.
 	shipmentDescID := shipmentMixinFields1[0].Descriptor()
 	// shipment.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	shipment.IDValidator = func() func(string) error {
-		validators := shipmentDescID.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(id string) error {
-			for _, fn := range fns {
-				if err := fn(id); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	shipment.IDValidator = shipmentDescID.Validators[0].(func(string) error)
 	shipmenthistoryMixin := schema.ShipmentHistory{}.Mixin()
 	shipmenthistoryMixinFields0 := shipmenthistoryMixin[0].Fields()
 	_ = shipmenthistoryMixinFields0
@@ -588,12 +556,6 @@ func init() {
 	shipmenthistoryDescCreatedAt := shipmenthistoryMixinFields0[0].Descriptor()
 	// shipmenthistory.DefaultCreatedAt holds the default value on creation for the created_at field.
 	shipmenthistory.DefaultCreatedAt = shipmenthistoryDescCreatedAt.Default.(func() time.Time)
-	// shipmenthistoryDescUpdatedAt is the schema descriptor for updated_at field.
-	shipmenthistoryDescUpdatedAt := shipmenthistoryMixinFields0[1].Descriptor()
-	// shipmenthistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	shipmenthistory.DefaultUpdatedAt = shipmenthistoryDescUpdatedAt.Default.(func() time.Time)
-	// shipmenthistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	shipmenthistory.UpdateDefaultUpdatedAt = shipmenthistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// shipmenthistoryDescShipmentID is the schema descriptor for shipment_id field.
 	shipmenthistoryDescShipmentID := shipmenthistoryFields[1].Descriptor()
 	// shipmenthistory.ShipmentIDValidator is a validator for the "shipment_id" field. It is called by the builders before save.

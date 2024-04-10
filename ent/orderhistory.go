@@ -22,9 +22,7 @@ type OrderHistory struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uuid.UUID `json:"order_id,omitempty"`
 	// PersonID holds the value of the "person_id" field.
@@ -109,7 +107,7 @@ func (*OrderHistory) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case orderhistory.FieldDescription:
 			values[i] = new(sql.NullString)
-		case orderhistory.FieldCreatedAt, orderhistory.FieldUpdatedAt:
+		case orderhistory.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case orderhistory.FieldID, orderhistory.FieldOrderID, orderhistory.FieldPersonID:
 			values[i] = new(uuid.UUID)
@@ -138,13 +136,8 @@ func (oh *OrderHistory) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				oh.CreatedAt = value.Time
-			}
-		case orderhistory.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				oh.UpdatedAt = value.Time
+				oh.CreatedAt = new(time.Time)
+				*oh.CreatedAt = value.Time
 			}
 		case orderhistory.FieldOrderID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -235,11 +228,10 @@ func (oh *OrderHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrderHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", oh.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(oh.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(oh.UpdatedAt.Format(time.ANSIC))
+	if v := oh.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
 	builder.WriteString(fmt.Sprintf("%v", oh.OrderID))

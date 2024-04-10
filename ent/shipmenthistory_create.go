@@ -38,20 +38,6 @@ func (shc *ShipmentHistoryCreate) SetNillableCreatedAt(t *time.Time) *ShipmentHi
 	return shc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (shc *ShipmentHistoryCreate) SetUpdatedAt(t time.Time) *ShipmentHistoryCreate {
-	shc.mutation.SetUpdatedAt(t)
-	return shc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (shc *ShipmentHistoryCreate) SetNillableUpdatedAt(t *time.Time) *ShipmentHistoryCreate {
-	if t != nil {
-		shc.SetUpdatedAt(*t)
-	}
-	return shc
-}
-
 // SetShipmentID sets the "shipment_id" field.
 func (shc *ShipmentHistoryCreate) SetShipmentID(s string) *ShipmentHistoryCreate {
 	shc.mutation.SetShipmentID(s)
@@ -207,10 +193,6 @@ func (shc *ShipmentHistoryCreate) defaults() {
 		v := shipmenthistory.DefaultCreatedAt()
 		shc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := shc.mutation.UpdatedAt(); !ok {
-		v := shipmenthistory.DefaultUpdatedAt()
-		shc.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := shc.mutation.ID(); !ok {
 		v := shipmenthistory.DefaultID()
 		shc.mutation.SetID(v)
@@ -221,9 +203,6 @@ func (shc *ShipmentHistoryCreate) defaults() {
 func (shc *ShipmentHistoryCreate) check() error {
 	if _, ok := shc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ShipmentHistory.created_at"`)}
-	}
-	if _, ok := shc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ShipmentHistory.updated_at"`)}
 	}
 	if _, ok := shc.mutation.ShipmentID(); !ok {
 		return &ValidationError{Name: "shipment_id", err: errors.New(`ent: missing required field "ShipmentHistory.shipment_id"`)}
@@ -279,11 +258,7 @@ func (shc *ShipmentHistoryCreate) createSpec() (*ShipmentHistory, *sqlgraph.Crea
 	}
 	if value, ok := shc.mutation.CreatedAt(); ok {
 		_spec.SetField(shipmenthistory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := shc.mutation.UpdatedAt(); ok {
-		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := shc.mutation.Description(); ok {
 		_spec.SetField(shipmenthistory.FieldDescription, field.TypeString, value)

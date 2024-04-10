@@ -206,11 +206,11 @@ func (cc *ConversationCreate) createSpec() (*Conversation, *sqlgraph.CreateSpec)
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(conversation.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := cc.mutation.UpdatedAt(); ok {
 		_spec.SetField(conversation.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := cc.mutation.Title(); ok {
 		_spec.SetField(conversation.FieldTitle, field.TypeString, value)

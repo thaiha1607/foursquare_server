@@ -73,6 +73,6 @@ func (InvoiceHistory) Edges() []ent.Edge {
 // Mixin of the InvoiceHistory.
 func (InvoiceHistory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		TimeMixin{},
+		CreationTimeMixin{},
 	}
 }

@@ -18,9 +18,9 @@ type ProductInfo struct {
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -100,13 +100,15 @@ func (pi *ProductInfo) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pi.CreatedAt = value.Time
+				pi.CreatedAt = new(time.Time)
+				*pi.CreatedAt = value.Time
 			}
 		case productinfo.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pi.UpdatedAt = value.Time
+				pi.UpdatedAt = new(time.Time)
+				*pi.UpdatedAt = value.Time
 			}
 		case productinfo.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -181,11 +183,15 @@ func (pi *ProductInfo) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductInfo(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pi.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pi.CreatedAt.Format(time.ANSIC))
+	if v := pi.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pi.UpdatedAt.Format(time.ANSIC))
+	if v := pi.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(pi.Name)

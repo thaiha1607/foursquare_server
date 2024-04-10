@@ -397,11 +397,11 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := oc.mutation.CreatedAt(); ok {
 		_spec.SetField(order.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := oc.mutation.UpdatedAt(); ok {
 		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := oc.mutation.Note(); ok {
 		_spec.SetField(order.FieldNote, field.TypeString, value)
@@ -409,11 +409,11 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := oc.mutation.Priority(); ok {
 		_spec.SetField(order.FieldPriority, field.TypeInt, value)
-		_node.Priority = value
+		_node.Priority = &value
 	}
 	if value, ok := oc.mutation.GetType(); ok {
 		_spec.SetField(order.FieldType, field.TypeEnum, value)
-		_node.Type = value
+		_node.Type = &value
 	}
 	if value, ok := oc.mutation.InternalNote(); ok {
 		_spec.SetField(order.FieldInternalNote, field.TypeString, value)
@@ -421,7 +421,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := oc.mutation.IsInternal(); ok {
 		_spec.SetField(order.FieldIsInternal, field.TypeBool, value)
-		_node.IsInternal = value
+		_node.IsInternal = &value
 	}
 	if nodes := oc.mutation.CustomerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

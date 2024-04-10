@@ -28,6 +28,7 @@ func (Invoice) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}).
+			Nillable().
 			Immutable(),
 		field.String("note").
 			Optional().
@@ -47,6 +48,7 @@ func (Invoice) Fields() []ent.Field {
 				"Recurring", "RECURRING",
 				"Other", "OTHER",
 			).Default("PRO_FORMA").
+			Nillable().
 			Immutable(),
 		/*
 			Status we might want to consider:
@@ -62,6 +64,7 @@ func (Invoice) Fields() []ent.Field {
 			- Other
 		*/
 		field.Int("status_code").
+			Nillable().
 			Default(1),
 		field.Enum("payment_method").
 			NamedValues(
@@ -74,7 +77,6 @@ func (Invoice) Fields() []ent.Field {
 				"Check", "CHECK",
 				"Other", "OTHER",
 			).Default("CASH").
-			Optional().
 			Nillable(),
 	}
 }

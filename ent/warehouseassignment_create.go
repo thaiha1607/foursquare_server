@@ -253,15 +253,15 @@ func (wac *WarehouseAssignmentCreate) createSpec() (*WarehouseAssignment, *sqlgr
 	}
 	if value, ok := wac.mutation.CreatedAt(); ok {
 		_spec.SetField(warehouseassignment.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := wac.mutation.UpdatedAt(); ok {
 		_spec.SetField(warehouseassignment.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := wac.mutation.Status(); ok {
 		_spec.SetField(warehouseassignment.FieldStatus, field.TypeEnum, value)
-		_node.Status = value
+		_node.Status = &value
 	}
 	if value, ok := wac.mutation.Note(); ok {
 		_spec.SetField(warehouseassignment.FieldNote, field.TypeString, value)

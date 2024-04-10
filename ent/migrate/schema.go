@@ -13,7 +13,6 @@ var (
 	AddressesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "line1", Type: field.TypeString},
 		{Name: "line2", Type: field.TypeString, Nullable: true},
 		{Name: "city", Type: field.TypeString},
@@ -72,7 +71,7 @@ var (
 		{Name: "total", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(12,2)", "postgres": "numeric(12,2)"}},
 		{Name: "note", Type: field.TypeString, Nullable: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"PRO_FORMA", "REGULAR", "PAST_DUE", "INTERIM", "TIMESHEET", "FINAL", "CREDIT", "DEBIT", "MIXED", "COMMERCIAL", "RECURRING", "OTHER"}, Default: "PRO_FORMA"},
-		{Name: "payment_method", Type: field.TypeEnum, Nullable: true, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
+		{Name: "payment_method", Type: field.TypeEnum, Enums: []string{"CASH", "ELECTRONIC_FUNDS_TRANSFER", "GIFT_CARD", "CREDIT_CARD", "DEBIT_CARD", "PREPAID_CARD", "CHECK", "OTHER"}, Default: "CASH"},
 		{Name: "order_id", Type: field.TypeUUID},
 		{Name: "status_code", Type: field.TypeInt, Default: 1},
 	}
@@ -100,7 +99,6 @@ var (
 	InvoiceHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "invoice_id", Type: field.TypeUUID},
 		{Name: "person_id", Type: field.TypeUUID},
@@ -115,25 +113,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "invoice_history_invoices_invoice",
-				Columns:    []*schema.Column{InvoiceHistoryColumns[4]},
+				Columns:    []*schema.Column{InvoiceHistoryColumns[3]},
 				RefColumns: []*schema.Column{InvoicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "invoice_history_persons_person",
-				Columns:    []*schema.Column{InvoiceHistoryColumns[5]},
+				Columns:    []*schema.Column{InvoiceHistoryColumns[4]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "invoice_history_invoice_status_codes_old_status",
-				Columns:    []*schema.Column{InvoiceHistoryColumns[6]},
+				Columns:    []*schema.Column{InvoiceHistoryColumns[5]},
 				RefColumns: []*schema.Column{InvoiceStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "invoice_history_invoice_status_codes_new_status",
-				Columns:    []*schema.Column{InvoiceHistoryColumns[7]},
+				Columns:    []*schema.Column{InvoiceHistoryColumns[6]},
 				RefColumns: []*schema.Column{InvoiceStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -248,7 +246,6 @@ var (
 	OrderHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "order_id", Type: field.TypeUUID},
 		{Name: "person_id", Type: field.TypeUUID},
@@ -263,25 +260,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "order_history_orders_order",
-				Columns:    []*schema.Column{OrderHistoryColumns[4]},
+				Columns:    []*schema.Column{OrderHistoryColumns[3]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "order_history_persons_person",
-				Columns:    []*schema.Column{OrderHistoryColumns[5]},
+				Columns:    []*schema.Column{OrderHistoryColumns[4]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "order_history_order_status_codes_old_status",
-				Columns:    []*schema.Column{OrderHistoryColumns[6]},
+				Columns:    []*schema.Column{OrderHistoryColumns[5]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "order_history_order_status_codes_new_status",
-				Columns:    []*schema.Column{OrderHistoryColumns[7]},
+				Columns:    []*schema.Column{OrderHistoryColumns[6]},
 				RefColumns: []*schema.Column{OrderStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -584,7 +581,6 @@ var (
 	ShipmentHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "shipment_id", Type: field.TypeString},
 		{Name: "person_id", Type: field.TypeUUID},
@@ -599,25 +595,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "shipment_history_shipments_shipment",
-				Columns:    []*schema.Column{ShipmentHistoryColumns[4]},
+				Columns:    []*schema.Column{ShipmentHistoryColumns[3]},
 				RefColumns: []*schema.Column{ShipmentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "shipment_history_persons_person",
-				Columns:    []*schema.Column{ShipmentHistoryColumns[5]},
+				Columns:    []*schema.Column{ShipmentHistoryColumns[4]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "shipment_history_shipment_status_codes_old_status",
-				Columns:    []*schema.Column{ShipmentHistoryColumns[6]},
+				Columns:    []*schema.Column{ShipmentHistoryColumns[5]},
 				RefColumns: []*schema.Column{ShipmentStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "shipment_history_shipment_status_codes_new_status",
-				Columns:    []*schema.Column{ShipmentHistoryColumns[7]},
+				Columns:    []*schema.Column{ShipmentHistoryColumns[6]},
 				RefColumns: []*schema.Column{ShipmentStatusCodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

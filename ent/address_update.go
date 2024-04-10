@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,12 +26,6 @@ type AddressUpdate struct {
 // Where appends a list predicates to the AddressUpdate builder.
 func (au *AddressUpdate) Where(ps ...predicate.Address) *AddressUpdate {
 	au.mutation.Where(ps...)
-	return au
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (au *AddressUpdate) SetUpdatedAt(t time.Time) *AddressUpdate {
-	au.mutation.SetUpdatedAt(t)
 	return au
 }
 
@@ -79,7 +72,6 @@ func (au *AddressUpdate) RemovePersons(p ...*Person) *AddressUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AddressUpdate) Save(ctx context.Context) (int, error) {
-	au.defaults()
 	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
@@ -105,14 +97,6 @@ func (au *AddressUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (au *AddressUpdate) defaults() {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
-		v := address.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
-	}
-}
-
 func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeUUID))
 	if ps := au.mutation.predicates; len(ps) > 0 {
@@ -121,9 +105,6 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
-		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if au.mutation.Line2Cleared() {
 		_spec.ClearField(address.FieldLine2, field.TypeString)
@@ -208,12 +189,6 @@ type AddressUpdateOne struct {
 	mutation *AddressMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (auo *AddressUpdateOne) SetUpdatedAt(t time.Time) *AddressUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
-	return auo
-}
-
 // AddPersonIDs adds the "persons" edge to the Person entity by IDs.
 func (auo *AddressUpdateOne) AddPersonIDs(ids ...uuid.UUID) *AddressUpdateOne {
 	auo.mutation.AddPersonIDs(ids...)
@@ -270,7 +245,6 @@ func (auo *AddressUpdateOne) Select(field string, fields ...string) *AddressUpda
 
 // Save executes the query and returns the updated Address entity.
 func (auo *AddressUpdateOne) Save(ctx context.Context) (*Address, error) {
-	auo.defaults()
 	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
@@ -293,14 +267,6 @@ func (auo *AddressUpdateOne) Exec(ctx context.Context) error {
 func (auo *AddressUpdateOne) ExecX(ctx context.Context) {
 	if err := auo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (auo *AddressUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
-		v := address.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -329,9 +295,6 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
-		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if auo.mutation.Line2Cleared() {
 		_spec.ClearField(address.FieldLine2, field.TypeString)

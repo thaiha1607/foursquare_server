@@ -38,7 +38,7 @@ func (e *entWarehouseAssignmentRepository) Store(ctx context.Context, obj *ent.W
 		SetOrderID(obj.OrderID).
 		SetWorkUnitID(obj.WorkUnitID).
 		SetNillableStaffID(obj.StaffID).
-		SetNillableStatus(&obj.Status).
+		SetNillableStatus(obj.Status).
 		SetNillableNote(obj.Note).
 		Save(ctx)
 	return
@@ -48,7 +48,7 @@ func (e *entWarehouseAssignmentRepository) Update(ctx context.Context, id uuid.U
 	res, err = e.Client.WarehouseAssignment.
 		UpdateOneID(id).
 		SetNillableStaffID(obj.StaffID).
-		SetNillableStatus(&obj.Status).
+		SetNillableStatus(obj.Status).
 		SetNillableNote(obj.Note).
 		Save(ctx)
 	return

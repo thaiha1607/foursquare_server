@@ -19,9 +19,7 @@ type Address struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// Line1 holds the value of the "line1" field.
 	Line1 string `json:"line1,omitempty"`
 	// Line2 holds the value of the "line2" field.
@@ -78,7 +76,7 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case address.FieldLine1, address.FieldLine2, address.FieldCity, address.FieldStateOrProvince, address.FieldZipOrPostcode, address.FieldCountry, address.FieldOtherAddressDetails:
 			values[i] = new(sql.NullString)
-		case address.FieldCreatedAt, address.FieldUpdatedAt:
+		case address.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case address.FieldID:
 			values[i] = new(uuid.UUID)
@@ -107,13 +105,8 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
-			}
-		case address.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				a.CreatedAt = new(time.Time)
+				*a.CreatedAt = value.Time
 			}
 		case address.FieldLine1:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -205,11 +198,10 @@ func (a *Address) String() string {
 	var builder strings.Builder
 	builder.WriteString("Address(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	if v := a.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("line1=")
 	builder.WriteString(a.Line1)

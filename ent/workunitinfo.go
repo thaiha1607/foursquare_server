@@ -20,15 +20,15 @@ type WorkUnitInfo struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// AddressID holds the value of the "address_id" field.
 	AddressID *uuid.UUID `json:"address_id,omitempty"`
 	// Type holds the value of the "type" field.
-	Type workunitinfo.Type `json:"type,omitempty"`
+	Type *workunitinfo.Type `json:"type,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
 	ImageURL *string `json:"image_url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -95,13 +95,15 @@ func (wui *WorkUnitInfo) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				wui.CreatedAt = value.Time
+				wui.CreatedAt = new(time.Time)
+				*wui.CreatedAt = value.Time
 			}
 		case workunitinfo.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				wui.UpdatedAt = value.Time
+				wui.UpdatedAt = new(time.Time)
+				*wui.UpdatedAt = value.Time
 			}
 		case workunitinfo.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -120,7 +122,8 @@ func (wui *WorkUnitInfo) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				wui.Type = workunitinfo.Type(value.String)
+				wui.Type = new(workunitinfo.Type)
+				*wui.Type = workunitinfo.Type(value.String)
 			}
 		case workunitinfo.FieldImageURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -170,11 +173,15 @@ func (wui *WorkUnitInfo) String() string {
 	var builder strings.Builder
 	builder.WriteString("WorkUnitInfo(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", wui.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(wui.CreatedAt.Format(time.ANSIC))
+	if v := wui.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(wui.UpdatedAt.Format(time.ANSIC))
+	if v := wui.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(wui.Name)
@@ -184,8 +191,10 @@ func (wui *WorkUnitInfo) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", wui.Type))
+	if v := wui.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := wui.ImageURL; v != nil {
 		builder.WriteString("image_url=")

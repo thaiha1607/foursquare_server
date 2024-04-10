@@ -37,7 +37,7 @@ func (e *entMessageRepository) Store(ctx context.Context, obj *ent.Message) (res
 		Create().
 		SetConversationID(obj.ConversationID).
 		SetSenderID(obj.SenderID).
-		SetNillableType(&obj.Type).
+		SetNillableType(obj.Type).
 		SetContent(obj.Content).
 		Save(ctx)
 	return
@@ -47,7 +47,7 @@ func (e *entMessageRepository) Update(ctx context.Context, id uuid.UUID, obj *en
 	res, err = e.Client.Message.
 		UpdateOneID(id).
 		SetNillableContent(&obj.Content).
-		SetNillableIsRead(&obj.IsRead).
+		SetNillableIsRead(obj.IsRead).
 		Save(ctx)
 	return
 }

@@ -19,9 +19,9 @@ import (
 type PersonAddress struct {
 	config `json:"-"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// PersonID holds the value of the "person_id" field.
 	PersonID uuid.UUID `json:"person_id,omitempty"`
 	// AddressID holds the value of the "address_id" field.
@@ -93,13 +93,15 @@ func (pa *PersonAddress) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pa.CreatedAt = value.Time
+				pa.CreatedAt = new(time.Time)
+				*pa.CreatedAt = value.Time
 			}
 		case personaddress.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pa.UpdatedAt = value.Time
+				pa.UpdatedAt = new(time.Time)
+				*pa.UpdatedAt = value.Time
 			}
 		case personaddress.FieldPersonID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -158,11 +160,15 @@ func (pa *PersonAddress) Unwrap() *PersonAddress {
 func (pa *PersonAddress) String() string {
 	var builder strings.Builder
 	builder.WriteString("PersonAddress(")
-	builder.WriteString("created_at=")
-	builder.WriteString(pa.CreatedAt.Format(time.ANSIC))
+	if v := pa.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pa.UpdatedAt.Format(time.ANSIC))
+	if v := pa.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("person_id=")
 	builder.WriteString(fmt.Sprintf("%v", pa.PersonID))

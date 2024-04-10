@@ -186,11 +186,11 @@ func (pcc *ProductColorCreate) createSpec() (*ProductColor, *sqlgraph.CreateSpec
 	}
 	if value, ok := pcc.mutation.CreatedAt(); ok {
 		_spec.SetField(productcolor.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := pcc.mutation.UpdatedAt(); ok {
 		_spec.SetField(productcolor.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := pcc.mutation.Name(); ok {
 		_spec.SetField(productcolor.FieldName, field.TypeString, value)

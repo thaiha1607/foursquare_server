@@ -217,19 +217,19 @@ func (sic *ShipmentItemCreate) createSpec() (*ShipmentItem, *sqlgraph.CreateSpec
 	}
 	if value, ok := sic.mutation.CreatedAt(); ok {
 		_spec.SetField(shipmentitem.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := sic.mutation.UpdatedAt(); ok {
 		_spec.SetField(shipmentitem.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := sic.mutation.Qty(); ok {
 		_spec.SetField(shipmentitem.FieldQty, field.TypeFloat64, value)
-		_node.Qty = value
+		_node.Qty = &value
 	}
 	if value, ok := sic.mutation.Total(); ok {
 		_spec.SetField(shipmentitem.FieldTotal, field.TypeFloat64, value)
-		_node.Total = value
+		_node.Total = &value
 	}
 	if nodes := sic.mutation.ShipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

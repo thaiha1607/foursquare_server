@@ -37,7 +37,7 @@ func (e *entWorkUnitInfoRepository) Store(ctx context.Context, obj *ent.WorkUnit
 		Create().
 		SetName(obj.Name).
 		SetNillableAddressID(obj.AddressID).
-		SetNillableType(&obj.Type).
+		SetNillableType(obj.Type).
 		SetNillableImageURL(obj.ImageURL).
 		Save(ctx)
 	return
@@ -47,7 +47,7 @@ func (e *entWorkUnitInfoRepository) Update(ctx context.Context, id uuid.UUID, ob
 	res, err = e.Client.WorkUnitInfo.
 		UpdateOneID(id).
 		SetNillableAddressID(obj.AddressID).
-		SetNillableType(&obj.Type).
+		SetNillableType(obj.Type).
 		SetNillableImageURL(obj.ImageURL).
 		Save(ctx)
 	return

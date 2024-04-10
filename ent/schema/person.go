@@ -65,15 +65,19 @@ func (Person) Fields() []ent.Field {
 				"Warehouse", "WAREHOUSE",
 				"Delivery", "DELIVERY",
 				"Management", "MANAGEMENT",
-			).Default("CUSTOMER"),
+			).
+			Nillable().
+			Default("CUSTOMER"),
 		field.Bytes("password_hash").
 			NotEmpty().
 			Optional().
 			Nillable().
 			Sensitive(),
 		field.Bool("is_email_verified").
+			Nillable().
 			Default(false),
 		field.Bool("is_phone_verified").
+			Nillable().
 			Default(false),
 		field.UUID("work_unit_id", uuid.UUID{}).
 			Optional().

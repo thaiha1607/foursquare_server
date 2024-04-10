@@ -18,9 +18,9 @@ type OrderStatusCode struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// OrderStatus holds the value of the "order_status" field.
 	OrderStatus  string `json:"order_status,omitempty"`
 	selectValues sql.SelectValues
@@ -62,13 +62,15 @@ func (osc *OrderStatusCode) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				osc.CreatedAt = value.Time
+				osc.CreatedAt = new(time.Time)
+				*osc.CreatedAt = value.Time
 			}
 		case orderstatuscode.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				osc.UpdatedAt = value.Time
+				osc.UpdatedAt = new(time.Time)
+				*osc.UpdatedAt = value.Time
 			}
 		case orderstatuscode.FieldOrderStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,11 +114,15 @@ func (osc *OrderStatusCode) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrderStatusCode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", osc.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(osc.CreatedAt.Format(time.ANSIC))
+	if v := osc.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(osc.UpdatedAt.Format(time.ANSIC))
+	if v := osc.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("order_status=")
 	builder.WriteString(osc.OrderStatus)

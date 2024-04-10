@@ -40,12 +40,14 @@ func (ProductQty) Fields() []ent.Field {
 			NotEmpty(),
 		field.Float("price_per_unit").
 			GoType(decimal.Decimal{}).
+			Nillable().
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}),
 		field.Float("qty").
 			GoType(decimal.Decimal{}).
+			Nillable().
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",

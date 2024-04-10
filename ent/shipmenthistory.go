@@ -22,9 +22,7 @@ type ShipmentHistory struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// ShipmentID holds the value of the "shipment_id" field.
 	ShipmentID string `json:"shipment_id,omitempty"`
 	// PersonID holds the value of the "person_id" field.
@@ -109,7 +107,7 @@ func (*ShipmentHistory) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case shipmenthistory.FieldShipmentID, shipmenthistory.FieldDescription:
 			values[i] = new(sql.NullString)
-		case shipmenthistory.FieldCreatedAt, shipmenthistory.FieldUpdatedAt:
+		case shipmenthistory.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case shipmenthistory.FieldID, shipmenthistory.FieldPersonID:
 			values[i] = new(uuid.UUID)
@@ -138,13 +136,8 @@ func (sh *ShipmentHistory) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				sh.CreatedAt = value.Time
-			}
-		case shipmenthistory.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				sh.UpdatedAt = value.Time
+				sh.CreatedAt = new(time.Time)
+				*sh.CreatedAt = value.Time
 			}
 		case shipmenthistory.FieldShipmentID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -235,11 +228,10 @@ func (sh *ShipmentHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("ShipmentHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", sh.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(sh.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(sh.UpdatedAt.Format(time.ANSIC))
+	if v := sh.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("shipment_id=")
 	builder.WriteString(sh.ShipmentID)

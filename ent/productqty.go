@@ -23,9 +23,9 @@ type ProductQty struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// WorkUnitID holds the value of the "work_unit_id" field.
 	WorkUnitID uuid.UUID `json:"work_unit_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
@@ -33,9 +33,9 @@ type ProductQty struct {
 	// ProductColorID holds the value of the "product_color_id" field.
 	ProductColorID string `json:"product_color_id,omitempty"`
 	// PricePerUnit holds the value of the "price_per_unit" field.
-	PricePerUnit decimal.Decimal `json:"price_per_unit,omitempty"`
+	PricePerUnit *decimal.Decimal `json:"price_per_unit,omitempty"`
 	// Qty holds the value of the "qty" field.
-	Qty decimal.Decimal `json:"qty,omitempty"`
+	Qty *decimal.Decimal `json:"qty,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQtyQuery when eager-loading is set.
 	Edges        ProductQtyEdges `json:"edges"`
@@ -94,7 +94,7 @@ func (*ProductQty) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case productqty.FieldPricePerUnit, productqty.FieldQty:
-			values[i] = new(decimal.Decimal)
+			values[i] = &sql.NullScanner{S: new(decimal.Decimal)}
 		case productqty.FieldProductID, productqty.FieldProductColorID:
 			values[i] = new(sql.NullString)
 		case productqty.FieldCreatedAt, productqty.FieldUpdatedAt:
@@ -126,13 +126,15 @@ func (pq *ProductQty) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pq.CreatedAt = value.Time
+				pq.CreatedAt = new(time.Time)
+				*pq.CreatedAt = value.Time
 			}
 		case productqty.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pq.UpdatedAt = value.Time
+				pq.UpdatedAt = new(time.Time)
+				*pq.UpdatedAt = value.Time
 			}
 		case productqty.FieldWorkUnitID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -153,16 +155,18 @@ func (pq *ProductQty) assignValues(columns []string, values []any) error {
 				pq.ProductColorID = value.String
 			}
 		case productqty.FieldPricePerUnit:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field price_per_unit", values[i])
-			} else if value != nil {
-				pq.PricePerUnit = *value
+			} else if value.Valid {
+				pq.PricePerUnit = new(decimal.Decimal)
+				*pq.PricePerUnit = *value.S.(*decimal.Decimal)
 			}
 		case productqty.FieldQty:
-			if value, ok := values[i].(*decimal.Decimal); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field qty", values[i])
-			} else if value != nil {
-				pq.Qty = *value
+			} else if value.Valid {
+				pq.Qty = new(decimal.Decimal)
+				*pq.Qty = *value.S.(*decimal.Decimal)
 			}
 		default:
 			pq.selectValues.Set(columns[i], values[i])
@@ -215,11 +219,15 @@ func (pq *ProductQty) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductQty(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pq.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pq.CreatedAt.Format(time.ANSIC))
+	if v := pq.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pq.UpdatedAt.Format(time.ANSIC))
+	if v := pq.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("work_unit_id=")
 	builder.WriteString(fmt.Sprintf("%v", pq.WorkUnitID))
@@ -230,11 +238,15 @@ func (pq *ProductQty) String() string {
 	builder.WriteString("product_color_id=")
 	builder.WriteString(pq.ProductColorID)
 	builder.WriteString(", ")
-	builder.WriteString("price_per_unit=")
-	builder.WriteString(fmt.Sprintf("%v", pq.PricePerUnit))
+	if v := pq.PricePerUnit; v != nil {
+		builder.WriteString("price_per_unit=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("qty=")
-	builder.WriteString(fmt.Sprintf("%v", pq.Qty))
+	if v := pq.Qty; v != nil {
+		builder.WriteString("qty=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -44,9 +44,9 @@ func (e *entOrderItemRepository) Store(ctx context.Context, obj *ent.OrderItem) 
 		SetProductColorID(obj.ProductColorID).
 		SetNillableSrcUnitID(obj.SrcUnitID).
 		SetNillableDstUnitID(obj.DstUnitID).
-		SetQty(obj.Qty).
-		SetPricePerUnit(obj.PricePerUnit).
-		SetNillableStatus(&obj.Status).
+		SetQty(*obj.Qty).
+		SetPricePerUnit(*obj.PricePerUnit).
+		SetNillableStatus(obj.Status).
 		Save(ctx)
 	return
 }
@@ -54,9 +54,9 @@ func (e *entOrderItemRepository) Store(ctx context.Context, obj *ent.OrderItem) 
 func (e *entOrderItemRepository) Update(ctx context.Context, id uuid.UUID, obj *ent.OrderItem) (res *ent.OrderItem, err error) {
 	res, err = e.Client.OrderItem.
 		UpdateOneID(id).
-		SetNillableQty(&obj.Qty).
-		SetNillablePricePerUnit(&obj.PricePerUnit).
-		SetNillableStatus(&obj.Status).
+		SetNillableQty(obj.Qty).
+		SetNillablePricePerUnit(obj.PricePerUnit).
+		SetNillableStatus(obj.Status).
 		Save(ctx)
 	return
 }

@@ -73,6 +73,6 @@ func (OrderHistory) Edges() []ent.Edge {
 // Mixin of the OrderHistory.
 func (OrderHistory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		TimeMixin{},
+		CreationTimeMixin{},
 	}
 }

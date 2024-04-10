@@ -41,6 +41,7 @@ func (ShipmentItem) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}).
+			Nillable().
 			Immutable(),
 		field.Float("total").
 			GoType(decimal.Decimal{}).
@@ -48,6 +49,7 @@ func (ShipmentItem) Fields() []ent.Field {
 				dialect.Postgres: "numeric(12,2)",
 				dialect.MySQL:    "decimal(12,2)",
 			}).
+			Nillable().
 			Immutable(),
 	}
 }

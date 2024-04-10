@@ -323,23 +323,23 @@ func (oic *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := oic.mutation.CreatedAt(); ok {
 		_spec.SetField(orderitem.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := oic.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderitem.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	if value, ok := oic.mutation.Qty(); ok {
 		_spec.SetField(orderitem.FieldQty, field.TypeFloat64, value)
-		_node.Qty = value
+		_node.Qty = &value
 	}
 	if value, ok := oic.mutation.PricePerUnit(); ok {
 		_spec.SetField(orderitem.FieldPricePerUnit, field.TypeFloat64, value)
-		_node.PricePerUnit = value
+		_node.PricePerUnit = &value
 	}
 	if value, ok := oic.mutation.Status(); ok {
 		_spec.SetField(orderitem.FieldStatus, field.TypeEnum, value)
-		_node.Status = value
+		_node.Status = &value
 	}
 	if nodes := oic.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

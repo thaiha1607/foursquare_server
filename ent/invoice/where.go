@@ -362,16 +362,6 @@ func PaymentMethodNotIn(vs ...PaymentMethod) predicate.Invoice {
 	return predicate.Invoice(sql.FieldNotIn(FieldPaymentMethod, vs...))
 }
 
-// PaymentMethodIsNil applies the IsNil predicate on the "payment_method" field.
-func PaymentMethodIsNil() predicate.Invoice {
-	return predicate.Invoice(sql.FieldIsNull(FieldPaymentMethod))
-}
-
-// PaymentMethodNotNil applies the NotNil predicate on the "payment_method" field.
-func PaymentMethodNotNil() predicate.Invoice {
-	return predicate.Invoice(sql.FieldNotNull(FieldPaymentMethod))
-}
-
 // HasOrder applies the HasEdge predicate on the "order" edge.
 func HasOrder() predicate.Invoice {
 	return predicate.Invoice(func(s *sql.Selector) {

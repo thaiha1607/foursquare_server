@@ -74,6 +74,6 @@ func (ShipmentHistory) Edges() []ent.Edge {
 // Mixin of the ShipmentHistory.
 func (ShipmentHistory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		TimeMixin{},
+		CreationTimeMixin{},
 	}
 }

@@ -37,9 +37,9 @@ func (e *entShipmentRepository) Store(ctx context.Context, obj *ent.Shipment) (r
 		SetOrderID(obj.OrderID).
 		SetInvoiceID(obj.InvoiceID).
 		SetStaffID(obj.StaffID).
-		SetShipmentDate(obj.ShipmentDate).
+		SetShipmentDate(*obj.ShipmentDate).
 		SetNillableNote(obj.Note).
-		SetNillableStatusCode(&obj.StatusCode).
+		SetNillableStatusCode(obj.StatusCode).
 		Save(ctx)
 	return
 }
@@ -47,9 +47,9 @@ func (e *entShipmentRepository) Store(ctx context.Context, obj *ent.Shipment) (r
 func (e *entShipmentRepository) Update(ctx context.Context, id string, obj *ent.Shipment) (res *ent.Shipment, err error) {
 	res, err = e.Client.Shipment.
 		UpdateOneID(id).
-		SetNillableShipmentDate(&obj.ShipmentDate).
+		SetNillableShipmentDate(obj.ShipmentDate).
 		SetNillableNote(obj.Note).
-		SetNillableStatusCode(&obj.StatusCode).
+		SetNillableStatusCode(obj.StatusCode).
 		Save(ctx)
 	return
 }

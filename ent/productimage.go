@@ -20,9 +20,9 @@ type ProductImage struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID string `json:"product_id,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
@@ -89,13 +89,15 @@ func (pi *ProductImage) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pi.CreatedAt = value.Time
+				pi.CreatedAt = new(time.Time)
+				*pi.CreatedAt = value.Time
 			}
 		case productimage.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pi.UpdatedAt = value.Time
+				pi.UpdatedAt = new(time.Time)
+				*pi.UpdatedAt = value.Time
 			}
 		case productimage.FieldProductID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -150,11 +152,15 @@ func (pi *ProductImage) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProductImage(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pi.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pi.CreatedAt.Format(time.ANSIC))
+	if v := pi.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pi.UpdatedAt.Format(time.ANSIC))
+	if v := pi.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("product_id=")
 	builder.WriteString(pi.ProductID)

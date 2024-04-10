@@ -38,20 +38,6 @@ func (ihc *InvoiceHistoryCreate) SetNillableCreatedAt(t *time.Time) *InvoiceHist
 	return ihc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ihc *InvoiceHistoryCreate) SetUpdatedAt(t time.Time) *InvoiceHistoryCreate {
-	ihc.mutation.SetUpdatedAt(t)
-	return ihc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ihc *InvoiceHistoryCreate) SetNillableUpdatedAt(t *time.Time) *InvoiceHistoryCreate {
-	if t != nil {
-		ihc.SetUpdatedAt(*t)
-	}
-	return ihc
-}
-
 // SetInvoiceID sets the "invoice_id" field.
 func (ihc *InvoiceHistoryCreate) SetInvoiceID(u uuid.UUID) *InvoiceHistoryCreate {
 	ihc.mutation.SetInvoiceID(u)
@@ -207,10 +193,6 @@ func (ihc *InvoiceHistoryCreate) defaults() {
 		v := invoicehistory.DefaultCreatedAt()
 		ihc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ihc.mutation.UpdatedAt(); !ok {
-		v := invoicehistory.DefaultUpdatedAt()
-		ihc.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := ihc.mutation.ID(); !ok {
 		v := invoicehistory.DefaultID()
 		ihc.mutation.SetID(v)
@@ -221,9 +203,6 @@ func (ihc *InvoiceHistoryCreate) defaults() {
 func (ihc *InvoiceHistoryCreate) check() error {
 	if _, ok := ihc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "InvoiceHistory.created_at"`)}
-	}
-	if _, ok := ihc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "InvoiceHistory.updated_at"`)}
 	}
 	if _, ok := ihc.mutation.InvoiceID(); !ok {
 		return &ValidationError{Name: "invoice_id", err: errors.New(`ent: missing required field "InvoiceHistory.invoice_id"`)}
@@ -274,11 +253,7 @@ func (ihc *InvoiceHistoryCreate) createSpec() (*InvoiceHistory, *sqlgraph.Create
 	}
 	if value, ok := ihc.mutation.CreatedAt(); ok {
 		_spec.SetField(invoicehistory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := ihc.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicehistory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.CreatedAt = &value
 	}
 	if value, ok := ihc.mutation.Description(); ok {
 		_spec.SetField(invoicehistory.FieldDescription, field.TypeString, value)

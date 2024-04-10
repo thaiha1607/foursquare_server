@@ -83,12 +83,6 @@ func (iu *InvoiceUpdate) SetNillablePaymentMethod(im *invoice.PaymentMethod) *In
 	return iu
 }
 
-// ClearPaymentMethod clears the value of the "payment_method" field.
-func (iu *InvoiceUpdate) ClearPaymentMethod() *InvoiceUpdate {
-	iu.mutation.ClearPaymentMethod()
-	return iu
-}
-
 // SetInvoiceStatusID sets the "invoice_status" edge to the InvoiceStatusCode entity by ID.
 func (iu *InvoiceUpdate) SetInvoiceStatusID(id int) *InvoiceUpdate {
 	iu.mutation.SetInvoiceStatusID(id)
@@ -186,9 +180,6 @@ func (iu *InvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.PaymentMethod(); ok {
 		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
-	}
-	if iu.mutation.PaymentMethodCleared() {
-		_spec.ClearField(invoice.FieldPaymentMethod, field.TypeEnum)
 	}
 	if iu.mutation.InvoiceStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -290,12 +281,6 @@ func (iuo *InvoiceUpdateOne) SetNillablePaymentMethod(im *invoice.PaymentMethod)
 	if im != nil {
 		iuo.SetPaymentMethod(*im)
 	}
-	return iuo
-}
-
-// ClearPaymentMethod clears the value of the "payment_method" field.
-func (iuo *InvoiceUpdateOne) ClearPaymentMethod() *InvoiceUpdateOne {
-	iuo.mutation.ClearPaymentMethod()
 	return iuo
 }
 
@@ -426,9 +411,6 @@ func (iuo *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err e
 	}
 	if value, ok := iuo.mutation.PaymentMethod(); ok {
 		_spec.SetField(invoice.FieldPaymentMethod, field.TypeEnum, value)
-	}
-	if iuo.mutation.PaymentMethodCleared() {
-		_spec.ClearField(invoice.FieldPaymentMethod, field.TypeEnum)
 	}
 	if iuo.mutation.InvoiceStatusCleared() {
 		edge := &sqlgraph.EdgeSpec{

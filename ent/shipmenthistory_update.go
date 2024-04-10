@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,12 +27,6 @@ func (shu *ShipmentHistoryUpdate) Where(ps ...predicate.ShipmentHistory) *Shipme
 	return shu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (shu *ShipmentHistoryUpdate) SetUpdatedAt(t time.Time) *ShipmentHistoryUpdate {
-	shu.mutation.SetUpdatedAt(t)
-	return shu
-}
-
 // Mutation returns the ShipmentHistoryMutation object of the builder.
 func (shu *ShipmentHistoryUpdate) Mutation() *ShipmentHistoryMutation {
 	return shu.mutation
@@ -41,7 +34,6 @@ func (shu *ShipmentHistoryUpdate) Mutation() *ShipmentHistoryMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (shu *ShipmentHistoryUpdate) Save(ctx context.Context) (int, error) {
-	shu.defaults()
 	return withHooks(ctx, shu.sqlSave, shu.mutation, shu.hooks)
 }
 
@@ -64,14 +56,6 @@ func (shu *ShipmentHistoryUpdate) Exec(ctx context.Context) error {
 func (shu *ShipmentHistoryUpdate) ExecX(ctx context.Context) {
 	if err := shu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (shu *ShipmentHistoryUpdate) defaults() {
-	if _, ok := shu.mutation.UpdatedAt(); !ok {
-		v := shipmenthistory.UpdateDefaultUpdatedAt()
-		shu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -98,9 +82,6 @@ func (shu *ShipmentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error
 			}
 		}
 	}
-	if value, ok := shu.mutation.UpdatedAt(); ok {
-		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if shu.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)
 	}
@@ -124,12 +105,6 @@ type ShipmentHistoryUpdateOne struct {
 	mutation *ShipmentHistoryMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (shuo *ShipmentHistoryUpdateOne) SetUpdatedAt(t time.Time) *ShipmentHistoryUpdateOne {
-	shuo.mutation.SetUpdatedAt(t)
-	return shuo
-}
-
 // Mutation returns the ShipmentHistoryMutation object of the builder.
 func (shuo *ShipmentHistoryUpdateOne) Mutation() *ShipmentHistoryMutation {
 	return shuo.mutation
@@ -150,7 +125,6 @@ func (shuo *ShipmentHistoryUpdateOne) Select(field string, fields ...string) *Sh
 
 // Save executes the query and returns the updated ShipmentHistory entity.
 func (shuo *ShipmentHistoryUpdateOne) Save(ctx context.Context) (*ShipmentHistory, error) {
-	shuo.defaults()
 	return withHooks(ctx, shuo.sqlSave, shuo.mutation, shuo.hooks)
 }
 
@@ -173,14 +147,6 @@ func (shuo *ShipmentHistoryUpdateOne) Exec(ctx context.Context) error {
 func (shuo *ShipmentHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := shuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (shuo *ShipmentHistoryUpdateOne) defaults() {
-	if _, ok := shuo.mutation.UpdatedAt(); !ok {
-		v := shipmenthistory.UpdateDefaultUpdatedAt()
-		shuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -223,9 +189,6 @@ func (shuo *ShipmentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Shipm
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := shuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(shipmenthistory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if shuo.mutation.DescriptionCleared() {
 		_spec.ClearField(shipmenthistory.FieldDescription, field.TypeString)

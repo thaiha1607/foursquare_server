@@ -18,9 +18,9 @@ type InvoiceStatusCode struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// InvoiceStatus holds the value of the "invoice_status" field.
 	InvoiceStatus string `json:"invoice_status,omitempty"`
 	selectValues  sql.SelectValues
@@ -62,13 +62,15 @@ func (isc *InvoiceStatusCode) assignValues(columns []string, values []any) error
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				isc.CreatedAt = value.Time
+				isc.CreatedAt = new(time.Time)
+				*isc.CreatedAt = value.Time
 			}
 		case invoicestatuscode.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				isc.UpdatedAt = value.Time
+				isc.UpdatedAt = new(time.Time)
+				*isc.UpdatedAt = value.Time
 			}
 		case invoicestatuscode.FieldInvoiceStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,11 +114,15 @@ func (isc *InvoiceStatusCode) String() string {
 	var builder strings.Builder
 	builder.WriteString("InvoiceStatusCode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", isc.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(isc.CreatedAt.Format(time.ANSIC))
+	if v := isc.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(isc.UpdatedAt.Format(time.ANSIC))
+	if v := isc.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("invoice_status=")
 	builder.WriteString(isc.InvoiceStatus)

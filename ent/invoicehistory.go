@@ -22,9 +22,7 @@ type InvoiceHistory struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// InvoiceID holds the value of the "invoice_id" field.
 	InvoiceID uuid.UUID `json:"invoice_id,omitempty"`
 	// PersonID holds the value of the "person_id" field.
@@ -109,7 +107,7 @@ func (*InvoiceHistory) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case invoicehistory.FieldDescription:
 			values[i] = new(sql.NullString)
-		case invoicehistory.FieldCreatedAt, invoicehistory.FieldUpdatedAt:
+		case invoicehistory.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case invoicehistory.FieldID, invoicehistory.FieldInvoiceID, invoicehistory.FieldPersonID:
 			values[i] = new(uuid.UUID)
@@ -138,13 +136,8 @@ func (ih *InvoiceHistory) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				ih.CreatedAt = value.Time
-			}
-		case invoicehistory.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				ih.UpdatedAt = value.Time
+				ih.CreatedAt = new(time.Time)
+				*ih.CreatedAt = value.Time
 			}
 		case invoicehistory.FieldInvoiceID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -235,11 +228,10 @@ func (ih *InvoiceHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("InvoiceHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ih.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(ih.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(ih.UpdatedAt.Format(time.ANSIC))
+	if v := ih.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("invoice_id=")
 	builder.WriteString(fmt.Sprintf("%v", ih.InvoiceID))

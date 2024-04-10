@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,12 +27,6 @@ func (ihu *InvoiceHistoryUpdate) Where(ps ...predicate.InvoiceHistory) *InvoiceH
 	return ihu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ihu *InvoiceHistoryUpdate) SetUpdatedAt(t time.Time) *InvoiceHistoryUpdate {
-	ihu.mutation.SetUpdatedAt(t)
-	return ihu
-}
-
 // Mutation returns the InvoiceHistoryMutation object of the builder.
 func (ihu *InvoiceHistoryUpdate) Mutation() *InvoiceHistoryMutation {
 	return ihu.mutation
@@ -41,7 +34,6 @@ func (ihu *InvoiceHistoryUpdate) Mutation() *InvoiceHistoryMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ihu *InvoiceHistoryUpdate) Save(ctx context.Context) (int, error) {
-	ihu.defaults()
 	return withHooks(ctx, ihu.sqlSave, ihu.mutation, ihu.hooks)
 }
 
@@ -64,14 +56,6 @@ func (ihu *InvoiceHistoryUpdate) Exec(ctx context.Context) error {
 func (ihu *InvoiceHistoryUpdate) ExecX(ctx context.Context) {
 	if err := ihu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ihu *InvoiceHistoryUpdate) defaults() {
-	if _, ok := ihu.mutation.UpdatedAt(); !ok {
-		v := invoicehistory.UpdateDefaultUpdatedAt()
-		ihu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -98,9 +82,6 @@ func (ihu *InvoiceHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			}
 		}
 	}
-	if value, ok := ihu.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicehistory.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if ihu.mutation.DescriptionCleared() {
 		_spec.ClearField(invoicehistory.FieldDescription, field.TypeString)
 	}
@@ -124,12 +105,6 @@ type InvoiceHistoryUpdateOne struct {
 	mutation *InvoiceHistoryMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ihuo *InvoiceHistoryUpdateOne) SetUpdatedAt(t time.Time) *InvoiceHistoryUpdateOne {
-	ihuo.mutation.SetUpdatedAt(t)
-	return ihuo
-}
-
 // Mutation returns the InvoiceHistoryMutation object of the builder.
 func (ihuo *InvoiceHistoryUpdateOne) Mutation() *InvoiceHistoryMutation {
 	return ihuo.mutation
@@ -150,7 +125,6 @@ func (ihuo *InvoiceHistoryUpdateOne) Select(field string, fields ...string) *Inv
 
 // Save executes the query and returns the updated InvoiceHistory entity.
 func (ihuo *InvoiceHistoryUpdateOne) Save(ctx context.Context) (*InvoiceHistory, error) {
-	ihuo.defaults()
 	return withHooks(ctx, ihuo.sqlSave, ihuo.mutation, ihuo.hooks)
 }
 
@@ -173,14 +147,6 @@ func (ihuo *InvoiceHistoryUpdateOne) Exec(ctx context.Context) error {
 func (ihuo *InvoiceHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := ihuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ihuo *InvoiceHistoryUpdateOne) defaults() {
-	if _, ok := ihuo.mutation.UpdatedAt(); !ok {
-		v := invoicehistory.UpdateDefaultUpdatedAt()
-		ihuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -223,9 +189,6 @@ func (ihuo *InvoiceHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Invoic
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := ihuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(invoicehistory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if ihuo.mutation.DescriptionCleared() {
 		_spec.ClearField(invoicehistory.FieldDescription, field.TypeString)

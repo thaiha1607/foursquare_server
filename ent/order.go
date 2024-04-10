@@ -22,9 +22,9 @@ type Order struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// CustomerID holds the value of the "customer_id" field.
 	CustomerID uuid.UUID `json:"customer_id,omitempty"`
 	// Note holds the value of the "note" field.
@@ -34,9 +34,9 @@ type Order struct {
 	// ParentOrderID holds the value of the "parent_order_id" field.
 	ParentOrderID *uuid.UUID `json:"parent_order_id,omitempty"`
 	// Priority holds the value of the "priority" field.
-	Priority int `json:"priority,omitempty"`
+	Priority *int `json:"priority,omitempty"`
 	// Type holds the value of the "type" field.
-	Type order.Type `json:"type,omitempty"`
+	Type *order.Type `json:"type,omitempty"`
 	// StatusCode holds the value of the "status_code" field.
 	StatusCode int `json:"status_code,omitempty"`
 	// StaffID holds the value of the "staff_id" field.
@@ -44,7 +44,7 @@ type Order struct {
 	// InternalNote holds the value of the "internal_note" field.
 	InternalNote *string `json:"internal_note,omitempty"`
 	// IsInternal holds the value of the "is_internal" field.
-	IsInternal bool `json:"is_internal,omitempty"`
+	IsInternal *bool `json:"is_internal,omitempty"`
 	// AddressID holds the value of the "address_id" field.
 	AddressID uuid.UUID `json:"address_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -180,13 +180,15 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				o.CreatedAt = value.Time
+				o.CreatedAt = new(time.Time)
+				*o.CreatedAt = value.Time
 			}
 		case order.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				o.UpdatedAt = value.Time
+				o.UpdatedAt = new(time.Time)
+				*o.UpdatedAt = value.Time
 			}
 		case order.FieldCustomerID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -218,13 +220,15 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field priority", values[i])
 			} else if value.Valid {
-				o.Priority = int(value.Int64)
+				o.Priority = new(int)
+				*o.Priority = int(value.Int64)
 			}
 		case order.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				o.Type = order.Type(value.String)
+				o.Type = new(order.Type)
+				*o.Type = order.Type(value.String)
 			}
 		case order.FieldStatusCode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -250,7 +254,8 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_internal", values[i])
 			} else if value.Valid {
-				o.IsInternal = value.Bool
+				o.IsInternal = new(bool)
+				*o.IsInternal = value.Bool
 			}
 		case order.FieldAddressID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -324,11 +329,15 @@ func (o *Order) String() string {
 	var builder strings.Builder
 	builder.WriteString("Order(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", o.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(o.CreatedAt.Format(time.ANSIC))
+	if v := o.CreatedAt; v != nil {
+		builder.WriteString("created_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(o.UpdatedAt.Format(time.ANSIC))
+	if v := o.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("customer_id=")
 	builder.WriteString(fmt.Sprintf("%v", o.CustomerID))
@@ -346,11 +355,15 @@ func (o *Order) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("priority=")
-	builder.WriteString(fmt.Sprintf("%v", o.Priority))
+	if v := o.Priority; v != nil {
+		builder.WriteString("priority=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", o.Type))
+	if v := o.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status_code=")
 	builder.WriteString(fmt.Sprintf("%v", o.StatusCode))
@@ -365,8 +378,10 @@ func (o *Order) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("is_internal=")
-	builder.WriteString(fmt.Sprintf("%v", o.IsInternal))
+	if v := o.IsInternal; v != nil {
+		builder.WriteString("is_internal=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("address_id=")
 	builder.WriteString(fmt.Sprintf("%v", o.AddressID))
